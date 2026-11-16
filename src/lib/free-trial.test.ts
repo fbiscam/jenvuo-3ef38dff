@@ -1,14 +1,8 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { FREE_TRIAL_CREDIT_USD, FREE_TRIAL_DAYS, TRIAL_API_RPM, trialRateBlock } from "./free-trial";
+import { TRIAL_API_RPM, trialRateBlock } from "./free-trial";
 
-describe("Free trial", () => {
-  it("gives exactly $30 credit, no more", () => {
-    expect(FREE_TRIAL_CREDIT_USD).toBe(30);
-  });
-  it("lasts 14 days", () => {
-    expect(FREE_TRIAL_DAYS).toBe(14);
-  });
+describe("Free plan / trial API rate limit", () => {
   it("allows trial API calls under 30 per minute", () => {
     expect(trialRateBlock({ isFreeTrial: true, requestsLastMinute: 29 })).toBe(null);
   });

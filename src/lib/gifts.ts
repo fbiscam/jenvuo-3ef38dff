@@ -3,6 +3,7 @@ export const GIFT_REASONS = [
   "admin_grant",
   "promo_bonus",
   "pro_trial_grant",
+  "free_monthly_credit",
   "referral_reward",
   "founding_referral_reward",
 ] as const;
@@ -21,6 +22,8 @@ export function giftTitle(reason: string): string {
       return "Bonus credit";
     case "pro_trial_grant":
       return "Free trial credit";
+    case "free_monthly_credit":
+      return "Free monthly credit";
     case "referral_reward":
     case "founding_referral_reward":
       return "Referral reward";

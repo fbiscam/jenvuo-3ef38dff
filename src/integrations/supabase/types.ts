@@ -1483,6 +1483,21 @@ export type Database = {
           },
         ]
       }
+      free_plan_credits: {
+        Row: {
+          last_granted_at: string
+          user_id: string
+        }
+        Insert: {
+          last_granted_at?: string
+          user_id: string
+        }
+        Update: {
+          last_granted_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       free_trial_claims: {
         Row: {
           claimed_at: string
@@ -3248,6 +3263,27 @@ export type Database = {
         }
         Relationships: []
       }
+      terminal_strategy_usage: {
+        Row: {
+          day: string
+          last_tick_at: string | null
+          seconds: number
+          user_id: string
+        }
+        Insert: {
+          day: string
+          last_tick_at?: string | null
+          seconds?: number
+          user_id: string
+        }
+        Update: {
+          day?: string
+          last_tick_at?: string | null
+          seconds?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       tool_lead_searches: {
         Row: {
           created_at: string
@@ -4059,6 +4095,7 @@ export type Database = {
       }
       process_founding_bot_milestones: { Args: never; Returns: number }
       process_founding_renewals: { Args: never; Returns: number }
+      process_free_monthly_credit: { Args: never; Returns: number }
       public_home_stats: { Args: never; Returns: Json }
       release_founding_credit: { Args: { _user_id: string }; Returns: boolean }
       renew_founding_plan: {
@@ -4086,6 +4123,10 @@ export type Database = {
       }
       start_founding_month: { Args: { _user_id: string }; Returns: boolean }
       start_signup_trial: { Args: { _user_id: string }; Returns: Json }
+      tick_terminal_strategy_usage: {
+        Args: { _add?: boolean }
+        Returns: number
+      }
       user_has_plan_feature: {
         Args: { _feature: string; _user_id: string }
         Returns: boolean

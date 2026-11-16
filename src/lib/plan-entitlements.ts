@@ -10,11 +10,13 @@ export type PlanCapabilities = {
 export function getPlanCapabilities(planId: string): PlanCapabilities {
   const plan = planId.toLowerCase()
   const paid = plan === 'pro' || plan === 'elite' || plan === 'ultra'
+  // Free includes API access with its own limits (1 key, $10 monthly credit, see free-plan.ts).
+  const api = paid || plan === 'free'
   const senior = plan === 'elite' || plan === 'ultra'
 
   return {
-    extensionAi: paid,
-    primaryAnalysis: paid,
+    extensionAi: api,
+    primaryAnalysis: api,
     seniorReview: senior,
     multiPairScanner: paid,
     customAlertRules: senior,

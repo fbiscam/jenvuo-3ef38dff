@@ -1292,7 +1292,7 @@ function AuthPage() {
                   {flashInline("email")}
                 </div>
                 <p className="text-center text-[13px] leading-snug text-muted-foreground">
-                  Free trial: $30 API credit and 14 days of Pro Terminal features.
+                  Free plan: $10 API credit every month and 2 hours a day of the paid Terminal indicators.
                   <br />
                   Want JX Bot?{" "}
                   <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">Apply for the Founding Program</Link>
@@ -1321,7 +1321,7 @@ function AuthPage() {
                   {socialButton("apple", "Sign up", "light")}
                 </div>
                 <p className="text-center text-[13px] leading-snug text-muted-foreground">
-                  Every new account gets $30 API credit and 14 days of Pro.
+                  Every new account starts on Free with $10 API credit a month.
                 </p>
                 {errorBox}
               </div>

@@ -64,6 +64,18 @@ function UtcClock() {
   return <span className="ml-auto font-mono text-[12px] tabular-nums text-foreground/80">{now ? `${now} UTC` : ""}</span>;
 }
 import { useStrategyAccess } from "./useStrategyAccess";
+import { TERMINAL_DAILY_HOURS, type StrategyTier } from "@/lib/free-plan";
+
+function strategyHoursLabel(tier: StrategyTier | null): string {
+  const h = tier && tier !== "unlimited" ? TERMINAL_DAILY_HOURS[tier] : TERMINAL_DAILY_HOURS.free;
+  return `${h} hours`;
+}
+
+function formatTimeLeft(seconds: number): string {
+  const m = Math.max(0, Math.floor(seconds / 60));
+  const h = Math.floor(m / 60);
+  return h > 0 ? `${h}h ${m % 60}m` : `${m}m`;
+}
 import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -393,7 +405,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const wantsZones = (smcToggles.sdStrategy ?? true) && SD_ZONE_TIMEFRAMES.has(timeframe.key);
   const wantsSwingSweep = (smcToggles.swingSweep ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key);
   const wantsPriceAction = (smcToggles.priceAction ?? true) && SWING_SWEEP_TIMEFRAMES.has(timeframe.key);
-  const strategyAccess = useStrategyAccess();
+  const strategyAccess = useStrategyAccess(wantsZones || wantsSwingSweep || wantsPriceAction);
   const strategiesUnlocked = strategyAccess.allowed;
   const chartSmcToggles = useMemo<SmcToggles>(() => {
     const zonesOn = wantsZones && strategiesUnlocked;
@@ -605,7 +617,15 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <p className="mx-2 mb-1.5 flex items-start gap-1.5 rounded-md bg-accent px-2 py-1.5 text-[11px] leading-4 text-muted-foreground sm:text-xs">
           <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
           <span>
-            Fresh sweep, price action and Zone + FVG come with a plan or the Founding Program.
+            Today's {strategyHoursLabel(strategyAccess.tier)} of Fresh sweep, price action and Zone + FVG is used up. They come back at 00:00 UTC, or upgrade for more hours.
+          </span>
+        </p>
+      )}
+      {!strategyAccess.loading && strategiesUnlocked && strategyAccess.secondsLeft !== null && (
+        <p className="mx-2 mb-1.5 flex items-start gap-1.5 rounded-md bg-accent px-2 py-1.5 text-[11px] leading-4 text-muted-foreground sm:text-xs">
+          <Clock3 className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
+          <span>
+            {formatTimeLeft(strategyAccess.secondsLeft)} left today ({strategyHoursLabel(strategyAccess.tier)} a day on your plan).
           </span>
         </p>
       )}

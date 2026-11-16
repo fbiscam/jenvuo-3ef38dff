@@ -337,6 +337,20 @@
       "when": 1794798978291,
       "tag": "0047_founding_month_no_subscription_fix",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1794809582108,
+      "tag": "0048_free_plan_monthly_credit_and_terminal_hours",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1794809913615,
+      "tag": "0049_terminal_usage_tick_cleanup",
+      "breakpoints": true
     }
   ]
 }

@@ -78,10 +78,10 @@ export const collections: Collection[] = [
       {
         slug: "create-account",
         title: "Create your account",
-        summary: "Sign up in a minute and get a free trial with $30 API credit.",
+        summary: "Sign up in a minute and start on the Free plan with $10 API credit a month.",
         updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "Anyone can create a Jenvu account (one person, one account). Every new account starts with a free trial: $30 API credit and 14 days of Pro features, including the Terminal's paid strategies. JX Bot is only for Founding members." },
+          { type: "p", content: "Anyone can create a Jenvu account (one person, one account). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day, Elite 16 and Ultra all day. JX Bot is only for Founding members." },
 
           { type: "h2", content: "Sign up" },
           { type: "ol", items: [
@@ -508,7 +508,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is open during the free trial (14 days of Pro for every new account), on a paid plan and for approved Founding Program members (100 seats a month). Founding members have 2 days after approval to upload their ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds the plan's API credit ($25 Pro, $50 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal, and plans can be picked only after your ID is verified (credit top-ups work before). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal is open to every signed-in account. Its paid indicators run for a set time each UTC day by plan (Free 2 hours, Pro 8, Elite 16, Ultra all day) and lock until 00:00 UTC once the time is used; approved Founding Program members (100 seats a month) get their plan's hours. Founding members have 2 days after approval to upload their ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds the plan's API credit ($25 Pro, $50 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal, and plans can be picked only after your ID is verified (credit top-ups work before). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [

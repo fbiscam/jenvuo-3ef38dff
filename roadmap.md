@@ -88,3 +88,6 @@
 - [x] Ask Jenvu knows the plan comparison
 
 - [x] Pricing logos: plain black icons on white (no black tiles), dashboard Terminal icon, xAI-sized
+
+- [x] Free plan replaces the free trial for new sign-ups: $10 API credit every month, 1 API key; Terminal paid indicators 2h/8h/16h/24h a day by plan (lock until 00:00 UTC); Pricing page Free card + compare table
+- [ ] JX Bot on Free with a $5 daily target — waiting on owner: JX Bot is Founding-only today

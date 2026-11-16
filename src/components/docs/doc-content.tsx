@@ -47,7 +47,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "sign up register signup login sign in founding apply",
         body: (
           <>
-            <p>Anyone can create a Jenvu account (one person, one account). Every new account starts with a free trial: $30 API credit and 14 days of Pro features.</p>
+            <p>Anyone can create a Jenvu account (one person, one account). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators.</p>
             <ol>
               <li>Open <a href="https://auth.jenvu.com/sign-in?mode=signup">auth.jenvu.com/sign-in</a> and choose Create an account.</li>
               <li>Enter the 6-digit code we email you.</li>
@@ -59,11 +59,11 @@ export const DOC_GROUPS: DocGroup[] = [
       },
       {
         id: "free-trial",
-        title: "Free trial & Founding Program",
+        title: "Free plan & Founding Program",
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The free trial gives every new account $30 API credit and 14 days of Pro features, including the Terminal's paid strategies. Free-trial API keys can send up to 30 requests per minute. JX Bot is not part of the trial.</p>
+            <p>The Free plan gives every account $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. Free API keys can send up to 30 requests per minute. JX Bot is not part of Free.</p>
             <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($25 Pro, $50 Elite). Plans can be bought after your ID is verified.</p>
           </>
         ),

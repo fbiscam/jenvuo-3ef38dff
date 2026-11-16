@@ -59,10 +59,10 @@ export async function getExtensionEntitlement(userId: string) {
   const { total: tokensUsedToday } = await readDailyTokenUsage(admin, userId)
   const tokensRemainingToday = Math.max(0, dailyTokenLimit - tokensUsedToday)
   const overDailyTokens = dailyTokenLimit > 0 && tokensUsedToday >= dailyTokenLimit
-  const planOk = active && capabilities.extensionAi && keyLimit > 0
-  // Free-trial accounts (not Founding members) get a per-minute request cap.
+  const planOk = capabilities.extensionAi && keyLimit > 0
+  // Free and free-trial accounts (not Founding members) get a per-minute request cap.
   let rateBlock: string | null = null
-  if (planOk && sub?.is_trial) {
+  if (planOk && (planId === 'free' || sub?.is_trial)) {
     const { data: founding } = await admin.rpc('is_founding_member', { _user_id: userId })
     if (!founding) {
       const { count } = await admin

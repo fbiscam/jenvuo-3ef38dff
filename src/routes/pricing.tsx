@@ -13,7 +13,8 @@ import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
 import { JX_BOT_PRICE, PLAN_API_CREDIT, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
-import { FREE_TRIAL_CREDIT_USD, FREE_TRIAL_DAYS, TRIAL_API_RPM } from "@/lib/free-trial";
+import { TRIAL_API_RPM } from "@/lib/free-trial";
+import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
 import { MODEL_CATALOG } from "@/lib/model-catalog";
 import { JxBotLogo, PlatformLogo, TerminalLogo } from "@/components/brand/ProductLogos";
 import openAiLogo from "@/assets/model-logos/openai.svg";
@@ -25,11 +26,11 @@ const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',sy
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["Is there a free trial or open sign-up?", "Yes. Anyone can sign up (one person, one account) and every new account gets a free trial: $30 API credit and 14 days of Pro, including the Terminal's paid strategies. JX Bot is not part of the trial: apply at jenvu.com/founding, and once approved and ID-verified you get Pro or Elite for 30 days from the verification day, with JX Bot and the plan's API credit ($25 Pro, $50 Elite)."],
-  ["What do the plans include?", "Every plan includes the Terminal's paid strategies, the Top AI Models and monthly API credit: Pro $29 a month with $25 credit, Elite $59 with $59 credit and Ultra $99 with $99 credit. Founding members get $25 (Pro) or $50 (Elite) credit for their Founding month. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to verified Founding Program members, who pay the bot's cost on top: Pro $49, Elite $99 or Ultra $169."],
+  ["Is there a free plan?", `Yes. Anyone can sign up (one person, one account) and use Jenvu on the Free plan: $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key and ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). When the day's time is used up they lock until 00:00 UTC. The 14-day free trial has ended for new sign-ups. JX Bot is not part of Free: apply at jenvu.com/founding, and once approved and ID-verified you get Pro or Elite for 30 days from the verification day, with JX Bot and the plan's API credit ($25 Pro, $50 Elite).`],
+  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day, Pro $29 a month with $25 credit and ${TERMINAL_DAILY_HOURS.pro} hours, Elite $59 with $59 credit and ${TERMINAL_DAILY_HOURS.elite} hours, and Ultra $99 with $99 credit and all day (${TERMINAL_DAILY_HOURS.ultra} hours).` + " Founding members get $25 (Pro) or $50 (Elite) credit for their Founding month. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to verified Founding Program members, who pay the bot's cost on top: Pro $49, Elite $99 or Ultra $169."],
   ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro ($49), Elite ($99) or Ultra ($169), which include the JX Bot cost. A plan bought without Founding membership covers the Terminal and API only. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
-  ["Who can use the Terminal?", "Every signed-in user can open the Terminal. Its paid strategies need a plan, a running free trial (14 days of Pro and $30 API credit at sign-up, one per person) or an approved Founding membership."],
+  ["Who can use the Terminal?", `Every signed-in user can open the Terminal. Its paid indicators run for a set time each UTC day by plan: Free ${TERMINAL_DAILY_HOURS.free} hours, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite} and Ultra all day. Time counts only while one of them is switched on and the Terminal is open; when it is used up they lock and disappear until 00:00 UTC.`],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
 ];
@@ -37,10 +38,10 @@ export const FAQ = [
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Transparent Jenvu pricing: Pro $29, Elite $59 and Ultra $99 a month for the Terminal and API, $3 per million tokens, with a free trial of Pro at sign-up." },
+      { title: "Jenvu Pricing — Free, Pro, Elite and Ultra Plans" },
+      { name: "description", content: "Jenvu pricing: a Free plan with $10 monthly API credit, then Pro $29, Elite $59 and Ultra $99 a month for more Terminal hours, API credit and keys." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Pro, Elite and Ultra plans for the Terminal and Top AI Models, with a free trial of Pro at sign-up." },
+      { property: "og:description", content: "Free, Pro, Elite and Ultra plans for the Terminal and Top AI Models, with daily Terminal hours by plan." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -61,8 +62,9 @@ export const Route = createFileRoute("/pricing")({
 });
 
 type PlanKey = "pro" | "elite" | "ultra";
+type CardKey = "free" | PlanKey;
 type Mark = boolean | string;
-/** One comparison row: values for Free trial, Pro, Elite, Ultra and Enterprise. */
+/** One comparison row: values for Free, Pro, Elite, Ultra and Enterprise. */
 type Row = { f: string; v: [Mark, Mark, Mark, Mark, Mark]; logo?: string; invert?: boolean };
 type GroupIcon = "terminal" | "bot" | "platform" | "models" | null;
 type Group = { title: string; icon: GroupIcon; rows: Row[]; bot?: boolean };
@@ -76,8 +78,8 @@ const GROUPS: ReadonlyArray<Group> = [
     icon: null,
     rows: [
       { f: "Usage", v: ["Limited", "Basic", "3x Pro", "6x Pro", "Pooled"] },
-      { f: "Monthly API credit", v: [`$${FREE_TRIAL_CREDIT_USD} once`, `$${PLAN_API_CREDIT.pro}`, `$${PLAN_API_CREDIT.elite}`, `$${PLAN_API_CREDIT.ultra}`, "Custom"] },
-      { f: "Daily token limit", v: [TOKENS("pro"), TOKENS("pro"), TOKENS("elite"), TOKENS("ultra"), "Custom"] },
+      { f: "Monthly API credit", v: [`$${FREE_PLAN_CREDIT_USD}`, `$${PLAN_API_CREDIT.pro}`, `$${PLAN_API_CREDIT.elite}`, `$${PLAN_API_CREDIT.ultra}`, "Custom"] },
+      { f: "Daily token limit", v: [TOKENS("free"), TOKENS("pro"), TOKENS("elite"), TOKENS("ultra"), "Custom"] },
       { f: "Balance-based quota ($3 = 1M tokens)", v: [true, true, true, true, true] },
       { f: "API requests per minute", v: [`${TRIAL_API_RPM}`, "Standard", "Standard", "Standard", "Custom"] },
     ],
@@ -99,7 +101,7 @@ const GROUPS: ReadonlyArray<Group> = [
     icon: "terminal",
     rows: [
       { f: "Live Gold, Bitcoin and EUR/USD charts", v: [true, true, true, true, true] },
-      { f: "Paid ICT/SMC strategies", v: ["14 days", true, true, true, true] },
+      { f: "Paid indicators (Fresh sweep, price action, Zone + FVG)", v: [`${TERMINAL_DAILY_HOURS.free}h a day`, `${TERMINAL_DAILY_HOURS.pro}h a day`, `${TERMINAL_DAILY_HOURS.elite}h a day`, "24h a day", "24h a day"] },
       { f: "Ask Jenvu on the chart", v: [true, true, true, true, true] },
     ],
   },
@@ -120,7 +122,7 @@ const GROUPS: ReadonlyArray<Group> = [
     title: "Platform & API",
     icon: "platform",
     rows: [
-      { f: "Active API keys", v: ["2", "2", "3", "5", "Custom"] },
+      { f: "Active API keys", v: [`${FREE_PLAN_API_KEYS}`, "2", "3", "5", "Custom"] },
       { f: "API access & webhooks", v: [false, false, true, true, true] },
       { f: "API usage controls & request logs", v: [false, false, true, true, true] },
     ],
@@ -194,10 +196,11 @@ function PricingPage() {
   const suffix = billing === "annual" ? "/ year" : "/ month";
   const [open, setOpen] = React.useState<number | null>(0);
 
-  const plans: Array<{ key: PlanKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
-    { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: "$25", bigLabel: "API credit every month", ips: 1, features: ["Terminal paid strategies", "ChatGPT 5.5 Pro and Grok 4.6", "1.5M daily tokens", "2 API keys"] },
-    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: "$59", bigLabel: "API credit & senior review", ips: 2, features: ["Claude Fable 5.1 senior review", "5M daily tokens", "3 API keys, webhooks & logs"] },
-    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: "$99", bigLabel: "API credit & priority desk", ips: 5, features: ["10M daily tokens", "5 API keys", "Priority desk support"] },
+  const plans: Array<{ key: CardKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
+    { key: "free", name: "Free", description: "Try the Terminal & API", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: 0, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
+    { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: `$${PLAN_API_CREDIT.pro}`, bigLabel: "API credit every month", ips: 1, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.pro}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", "1.5M daily tokens", "2 API keys"] },
+    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: `$${PLAN_API_CREDIT.elite}`, bigLabel: "API credit & senior review", ips: 2, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.elite}h a day`, "Claude Fable 5.1 senior review", "5M daily tokens", "3 API keys, webhooks & logs"] },
+    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: `$${PLAN_API_CREDIT.ultra}`, bigLabel: "API credit & priority desk", ips: 5, features: ["Terminal paid indicators all day", "10M daily tokens", "5 API keys", "Priority desk support"] },
   ];
 
   const bigBase = "flex h-10 w-full items-center justify-center rounded-full text-[15px] font-medium transition";
@@ -209,11 +212,15 @@ function PricingPage() {
     solid ? `${smallBase} bg-foreground text-background hover:opacity-90` : `${smallBase} bg-gc-pill text-foreground hover:bg-gc-line`;
   const name = (k: PlanKey) => k[0].toUpperCase() + k.slice(1);
 
-  // Free trial column: offered once at sign-up.
-  const trialCta = () => {
-    if (signedOut) return <Link to="/auth" search={{ mode: "signup" } as never} className={smallStyle(false)}>Get Free Trial</Link>;
-    if (trial.active) return <div className={`${smallBase} bg-gc-pill text-gc-ink-muted`}>Active</div>;
-    return <div className={`${smallBase} bg-gc-pill text-gc-ink-muted`}>Used</div>;
+  // Free plan: every sign-up starts on it.
+  const freeCta = (small = false) => {
+    const btnBase = small ? smallBase : bigBase;
+    const quiet = small ? "bg-gc-pill text-gc-ink-muted" : "border border-gc-line bg-background text-gc-ink-muted";
+    if (signedOut) {
+      return <Link to="/auth" search={{ mode: "signup" } as never} className={small ? smallStyle(false) : bigStyle(false)}>Sign up free</Link>;
+    }
+    const onFree = (currentPlan === "free" || currentPlan === null) && !trial.active;
+    return <div className={`${btnBase} ${quiet}`}>{onFree ? "Current plan" : "Included"}</div>;
   };
 
   const planCta = (key: PlanKey, small = false) => {
@@ -235,12 +242,11 @@ function PricingPage() {
         </button>
       );
     }
-    // Signed out: Pro offers the free trial (14 days of Pro + API credit at sign-up); the
-    // other paid plans say Buy now and send the visitor to sign up first.
+    // Signed out: paid plans say Buy now and send the visitor to sign up first.
     if (signedOut) {
       return (
         <Link to="/auth" search={{ mode: "signup" } as never} className={btnStyle(solid)}>
-          {small ? `Get ${name(key)}` : key === "pro" ? "Get Free Trial" : "Buy now"}
+          {small ? `Get ${name(key)}` : "Buy now"}
         </Link>
       );
     }
@@ -283,7 +289,7 @@ function PricingPage() {
 
       {/* PLAN CARDS */}
       <section id="plans" className="scroll-mt-24 mx-auto max-w-7xl px-5 pb-16 sm:px-8">
-        <div className="mx-auto grid max-w-[1100px] gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mx-auto grid max-w-[1240px] gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((plan) => (
             <article
               key={plan.key}
@@ -296,34 +302,36 @@ function PricingPage() {
                 )}
               </div>
               <div className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-[40px] font-medium leading-none tracking-tight">${priceOf(planPrice(plan.key, founding))}</span>
+                <span className="text-[40px] font-medium leading-none tracking-tight">${plan.key === "free" ? 0 : priceOf(planPrice(plan.key, founding))}</span>
                 <span className="text-[13px] text-gc-ink-muted">{suffix}</span>
               </div>
               <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
-                {founding
-                  ? `Terminal + API $${TERMINAL_API_PRICE[plan.key]} + JX Bot $${JX_BOT_PRICE[plan.key]}`
-                  : "Terminal + API"}
+                {plan.key === "free"
+                  ? "Free forever, one account per person"
+                  : founding
+                    ? `Terminal + API $${TERMINAL_API_PRICE[plan.key]} + JX Bot $${JX_BOT_PRICE[plan.key]}`
+                    : "Terminal + API"}
               </p>
-              <div className="mt-4">{planCta(plan.key)}</div>
+              <div className="mt-4">{plan.key === "free" ? freeCta() : planCta(plan.key)}</div>
               <p className="mt-6 min-h-[20px] text-[13px] text-gc-ink-muted">
-                {plan.key === "elite" ? "Everything in Pro, and:" : plan.key === "ultra" ? "Everything in Elite, and:" : plan.description}
+                {plan.key === "pro" ? "Everything in Free, and:" : plan.key === "elite" ? "Everything in Pro, and:" : plan.key === "ultra" ? "Everything in Elite, and:" : plan.description}
               </p>
               <Summary big={plan.big} label={plan.bigLabel} />
               <FeatureList title="Platform & AI" items={plan.features} />
               <FeatureList
                 title="JX Bot (MT5)"
                 items={
-                  founding
+                  founding && plan.key !== "free"
                     ? [`${plan.ips} IP${plan.ips > 1 ? "s" : ""} included`, `${DAILY_TARGET_PCT[plan.key]}% daily target per IP`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`]
-                    : ["Founding members only"]
+                    : [plan.key === "free" ? "Not on Free" : "Founding members only"]
                 }
-                muted={!founding}
+                muted={!founding || plan.key === "free"}
               />
             </article>
           ))}
         </div>
         <p className="mt-5 text-center text-[13px] text-gc-ink-muted">
-          Prices in USD. Live market data is free on every plan. Plans can be bought after your ID is verified.
+          Prices in USD. Live market data is free on every plan. Terminal hours reset at 00:00 UTC. Plans can be bought after your ID is verified.
         </p>
       </section>
 
@@ -337,7 +345,7 @@ function PricingPage() {
               <tr className="border-b border-gc-line">
                 <th className="w-[28%] pb-5 text-left align-bottom text-[14px] font-normal text-gc-ink-muted">Feature</th>
                 {[
-                  { key: "trial", label: "Free trial", price: `$0 · ${FREE_TRIAL_DAYS} days`, cta: trialCta() },
+                  { key: "free", label: "Free", price: "$0/month", cta: freeCta(true) },
                   ...(["pro", "elite", "ultra"] as const).map((k) => ({
                     key: k,
                     label: name(k),

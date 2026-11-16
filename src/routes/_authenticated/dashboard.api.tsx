@@ -258,9 +258,9 @@ function ExtensionPage() {
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .filter((k) => !q || k.name.toLowerCase().includes(q) || k.key_prefix.toLowerCase().includes(q));
   const canCreate = Boolean(
-    access?.active && access.plan !== "free" && activeKeys.length < access.keyLimit,
+    access && access.keyLimit > 0 && activeKeys.length < access.keyLimit,
   );
-  const capabilities = getPlanCapabilities(access?.active ? access.plan : "free");
+  const capabilities = getPlanCapabilities(access?.plan ?? "free");
 
   return (
     <div className="mx-auto w-full max-w-[1100px] pb-10">

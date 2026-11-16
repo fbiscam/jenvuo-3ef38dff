@@ -52,7 +52,7 @@ export const createExtensionKey = createServerFn({ method: 'POST' })
     const { generateExtensionKey, hashExtensionKey, encryptExtensionKey } = await import('./extension-auth.server')
     const client = context.supabase as any
     const access = await readAccess(client, context.userId)
-    if (!access.active || access.plan === 'free' || access.keyLimit < 1) return { ok: false as const, error: 'Upgrade to Pro, Elite, or Ultra to create an extension API key.' }
+    if (access.keyLimit < 1) return { ok: false as const, error: 'Your plan does not include API keys. Upgrade to Pro, Elite, or Ultra.' }
 
     const { count } = await client
       .from('extension_api_keys')

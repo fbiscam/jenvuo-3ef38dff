@@ -19,7 +19,7 @@ describe("Terminal access (Founding members only)", () => {
   it("a running free trial opens the Terminal with the paid strategies", () => {
     const trial = evaluatePlanAccess(sub({ plan_id: "pro", status: "active", is_trial: true, trial_ends_at: iso(now + day) }), now);
     expect(evaluateTerminalAccess(trial).allowed).toBe(true);
-    expect(evaluateStrategyAccess(trial).allowed).toBe(true);
+    expect(evaluateStrategyAccess(trial, "pro", 0).allowed).toBe(true);
   });
   it("an ended free trial locks the Terminal again", () => {
     const trial = evaluatePlanAccess(sub({ plan_id: "pro", status: "active", is_trial: true, trial_ends_at: iso(now - day) }), now);
@@ -57,16 +57,17 @@ describe("Terminal access (Founding members only)", () => {
     expect(r.allowed).toBe(false);
     expect(r.reason).toBe("founding_ended");
   });
-  it("a free account keeps the paid chart strategies locked", () => {
-    expect(evaluateStrategyAccess(evaluatePlanAccess(null, now)).allowed).toBe(false);
+  it("a free account gets the paid chart strategies only within its 2 daily hours", () => {
+    expect(evaluateStrategyAccess(evaluatePlanAccess(null, now), "free", 0).allowed).toBe(true);
+    expect(evaluateStrategyAccess(evaluatePlanAccess(null, now), "free", 2 * 3600).allowed).toBe(false);
   });
   it("an active Starter plan unlocks the paid strategies", () => {
     const plan = evaluatePlanAccess(sub({ plan_id: "starter", status: "active", current_period_end: iso(now + day) }), now);
-    expect(evaluateStrategyAccess(plan).allowed).toBe(true);
+    expect(evaluateStrategyAccess(plan, "starter", 3 * 3600).allowed).toBe(true);
   });
   it("an expired paid plan locks the paid strategies again", () => {
     const plan = evaluatePlanAccess(sub({ plan_id: "pro", status: "active", current_period_end: iso(now - day) }), now);
-    expect(evaluateStrategyAccess(plan).allowed).toBe(false);
+    expect(evaluateStrategyAccess(plan, "pro", 3 * 3600).allowed).toBe(false);
     expect(evaluateTerminalAccess(plan).allowed).toBe(false);
   });
   it("a running Pro trial unlocks them, an ended one does not", () => {

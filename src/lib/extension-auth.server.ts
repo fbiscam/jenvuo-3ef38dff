@@ -77,7 +77,7 @@ export async function authenticateExtensionRequest(request: Request): Promise<Ex
   const planId = active ? String(sub.plan_id || 'free') : 'free'
   const { data: plan } = await admin.from('plans').select('extension_key_limit').eq('id', planId).maybeSingle()
   const keyLimit = Number(plan?.extension_key_limit ?? 0)
-  if (!active || planId === 'free' || keyLimit < 1) return { ok: false, status: 403, error: 'A paid Pro, Elite, or Ultra plan is required for extension access.' }
+  if (keyLimit < 1) return { ok: false, status: 403, error: 'Your plan does not include API access. Upgrade to Pro, Elite, or Ultra.' }
   const { data: allowedKeys } = await admin.from('extension_api_keys').select('id').eq('user_id', data.user_id).is('revoked_at', null).order('created_at', { ascending: false }).limit(keyLimit)
   if (!(allowedKeys ?? []).some((key: any) => key.id === data.id)) return { ok: false, status: 403, error: `This key is outside your ${planId} plan's active-key allowance.` }
 
