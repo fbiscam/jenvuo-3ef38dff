@@ -8,6 +8,7 @@ import { useAuthUser } from '@/hooks/useAuthUser'
 import { PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from '@/lib/free-plan'
 import { WhyProductPreview, WhyWorkspaceScene } from '@/components/WhyWorkspaceScene'
 import { JxBotLogo, NewsLogo, PlatformLogo, TerminalLogo } from '@/components/brand/ProductLogos'
+import { ReviewPlatformMark, type ReviewPlatform } from '@/components/brand/ReviewPlatformMark'
 import portrait1 from '@/assets/why-profile-1.jpg'
 import portrait2 from '@/assets/why-profile-2.jpg'
 import portrait3 from '@/assets/why-profile-3.jpg'
@@ -67,6 +68,7 @@ const samples = [
   { name: 'Sophie', image: portrait6, quote: 'Starting on Free gives me room to understand the workspace before choosing a plan. I can look at the Terminal, explore News Trading and try the API with the monthly credit. Then compare the actual allowances rather than buying a collection of unrelated tools. For me, the useful part is the connection between them: research, chart context and account controls together, while Gold analysis stays separate from the EUR/USD bot. That distinction makes the whole desk easier to understand.' },
   { name: 'Marcus', image: portrait9, quote: 'Less switching between tools, more attention on the question in front of me. A simple workspace with clear product boundaries is a good starting point.' },
 ]
+const reviewPlatforms: ReviewPlatform[] = ['x', 'mt5', 'tradingview', 'binance', 'ctrader', 'bybit', 'tradingview', 'mt5', 'x']
 
 function Actions() {
   const { user } = useAuthUser()
@@ -90,7 +92,7 @@ function AboutPage() {
       </section>
       <section className="why-wrap why-logo-strip text-center">
         <p className="text-sm text-gc-ink-muted">One workspace. Every part of your desk.</p>
-        <div className="why-marks">{workspaceMarks.map(([title, Mark]) => <span key={title}><Mark className="size-7" />{title}</span>)}</div>
+        <div className="why-marks">{workspaceMarks.map(([title, Mark]) => <span key={title} role="img" aria-label={title}><Mark className="size-10" /></span>)}</div>
       </section>
       <section className="why-wrap why-section">
         <h2 className="why-heading">How we can help</h2>
@@ -107,8 +109,8 @@ function AboutPage() {
       </section>
       <section className="why-wrap why-section">
         <h2 className="why-heading">Community voices</h2>
-        <p className="mt-3 text-xs text-gc-ink-muted">Illustrative reviews and AI-generated portraits — not verified customer testimonials.</p>
-        <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}<p className="mt-1 text-[10px] text-gc-ink-muted">Sample review {i+1}</p></div><span className="ml-auto text-sm text-gc-ink-muted" aria-hidden>𝕏</span></div></article>)}</div>
+        <p className="mt-3 text-xs text-gc-ink-muted">Illustrative reviews and AI-generated portraits — not verified testimonials. Platform marks are decorative, not endorsements.</p>
+        <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}<p className="mt-1 text-[10px] text-gc-ink-muted">Sample review {i+1}</p></div><ReviewPlatformMark platform={reviewPlatforms[i] ?? 'tradingview'} /></div></article>)}</div>
       </section>
       <section className="why-wrap why-section">
         <h2 className="why-heading mb-8">FAQ</h2>

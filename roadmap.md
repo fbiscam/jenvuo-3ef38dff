@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Add colored code/status previews, richer motion, black icon-only workspace strip and trading-platform review marks (2 X, 7 trading marks). Desktop, 390px/320px phones, all nine portraits, FAQ and reduced motion verified; no overflow/runtime errors, build OK. Utils numeric inputs return strings; reported line 8 absent. Prior email-code, credit-schedule and Docs verification limits unchanged.
+
 - [x] Refine Why Jenvu against all seven references: floating windows, four pricing marks, nine longer masonry reviews with labelled generated portraits, FAQ and spacing. Desktop/mobile, all portraits, animation, FAQ and reduced motion checked; no overflow or runtime errors, build OK. Reported utils line 8 absent; numeric inputs return strings. Earlier email-code/credit-schedule/Docs checks remain unverified.
 
 - [x] Rebuild Why Jenvu with floating animated windows, reference spacing, detailed previews and review cards; desktop/mobile screenshots, FAQ expansion, no overflow/runtime errors and reduced motion verified. Build OK; utils numeric-input check returns a string (reported line 8 does not exist). Reviews remain labelled samples; earlier email OTP/cron verification limits remain unchanged.
