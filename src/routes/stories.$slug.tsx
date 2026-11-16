@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { createFileRoute, notFound, Link, useRouter, type ErrorComponentProps } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -29,9 +29,15 @@ export const Route = createFileRoute("/stories/$slug")({
       links: [{ rel: "canonical", href: url }],
     };
   },
-  notFoundComponent: StoryNotFound,
+  notFoundComponent: () => <StoryNotFound />,
+  errorComponent: StoryError,
   component: StoryPage,
 });
+
+function StoryError({ reset }: ErrorComponentProps) {
+  const router = useRouter();
+  return <div className="bg-background text-foreground"><SiteHeader/><main className="site-edge py-24"><h1 className="text-4xl">Story unavailable</h1><Button variant="secondary" className="mt-5" onClick={async () => { await router.invalidate(); reset(); }}>Try again</Button><Button asChild variant="link" className="mt-5"><Link to="/stories">All stories<ArrowRight/></Link></Button></main><SiteFooter/></div>;
+}
 
 function StoryNotFound() {
   return <div className="bg-background text-foreground"><SiteHeader/><main className="site-edge py-24"><h1 className="text-4xl">Story not found</h1><Button asChild variant="link" className="mt-5"><Link to="/stories">All stories<ArrowRight/></Link></Button></main><SiteFooter/></div>;

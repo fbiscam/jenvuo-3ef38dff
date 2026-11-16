@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { createRouter } from "@tanstack/react-router";
+import { createRouter, ErrorComponent } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { rewriteInput, rewriteOutput } from "./lib/url-rewrite";
 
@@ -24,6 +24,7 @@ export const getRouter = () => {
     defaultPendingMs: 200,
     defaultPendingMinMs: 100,
     defaultPendingComponent: () => null,
+    defaultErrorComponent: ErrorComponent,
     // Clean URLs on the apex domain: /alerts, /billing, /admin/*, etc.
     // The internal route tree still lives at /dashboard/* for the dashboard section.
     rewrite: {
