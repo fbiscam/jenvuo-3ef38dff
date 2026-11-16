@@ -1,15 +1,15 @@
 import { describe, it as test } from 'node:test'
 import { expect } from './chart/test-expect'
-import { companyDomainVerdict, ipSubnet, isDisposableMx, splitFingerprint, trustedSignupIpCap } from './signup-guard'
+import { emailOwnershipConflict, companyDomainVerdict, ipSubnet, isDisposableMx, splitFingerprint, trustedSignupIpCap } from './signup-guard'
 import { isDisposableEmail } from './disposable-email-domains'
 
 describe('signup guard', () => {
-  test('company domain allows 4 existing accounts, blocks the 6th', () => {
+  test('company domain allows multiple accounts', () => {
     expect(companyDomainVerdict(4, 0)).toBe(null)
-    expect(companyDomainVerdict(5, 0) === null).toBe(false)
+    expect(companyDomainVerdict(500, 0)).toBe(null)
   })
-  test('company domain burst of 2 in an hour blocks', () => {
-    expect(companyDomainVerdict(1, 2) === null).toBe(false)
+  test('company account count does not block shared-domain signup', () => {
+    expect(companyDomainVerdict(100, 20)).toBe(null)
   })
   test('temp-mail providers the user named are blocked', () => {
     for (const d of ['temp-mail.org', 'temp-mail.io', 'tempail.com', 'yopmail.com', 'mail.tm', 'mailinator.com', 'guerrillamail.com', 'burnermail.io', 'emailondeck.com']) {
@@ -27,27 +27,27 @@ describe('signup guard', () => {
     expect(fp.browser).toBe('a'.repeat(64))
     expect(fp.hardware).toBe('b'.repeat(40))
   })
-  test('trusted tester IP gets its own cap of 3, others get none', () => {
-    expect(trustedSignupIpCap('153.117.68.156')).toBe(3)
-    expect(trustedSignupIpCap(' 153.117.68.156 ')).toBe(3)
+  test('trusted networks have no account cap', () => {
+    expect(trustedSignupIpCap('153.117.68.156')).toBe(Infinity)
+    expect(trustedSignupIpCap(' 153.117.68.156 ')).toBe(Infinity)
     expect(trustedSignupIpCap('153.117.68.157')).toBe(null)
     expect(trustedSignupIpCap('')).toBe(null)
   })
 })
 
-describe('one person, one account', () => {
+describe('multiple accounts per person', () => {
   const signup = { ip: '203.0.113.9', browser: 'b'.repeat(32), hardware: 'h'.repeat(32) }
-  test('only one account per IP', async () => {
+  test('no account cap per IP', async () => {
     const { MAX_ACCOUNTS_PER_IP } = await import('./signup-guard')
-    expect(MAX_ACCOUNTS_PER_IP).toBe(1)
+    expect(MAX_ACCOUNTS_PER_IP).toBe(Infinity)
   })
-  test('blocked when another account signed in from the same Wi-Fi', async () => {
+  test('allowed when another account signed in from the same Wi-Fi', async () => {
     const { personLinkVerdict } = await import('./signup-guard')
-    expect(personLinkVerdict(signup, [{ user_id: 'u1', ip: '203.0.113.9', fingerprint: 'zzz' }]) === null).toBe(false)
+    expect(personLinkVerdict(signup, [{ user_id: 'u1', ip: '203.0.113.9', fingerprint: 'zzz' }])).toBe(null)
   })
-  test('blocked when the same laptop signed in to another account', async () => {
+  test('allowed when the same laptop signed in to another account', async () => {
     const { personLinkVerdict } = await import('./signup-guard')
-    expect(personLinkVerdict(signup, [{ user_id: 'u1', ip: '1.1.1.1', fingerprint: 'h'.repeat(32) }]) === null).toBe(false)
+    expect(personLinkVerdict(signup, [{ user_id: 'u1', ip: '1.1.1.1', fingerprint: 'h'.repeat(32) }])).toBe(null)
   })
   test('allowed for a new network and device', async () => {
     const { personLinkVerdict } = await import('./signup-guard')
@@ -58,5 +58,17 @@ describe('one person, one account', () => {
       expect(isDisposableEmail(`a@${d}`)).toBe(true)
     }
     expect(isDisposableEmail('a@outlook.com')).toBe(false)
+  })
+})
+
+ describe('one email per account', () => {
+  test('another account cannot claim an owned email', () => {
+    expect(emailOwnershipConflict('account-one', 'account-two')).toBe(true)
+  })
+  test('the owner may keep its email', () => {
+    expect(emailOwnershipConflict('account-one', 'account-one')).toBe(false)
+  })
+  test('an unlinked email may be added', () => {
+    expect(emailOwnershipConflict(null, 'account-two')).toBe(false)
   })
 })

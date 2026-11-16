@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Session, User } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { sendCustomAuthEmail } from './custom-auth-email.server'
+import { EMAIL_ALREADY_LINKED } from './signup-guard'
 
 type OtpPurpose = 'signup' | 'recovery' | 'login' | 'second_step' | 'email_2fa_setup'
 
@@ -31,41 +32,6 @@ const encoder = new TextEncoder()
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase()
-}
-
-// Gmail ignores dots and "+tags", most providers ignore "+tags": one inbox
-// can otherwise open many accounts (a.b+1@gmail.com, ab+2@gmail.com, ...).
-export function canonicalEmail(email: string): string {
-  const [rawLocal = '', rawDomain = ''] = normalizeEmail(email).split('@')
-  let domain = rawDomain === 'googlemail.com' ? 'gmail.com' : rawDomain
-  let local = rawLocal.split('+')[0]
-  if (domain === 'gmail.com') local = local.replace(/\./g, '')
-  return `${local}@${domain}`
-}
-
-async function assertNoEmailAlias(email: string) {
-  if (await emailAliasTaken(email)) {
-    throw new Error('An account already exists for this email inbox. Please sign in to your existing account.')
-  }
-}
-
-/** True when another spelling of the same inbox (Gmail dots, +tags) already has an account. */
-async function emailAliasTaken(email: string): Promise<boolean> {
-  const canonical = canonicalEmail(email)
-  const [local, domain] = canonical.split('@')
-  if (!local || !domain) return false
-  const domains = domain === 'gmail.com' ? ['gmail.com', 'googlemail.com'] : [domain]
-  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  for (const d of domains) {
-    const pattern = `${local.replace(/[%_\\]/g, '').split('').join('%')}%@${d}`
-    const { data } = await (supabaseAdmin as any).from('profiles').select('email').ilike('email', pattern).limit(50)
-    for (const row of (data ?? []) as { email: string | null }[]) {
-      if (row.email && normalizeEmail(row.email) !== normalizeEmail(email) && canonicalEmail(row.email) === canonical) {
-        return true
-      }
-    }
-  }
-  return false
 }
 
 function publicSignupEnabled(): boolean {
@@ -187,9 +153,6 @@ export async function findUserByEmail(email: string): Promise<User | null> {
   return null
 }
 
-const SIGNUP_IP_LIMIT_PER_HOUR = 5
-const SIGNUP_DOMAIN_LIMIT_PER_HOUR = 20
-const MAX_ACCOUNTS_PER_DEVICE = 1
 
 // Public email providers — skip domain-level rate limit (millions of legit users share these).
 // Abuse from these is caught by device fingerprint + IP caps instead.
@@ -209,84 +172,6 @@ function assertSignupSignals(input: { country?: string; fingerprint?: string; us
   if (userAgent.length < 10 || /^(curl|wget|python-requests|postmanruntime|insomnia)\b/i.test(userAgent)) {
     throw new Error('This browser could not be verified. Please use a current web browser.')
   }
-}
-
-// Blocks sign-ups from VPN / proxy / Tor / hosting networks (proxycheck.io).
-// Fails open on lookup errors so a provider outage never blocks every sign-up.
-async function assertNotVpn(ip: string | undefined) {
-  const addr = (ip || '').trim()
-  if (!addr || addr === '127.0.0.1' || addr === '::1') return
-  const { trustedSignupIpCap } = await import('./signup-guard')
-  if (trustedSignupIpCap(addr) != null) return
-  try {
-    const key = process.env.PROXYCHECK_API_KEY
-    const url = `https://proxycheck.io/v2/${encodeURIComponent(addr)}?vpn=3&risk=1${key ? `&key=${encodeURIComponent(key)}` : ''}`
-    const res = await fetch(url, { signal: AbortSignal.timeout(4000) })
-    if (!res.ok) return
-    const json: any = await res.json()
-    const info = json?.[addr]
-    if (!info) return
-    const type = String(info.type || '').toLowerCase()
-    if (info.proxy === 'yes' || info.vpn === 'yes' || type === 'vpn' || type === 'tor' || type === 'hosting') {
-      throw new Error('VPN_BLOCKED')
-    }
-  } catch (e) {
-    if ((e as Error)?.message === 'VPN_BLOCKED') {
-      throw new Error('Account creation is not allowed over a VPN or proxy. Please turn it off and try again.')
-    }
-  }
-}
-
-async function assertDeviceUnderCap(ip: string | undefined, rawFingerprint: string) {
-  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  const { splitFingerprint, ipSubnet, MAX_ACCOUNTS_PER_SUBNET_DAY, MAX_ACCOUNTS_PER_IP, PERSON_LINK_WINDOW_DAYS, personLinkVerdict, trustedSignupIpCap } = await import('./signup-guard')
-  const admin = supabaseAdmin as any
-  // Trusted tester IPs: skip device/subnet caps, enforce only their own IP cap.
-  const trustedCap = trustedSignupIpCap(ip || '')
-  if (trustedCap != null) {
-    const normalizedTrustedIp = (ip || '').trim().slice(0, 100)
-    const { data: trustedRows } = await admin.from('account_devices').select('user_id').eq('ip', normalizedTrustedIp)
-    if (new Set((trustedRows ?? []).map((r: { user_id: string }) => r.user_id)).size >= trustedCap) {
-      throw new Error('This network has reached its account limit. Please sign in to your existing account.')
-    }
-    return
-  }
-  const { browser, hardware } = splitFingerprint(rawFingerprint)
-  const tooMany = 'An account is already linked to this device. Please sign in to your existing account.'
-  const countUsers = (rows: { user_id: string }[] | null) => new Set((rows ?? []).map((r) => r.user_id)).size
-  for (const fp of [browser, rawFingerprint]) {
-    const { data } = await admin.from('account_devices').select('user_id').eq('fingerprint', fp)
-    if (countUsers(data) >= MAX_ACCOUNTS_PER_DEVICE) throw new Error(tooMany)
-  }
-  if (hardware) {
-    const { data } = await admin.from('account_devices').select('user_id').eq('hw_fingerprint', hardware)
-    if (countUsers(data) >= MAX_ACCOUNTS_PER_DEVICE) throw new Error(tooMany)
-  }
-  const normalizedIp = (ip || '').trim().slice(0, 100)
-  if (normalizedIp) {
-    const { data: ipRows } = await admin.from('account_devices').select('user_id').eq('ip', normalizedIp)
-    if (countUsers(ipRows) >= MAX_ACCOUNTS_PER_IP) throw new Error('An account is already linked to this network. Please sign in to your existing account.')
-    const subnet = ipSubnet(normalizedIp)
-    if (subnet) {
-      const since = new Date(Date.now() - 24 * 60 * 60_000).toISOString()
-      const { data: netRows } = await admin.from('account_devices').select('user_id').like('ip', `${subnet}%`).gte('created_at', since)
-      if (countUsers(netRows) >= MAX_ACCOUNTS_PER_SUBNET_DAY) throw new Error('Too many new accounts from this network today. Please try again tomorrow.')
-    }
-  }
-  // Person link: same IP / device already used to sign in to another account.
-  const sinceLink = new Date(Date.now() - PERSON_LINK_WINDOW_DAYS * 86400000).toISOString()
-  const history: { user_id: string; ip: string | null; fingerprint: string | null }[] = []
-  if (normalizedIp) {
-    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').eq('ip', normalizedIp).gte('created_at', sinceLink).limit(5)
-    history.push(...(data ?? []))
-  }
-  const fps = [browser, hardware].filter((v): v is string => !!v)
-  if (fps.length) {
-    const { data } = await admin.from('login_events').select('user_id,ip,fingerprint').in('fingerprint', fps).gte('created_at', sinceLink).limit(5)
-    history.push(...(data ?? []))
-  }
-  const verdict = personLinkVerdict({ ip: normalizedIp || null, browser: browser || null, hardware }, history)
-  if (verdict) throw new Error(verdict)
 }
 
 // Looks up the domain's mail servers (DNS over HTTPS). Blocks domains with no
@@ -312,18 +197,6 @@ async function assertRealMailDomain(domain: string) {
   }
 }
 
-async function assertCompanyDomainCap(domain: string) {
-  if (!domain || PUBLIC_EMAIL_PROVIDERS.has(domain)) return
-  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  const { companyDomainVerdict } = await import('./signup-guard')
-  const admin = supabaseAdmin as any
-  const { count: total } = await admin.from('profiles').select('id', { count: 'exact', head: true }).ilike('email', `%@${domain}`)
-  const since = new Date(Date.now() - 60 * 60_000).toISOString()
-  const { data: recent } = await admin.from('profiles').select('id').ilike('email', `%@${domain}`).gte('created_at', since)
-  const verdict = companyDomainVerdict(total ?? 0, (recent ?? []).length)
-  if (verdict) throw new Error(verdict)
-}
-
 export async function createSignupOtp(input: { email: string; password?: string; fullName?: string; siteUrl?: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }) {
   assertPublicSignupOpen()
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
@@ -339,46 +212,18 @@ export async function createSignupOtp(input: { email: string; password?: string;
   assertSignupSignals(input)
   // Taken inboxes get the same "code sent" answer as new ones (the owner is
   // emailed a sign-in note instead), so this step can't reveal who has an account.
-  const aliasTaken = await emailAliasTaken(email)
   const signupDomain = email.split('@')[1]?.toLowerCase().trim() || ''
   await assertRealMailDomain(signupDomain)
-  await assertCompanyDomainCap(signupDomain)
-  await assertNotVpn(input.ip)
-  await assertDeviceUnderCap(input.ip, input.fingerprint)
 
-  // 3. Per-email-domain rate limit: skipped for public providers (gmail/yahoo/etc.);
-  //    applied only to custom/corporate domains where bulk abuse is actually meaningful.
-  const domain = email.split('@')[1]?.toLowerCase().trim()
-  const since = new Date(Date.now() - 60 * 60_000).toISOString()
-  if (domain && !PUBLIC_EMAIL_PROVIDERS.has(domain)) {
-    const { count: domainCount, error: domainErr } = await (supabaseAdmin as any)
-      .from('signup_attempts')
-      .select('id', { count: 'exact', head: true })
-      .ilike('email', `%@${domain}`)
-      .gte('created_at', since)
-    if (!domainErr && typeof domainCount === 'number' && domainCount >= SIGNUP_DOMAIN_LIMIT_PER_HOUR) {
-      throw new Error(`Too many signup attempts from ${domain} recently. Please try again in an hour.`)
-    }
-  }
-
-  // 4. Per-IP signup rate limit: at most N attempts per hour from one IP.
-  const ip = (input.ip || '').trim().slice(0, 100)
-  if (ip) {
-    const { count, error: countErr } = await (supabaseAdmin as any)
-      .from('signup_attempts')
-      .select('id', { count: 'exact', head: true })
-      .eq('ip', ip)
-      .gte('created_at', since)
-    if (!countErr && typeof count === 'number' && count >= SIGNUP_IP_LIMIT_PER_HOUR) {
-      throw new Error('Too many signup attempts from your network. Please try again in an hour.')
-    }
-    try {
-      await (supabaseAdmin as any).from('signup_attempts').insert({ ip, email, country: input.country || null })
-    } catch { /* logging failure must not block signup */ }
-  }
+  // Limit code resends per email, not accounts per shared network.
+  const recent = await latestValidOtp(email, 'signup')
+  if (recent && new Date(recent.expires_at).getTime() - OTP_TTL_MINUTES * 60_000 > Date.now() - 45_000) return
+  try {
+    await (supabaseAdmin as any).from('signup_attempts').insert({ ip: (input.ip || '').slice(0, 100) || null, email, country: input.country || null })
+  } catch { /* audit failure must not block signup */ }
 
   const existingUser = await findUserByEmail(email)
-  if (aliasTaken || existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
+  if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
     try {
       await sendCustomAuthEmail({ to: email, type: 'existing_account', siteUrl: input.siteUrl })
     } catch { /* same answer either way */ }
@@ -447,7 +292,7 @@ export async function checkSignupOtp(input: { email: string; code: string }): Pr
   if (!verified.ok) return { ok: false, error: verified.error }
   const existingUser = await findUserByEmail(email)
   if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
-    return { ok: false, error: 'Account already exists. Please sign in.' }
+    return { ok: false, error: EMAIL_ALREADY_LINKED }
   }
   return { ok: true }
 }
@@ -467,22 +312,18 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   const existingUser = await findUserByEmail(email)
 
   if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
-    return { ok: false, error: 'Account already exists. Please sign in.' }
+    return { ok: false, error: EMAIL_ALREADY_LINKED }
   }
 
-  // Re-check device cap at the confirm step, in case someone tried to bypass the request step.
+  // Re-check email, password and browser verification at confirmation.
   try {
     await assertPasswordNotLeaked(password)
     assertSignupSignals(input)
-    await assertNotVpn(input.ip)
-    await assertNoEmailAlias(email)
-    const { isDisposableEmail } = await import('./disposable-email-domains')
+      const { isDisposableEmail } = await import('./disposable-email-domains')
     if (isDisposableEmail(email)) throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
     const d = email.split('@')[1]?.toLowerCase().trim() || ''
     await assertRealMailDomain(d)
-    await assertCompanyDomainCap(d)
-    await assertDeviceUnderCap(input.ip, input.fingerprint)
-  } catch (e) {
+    } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Signup not allowed on this device.' }
   }
 
@@ -505,7 +346,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   const { data, error } = await auth.auth.signInWithPassword({ email, password })
   if (error || !data.session) return { ok: false, error: error?.message || 'Account verified. Please sign in.' }
 
-  // Log this confirmed account against the device / IP so the cap holds for future signups.
+  // Keep device history for login security, never to cap account creation.
   const uid = data.session.user.id
   try {
     if (uid) {
@@ -519,7 +360,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
     }
   } catch { /* logging failure must not block signup */ }
 
-  // Free trial: one per device fingerprint / IP (and one per account in the database).
+  // Initialize Free once per account; shared devices and networks do not affect it.
   try {
     if (uid) await claimProTrial(uid, (input.fingerprint || '').split('_')[0], input.ip)
   } catch { /* never block signup on trial bookkeeping */ }
@@ -528,50 +369,12 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   return { ok: true, session: data.session }
 }
 
-/**
- * Starts the free trial for a new account and records it against this device/IP.
- * If the same device or IP already had a trial, no trial is given and the account
- * starts on Free instead.
- */
-async function claimProTrial(userId: string, fingerprint?: string, ip?: string) {
+/** Every new account receives the server-defined Free plan, irrespective of device/IP history. */
+async function claimProTrial(userId: string, _fingerprint?: string, _ip?: string) {
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
-  const admin = supabaseAdmin as any
-  const rawFp = typeof fingerprint === 'string' ? fingerprint.slice(0, 128) : ''
-  const fp = /^[A-Za-z0-9_-]{8,128}$/.test(rawFp) ? rawFp : null
-  const ipHash = ip ? await sha256Hex(`jenvu-trial:${ip}`) : null
-
-  let alreadyUsed = false
-  if (fp || ipHash) {
-    // Separate parameterized lookups — never interpolate caller input into filters.
-    for (const [col, val] of [['fingerprint', fp], ['ip_hash', ipHash]] as const) {
-      if (!val || alreadyUsed) continue
-      const { data: prior } = await admin
-        .from('trial_claims')
-        .select('id')
-        .eq(col, val)
-        .neq('user_id', userId)
-        .limit(1)
-      alreadyUsed = Array.isArray(prior) && prior.length > 0
-    }
-  }
-
-  // Same device or network already had a trial: the account starts on Free, no credit.
-  if (alreadyUsed) {
-    await admin.rpc('revoke_pro_trial', { _user_id: userId, _reason: 'duplicate_device' })
-    return
-  }
-
-  await admin.from('trial_claims').insert({ user_id: userId, fingerprint: fp, ip_hash: ipHash })
-  // Free trial (FREE_TRIAL_DAYS of Pro + FREE_TRIAL_CREDIT_USD credit), once per account, server-side only.
-  const { error } = await admin.rpc('start_signup_trial', { _user_id: userId })
-  if (error) console.error('[signup] free trial start failed:', error.message)
+  const { error } = await (supabaseAdmin as any).rpc('start_signup_trial', { _user_id: userId })
+  if (error) console.error('[signup] Free plan initialization failed:', error.message)
 }
-
-async function sha256Hex(input: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
-}
-
 
 export async function verifyRecoveryOtp(input: { email: string; code: string; siteUrl?: string }): Promise<CustomAuthResult> {
   const email = normalizeEmail(input.email)
@@ -644,15 +447,12 @@ export async function finishSocialSignup(input: { userId: string; ip?: string; c
   try {
     assertPublicSignupOpen()
     assertSignupSignals(input)
-    await assertNotVpn(input.ip)
     if (email) {
-      await assertNoEmailAlias(email)
       const { isDisposableEmail } = await import('./disposable-email-domains')
       if (isDisposableEmail(email)) throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
     }
-    await assertDeviceUnderCap(input.ip, input.fingerprint)
   } catch (e) {
-    // Remove the just-created account so the same person can't keep it.
+    // Remove a new social account only when email/browser security verification fails.
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined)
     return { ok: false, isNew: true, error: e instanceof Error ? e.message : 'Sign-up is not allowed on this device.' }
   }

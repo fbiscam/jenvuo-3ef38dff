@@ -2,6 +2,7 @@ import * as React from 'react'
 import { render } from '@react-email/render'
 import { sendLovableEmail } from '@lovable.dev/email-js'
 import { EmailChangeEmail } from '@/lib/email-templates/email-change'
+import { EMAIL_ALREADY_LINKED, emailOwnershipConflict } from './signup-guard'
 
 const SITE_NAME = 'Jenvu'
 const ROOT_DOMAIN = 'jenvu.com'
@@ -93,8 +94,9 @@ export async function createEmailChangeRequest(input: {
   for (let page = 1; page <= 10; page += 1) {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 })
     if (error) return fail(error.message)
-    if (data.users.find((u) => u.email?.toLowerCase() === newEmail)) {
-      return fail('That email is already in use by another account.')
+    const owner = data.users.find((u) => u.email?.toLowerCase() === newEmail)
+    if (emailOwnershipConflict(owner?.id ?? null, input.userId)) {
+      return fail(EMAIL_ALREADY_LINKED)
     }
     if (!data.nextPage) break
   }
@@ -245,13 +247,21 @@ export async function confirmEmailChangeToken(
     return { ok: false as const, error: 'This confirmation link has expired. Please request a new one.' }
   }
 
+  // Re-check ownership after email verification: another account may have claimed
+  // the address since the request. Auth's unique email constraint handles races.
+  const { findUserByEmail } = await import('./custom-auth.server')
+  const owner = await findUserByEmail(normalizeEmail(row.new_email))
+  if (emailOwnershipConflict(owner?.id ?? null, row.user_id)) {
+    await writeAudit({ ...ctx, event: 'failed_confirm', errorReason: 'email_already_linked' })
+    return { ok: false as const, error: EMAIL_ALREADY_LINKED }
+  }
   const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(row.user_id, {
     email: row.new_email,
     email_confirm: true,
   })
   if (updErr) {
     await writeAudit({ ...ctx, event: 'failed_confirm', errorReason: updErr.message })
-    return { ok: false as const, error: updErr.message }
+    return { ok: false as const, error: /already|registered|exists/i.test(updErr.message) ? EMAIL_ALREADY_LINKED : 'Could not change your email. Please request a new link.' }
   }
 
   // Sign out all sessions across all devices for this user after email change

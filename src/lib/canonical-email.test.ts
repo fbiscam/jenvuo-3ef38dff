@@ -1,10 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { canonicalEmail } from "./custom-auth.server";
-test("gmail dots and +tags map to one inbox", () => {
-  assert.equal(canonicalEmail("A.B.C+promo@Gmail.com"), "abc@gmail.com");
-  assert.equal(canonicalEmail("abc@googlemail.com"), "abc@gmail.com");
-});
-test("other providers keep dots but drop +tags", () => {
-  assert.equal(canonicalEmail("a.b+x@outlook.com"), "a.b@outlook.com");
+import { emailOwnershipConflict } from "./signup-guard";
+test("different email addresses may belong to the same person", () => {
+  // No canonical-inbox or person restriction: only an existing exact-address owner blocks linking.
+  assert.equal(emailOwnershipConflict(null, "second-account"), false);
+  assert.equal(emailOwnershipConflict("first-account", "second-account"), true);
 });

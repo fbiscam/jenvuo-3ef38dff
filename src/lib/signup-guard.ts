@@ -1,40 +1,38 @@
 // Pure helpers for sign-up abuse checks (tested in signup-guard.test.ts).
 
 /** Max accounts allowed for one custom/company email domain. */
-export const MAX_ACCOUNTS_PER_COMPANY_DOMAIN = 5
+export const MAX_ACCOUNTS_PER_COMPANY_DOMAIN = Infinity
 /** Company-domain sign-ups allowed in one hour before it looks automated. */
-export const COMPANY_DOMAIN_BURST_PER_HOUR = 2
+export const COMPANY_DOMAIN_BURST_PER_HOUR = Infinity
 /** Accounts created from one /24 (IPv4) or /48 (IPv6) network in 24h. */
-export const MAX_ACCOUNTS_PER_SUBNET_DAY = 2
-/** Accounts allowed per IP (one person = one account, even across several devices). */
-export const MAX_ACCOUNTS_PER_IP = 1
-/** How far back sign-in history is checked to link a new sign-up to an existing person. */
+export const MAX_ACCOUNTS_PER_SUBNET_DAY = Infinity
+/** Shared networks do not impose an account count cap. */
+export const MAX_ACCOUNTS_PER_IP = Infinity
+export const EMAIL_ALREADY_LINKED = 'This email is already linked to another account. Please remove it from that account first, or sign in.'
+
+/** Exact addresses are unique; different addresses may belong to the same person. */
+export function emailOwnershipConflict(ownerId: string | null, requestingUserId?: string): boolean {
+  return ownerId !== null && ownerId !== requestingUserId
+}
+/** Retained for audit-history consumers, never used to block signup. */
 export const PERSON_LINK_WINDOW_DAYS = 30
 
 /**
- * One person, one account: a new sign-up is blocked when its IP, browser or
- * hardware fingerprint was already used to sign in to another account recently.
- * Catches the same person on a 2nd phone or 3rd laptop on the same Wi-Fi.
+ * Shared IPs and fingerprints never prevent another account being created.
  */
 export function personLinkVerdict(
   signup: { ip: string | null; browser: string | null; hardware: string | null },
   history: { user_id: string; ip: string | null; fingerprint: string | null }[],
 ): string | null {
-  for (const h of history) {
-    if (!h.user_id) continue
-    if (signup.ip && h.ip === signup.ip) return 'An account is already linked to this network. Please sign in to your existing account.'
-    // Sign-in history stores the hardware hash when known, else the browser hash.
-    const fp = h.fingerprint || ''
-    if (fp && (fp === signup.browser || fp === signup.hardware)) {
-      return 'An account is already linked to this device. Please sign in to your existing account.'
-    }
-  }
+  // Login history is for security notifications, not account ownership.
+  void signup
+  void history
   return null
 }
 
 /** Trusted tester IPs allowed more accounts than the normal caps (owner testing). */
 const TRUSTED_SIGNUP_IPS: Record<string, number> = {
-  '153.117.68.156': 3,
+  '153.117.68.156': Infinity,
 }
 
 /** Account cap for a trusted IP, or null when the IP is not trusted. */

@@ -1,5 +1,10 @@
 # Roadmap
 
+- [x] Remove signup device/IP/subnet/VPN account caps while preserving email ownership and verification
+- [x] Redesign Why Jenvu to match the supplied startup-page references (review layout uses clearly labelled samples)
+- [x] Verify stale utils error, 28 account/security tests and desktop/mobile page; latest build OK
+- [ ] Complete new-account email OTP end-to-end check — requires a controlled inbox and its delivered code
+
 - [x] Keep mobile API metric labels on one line and align shared CTA/footer dividers (including API Platform)
 - [x] Inspect the reported utils.ts error: current helper returns a string and has no line 8
 
