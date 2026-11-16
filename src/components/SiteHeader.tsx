@@ -10,8 +10,8 @@ import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/a
 import { getDefaultAvatar } from "@/lib/default-avatar";
 import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
-/** Current page in the top menu: dark text with a blue line along the bottom of the header. */
-const ACTIVE = { className: "!bg-muted !text-foreground" };
+/** Current page shares the Contact Sales surface in both themes. */
+const ACTIVE = { className: "!bg-gc-pill !text-foreground" };
 
 const MONO = "font-sans";
 
@@ -245,6 +245,7 @@ export default function SiteHeader() {
                 <Link
                   key={it.to}
                   to={it.to}
+                  activeProps={ACTIVE}
                   onClick={() => setMobileMenuOpen(false)}
                   className="rounded-lg px-3 py-3 hover:bg-muted"
                 >

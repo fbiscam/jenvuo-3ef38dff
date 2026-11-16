@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from '@tanstack/react-router';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { Check, CircleHelp, CircleAlert, RefreshCw } from 'lucide-react';
-import JenvuMark from './JenvuMark';
+import SiteHeader from './SiteHeader';
 import SiteFooter from './SiteFooter';
-import { ThemeToggle } from './ThemeToggle';
 import { Button } from './ui/button';
 import { getServiceStatus } from '@/lib/service-status.functions';
 import { aggregateState, statusDays, STATE_LABEL, STATUS_GROUPS, type ServiceState } from '@/lib/service-status';
@@ -16,20 +14,14 @@ function Indicator({ state }: { state: ServiceState }) {
 }
 export default function ServiceStatusPage() {
   const { data, refetch, isFetching } = useSuspenseQuery(serviceStatusQuery);
-  const [zone, setZone] = useState('UTC');
   const [updated, setUpdated] = useState(data.checkedAt.replace('T', ' ').slice(0, 16) + ' UTC');
   useEffect(() => {
     const format = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'shortOffset' });
-    setZone(format.formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value ?? 'UTC');
     setUpdated(format.format(new Date(data.checkedAt)));
   }, [data.checkedAt]);
   const overall = aggregateState(data.checks.map(c => c.state));
   return <div className="status-page">
-    <header className="status-header">
-      <Button asChild variant="ghost" size="icon"><Link to="/" aria-label="Jenvu home"><JenvuMark className="h-7 w-7" /></Link></Button>
-      <span className="status-overview">Overview</span>
-      <div className="status-header-tools"><span><span className="status-muted">Time</span> {zone}</span><ThemeToggle /></div>
-    </header>
+    <SiteHeader />
     <main className="status-main">
       <div className="status-heading"><div><h1>Service Status</h1><p>Updated {updated}</p></div><Button variant="outline" size="icon" className="rounded-full" aria-label="Refresh status" title="Refresh status" disabled={isFetching} onClick={() => void refetch()}><RefreshCw className={isFetching ? 'animate-spin' : ''} /></Button></div>
       <div className={`status-summary status-${overall}`} role="status"><Indicator state={overall} /><div><h2>{overall === 'operational' ? 'All monitored services operational' : overall === 'unknown' ? 'Some checks could not be verified' : 'Service disruption detected'}</h2><p>{overall === 'operational' ? 'Current availability checks are passing.' : 'See individual services below for the latest availability.'}</p></div></div>

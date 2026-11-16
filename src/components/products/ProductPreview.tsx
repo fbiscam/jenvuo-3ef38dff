@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import featureVideo from "@/assets/videos/features-loop.mp4.asset.json";
-import featurePoster from "@/assets/videos/features-loop-poster.jpg.asset.json";
+import featureVideo from "@/assets/videos/features-loop-sharp.mp4.asset.json";
+import featurePoster from "@/assets/videos/features-loop-sharp-poster.jpg.asset.json";
 
 export type ProductId = "terminal" | "bot" | "news" | "api";
 
