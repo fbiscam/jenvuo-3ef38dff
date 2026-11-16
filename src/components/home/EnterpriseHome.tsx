@@ -6,11 +6,6 @@ import { RevealWords } from "@/components/RevealWords";
 import showController from "@/assets/home/show-imagine-controller.webp";
 import showCoast from "@/assets/home/show-imagine-coast.webp";
 import showMerch from "@/assets/home/show-imagine-merch.webp";
-import showSneaker from "@/assets/home/show-explore-sneaker.webp";
-import showPerfume from "@/assets/home/show-explore-perfume.webp";
-import showRedTop from "@/assets/home/show-explore-redtop.webp";
-import showOrchid from "@/assets/home/show-explore-orchid.webp";
-import showWatch from "@/assets/home/show-explore-watch.webp";
 import { shortTitle, type HomeArticle } from "@/lib/home-articles";
 import { insightCoverUrl } from "@/lib/insight-cover";
 import starsNebula from "@/assets/platform/stars-nebula.webp";
@@ -239,15 +234,41 @@ const IMAGINE_LOOP = [
   { src: showCoast, alt: "Friends walking along a coastal road at sunset" },
   { src: showMerch, alt: "Black hoodie, cap, tote bag and mug laid flat" },
 ];
-const FOX_LOOP = [
-  { src: showSneaker, alt: "White running sneaker floating on grey" },
-  { src: showPerfume, alt: "Perfume bottle on pink flower petals" },
-  { src: showRedTop, alt: "Woman in a red tank top in a studio" },
-];
-const CAR_LOOP = [
-  { src: showOrchid, alt: "Orchid Bloom serum bottle beside a purple orchid" },
-  { src: showWatch, alt: "Silver wristwatch on white marble" },
-];
+
+const EXPLORE_STEPS = 7;
+/** x.ai-style agent terminal on pure black: lines appear one by one, then loop. */
+function ExploreTile() {
+  const step = useLoopStep(EXPLORE_STEPS, 1100);
+  const running = step < 6;
+  return (
+    <Link to="/docs" className={`${tile} flex h-[290px] flex-col bg-ent-explore font-mono text-[11.5px] leading-[1.75] text-ent-ide-fg antialiased`}>
+      <div className="flex items-center gap-1.5 px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-ent-ide-red" /><span className="h-2.5 w-2.5 rounded-full bg-ent-ide-amber" /><span className="h-2.5 w-2.5 rounded-full bg-ent-ide-green" />
+        <span className="ml-3 text-ent-ide-fg/55">projects/main</span>
+        <span className="ml-auto rounded-full border border-ent-ide-fg/15 px-2 text-[10px] text-ent-ide-fg/60">12.30%</span>
+      </div>
+      <div className="relative flex-1 overflow-hidden whitespace-nowrap px-4">
+        <div className={`${reveal(step >= 1)} text-ent-ide-fg/50`}>{running ? <span className="sc-blink">Thinking…</span> : "Thought"}</div>
+        <div className={reveal(step >= 2)}><span className="text-ent-ide-cyan">▸ read_file</span> src/middleware/auth.ts <span className="text-ent-ide-fg/35">68 lines</span></div>
+        <div className={reveal(step >= 3)}><span className="text-ent-ide-cyan">▸ grep</span> <span className="text-ent-ide-amber">"session"</span> src/ <span className="text-ent-ide-fg/35">4 matches</span></div>
+        <div className={`${reveal(step >= 3)} flex items-center justify-between gap-2`}>
+          <span className="truncate text-ent-ide-fg/70">| Audit auth middleware <span className="text-ent-ide-fg/40">explore</span></span>
+          {running
+            ? <span className="shrink-0 rounded bg-ent-ide-blue/15 px-1.5 text-ent-ide-blue">running</span>
+            : <span className="shrink-0 rounded bg-ent-ide-add px-1.5 text-ent-ide-green">done</span>}
+        </div>
+        <div className={`${reveal(step >= 4)} text-ent-ide-purple`}>◆ Thought for 4.1s</div>
+        <div className={`${reveal(step >= 5)} text-ent-ide-purple`}>◆ <span className="text-ent-ide-fg">Edit</span> <span className="text-ent-ide-cyan">src/middleware/auth.ts</span></div>
+        <div className={`${reveal(step >= 5)} mt-1 blur-[1.5px]`}>
+          <div><span className="text-ent-ide-purple">export async function</span> <span className="text-ent-ide-amber">handler</span>(req) {"{"}</div>
+          <div className="pl-3">const token = <span className="text-ent-ide-cyan">extractBearer</span>(req);</div>
+        </div>
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-ent-explore to-transparent" />
+      </div>
+      <span className="absolute bottom-3 right-4 z-10 inline-flex items-center gap-1 font-sans text-[14px] text-ent-ide-fg">Explore <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" /></span>
+    </Link>
+  );
+}
 
 /** Cross-fades through a set of pictures in a loop (pauses for reduced motion). */
 function LoopImages({ images, width, height, offset = 0, className = "" }: { images: { src: string; alt: string }[]; width: number; height: number; offset?: number; className?: string }) {
@@ -291,15 +312,7 @@ export function EntShowcase() {
           </div>
           <span className="absolute bottom-4 left-5 z-10 text-[14px] text-gc-on-night">Imagine</span>
         </Link>
-        <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
-          <div className="relative overflow-hidden rounded-[18px]">
-            <LoopImages images={FOX_LOOP} width={1152} height={960} offset={1300} />
-          </div>
-          <div className="relative overflow-hidden rounded-[18px]">
-            <LoopImages images={CAR_LOOP} width={1152} height={960} offset={2600} />
-            <span className="absolute bottom-3 right-4 z-10 inline-flex items-center gap-1 text-[14px] text-gc-on-night">Explore <ArrowRight className="h-3.5 w-3.5" /></span>
-          </div>
-        </Link>
+        <ExploreTile />
         <VoiceTile />
       </div>
     </section>

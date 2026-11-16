@@ -176,6 +176,8 @@
   --color-ent-ide-amber: var(--ent-ide-amber);
   --color-ent-ide-red: var(--ent-ide-red);
   --color-ent-ide-bar: var(--ent-ide-bar);
+  --color-ent-explore: var(--ent-explore);
+  --color-ent-ide-blue: var(--ent-ide-blue);
   --color-ent-orange: var(--ent-orange);
   --color-ent-excel: var(--ent-excel);
 }
@@ -1757,6 +1759,8 @@ pre, pre *, code, kbd, samp {
   --ent-ide-amber: #fbbf24;
   --ent-ide-red: #ff7b72;
   --ent-ide-bar: #161b22;
+  --ent-explore: #000000;
+  --ent-ide-blue: #60a5fa;
   --ent-orange: #f26b1d;
   --ent-excel: #1d7044;
 }
@@ -2130,7 +2134,9 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 .sc-bar { animation: sc-bar 0.9s ease-in-out infinite; transform-origin: center; }
 .sc-ripple { animation: sc-ripple 3.3s ease-out infinite; }
 .sc-orb { animation: sc-orb 3.3s ease-in-out infinite; }
-@media (prefers-reduced-motion: reduce) { .sc-dot, .sc-scroll, .sc-progress, .sc-bar, .sc-ripple, .sc-orb { animation: none; } }
+@keyframes sc-blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+.sc-blink { animation: sc-blink 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .sc-blink, .sc-dot, .sc-scroll, .sc-progress, .sc-bar, .sc-ripple, .sc-orb { animation: none; } }
 
 /* Desktop dashboard: side menu 7% smaller; page area 15% then another 13% smaller (centred). */
 @media (min-width: 1024px) {
