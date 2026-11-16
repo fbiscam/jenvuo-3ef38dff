@@ -107,7 +107,7 @@ function AboutPage() {
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{benefits.map(b => <article key={b.title} className="why-benefit"><b.icon className="mb-7 size-5 text-gc-ink-muted" /><h3 className="text-[17px] font-normal">{b.title}</h3><p className="mt-3 text-[15px] leading-6 text-gc-ink-muted">{b.text}</p></article>)}</div>
       </section>
       <section className="why-wrap why-section">
-        <h2 className="why-heading">Illustrative community voices</h2>
+        <h2 className="why-heading">Community voices</h2>
         <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}<span className="block text-[10px] text-gc-ink-muted">{q.role}</span></div><ReviewPlatformMark platform={reviewPlatforms[i] ?? 'tradingview'} /></div></article>)}</div>
       </section>
       <section className="why-wrap why-section">
