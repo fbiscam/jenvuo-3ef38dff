@@ -109,7 +109,7 @@ function AboutPage() {
       <section className="why-wrap why-section">
         <h2 className="why-heading">Community voices</h2>
         <p className="mt-3 text-sm text-gc-ink-muted">Illustrative reviews and AI-generated portraits — not verified testimonials. Platform marks are decorative, not endorsements.</p>
-        <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}</div><ReviewPlatformMark platform={reviewPlatforms[i] ?? 'tradingview'} /></div></article>)}</div>
+        <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}<span className="block text-[10px] text-gc-ink-muted">{q.name === 'Omar' ? 'Bot trader' : 'CFD trader'}</span></div><ReviewPlatformMark platform={reviewPlatforms[i] ?? 'tradingview'} /></div></article>)}</div>
       </section>
       <section className="why-wrap why-section">
         <h2 className="why-heading mb-8">FAQ</h2>
