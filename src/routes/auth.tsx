@@ -1110,7 +1110,7 @@ function AuthPage() {
                         </div>
 
                         <p className="text-[12px] leading-snug text-muted-foreground">
-                          Free trial: $30 API credit and 14 days of Pro Terminal features. Want JX Bot?{" "}
+                          Free trial: $30 API credit and 14 days of Pro Terminal features.{" \n"}Want JX Bot?{" "}
                           <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
                             Apply for the Founding Program
                           </Link>
