@@ -21,7 +21,7 @@ export const FAQ = [
   ["What do the plans include?", "Every plan includes the Terminal's paid strategies, the Top AI Models and monthly API credit: Pro $29 a month with $25 credit, Elite $59 with $59 credit and Ultra $99 with $99 credit. Founding members get $25 (Pro) or $50 (Elite) credit for their Founding month. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to verified Founding Program members, who pay the bot's cost on top: Pro $49, Elite $99 or Ultra $169."],
   ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro ($49), Elite ($99) or Ultra ($169), which include the JX Bot cost. A plan bought without Founding membership covers the Terminal and API only. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
-  ["Who can use the Terminal?", "Only approved Founding Program members. After approval you have 2 days to verify your ID; if it isn't sent in time the Terminal locks until you send it. Plans can be bought only after your ID is verified."],
+  ["Who can use the Terminal?", "Every signed-in user can open the Terminal. Its paid strategies need a plan, a running free trial (14 days of Pro and $30 API credit at sign-up, one per person) or an approved Founding membership."],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
 ];
@@ -30,9 +30,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Transparent Jenvu pricing: Pro $29, Elite $59 and Ultra $99 a month for the Terminal and API, $3 per million tokens, for approved Founding Program members." },
+      { name: "description", content: "Transparent Jenvu pricing: Pro $29, Elite $59 and Ultra $99 a month for the Terminal and API, $3 per million tokens, with a free trial of Pro at sign-up." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Pro, Elite and Ultra plans for the Terminal and Top AI Models, with JX Bot for approved Founding members." },
+      { property: "og:description", content: "Pro, Elite and Ultra plans for the Terminal and Top AI Models, with a free trial of Pro at sign-up." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
