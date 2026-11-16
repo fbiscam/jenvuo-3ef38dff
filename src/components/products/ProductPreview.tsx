@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import featureVideo from "@/assets/videos/product-workflow-hd-v2.mp4.asset.json";
-import featurePoster from "@/assets/videos/product-workflow-hd-v2-poster.jpg.asset.json";
+import featureVideo from "@/assets/videos/product-workflow-hd-final.mp4.asset.json";
+import featurePoster from "@/assets/videos/product-workflow-hd-final-poster.jpg.asset.json";
 
 export type ProductId = "terminal" | "bot" | "news" | "api";
 
