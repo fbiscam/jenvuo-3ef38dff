@@ -83,7 +83,6 @@ function AboutPage() {
     <main>
       <section className="why-hero why-wrap">
         <div className="why-hero-copy">
-          <p className="mb-8 text-sm text-gc-ink-muted">Jenvu for Traders</p>
           <h1>Everything you<br />need for your<br />trading workspace</h1>
           <p className="mb-9 mt-7 max-w-[550px] text-[17px] leading-7 text-gc-ink-muted">Analysis and support across Terminal, JX Bot, News Trading and the Jenvu API, all in one place.</p>
           <Actions />
