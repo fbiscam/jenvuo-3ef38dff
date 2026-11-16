@@ -1366,7 +1366,7 @@ function AuthPage() {
               <div className="mt-7 space-y-7">
                 {terms}
                 <div className="space-y-3">
-                  {socialButton("google", "Sign up", "google-dark")}
+                  {socialButton("google", "Sign up", "google-light")}
                   <div className="mx-auto h-px w-[76%] bg-border" />
                   <button type="button" onClick={() => { setSignupStep("form"); setErrorMsg(null); }} disabled={!!socialBusy} className={pillLight}>
                     <Mail className="h-[18px] w-[18px]" aria-hidden="true" />

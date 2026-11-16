@@ -144,6 +144,7 @@
   --color-gc-green-soft: var(--gc-green-soft);
   --color-gc-ink: var(--gc-ink);
   --color-gc-ink-muted: var(--gc-ink-muted);
+  --color-ink-strong: var(--ink-strong);
   --color-gc-surface: var(--gc-surface);
   --color-gc-pill: var(--gc-pill);
   --color-gc-line: var(--gc-line);
@@ -250,6 +251,7 @@
   --gc-green: #34a853;
   --gc-green-soft: #e6f4ea;
   --gc-ink: #141414;
+  --ink-strong: #000000;
   --gc-ink-muted: #3c4043;
   --gc-surface: #f9f8f6;
   --gc-pill: #f2f1ef;
@@ -323,6 +325,7 @@
   --gc-blue-deep: #ffffff;
   --gc-on-blue: #000000;
   --gc-ink: #ffffff;
+  --ink-strong: #ffffff;
   --gc-ink-muted: #a1a1aa;
   --gc-surface: #0e0e10;
   --gc-pill: #1f1f22;

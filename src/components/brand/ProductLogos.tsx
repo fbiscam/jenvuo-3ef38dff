@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type * as React from "react";
 import { Terminal } from "lucide-react";
 import { JxFace } from "@/components/jxbot/JxBotFeatures";
@@ -48,16 +49,25 @@ export function PlatformLogo({ className = "h-4 w-4", framed }: Props) {
   );
 }
 
-/** News Trading mark: a folded newspaper with a headline, text lines and an up arrow cut out. */
+/**
+ * News Trading mark: a heavy solid tile (the news sheet) with a headline bar,
+ * a "live" dot and a bold rising price line cut out of it.
+ */
 export function NewsLogo({ className = "h-4 w-4", framed }: Props) {
+  const mask = `news-cut-${useId().replace(/:/g, "")}`;
   return (
     <Frame framed={framed} className={className}>
-      <svg viewBox="0 0 24 24" className={framed ? "h-[54%] w-[54%]" : "h-full w-full"} fill="currentColor">
-        <path
-          fillRule="evenodd"
-          d="M4.5 3h12A1.5 1.5 0 0 1 18 4.5v14a2.5 2.5 0 0 0 2.5 2.5h-15A2.5 2.5 0 0 1 3 18.5v-14A1.5 1.5 0 0 1 4.5 3ZM6 6.5h9v3H6Zm0 5h9v1.6H6Zm0 3.3h4.5v1.6H6Zm5.8 1.6 1.8-2.8 1.8 2.8Z"
-        />
-        <path d="M19 8h1.5A1.5 1.5 0 0 1 22 9.5v9a2.5 2.5 0 0 1-1.4 2.25A2.4 2.4 0 0 1 19 18.5Z" opacity=".7" />
+      <svg viewBox="0 0 24 24" className={framed ? "h-[56%] w-[56%]" : "h-full w-full"}>
+        <defs>
+          <mask id={mask} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+            <rect width="24" height="24" fill="#fff" />
+            <rect x="5" y="5" width="8.5" height="3.2" rx="1.1" fill="#000" />
+            <circle cx="17.6" cy="6.6" r="1.9" fill="#000" />
+            <path d="M5.2 18.2 9.4 13.6l3 2.6 5.6-5.8" fill="none" stroke="#000" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M14.4 9.6h4.4V14Z" fill="#000" stroke="#000" strokeWidth="1.2" strokeLinejoin="round" />
+          </mask>
+        </defs>
+        <rect x="1.5" y="1.5" width="21" height="21" rx="5.2" fill="currentColor" mask={`url(#${mask})`} />
       </svg>
     </Frame>
   );

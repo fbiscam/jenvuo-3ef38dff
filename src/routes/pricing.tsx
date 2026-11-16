@@ -422,7 +422,7 @@ function PricingPage() {
                 </tr>
                 {g.rows.map((row) => (
                   <tr key={row.f} className="border-b border-gc-line">
-                    <td className="py-4 pr-4 text-gc-ink">
+                    <td className="py-4 pr-4 text-ink-strong">
                       <span className="flex items-center gap-2.5">
                         {row.logo && <img src={row.logo} alt="" className={`h-4 w-4 shrink-0 ${row.invert ? "dark:invert" : ""}`} />}
                         {row.f}
@@ -435,7 +435,7 @@ function PricingPage() {
                         ) : v === false ? (
                           <Minus className="mx-auto h-4 w-4 text-gc-ink-muted/50" aria-label="Not included" />
                         ) : (
-                          <span className="text-gc-ink">{v}</span>
+                          <span className="text-ink-strong">{v}</span>
                         )}
                       </td>
                     ))}
