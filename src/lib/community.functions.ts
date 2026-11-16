@@ -42,21 +42,17 @@ export type CommunityPostRow = {
 };
 
 // ---------- helpers ----------
-// Signed links are short-lived so access ends soon after a block.
-const SIGNED_URL_TTL_SEC = 5 * 60;
+// Private files are served through /api/community-media, which re-checks blocks on
+// every load, so a block cuts access at once (no storage links that outlive it).
 
-/** Signs avatar paths only when each path sits in its profile owner's folder. */
-async function signAvatars(admin: any, entries: { path: string; ownerId: string }[]): Promise<Map<string, string>> {
+/** Photo links for profile avatars kept in each profile owner's own folder. */
+async function signAvatars(viewerId: string, entries: { path: string; ownerId: string }[]): Promise<Map<string, string>> {
+  const { communityMediaUrl } = await import("@/lib/community-media-token.server");
   const map = new Map<string, string>();
-  const priv: string[] = [];
   for (const { path, ownerId } of entries) {
-    if (!path) continue;
+    if (!path || map.has(path)) continue;
     if (/^https?:\/\//i.test(path)) map.set(path, path);
-    else if (isOwnedMediaRef(path, ownerId)) priv.push(path);
-  }
-  if (priv.length) {
-    const { data } = await admin.storage.from("avatars").createSignedUrls(Array.from(new Set(priv)), SIGNED_URL_TTL_SEC);
-    for (const it of data ?? []) if (it.path && it.signedUrl) map.set(it.path, it.signedUrl);
+    else if (isOwnedMediaRef(path, ownerId)) map.set(path, await communityMediaUrl("avatars", path, viewerId, ownerId));
   }
   return map;
 }
@@ -68,14 +64,13 @@ function isOwnedMediaRef(ref: unknown, ownerId: string): boolean {
   return ref.startsWith(`${ownerId}/`);
 }
 
-async function signCommunityMedia(admin: any, paths: string[]): Promise<Map<string, string>> {
+async function signCommunityMedia(viewerId: string, entries: { path: string; ownerId: string }[]): Promise<Map<string, string>> {
+  const { communityMediaUrl } = await import("@/lib/community-media-token.server");
   const map = new Map<string, string>();
-  const priv = paths.filter((p) => p && !/^https?:\/\//i.test(p));
-  const pub = paths.filter((p) => p && /^https?:\/\//i.test(p));
-  for (const p of pub) map.set(p, p);
-  if (priv.length) {
-    const { data } = await admin.storage.from("community-media").createSignedUrls(priv, SIGNED_URL_TTL_SEC);
-    for (const it of data ?? []) if (it.path && it.signedUrl) map.set(it.path, it.signedUrl);
+  for (const { path, ownerId } of entries) {
+    if (!path || map.has(path)) continue;
+    if (/^https?:\/\//i.test(path)) map.set(path, path);
+    else map.set(path, await communityMediaUrl("community-media", path, viewerId, ownerId));
   }
   return map;
 }
@@ -101,19 +96,17 @@ async function hydratePosts(admin: any, rows: any[], viewerId: string): Promise<
   for (const p of profs ?? []) profMap.set(p.id, { name: displayMap.get(p.id) ?? null, avatar: p.avatar_url ?? null });
 
   const avatarSigned = await signAvatars(
-    admin,
+    viewerId,
     Array.from(profMap.entries()).filter(([, p]) => !!p.avatar).map(([id, p]) => ({ path: p.avatar as string, ownerId: id })),
   );
 
   // Only sign storage paths inside the post author's own folder.
-  const allMedia = Array.from(
-    new Set(
-      rows.flatMap((r) =>
-        (r.media_urls || []).filter((m: string) => isOwnedMediaRef(m, r.author_id)),
-      ),
-    ),
+  const allMedia = rows.flatMap((r) =>
+    (r.media_urls || [])
+      .filter((m: string) => isOwnedMediaRef(m, r.author_id))
+      .map((m: string) => ({ path: m, ownerId: r.author_id as string })),
   );
-  const mediaSigned = await signCommunityMedia(admin, allMedia);
+  const mediaSigned = await signCommunityMedia(viewerId, allMedia);
 
   // tier lookup
   const tierMap = new Map<string, CommunityTier>();
@@ -226,7 +219,7 @@ export const getCommunityProfile = createServerFn({ method: "GET" })
       supabaseAdmin.from("community_follows").select("follower_id").eq("follower_id", context.userId).eq("followee_id", p.user_id).maybeSingle(),
       supabaseAdmin.rpc("community_get_tier", { _user_id: p.user_id }),
     ]);
-    const avatarSigned = await signAvatars(supabaseAdmin, prof?.avatar_url ? [{ path: prof.avatar_url, ownerId: p.user_id }] : []);
+    const avatarSigned = await signAvatars(context.userId, prof?.avatar_url ? [{ path: prof.avatar_url, ownerId: p.user_id }] : []);
     return {
       user_id: p.user_id, handle: p.handle, display_name: p.display_name,
       bio: p.bio, cover_url: p.cover_url,

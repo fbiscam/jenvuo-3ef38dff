@@ -48,6 +48,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInboxRouteImport } from './routes/_authenticated/inbox'
 import { Route as AuthenticatedTerminalRouteImport } from './routes/_authenticated/terminal'
 import { Route as ApiChatImageRouteImport } from './routes/api/chat-image'
+import { Route as ApiCommunityMediaRouteImport } from './routes/api/community-media'
 import { Route as HelpIndexRouteImport } from './routes/help.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -328,6 +329,11 @@ const AuthenticatedTerminalRoute = AuthenticatedTerminalRouteImport.update({
 const ApiChatImageRoute = ApiChatImageRouteImport.update({
   id: '/api/chat-image',
   path: '/api/chat-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCommunityMediaRoute = ApiCommunityMediaRouteImport.update({
+  id: '/api/community-media',
+  path: '/api/community-media',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpIndexRoute = HelpIndexRouteImport.update({
@@ -855,6 +861,7 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof AuthenticatedInboxRoute
   '/terminal': typeof AuthenticatedTerminalRoute
   '/api/chat-image': typeof ApiChatImageRoute
+  '/api/community-media': typeof ApiCommunityMediaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/accuracy': typeof OpsX9k27m4nAccuracyRoute
@@ -977,6 +984,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof AuthenticatedInboxRoute
   '/terminal': typeof AuthenticatedTerminalRoute
   '/api/chat-image': typeof ApiChatImageRoute
+  '/api/community-media': typeof ApiCommunityMediaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/accuracy': typeof OpsX9k27m4nAccuracyRoute
@@ -1105,6 +1113,7 @@ export interface FileRoutesById {
   '/_authenticated/inbox': typeof AuthenticatedInboxRoute
   '/_authenticated/terminal': typeof AuthenticatedTerminalRoute
   '/api/chat-image': typeof ApiChatImageRoute
+  '/api/community-media': typeof ApiCommunityMediaRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/jenvu-ops-x9k2/inbox': typeof JenvuOpsX9k2InboxRoute
   '/ops-x9k2-7m4n/accuracy': typeof OpsX9k27m4nAccuracyRoute
@@ -1233,6 +1242,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/terminal'
     | '/api/chat-image'
+    | '/api/community-media'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/accuracy'
@@ -1355,6 +1365,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/terminal'
     | '/api/chat-image'
+    | '/api/community-media'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/accuracy'
@@ -1482,6 +1493,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox'
     | '/_authenticated/terminal'
     | '/api/chat-image'
+    | '/api/community-media'
     | '/insights/$slug'
     | '/jenvu-ops-x9k2/inbox'
     | '/ops-x9k2-7m4n/accuracy'
@@ -1607,6 +1619,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiChatImageRoute: typeof ApiChatImageRoute
+  ApiCommunityMediaRoute: typeof ApiCommunityMediaRoute
   StoriesSlugRoute: typeof StoriesSlugRoute
   StrategiesIctGoldTradingRoute: typeof StrategiesIctGoldTradingRoute
   HelpIndexRoute: typeof HelpIndexRoute
@@ -1911,6 +1924,13 @@ declare module '@tanstack/react-router' {
       path: '/api/chat-image'
       fullPath: '/api/chat-image'
       preLoaderRoute: typeof ApiChatImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/community-media': {
+      id: '/api/community-media'
+      path: '/api/community-media'
+      fullPath: '/api/community-media'
+      preLoaderRoute: typeof ApiCommunityMediaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help/': {
@@ -2739,6 +2759,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiChatImageRoute: ApiChatImageRoute,
+  ApiCommunityMediaRoute: ApiCommunityMediaRoute,
   StoriesSlugRoute: StoriesSlugRoute,
   StrategiesIctGoldTradingRoute: StrategiesIctGoldTradingRoute,
   HelpIndexRoute: HelpIndexRoute,

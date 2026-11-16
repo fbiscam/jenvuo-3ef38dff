@@ -157,31 +157,25 @@ export const listMail = createServerFn({ method: "POST" })
         }
       }
     }
-    const avatarPaths = Array.from(
-      new Set(
-        Array.from(profileMap.values())
-          .map((p) => p.avatar_url)
-          .filter((path): path is string => Boolean(path)),
-      ),
-    );
-    const privateAvatarPaths = avatarPaths.filter((path) => !/^https?:\/\//i.test(path));
-    for (const url of avatarPaths.filter((path) => /^https?:\/\//i.test(path))) {
-      avatarUrlMap.set(url, url);
+    // Only the viewer's own private photo is signed, with their own session (storage
+    // rules apply). Other members' private photos are never handed out through mail:
+    // anyone can write to any address, so mail must not become a way to read them.
+    const ownAvatar = profileMap.get(context.userId)?.avatar_url ?? null;
+    for (const p of profileMap.values()) {
+      if (p.avatar_url && /^https?:\/\//i.test(p.avatar_url)) avatarUrlMap.set(p.avatar_url, p.avatar_url);
     }
-    if (privateAvatarPaths.length) {
-      const { data: signedAvatars } = await supabaseAdmin.storage
-        .from("avatars")
-        .createSignedUrls(privateAvatarPaths, 60 * 60);
-      for (const item of signedAvatars ?? []) {
-        if (item.path && item.signedUrl) avatarUrlMap.set(item.path, item.signedUrl);
-      }
+    if (ownAvatar && !/^https?:\/\//i.test(ownAvatar) && ownAvatar.startsWith(`${context.userId}/`)) {
+      const { data: signed } = await context.supabase.storage.from("avatars").createSignedUrl(ownAvatar, 60 * 60);
+      if (signed?.signedUrl) avatarUrlMap.set(ownAvatar, signed.signedUrl);
     }
     const resolve = (id: string | null, addr: string | null) => {
       const uid = id ?? (addr ? addrToUser.get(addr) ?? null : null);
       const p = uid ? profileMap.get(uid) : null;
       return {
         name: p?.full_name ?? null,
-        avatar: p?.avatar_url ? avatarUrlMap.get(p.avatar_url) ?? null : null,
+        avatar: p?.avatar_url && (uid === context.userId || /^https?:\/\//i.test(p.avatar_url))
+          ? avatarUrlMap.get(p.avatar_url) ?? null
+          : null,
       };
     };
 

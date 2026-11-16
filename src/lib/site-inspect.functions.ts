@@ -57,26 +57,28 @@ export const inspectSite = createServerFn({ method: "POST" })
     const rl = checkAnalyzeRateLimit(`site-inspect:${context.userId}`);
     if (!rl.allowed) return { ...r, error: `Too many website checks. Please wait ${rl.retryInSec}s.` };
     if (!isInspectableUrl(url)) return { ...r, error: "This website can't be checked." };
+    // The page is read through the Firecrawl connector (a fixed, server-chosen host),
+    // so this server never opens the caller's domain itself.
     const page = (async () => {
-      const t0 = Date.now();
       try {
-        // Redirects are followed by hand (max 5) so every hop is checked as a public website.
-        let target = url;
-        let res: Response | null = null;
-        for (let hop = 0; hop <= 5; hop++) {
-          if (!isInspectableUrl(target)) throw new Error("blocked");
-          res = await fetch(target, { redirect: "manual", headers: { "user-agent": "Mozilla/5.0 JenvuInspector" }, signal: AbortSignal.timeout(10000) });
-          const loc = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null;
-          if (!loc) break;
-          target = new URL(loc, target).toString();
-          res = null;
-        }
-        if (!res) throw new Error("too many redirects");
-        r.ms = Date.now() - t0;
-        r.status = res.status;
-        r.https = target.startsWith("https://");
-        r.server = res.headers.get("server");
-        const html = (await res.text()).slice(0, 800_000);
+        const lk = process.env["LOVABLE_API_KEY"];
+        const fk = process.env["FIRECRAWL_API_KEY"];
+        if (!lk || !fk) { r.error = "Website reports aren't set up yet."; return; }
+        const res = await fetch("https://connector-gateway.lovable.dev/firecrawl/v2/scrape", {
+          method: "POST",
+          redirect: "error",
+          headers: { Authorization: `Bearer ${lk}`, "X-Connection-Api-Key": fk, "Content-Type": "application/json" },
+          body: JSON.stringify({ url, formats: ["rawHtml"], onlyMainContent: false, timeout: 15000 }),
+          signal: AbortSignal.timeout(20000),
+        });
+        if (!res.ok) throw new Error(`scrape ${res.status}`);
+        const j = (await res.json()) as { data?: { rawHtml?: string; metadata?: { statusCode?: number; url?: string; sourceURL?: string } } };
+        const md = j.data?.metadata ?? {};
+        const finalUrl = String(md.url || md.sourceURL || url);
+        r.status = typeof md.statusCode === "number" ? md.statusCode : null;
+        r.https = finalUrl.startsWith("https://");
+        const html = String(j.data?.rawHtml ?? "").slice(0, 800_000);
+        if (!html && !r.status) throw new Error("empty");
         r.title = pick(html, /<title[^>]*>([\s\S]*?)<\/title>/i);
         r.description = pick(html, /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)/i) ?? pick(html, /<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i);
         r.canonical = pick(html, /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']*)/i);
@@ -94,10 +96,24 @@ export const inspectSite = createServerFn({ method: "POST" })
         r.error = "The website could not be opened.";
       }
     })();
+    // Registration data comes from rdap.org (fixed host). It answers with a redirect to
+    // the registry's RDAP server; only an https registry address for this same domain
+    // lookup is followed, so the caller can't steer the request anywhere else.
     const rdap = (async () => {
       try {
-        const res = await fetch(`https://rdap.org/domain/${domain}`, { signal: AbortSignal.timeout(8000) });
-        if (!res.ok) return;
+        let target = `https://rdap.org/domain/${encodeURIComponent(domain)}`;
+        let res: Response | null = null;
+        for (let hop = 0; hop <= 3; hop++) {
+          res = await fetch(target, { redirect: "manual", headers: { accept: "application/rdap+json" }, signal: AbortSignal.timeout(8000) });
+          const loc = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null;
+          if (!loc) break;
+          const next = new URL(loc, target);
+          if (next.protocol !== "https:" || !isInspectableUrl(next.toString())) return;
+          if (!next.pathname.toLowerCase().endsWith(`/domain/${domain}`)) return;
+          target = next.toString();
+          res = null;
+        }
+        if (!res || !res.ok) return;
         const j = (await res.json()) as { events?: { eventAction?: string; eventDate?: string }[]; entities?: { roles?: string[]; vcardArray?: unknown[] }[] };
         const ev = (a: string) => j.events?.find((e) => e.eventAction === a)?.eventDate ?? null;
         r.created = ev("registration");
@@ -117,7 +133,8 @@ export const inspectSite = createServerFn({ method: "POST" })
     if (r.canonical) s += 10;
     if (r.lang) s += 5;
     if (r.images === 0 || r.imagesNoAlt / r.images < 0.2) s += 10;
-    if (r.ms !== null && r.ms < 1500) s += 15; else if (r.ms !== null && r.ms < 3500) s += 7;
-    r.score = r.status ? s : 0;
+    // Load time isn't measured (the page is read through the connector), so the
+    // remaining checks are scaled to 100.
+    r.score = r.status ? Math.min(100, Math.round((s * 100) / 85)) : 0;
     return r;
   });

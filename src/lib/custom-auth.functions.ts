@@ -217,19 +217,6 @@ export const confirmRecoveryOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => verifyRecoveryOtp(data))
-/**
- * After a failed password sign-in, tells the page whether the email has an
- * account (so it can say "wrong password") or not (so it can say "sign up").
- */
-export const signInFailureHint = createServerFn({ method: 'POST' })
-  .inputValidator((d: unknown) => z.object({ email: z.string().trim().email().max(255) }).parse(d))
-  .handler(async ({ data }) => {
-    const { findUserByEmail } = await import('./custom-auth.server')
-    const user = await findUserByEmail(data.email.toLowerCase())
-    const exists = !!user
-    return { hint: exists ? ('wrong_password' as const) : ('no_account' as const) }
-  })
-
 /** After Google / Apple sign-in: runs the sign-up checks + free trial for brand-new accounts. */
 export const completeSocialSignup = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])

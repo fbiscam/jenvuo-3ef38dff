@@ -18,7 +18,6 @@ import {
   getTurnstileSiteKey,
   requestRecoveryOtp,
   requestSignupOtp,
-  signInFailureHint,
   signInWithTurnstile,
   finishSignInWithEmailCode,
   requestLoginCode,
@@ -153,7 +152,6 @@ function AuthPage() {
   const checkCode = useServerFn(checkSignupCode);
   const sendRecoveryOtp = useServerFn(requestRecoveryOtp);
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
-  const signInHint = useServerFn(signInFailureHint);
   const serverSignIn = useServerFn(signInWithTurnstile);
   const finishWithEmailCode = useServerFn(finishSignInWithEmailCode);
   const sendLoginCodeFn = useServerFn(requestLoginCode);
@@ -600,19 +598,9 @@ function AuthPage() {
         return;
       }
       if (/invalid.*(login|credential)/i.test(msg)) {
-        let hint: "wrong_password" | "no_account" | null = null;
-        try {
-          hint = (await signInHint({ data: { email: parsed.data.email } })).hint;
-        } catch {
-          hint = null;
-        }
-        if (hint === "wrong_password") {
-          setErrorMsg("Wrong password. Please try again or reset it with \"Forgot password\".");
-        } else if (hint === "no_account") {
-          setErrorMsg("No account found with this email. Please sign up.");
-        } else {
-          setErrorMsg("Email or password is incorrect.");
-        }
+        // One answer for wrong password and unknown email, so the page can't be used
+        // to find out which emails have accounts.
+        setErrorMsg("Email or password is incorrect. Try again, reset it with \"Forgot password\", or sign up.");
         return;
       }
       setErrorMsg(msg);

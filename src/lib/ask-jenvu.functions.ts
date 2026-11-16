@@ -32,10 +32,6 @@ After your answer, on new lines, output exactly:
 KNOWLEDGE:
 ${knowledge}`;
 
-const ANON_DAILY_LIMIT = 30;
-// Total free answers per day for all signed-out visitors together, so rotating IPs
-// can't turn the free assistant into an unbounded paid AI bill.
-const ANON_GLOBAL_DAILY_LIMIT = 600;
 export const askJenvu = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }): Promise<AskJenvuResult> => {
@@ -46,34 +42,16 @@ export const askJenvu = createServerFn({ method: "POST" })
     const { getOptionalUserId } = await import("@/lib/optional-auth.server");
     const userId = await getOptionalUserId().catch(() => null);
 
-    // Ask Jenvu is free for everyone, signed in or not. Visitors are
-    // rate-limited per IP and get a shorter history/answer budget below.
+    // Ask Jenvu is free for every signed-in account; visitors are asked to sign in
+    // so the paid AI service is never reachable without an account.
+    if (!userId) return { ok: false, error: "Please sign in to ask Jenvu. It's free with any account." };
+
     const ip =
       getRequestHeader("cf-connecting-ip") ||
       getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
       "anon";
-    const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
+    const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
-
-    // Durable daily cap for visitors (per IP) so the free assistant can't be
-    // used as an unlimited AI proxy. Signed-in users keep the per-minute limit.
-    if (!userId) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: used, error } = await supabaseAdmin.rpc("bump_ask_jenvu_anon", { _bucket: `ip:${ip}` });
-        if (error) throw error;
-        if ((used ?? 0) > ANON_DAILY_LIMIT) {
-          return { ok: false, error: "You've reached today's free question limit. Sign in to keep asking." };
-        }
-        const { data: total, error: gErr } = await supabaseAdmin.rpc("bump_ask_jenvu_anon", { _bucket: "global:visitors" });
-        if (gErr) throw gErr;
-        if ((total ?? 0) > ANON_GLOBAL_DAILY_LIMIT) {
-          return { ok: false, error: "Ask Jenvu is busy for visitors today. Sign in to keep asking." };
-        }
-      } catch {
-        return { ok: false, error: "Ask Jenvu couldn't answer right now. Please try again in a moment." };
-      }
-    }
 
     const history = data.messages.slice(-12);
     if (history[history.length - 1].role !== "user") return { ok: false, error: "Please type a question." };
@@ -81,10 +59,10 @@ export const askJenvu = createServerFn({ method: "POST" })
     try {
       const { content } = await callChatCompletion({
         models: [...ASK_JENVU_CHAIN],
-        messages: [{ role: "system", content: SYSTEM(getRelevantJenvuKnowledge(history.slice(-3).filter((m) => m.role === "user").map((m) => m.content).join(" "))) }, toServerOwnedMessage(userId ? history : history.slice(-6))],
+        messages: [{ role: "system", content: SYSTEM(getRelevantJenvuKnowledge(history.slice(-3).filter((m) => m.role === "user").map((m) => m.content).join(" "))) }, toServerOwnedMessage(history)],
         // Generous ceiling: some models count hidden reasoning against it,
         // which used to cut answers off halfway.
-        maxTokens: userId ? 4000 : 2000,
+        maxTokens: 4000,
         rejectTruncated: true,
         retriesPerModel: 1,
         // Ask the models at once and keep the fastest good answer; after 12s

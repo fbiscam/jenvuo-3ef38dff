@@ -419,7 +419,22 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
       ? createClient<Database>(url, service, { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } })
       : supabase;
     // Reopen: a rejected applicant, or one whose account was removed, starts fresh.
+    // Replacing the old application needs proof the caller owns this email: they must be
+    // signed in with it. Anyone else gets the same neutral answer and the inbox owner is
+    // told how to reapply, so the form can't be used to delete someone's application.
     if (decision.action === "reopen" && priorRow) {
+      const { getOptionalCaller } = await import("@/lib/optional-auth.server");
+      const caller = await getOptionalCaller();
+      const ownsEmail = !!caller && caller.email === email && (!priorRow.user_id || !hasAccount || priorRow.user_id === caller.id);
+      if (!ownsEmail) {
+        if (service) {
+          const day = new Date().toISOString().slice(0, 10);
+          await enqueueApplicantEmail(reader, "already_applied", email, data.full_name, data.requested_plan, `${priorRow.id}-reopen-${day}`, {
+            note: "To apply again, sign in to Jenvu with this email first, then send the Founding form again.",
+          });
+        }
+        return { ok: true };
+      }
       const { error: delErr } = await writer.from("founding_applications" as any).delete().eq("id", priorRow.id);
       if (delErr) {
         console.error("[founding] reopen failed:", delErr.message);
