@@ -53,9 +53,70 @@ export const signInWithTurnstile = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const check = await passTurnstile(data.turnstileToken)
     if (!check.ok) return { ok: false as const, error: check.error, captcha: true }
-    const { passwordSignIn } = await import('./custom-auth.server')
-    const res = await passwordSignIn(data.email, data.password)
+    const { passwordSignInWithSecondStep } = await import('./custom-auth.server')
+    const res = await passwordSignInWithSecondStep(data.email, data.password)
     return res.ok ? res : { ...res, captcha: false }
+  })
+
+/** Second step after a correct password when the account has email codes on. */
+export const finishSignInWithEmailCode = createServerFn({ method: 'POST' })
+  .inputValidator((data) =>
+    z
+      .object({
+        email: z.string().trim().email('Enter a valid email').max(255),
+        password: z.string().min(1).max(72),
+        code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    try {
+      const { finishPasswordSignInWithCode } = await import('./custom-auth.server')
+      return await finishPasswordSignInWithCode(data.email, data.password, data.code)
+    } catch {
+      return { ok: false as const, error: 'Could not finish signing in. Try again.' }
+    }
+  })
+
+/** Sends a one-time sign-in code (no password). Always answers the same so it can't reveal who has an account. */
+export const requestLoginCode = createServerFn({ method: 'POST' })
+  .inputValidator((data) =>
+    z
+      .object({
+        email: z.string().trim().email('Enter a valid email').max(255),
+        turnstileToken: turnstileTokenSchema,
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const check = await passTurnstile(data.turnstileToken)
+    if (!check.ok) return { ok: false as const, error: check.error }
+    try {
+      const { findUserByEmail, sendPurposeCode } = await import('./custom-auth.server')
+      const user = await findUserByEmail(data.email.toLowerCase())
+      if (user) await sendPurposeCode(data.email, 'login')
+      return { ok: true as const }
+    } catch {
+      return { ok: false as const, error: 'Could not send the code. Try again.' }
+    }
+  })
+
+export const signInWithLoginCode = createServerFn({ method: 'POST' })
+  .inputValidator((data) =>
+    z
+      .object({
+        email: z.string().trim().email('Enter a valid email').max(255),
+        code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    try {
+      const { codeSignIn } = await import('./custom-auth.server')
+      return await codeSignIn(data.email, data.code)
+    } catch {
+      return { ok: false as const, error: 'Could not sign you in. Request a new code.' }
+    }
   })
 
 /** Public sign-up is open (free trial: see free-trial.ts); abuse checks run in custom-auth.server.ts. */

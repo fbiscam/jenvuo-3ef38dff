@@ -20,6 +20,9 @@ import {
   requestSignupOtp,
   signInFailureHint,
   signInWithTurnstile,
+  finishSignInWithEmailCode,
+  requestLoginCode,
+  signInWithLoginCode,
 } from "@/lib/custom-auth.functions";
 import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 import { applyReferralCode } from "@/lib/referrals.functions";
@@ -152,6 +155,11 @@ function AuthPage() {
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const signInHint = useServerFn(signInFailureHint);
   const serverSignIn = useServerFn(signInWithTurnstile);
+  const finishWithEmailCode = useServerFn(finishSignInWithEmailCode);
+  const sendLoginCodeFn = useServerFn(requestLoginCode);
+  const loginWithCode = useServerFn(signInWithLoginCode);
+  // "login" = one-time code instead of a password; "second" = code after a correct password.
+  const [codeFor, setCodeFor] = React.useState<"login" | "second">("login");
   const loadSiteKey = useServerFn(getTurnstileSiteKey);
   const [turnstileSiteKey, setTurnstileSiteKey] = React.useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
@@ -171,7 +179,7 @@ function AuthPage() {
   );
   // A brand-new account goes straight to API keys to create its first key.
   const signedUpRef = React.useRef(false);
-  const [signinStep, setSigninStep] = React.useState<"choose" | "email" | "password">("choose");
+  const [signinStep, setSigninStep] = React.useState<"choose" | "email" | "password" | "code">("choose");
   const [signupStep, setSignupStep] = React.useState<"choose" | "form" | "details">("choose");
   const [socialBusy, setSocialBusy] = React.useState<SocialProvider | null>(null);
   // "Completing sign-in / sign-up" screen while the session is checked and the next page opens.
@@ -492,12 +500,12 @@ function AuthPage() {
 
   // Autofocus OTP inputs when the step opens
   React.useEffect(() => {
-    if (mode === "signup" && otpStep) {
+    if ((mode === "signup" && otpStep) || (mode === "signin" && signinStep === "code")) {
       otpInputRef.current?.focus();
     } else if (mode === "forgot" && forgotStep === "code") {
       recoveryOtpInputRef.current?.focus();
     }
-  }, [mode, otpStep, forgotStep]);
+  }, [mode, otpStep, forgotStep, signinStep]);
 
   // Auto-submit OTP — only when a full 6 digits are present, no error is showing,
   // no verify is already in flight, and the code matches the CURRENT OTP step.
@@ -511,17 +519,20 @@ function AuthPage() {
 
     const isSignupOtp = mode === "signup" && otpStep;
     const isRecoveryOtp = mode === "forgot" && forgotStep === "code";
+    const isSigninCode = mode === "signin" && signinStep === "code";
     // Exactly one flow must be active for auto-submit
-    if (isSignupOtp === isRecoveryOtp) return;
+    if (Number(isSignupOtp) + Number(isRecoveryOtp) + Number(isSigninCode) !== 1) return;
 
     lastSubmittedOtpRef.current = otpCode;
     const fakeEvent = { preventDefault: () => {} } as React.FormEvent;
-    if (isSignupOtp) {
+    if (isSigninCode) {
+      void submitSigninCode(fakeEvent);
+    } else if (isSignupOtp) {
       void verifyOtp(fakeEvent);
     } else {
       void verifyRecoveryOtp(fakeEvent);
     }
-  }, [otpCode, loading, mode, otpStep, forgotStep, otpError]);
+  }, [otpCode, loading, mode, otpStep, forgotStep, otpError, signinStep]);
 
   const signInSchema = z.object({
     email: z.string().trim().email("Enter a valid email").max(255),
@@ -557,24 +568,26 @@ function AuthPage() {
     }
     setLoading(true);
     let error: { message: string } | null = null;
-    if (turnstileSiteKey) {
-      // Cloudflare check is on: the server verifies it before signing in.
-      const res = await serverSignIn({
-        data: { email: parsed.data.email, password: parsed.data.password, turnstileToken },
-      }).catch(() => ({ ok: false as const, error: "Sign-in failed. Please try again.", captcha: false }));
-      freshTurnstile();
-      if (res.ok) {
-        const set = await supabase.auth.setSession(res.session);
-        error = set.error ? { message: set.error.message } : null;
-      } else {
-        error = { message: res.error };
-      }
+    // Always signed in on the server: it runs the security check and, when the
+    // account has email codes on, sends the code instead of opening a session.
+    const res = await serverSignIn({
+      data: { email: parsed.data.email, password: parsed.data.password, turnstileToken },
+    }).catch(() => ({ ok: false as const, error: "Sign-in failed. Please try again.", captcha: false }));
+    if (turnstileSiteKey) freshTurnstile();
+    if (res.ok) {
+      const set = await supabase.auth.setSession(res.session);
+      error = set.error ? { message: set.error.message } : null;
+    } else if ("needsEmailCode" in res && res.needsEmailCode) {
+      setLoading(false);
+      setCodeFor("second");
+      setOtpCode("");
+      setOtpError(null);
+      setResendCooldown(45);
+      setSigninStep("code");
+      flashInfo("6-digit security code sent to your email");
+      return;
     } else {
-      const res = await supabase.auth.signInWithPassword({
-        email: parsed.data.email,
-        password: parsed.data.password,
-      });
-      error = res.error ? { message: res.error.message } : null;
+      error = { message: res.error };
     }
     setLoading(false);
     if (error) {
@@ -612,6 +625,60 @@ function AuthPage() {
     }
     // Do NOT navigate here — the onAuthStateChange listener above will
     // check MFA level and either open the MFA challenge or navigate.
+  };
+
+  const rememberEmail = (value: string) => {
+    if (rememberLogin) window.localStorage.setItem(SAVED_LOGIN_EMAIL_KEY, value);
+    else window.localStorage.removeItem(SAVED_LOGIN_EMAIL_KEY);
+  };
+
+  // One-time code sign-in: email a code instead of typing the password.
+  const sendLoginCode = async () => {
+    setErrorMsg(null);
+    const ok = z.string().trim().email().max(255).safeParse(email);
+    if (!ok.success) { setErrorMsg("Enter a valid email"); return; }
+    if (needsTurnstile) { setErrorMsg("Please complete the security check."); return; }
+    setLoading(true);
+    const res = await sendLoginCodeFn({ data: { email: ok.data, turnstileToken } })
+      .catch(() => ({ ok: false as const, error: "Could not send the code. Try again." }));
+    if (turnstileSiteKey) freshTurnstile();
+    setLoading(false);
+    if (!res.ok) { setErrorMsg(res.error || "Could not send the code. Try again."); return; }
+    setCodeFor("login");
+    setOtpCode("");
+    setOtpError(null);
+    setResendCooldown(45);
+    setSigninStep("code");
+    flashInfo("If this email has an account, a 6-digit sign-in code is on its way");
+  };
+
+  const resendSigninCode = async () => {
+    if (resendCooldown > 0) return;
+    if (codeFor === "login") { await sendLoginCode(); return; }
+    await signIn({ preventDefault: () => {} } as React.FormEvent);
+  };
+
+  const submitSigninCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setOtpError(null);
+    setErrorMsg(null);
+    if (!/^\d{6}$/.test(otpCode)) { setOtpError("Enter the 6-digit code from your email"); return; }
+    setLoading(true);
+    const res = codeFor === "login"
+      ? await loginWithCode({ data: { email: email.trim(), code: otpCode } }).catch(() => ({ ok: false as const, error: "Could not sign you in. Try again." }))
+      : await finishWithEmailCode({ data: { email: email.trim(), password, code: otpCode } }).catch(() => ({ ok: false as const, error: "Could not sign you in. Try again." }));
+    if (!res.ok) {
+      setLoading(false);
+      setOtpError(res.error || "Invalid code. Try again.");
+      setOtpShake(true);
+      setTimeout(() => setOtpShake(false), 400);
+      return;
+    }
+    const set = await supabase.auth.setSession(res.session);
+    setLoading(false);
+    if (set.error) { setErrorMsg(set.error.message); return; }
+    rememberEmail(email.trim());
+    // The SIGNED_IN listener checks the authenticator step and opens the next page.
   };
 
   const signUp = async (e: React.FormEvent) => {
@@ -1149,7 +1216,7 @@ function AuthPage() {
       ? forgotStep === "code" ? "Check your email" : forgotStep === "reset" ? "Set a new password" : "Reset your password"
       : mode === "signup"
         ? otpStep ? "Verify your email" : signupStep === "details" ? "Complete your sign up" : signupStep === "form" ? "Sign up with your email" : "Create your account"
-        : signinStep === "choose" ? "Log into your account" : "Log in with your email";
+        : signinStep === "choose" ? "Log into your account" : signinStep === "code" ? "Check your email" : "Log in with your email";
 
   if (completing && !mfaChallenge && !errorMsg) {
     return (
@@ -1406,6 +1473,26 @@ function AuthPage() {
                 <button type="button" onClick={() => { setSigninStep("choose"); setErrorMsg(null); }} className={pillLight}>Go back</button>
               </div>
             </form>
+          ) : signinStep === "code" ? (
+            <form onSubmit={submitSigninCode} className="mt-4 space-y-5">
+              <p className="text-center text-[15px] leading-relaxed text-muted-foreground">
+                {codeFor === "login"
+                  ? <>If <span className="text-foreground">{email}</span> has a Jenvu account, we've emailed it a one-time sign-in code. Enter it below:</>
+                  : <>Your account asks for an email code. We've sent a 6-digit security code to <span className="text-foreground">{email}</span>. Enter it below:</>}
+              </p>
+              {otpBoxes(otpInputRef, "signin-code-error")}
+              {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} />}
+              {resendLine(() => void resendSigninCode())}
+              {errorBox}
+              <div className="space-y-3">
+                <button type="submit" disabled={loading || otpCode.length !== 6} className={pillDark}>
+                  {loading ? btnLoading("Signing in…") : "Continue"}
+                </button>
+                <button type="button" onClick={() => { setSigninStep("password"); setOtpCode(""); setOtpError(null); setErrorMsg(null); }} disabled={loading} className={pillLight}>
+                  Go back
+                </button>
+              </div>
+            </form>
           ) : (
             <form onSubmit={signIn} className="mt-6 space-y-4">
               <div>
@@ -1435,6 +1522,10 @@ function AuthPage() {
               <div className="space-y-3 pt-1">
                 <button type="submit" disabled={loading} className={pillDark}>
                   {loading ? btnLoading("Logging in…") : "Login"}
+                </button>
+                <button type="button" onClick={() => void sendLoginCode()} disabled={loading} className={pillLight}>
+                  <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
+                  <span>Email me a one-time code</span>
                 </button>
                 <button type="button" onClick={() => { setSigninStep("email"); setErrorMsg(null); }} disabled={loading} className={pillLight}>
                   Go back

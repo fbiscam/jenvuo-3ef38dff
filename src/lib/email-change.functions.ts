@@ -21,6 +21,13 @@ export const requestEmailChange = createServerFn({ method: 'POST' })
   )
   .handler(async ({ data, context }) => {
     try {
+      // Blocked for 24h after a sign-in from a new device (two-factor.ts).
+      const { readSecurityHold } = await import('./two-factor.server')
+      const hold = await readSecurityHold(context.userId)
+      if (hold) {
+        const { securityHoldMessage } = await import('./two-factor')
+        return { ok: false as const, error: securityHoldMessage(hold) }
+      }
       const { createEmailChangeRequest } = await import('./email-change.server')
       const { data: userRes, error } = await context.supabase.auth.getUser()
       if (error || !userRes.user?.email) {

@@ -1,6 +1,5 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
-import { trialRateBlock } from '@/lib/free-trial'
-import { getEffectiveDailyTokenLimit, getPlanCapabilities, tokensToUsd, TOKEN_RATE_USD_PER_MILLION } from '@/lib/plan-entitlements'
+import { getEffectiveDailyTokenLimit, getPlanCapabilities, planRateBlock, tokensToUsd, TOKEN_RATE_USD_PER_MILLION } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
 export const EXTENSION_TOKEN_PRICE_MULTIPLIER = 0.5
@@ -60,19 +59,16 @@ export async function getExtensionEntitlement(userId: string) {
   const tokensRemainingToday = Math.max(0, dailyTokenLimit - tokensUsedToday)
   const overDailyTokens = dailyTokenLimit > 0 && tokensUsedToday >= dailyTokenLimit
   const planOk = capabilities.extensionAi && keyLimit > 0
-  // Free and free-trial accounts (not Founding members) get a per-minute request cap.
+  // Every plan has a per-minute request cap (PLAN_API_RPM: Free 10, Pro 20, Elite 40, Ultra 80).
   let rateBlock: string | null = null
-  if (planOk && (planId === 'free' || sub?.is_trial)) {
-    const { data: founding } = await admin.rpc('is_founding_member', { _user_id: userId })
-    if (!founding) {
-      const { count } = await admin
-        .from('credit_ledger')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('reason', 'extension_api')
-        .gte('created_at', new Date(Date.now() - 60_000).toISOString())
-      rateBlock = trialRateBlock({ isFreeTrial: true, requestsLastMinute: Number(count ?? 0) })
-    }
+  if (planOk) {
+    const { count } = await admin
+      .from('credit_ledger')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('reason', 'extension_api')
+      .gte('created_at', new Date(Date.now() - 60_000).toISOString())
+    rateBlock = planRateBlock({ planId, requestsLastMinute: Number(count ?? 0) })
   }
   const result = {
     allowed: planOk && balance > 0 && !overDailyTokens && !rateBlock,

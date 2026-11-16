@@ -5,7 +5,9 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAutoCloseTrades } from "@/hooks/useAutoCloseTrades";
 import { verifyTrustedDevice } from "@/lib/trusted-devices.functions";
-import { restoreSharedSession, authSignInUrl } from "@/lib/cross-domain-session";
+import { restoreSharedSession, authSignInUrl, signOutAndRedirect } from "@/lib/cross-domain-session";
+import { checkEmailSecondStep } from "@/lib/two-factor.functions";
+import { readTokenClaims, sessionMethods } from "@/lib/two-factor";
 
 const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 
@@ -15,6 +17,27 @@ const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
 let verifiedUserId: string | null = null;
 let trustedDeviceVerified: string | null = null;
 let planCheckedUserId: string | null = null;
+let emailStepCheckedSession: string | null = null;
+
+/**
+ * Accounts with email codes on: a password session that skipped the emailed
+ * code (e.g. signed in outside the sign-in page) is signed out. Only asks the
+ * server when the token says email codes are on and the sign-in used a password.
+ */
+async function owesEmailCode(session: { access_token: string; user: { app_metadata?: Record<string, unknown> } }): Promise<boolean> {
+  if (session.user.app_metadata?.email_2fa !== true) return false;
+  const claims = readTokenClaims(session.access_token);
+  if (!sessionMethods(claims).includes("password")) return false;
+  const sid = String(claims?.session_id || "");
+  if (sid && emailStepCheckedSession === sid) return false;
+  try {
+    const res = await checkEmailSecondStep();
+    if (!res.required) emailStepCheckedSession = sid;
+    return res.required;
+  } catch {
+    return false;
+  }
+}
 
 async function hasValidTrustedDevice(uid: string): Promise<boolean> {
   if (typeof window === "undefined") return false;
@@ -92,6 +115,12 @@ export const Route = createFileRoute("/_authenticated")({
         return;
       }
       throw redirect({ to: "/auth", search: { verify: "1" } as never });
+    }
+
+    if (await owesEmailCode(session)) {
+      // Shared sign-out clears this tab and the .jenvu.com copy, then opens sign-in.
+      await signOutAndRedirect(location.href);
+      return;
     }
 
     // getAuthenticatorAssuranceLevel decodes the current JWT — synchronous, no network.

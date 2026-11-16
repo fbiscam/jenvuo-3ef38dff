@@ -155,10 +155,10 @@ function SecurityPage() {
       <div id="security" className="mt-6 divide-y divide-gc-line">
         <Row
           id="2fa"
-          title="Two-factor authentication"
-          hint="Ask for a six-digit code from your authenticator app every time you sign in."
+          title="Two-step sign-in"
+          hint="Ask for a code from your email, your authenticator app, or both, every time you sign in."
           open={open === "2fa"}
-          action={<Toggle open={open === "2fa"} onClick={() => toggle("2fa")} label="Manage MFA" />}
+          action={<Toggle open={open === "2fa"} onClick={() => toggle("2fa")} label="Manage" />}
         >
           <TwoFactorSettings />
         </Row>
@@ -176,7 +176,7 @@ function SecurityPage() {
         <Row
           id="change-email"
           title="Change email"
-          hint="We confirm the change through a link sent to your current email."
+          hint="We confirm the change through a link sent to your current email. Locked for 24 hours after a sign-in from a new device."
           open={open === "email"}
           action={<Toggle open={open === "email"} onClick={() => toggle("email")} label="Change email" />}
         >

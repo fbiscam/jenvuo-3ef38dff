@@ -3,10 +3,11 @@ import { sendLovableEmail } from '@lovable.dev/email-js'
 import { render } from '@react-email/render'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { RecoveryEmail } from '@/lib/email-templates/recovery'
+import { SignInCodeEmail, signInCodeSubject } from '@/lib/email-templates/sign-in-code'
 
 type CustomAuthEmailInput = {
   to: string
-  type: 'signup' | 'recovery'
+  type: 'signup' | 'recovery' | 'login' | 'second_step' | 'email_2fa_setup'
   code: string
   siteUrl?: string
   resetLink?: string
@@ -44,6 +45,8 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
         token={code}
         showLink={false}
       />
+    ) : type !== 'recovery' ? (
+      <SignInCodeEmail kind={type} token={code} />
     ) : (
       <RecoveryEmail
         siteName={SITE_NAME}
@@ -57,7 +60,7 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
 
   const html = await render(element)
   const text = await render(element, { plainText: true })
-  const subject = type === 'signup' ? 'Confirm your email' : 'Reset your password'
+  const subject = type === 'signup' ? 'Confirm your email' : type === 'recovery' ? 'Reset your password' : signInCodeSubject(type)
 
   await supabaseAdmin.from('email_send_log').insert({
     message_id: messageId,

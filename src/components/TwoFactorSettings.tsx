@@ -1,7 +1,15 @@
 import * as React from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Shield, ShieldCheck, ShieldOff, Copy, Check } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Loader2, Shield, ShieldCheck, ShieldOff, Copy, Check, Mail, Smartphone } from "lucide-react";
+import {
+  confirmEmailTwoStep,
+  disableAuthenticator,
+  disableEmailTwoStep,
+  getTwoStepStatus,
+  startEmailTwoStep,
+} from "@/lib/two-factor.functions";
 
 type Factor = {
   id: string;
@@ -18,7 +26,8 @@ type EnrollData = {
   uri: string;
 };
 
-export function TwoFactorSettings() {
+function AuthenticatorSettings({ holdUntil }: { holdUntil: string | null }) {
+  const removeFactor = useServerFn(disableAuthenticator);
   const [loading, setLoading] = React.useState(true);
   const [busy, setBusy] = React.useState(false);
   const [factors, setFactors] = React.useState<Factor[]>([]);
@@ -144,15 +153,15 @@ export function TwoFactorSettings() {
 
   const disable = async () => {
     if (!verified) return;
-    if (!window.confirm("Disable two-factor authentication? You'll no longer need a code at sign-in.")) return;
+    if (!window.confirm("Remove the authenticator app? You'll no longer need its code at sign-in.")) return;
     setBusy(true);
-    const { error } = await supabase.auth.mfa.unenroll({ factorId: verified.id });
+    const res = await removeFactor({ data: { factorId: verified.id } }).catch(() => ({ ok: false as const, error: "Could not remove the authenticator. Try again." }));
     setBusy(false);
-    if (error) {
-      toast.error(error.message);
+    if (!res.ok) {
+      toast.error(res.error);
       return;
     }
-    toast.success("Two-factor authentication disabled");
+    toast.success("Authenticator app removed");
     void refresh();
   };
 
@@ -179,7 +188,7 @@ export function TwoFactorSettings() {
   // Enrollment in progress
   if (enroll) {
     return (
-      <form onSubmit={verifyEnroll} className="mt-5 space-y-4 rounded-xl border border-border bg-card p-5">
+      <form onSubmit={verifyEnroll} className="space-y-4 rounded-xl border border-border bg-card p-5">
         <div className="flex items-start gap-3">
           <Shield className="mt-0.5 h-5 w-5 shrink-0 text-foreground" />
           <div>
@@ -255,22 +264,23 @@ export function TwoFactorSettings() {
   // Enabled state
   if (verified) {
     return (
-      <div className="mt-5 rounded-xl border border-border bg-card p-4">
+      <div className="rounded-xl border border-border bg-card p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
           
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-foreground whitespace-nowrap">Two-factor authentication is ON</p>
+            <p className="flex items-center gap-2 text-sm font-medium text-foreground"><Smartphone className="h-4 w-4" />Authenticator app is ON</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Every sign-in requires a 6-digit code from your authenticator app.
+              Every sign-in asks for a 6-digit code from your authenticator app.
             </p>
+            {holdUntil && <HoldNote until={holdUntil} />}
           </div>
           <button
             onClick={disable}
-            disabled={busy}
+            disabled={busy || !!holdUntil}
             className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
           >
             {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldOff className="h-3.5 w-3.5" />}
-            Disable
+            Remove
           </button>
         </div>
       </div>
@@ -279,12 +289,12 @@ export function TwoFactorSettings() {
 
   // Disabled state — offer to enable
   return (
-    <div className="mt-5 rounded-xl border border-border bg-card p-4">
+    <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-foreground">Two-factor authentication</p>
-          <p className="mt-1 text-xs text-muted-foreground">Require a 6-digit code from an authenticator app on every sign-in.</p>
+          <p className="flex items-center gap-2 text-sm font-medium text-foreground"><Smartphone className="h-4 w-4" />Authenticator app</p>
+          <p className="mt-1 text-xs text-muted-foreground">Ask for a 6-digit code from Google Authenticator, Authy or 1Password on every sign-in.</p>
         </div>
         <button
           onClick={startEnroll}
@@ -292,10 +302,140 @@ export function TwoFactorSettings() {
           className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-background hover:opacity-90 disabled:opacity-50"
         >
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Shield className="h-3.5 w-3.5" />}
-          Enable
+          Set up
         </button>
       </div>
     </div>
   );
 }
 
+
+
+function HoldNote({ until }: { until: string }) {
+  return (
+    <p className="mt-2 text-xs font-medium text-destructive">
+      A sign-in from a new device was spotted, so removing this is locked until {new Date(until).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}.
+    </p>
+  );
+}
+
+/** Email codes: turned on only after the code sent to the account email is entered. */
+function EmailCodeSettings({ on, holdUntil, onChange }: { on: boolean; holdUntil: string | null; onChange: () => void }) {
+  const start = useServerFn(startEmailTwoStep);
+  const confirm = useServerFn(confirmEmailTwoStep);
+  const turnOff = useServerFn(disableEmailTwoStep);
+  const [busy, setBusy] = React.useState(false);
+  const [sentTo, setSentTo] = React.useState<string | null>(null);
+  const [code, setCode] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+
+  const send = async () => {
+    setBusy(true);
+    setError(null);
+    const res = await start().catch(() => ({ ok: false as const, error: "Could not send the code. Try again." }));
+    setBusy(false);
+    if (!res.ok) { toast.error(res.error); return; }
+    setSentTo(res.email);
+    setCode("");
+    toast.success(res.resent ? `Code sent to ${res.email}` : "A code was just sent. Check your inbox.");
+  };
+
+  const verify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(code)) { setError("Enter the 6-digit code from your email."); return; }
+    setBusy(true);
+    const res = await confirm({ data: { code } }).catch(() => ({ ok: false as const, error: "Could not check the code. Try again." }));
+    setBusy(false);
+    if (!res.ok) { setError(res.error); setCode(""); return; }
+    setSentTo(null);
+    setCode("");
+    toast.success("Email codes turned on");
+    onChange();
+  };
+
+  const off = async () => {
+    if (!window.confirm("Turn off email codes? Password sign-ins will no longer ask for an emailed code.")) return;
+    setBusy(true);
+    const res = await turnOff().catch(() => ({ ok: false as const, error: "Could not turn off email codes. Try again." }));
+    setBusy(false);
+    if (!res.ok) { toast.error(res.error); return; }
+    toast.success("Email codes turned off");
+    onChange();
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-2 text-sm font-medium text-foreground"><Mail className="h-4 w-4" />Email code {on ? "is ON" : ""}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {on ? "After your password, every sign-in asks for a 6-digit code sent to your email." : "After your password, ask for a 6-digit code sent to your email."}
+          </p>
+          {on && holdUntil && <HoldNote until={holdUntil} />}
+        </div>
+        {on ? (
+          <button onClick={off} disabled={busy || !!holdUntil} className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50">
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldOff className="h-3.5 w-3.5" />}
+            Turn off
+          </button>
+        ) : !sentTo ? (
+          <button onClick={send} disabled={busy} className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-background hover:opacity-90 disabled:opacity-50">
+            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+            Turn on
+          </button>
+        ) : null}
+      </div>
+      {!on && sentTo && (
+        <form onSubmit={verify} className="mt-4 space-y-3">
+          <p className="text-xs text-muted-foreground">We sent a code to <span className="text-foreground">{sentTo}</span>. Enter it to turn email codes on.</p>
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            value={code}
+            onChange={(e) => { setError(null); setCode(e.target.value.replace(/\D/g, "").slice(0, 6)); }}
+            aria-label="Email code"
+            placeholder="••••••"
+            className={`block w-full max-w-[260px] rounded-lg border px-4 py-2.5 text-center font-mono text-xl tracking-[0.5em] outline-none ${error ? "border-destructive text-destructive" : "border-border bg-background text-foreground focus:border-foreground"}`}
+          />
+          {error && <p className="text-xs text-destructive">{error}</p>}
+          <div className="flex flex-wrap gap-2">
+            <button type="submit" disabled={busy || code.length !== 6} className="inline-flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50">
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
+              Verify & turn on
+            </button>
+            <button type="button" onClick={send} disabled={busy} className="rounded-full border border-border px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50">Send again</button>
+            <button type="button" onClick={() => { setSentTo(null); setCode(""); setError(null); }} disabled={busy} className="rounded-full px-4 py-2 text-sm text-muted-foreground hover:text-foreground">Cancel</button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
+/** Two-step sign-in: email code, authenticator app, or both. */
+export function TwoFactorSettings() {
+  const loadStatus = useServerFn(getTwoStepStatus);
+  const [status, setStatus] = React.useState<{ emailCode: boolean; holdUntil: string | null } | null>(null);
+  const refresh = React.useCallback(() => {
+    void loadStatus().then(setStatus).catch(() => setStatus({ emailCode: false, holdUntil: null }));
+  }, [loadStatus]);
+  React.useEffect(() => { refresh(); }, [refresh]);
+
+  if (!status) {
+    return (
+      <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading two-step settings…
+      </div>
+    );
+  }
+  return (
+    <div className="mt-4 space-y-3">
+      <p className="text-xs text-muted-foreground">Use one method or both. With both on, sign-in asks for the email code first, then the authenticator code.</p>
+      <EmailCodeSettings on={status.emailCode} holdUntil={status.holdUntil} onChange={refresh} />
+      <AuthenticatorSettings holdUntil={status.holdUntil} />
+    </div>
+  );
+}

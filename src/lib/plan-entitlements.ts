@@ -29,10 +29,37 @@ export const TOKEN_RATE_USD_PER_MILLION = 3
 
 /** Daily token allowance per plan (prompt + completion tokens combined). */
 export const PLAN_DAILY_TOKEN_LIMITS: Record<string, number> = {
-  free: 100_000,
-  pro: 1_500_000,
-  elite: 5_000_000,
-  ultra: 10_000_000,
+  free: 1_000_000,
+  pro: 4_000_000,
+  elite: 10_000_000,
+  ultra: 20_000_000,
+}
+
+/** API requests per minute per plan (each paid tier doubles the one below it from Pro). */
+export const PLAN_API_RPM: Record<string, number> = {
+  free: 10,
+  pro: 20,
+  elite: 40,
+  ultra: 80,
+}
+
+export function getPlanApiRpm(planId: string): number {
+  return PLAN_API_RPM[planId.toLowerCase()] ?? PLAN_API_RPM.free
+}
+
+/** Error for an API call over the plan's per-minute limit, or null when it may run. */
+export function planRateBlock(input: { planId: string; requestsLastMinute: number }): string | null {
+  const rpm = getPlanApiRpm(input.planId)
+  if ((Number(input.requestsLastMinute) || 0) < rpm) return null
+  const name = input.planId.charAt(0).toUpperCase() + input.planId.slice(1).toLowerCase()
+  const more = input.planId.toLowerCase() === 'ultra' ? '' : ', or upgrade your plan for a higher limit'
+  return `${name} plan limit: ${rpm} requests per minute. Wait a moment and try again${more}.`
+}
+
+/** Short label for the daily token allowance, e.g. "4M tokens a day". */
+export function dailyTokenLabel(planId: string): string {
+  const n = getPlanDailyTokenLimit(planId)
+  return `${n >= 1_000_000 ? `${n / 1_000_000}M` : `${Math.round(n / 1000)}K`} tokens a day`
 }
 
 export function getPlanDailyTokenLimit(planId: string): number {

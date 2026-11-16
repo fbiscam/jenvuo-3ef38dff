@@ -44,6 +44,21 @@ export type Database = {
         }
         Relationships: []
       }
+      account_email_2fa: {
+        Row: {
+          enabled_at: string
+          user_id: string
+        }
+        Insert: {
+          enabled_at?: string
+          user_id: string
+        }
+        Update: {
+          enabled_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       admin_sent_emails: {
         Row: {
           body: string
@@ -978,6 +993,24 @@ export type Database = {
           purpose?: string
           recovery_link?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      email_2fa_sessions: {
+        Row: {
+          created_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          session_id?: string
+          user_id?: string
         }
         Relationships: []
       }

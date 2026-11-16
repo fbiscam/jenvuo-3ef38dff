@@ -3,7 +3,7 @@ import type { Session, User } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { sendCustomAuthEmail } from './custom-auth-email.server'
 
-type OtpPurpose = 'signup' | 'recovery'
+type OtpPurpose = 'signup' | 'recovery' | 'login' | 'second_step' | 'email_2fa_setup'
 
 type OtpRow = {
   id: string
@@ -657,4 +657,117 @@ export async function finishSocialSignup(input: { userId: string; ip?: string; c
     await claimProTrial(user.id, (input.fingerprint || '').split('_')[0], input.ip)
   } catch { /* never block signup on trial bookkeeping */ }
   return { ok: true, isNew: true }
+}
+
+
+// ---------------------------------------------------------------------------
+// One-time email codes for sign-in and the email second step (rules: two-factor.ts)
+// ---------------------------------------------------------------------------
+
+type CodePurpose = 'login' | 'second_step' | 'email_2fa_setup'
+/** No new code for the same email+purpose more often than this. */
+const CODE_RESEND_GAP_MS = 45_000
+
+/** Creates and emails a 6-digit code for `purpose`, replacing any open one. Returns false when one was sent moments ago. */
+export async function sendPurposeCode(rawEmail: string, purpose: CodePurpose): Promise<boolean> {
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const admin = supabaseAdmin as any
+  const email = normalizeEmail(rawEmail)
+  const { data: recent } = await admin
+    .from('custom_auth_otps')
+    .select('id')
+    .eq('email', email)
+    .eq('purpose', purpose)
+    .gte('created_at', new Date(Date.now() - CODE_RESEND_GAP_MS).toISOString())
+    .limit(1)
+  if ((recent ?? []).length) return false
+  await admin
+    .from('custom_auth_otps')
+    .update({ consumed_at: new Date().toISOString() })
+    .eq('email', email)
+    .eq('purpose', purpose)
+    .is('consumed_at', null)
+  const code = generateSixDigitCode()
+  const { error } = await admin.from('custom_auth_otps').insert({
+    email,
+    purpose,
+    code_hash: await hmacCode(email, purpose, code),
+    expires_at: new Date(Date.now() + OTP_TTL_MINUTES * 60_000).toISOString(),
+  })
+  if (error) throw new Error(error.message)
+  await sendCustomAuthEmail({ to: email, type: purpose, code })
+  return true
+}
+
+/** Checks and uses up a code (5 wrong tries max). */
+export async function usePurposeCode(rawEmail: string, purpose: CodePurpose, code: string): Promise<{ ok: boolean; error?: string }> {
+  const email = normalizeEmail(rawEmail)
+  const verified = await verifyCustomOtp(email, purpose, code)
+  if (!verified.ok) return { ok: false, error: verified.error }
+  await consumeOtp(verified.row.id)
+  return { ok: true }
+}
+
+export async function emailCodeOn(userId: string): Promise<boolean> {
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const { data } = await (supabaseAdmin as any).from('account_email_2fa').select('user_id').eq('user_id', userId).maybeSingle()
+  return !!data
+}
+
+/** Marks the session in this token as having passed the email second step. */
+export async function markSessionEmailVerified(accessToken: string, userId: string) {
+  const { readTokenClaims } = await import('./two-factor')
+  const sessionId = String(readTokenClaims(accessToken)?.session_id || '')
+  if (!sessionId) return
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  await (supabaseAdmin as any).from('email_2fa_sessions').upsert({ session_id: sessionId, user_id: userId })
+}
+
+/**
+ * Password sign-in on the server. When the account has email codes on, the new
+ * session is ended right away and a code is emailed instead; the sign-in only
+ * finishes in `finishPasswordSignInWithCode`.
+ */
+export async function passwordSignInWithSecondStep(email: string, password: string) {
+  const client = publicAuthClient()
+  const { data, error } = await client.auth.signInWithPassword({ email, password })
+  if (error || !data.session) return { ok: false as const, error: error?.message || 'Sign-in failed.' }
+  if (await emailCodeOn(data.user.id)) {
+    await client.auth.signOut({ scope: 'local' }).catch(() => undefined)
+    await sendPurposeCode(email, 'second_step')
+    return { ok: false as const, needsEmailCode: true as const, error: 'Enter the code we emailed you.' }
+  }
+  return {
+    ok: true as const,
+    session: { access_token: data.session.access_token, refresh_token: data.session.refresh_token },
+  }
+}
+
+export async function finishPasswordSignInWithCode(email: string, password: string, code: string) {
+  const checked = await usePurposeCode(email, 'second_step', code)
+  if (!checked.ok) return { ok: false as const, error: checked.error || 'Invalid code. Try again.' }
+  const { data, error } = await publicAuthClient().auth.signInWithPassword({ email, password })
+  if (error || !data.session) return { ok: false as const, error: error?.message || 'Sign-in failed.' }
+  await markSessionEmailVerified(data.session.access_token, data.user.id)
+  return {
+    ok: true as const,
+    session: { access_token: data.session.access_token, refresh_token: data.session.refresh_token },
+  }
+}
+
+/** One-time email code sign-in (no password). */
+export async function codeSignIn(rawEmail: string, code: string) {
+  const email = normalizeEmail(rawEmail)
+  const checked = await usePurposeCode(email, 'login', code)
+  if (!checked.ok) return { ok: false as const, error: checked.error || 'Invalid code. Try again.' }
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const link = await supabaseAdmin.auth.admin.generateLink({ type: 'magiclink', email })
+  const otp = link.data?.properties?.email_otp
+  if (link.error || !otp) return { ok: false as const, error: 'Could not sign you in. Request a new code.' }
+  const { data, error } = await publicAuthClient().auth.verifyOtp({ email, token: otp, type: 'email' })
+  if (error || !data.session || !data.user) return { ok: false as const, error: error?.message || 'Could not sign you in. Request a new code.' }
+  return {
+    ok: true as const,
+    session: { access_token: data.session.access_token, refresh_token: data.session.refresh_token },
+  }
 }
