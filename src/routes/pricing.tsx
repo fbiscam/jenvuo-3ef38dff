@@ -147,7 +147,7 @@ const GROUPS: ReadonlyArray<Group> = [
     rows: [
       { f: "Free on every plan, no extra cost", v: ALL },
       { f: "NFP, CPI, FOMC, PCE, PPI and GDP releases", v: ALL },
-      { f: "Live countdown to the next US high-impact release", v: ALL },
+      { f: "Live countdown to next US high-impact release", v: ALL },
       { f: "Last-hour pre-news banner", v: ALL },
       { f: "Gold UP / DOWN read if the number beats or misses", v: ALL },
       { f: `Confidence from the last ${RELEASES_PER_EVENT} real releases`, v: ALL },
