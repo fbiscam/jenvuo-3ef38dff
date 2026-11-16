@@ -1121,7 +1121,7 @@ async function getServiceClient() {
 async function signPaths(admin: any, rows: FoundingDocFile[]): Promise<FoundingDocFile[]> {
   const paths = rows.map((r) => r.storage_path);
   if (!paths.length) return rows;
-  const { data } = await admin.storage.from(BUCKET).createSignedUrls(paths, 60 * 60);
+  const { data } = await admin.storage.from(BUCKET).createSignedUrls(paths, 5 * 60);
   const map = new Map<string, string>();
   (data || []).forEach((d: any) => {
     if (d && d.path && d.signedUrl) map.set(d.path, d.signedUrl);

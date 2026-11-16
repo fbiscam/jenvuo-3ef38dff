@@ -393,6 +393,13 @@
       "when": 1794827869170,
       "tag": "0055_service_status_daily_history",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1794833368809,
+      "tag": "0056_migration",
+      "breakpoints": true
     }
   ]
 }

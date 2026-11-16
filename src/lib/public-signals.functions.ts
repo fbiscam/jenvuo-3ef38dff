@@ -18,9 +18,21 @@ export type PublicSignalRow = {
  */
 export const getPublicRecentSignals = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicSignalRow[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Only signed-in callers, read with their own token so the paid-only
+    // row rules apply; visitors and non-paying accounts get an empty list.
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
+    const header = getRequestHeader("authorization") ?? "";
+    const token = header.toLowerCase().startsWith("bearer ") ? header.slice(7).trim() : "";
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+    if (!token || !url || !key) return [];
+    const { createClient } = await import("@supabase/supabase-js");
+    const db = createClient(url, key, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
     const since = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await db
       .from("signal_alerts")
       .select("pair,direction,grade,confidence,rr,session,killzone,fired_at")
       .gte("fired_at", since)
