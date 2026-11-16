@@ -147,9 +147,9 @@ const CUSTOM: ReadonlyArray<[string, string]> = [
 ];
 
 function GroupMark({ icon }: { icon: GroupIcon }) {
-  if (icon === "terminal") return <TerminalLogo className="h-5 w-5" />;
-  if (icon === "bot") return <JxBotLogo className="h-5 w-5" />;
-  if (icon === "platform") return <PlatformLogo className="h-5 w-5" />;
+  if (icon === "terminal") return <TerminalLogo className="h-[18px] w-[18px]" />;
+  if (icon === "bot") return <JxBotLogo className="h-[18px] w-[18px]" />;
+  if (icon === "platform") return <PlatformLogo className="h-[18px] w-[18px]" />;
   if (icon === "models") {
     return (
       <span className="flex -space-x-1.5" aria-hidden>
@@ -259,10 +259,10 @@ function PricingPage() {
 
       {/* HEADER */}
       <section className="mx-auto max-w-[900px] px-5 pb-10 pt-16 text-center sm:px-8 sm:pt-24">
-        <div className="mx-auto flex items-end justify-center gap-6 sm:gap-8">
+        <div className="mx-auto flex items-end justify-center gap-5 sm:gap-7">
           {([["Terminal", TerminalLogo], ["JX Bot", JxBotLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
             <div key={label} className="flex flex-col items-center gap-2">
-              <Logo className="h-12 w-12 sm:h-14 sm:w-14" />
+              <Logo framed className="h-11 w-11 sm:h-12 sm:w-12" />
               <span className="text-[12px] font-medium text-gc-ink-muted">{label}</span>
             </div>
           ))}
@@ -482,7 +482,7 @@ function FeatureList({ title, items, muted }: { title: string; items: string[]; 
   return (
     <div className="mt-6">
       <p className="flex items-center gap-2 border-b border-gc-line pb-2.5 text-[13px] text-gc-ink-muted">
-        {title.startsWith("JX") ? <JxBotLogo className="h-[18px] w-[18px]" /> : title.includes("Terminal") ? <TerminalLogo className="h-[18px] w-[18px]" /> : <PlatformLogo className="h-[18px] w-[18px]" />}
+        {title.startsWith("JX") ? <JxBotLogo className="h-3.5 w-3.5" /> : title.includes("Terminal") ? <TerminalLogo className="h-3.5 w-3.5" /> : <PlatformLogo className="h-3.5 w-3.5" />}
         {title}
       </p>
       <ul className="mt-3.5 space-y-2.5 text-[13.5px]">

@@ -86,3 +86,5 @@
 - [x] Homepage footer on every public page (small footer removed)
 - [x] Sign-in / sign-up: "Completing sign-in / sign-up" verifying screen before the dashboard opens
 - [x] Ask Jenvu knows the plan comparison
+
+- [x] Pricing logos: plain black icons on white (no black tiles), dashboard Terminal icon, xAI-sized
