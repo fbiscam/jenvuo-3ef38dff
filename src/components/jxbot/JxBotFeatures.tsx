@@ -98,7 +98,7 @@ function HoursCard() {
 export function JxBotFeatures() {
   return (
     <section className="jx-features px-5 py-14" aria-labelledby="jx-features-title">
-      <h2 id="jx-features-title" className="text-center text-[30px] font-medium text-foreground md:text-[36px]">Everything you'd want in a trading bot</h2>
+      <h2 id="jx-features-title" className="text-center text-[30px] font-medium text-foreground md:text-[36px]">Everything you want in a trading bot</h2>
       <p className="mx-auto mt-4 max-w-[650px] text-center text-[17px] leading-relaxed text-foreground md:text-[18px]">
         Download the bot, add your IP and let it run. Each IP works with one MT5 account, and your dashboard shows every
         trade, the daily target & ON/OFF log.
