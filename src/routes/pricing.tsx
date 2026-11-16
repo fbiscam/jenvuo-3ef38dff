@@ -3,7 +3,8 @@ import { showBuyBlocked } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import * as React from "react";
-import { Bot, Check, Cpu, LineChart, Minus, Plus, Sparkles } from "lucide-react";
+import { Check, Cpu, Layers, LineChart, Minus, Plus } from "lucide-react";
+import { JxFace } from "@/components/jxbot/JxBotFeatures";
 import BlogFooter from "@/components/BlogFooter";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
@@ -379,11 +380,16 @@ function Summary({ big, label }: { big: string; label: string }) {
 }
 
 function FeatureList({ title, items, muted }: { title: string; items: string[]; muted?: boolean }) {
-  const Icon = title.startsWith("JX") ? Bot : title.includes("AI") ? Sparkles : title.includes("Terminal") ? LineChart : Cpu;
+  const Icon = title.includes("AI") ? Layers : title.includes("Terminal") ? LineChart : Cpu;
   return (
     <div className="mt-6">
       <p className="flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-wide text-gc-ink-muted">
-        <Icon className="h-3.5 w-3.5" aria-hidden /> {title}
+        {title.startsWith("JX") ? (
+          <JxFace className="h-4 w-4 shrink-0 bg-gc-ink" eyes="bg-background" />
+        ) : (
+          <Icon className="h-4 w-4 text-gc-ink" strokeWidth={2.25} aria-hidden />
+        )}{" "}
+        {title}
       </p>
       <ul className="mt-3 space-y-2.5 text-[14px]">
         {items.map((it) => (
