@@ -18,6 +18,7 @@ const MONO = "font-sans";
 /** Resources menu items (desktop dropdown + phone menu). */
 const RESOURCES = [
   { to: "/insights", label: "Blog" },
+  { to: "/stories", label: "Stories" },
   { to: "/help", label: "Support" },
   { to: "/docs", label: "Docs" },
   { to: "/contact", label: "Contact" },
@@ -80,7 +81,6 @@ export default function SiteHeader() {
             <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
             <Link to="/ai-engine" activeProps={ACTIVE}>Products</Link>
             <Link to="/jx-bot" activeProps={ACTIVE}>JX Bot</Link>
-            <Link to="/strategies/ict-gold-trading" activeProps={ACTIVE}>Solutions</Link>
             <div className="relative" onMouseLeave={() => setResOpen(false)}>
               <button
                 type="button"
@@ -235,7 +235,6 @@ export default function SiteHeader() {
                 { to: "/about", label: "Why Jenvu" },
                 { to: "/ai-engine", label: "Products" },
                 { to: "/jx-bot", label: "JX Bot" },
-                { to: "/strategies/ict-gold-trading", label: "Solutions" },
                 { to: "/platform", label: "Platform" },
                 { to: "/pricing", label: "Pricing" },
                 ...RESOURCES,

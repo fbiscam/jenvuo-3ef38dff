@@ -1,5 +1,9 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { PageShell, Banner, StoryCards, UL } from "@/components/PageShell";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
+import { Button } from "@/components/ui/button";
+import StoryTile, { storyMinutes } from "@/components/stories/StoryTile";
 import { STORIES, getStory } from "@/lib/stories";
 
 export const Route = createFileRoute("/stories/$slug")({
@@ -10,9 +14,7 @@ export const Route = createFileRoute("/stories/$slug")({
   },
   head: ({ loaderData }) => {
     const story = loaderData ? getStory(loaderData.slug) : undefined;
-    if (!story) {
-      return { meta: [{ title: "Story not found — Jenvu" }, { name: "robots", content: "noindex" }] };
-    }
+    if (!story) return { meta: [{ title: "Story not found — Jenvu" }, { name: "description", content: "This Jenvu story is unavailable." }, { property: "og:title", content: "Story not found — Jenvu" }, { property: "og:description", content: "Explore more Jenvu product stories." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] };
     const url = `https://jenvu.com/stories/${story.slug}`;
     return {
       meta: [
@@ -32,90 +34,23 @@ export const Route = createFileRoute("/stories/$slug")({
 });
 
 function StoryNotFound() {
-  return (
-    <PageShell eyebrow="\n" title="Story not found" intro="This story doesn't exist or has moved.">
-      <Link to="/" className="text-gc-blue-deep hover:underline">Back to the homepage</Link>
-    </PageShell>
-  );
+  return <div className="bg-background text-foreground"><SiteHeader/><main className="site-edge py-24"><h1 className="text-4xl">Story not found</h1><Button asChild variant="link" className="mt-5"><Link to="/stories">All stories<ArrowRight/></Link></Button></main><SiteFooter/></div>;
 }
 
 function StoryPage() {
   const { slug } = Route.useLoaderData();
-  const story = getStory(slug)!;
+  const story = getStory(slug);
+  if (!story) return <StoryNotFound/>;
   const idx = STORIES.findIndex((s) => s.slug === slug);
   const related = [1, 2, 3].map((n) => STORIES[(idx + n) % STORIES.length]);
-
-  return (
-    <PageShell wide oneLine eyebrow={story.tag} title={story.title} intro={story.intro}>
-      {/* Feature: text and picture, vertically centred */}
-      <section className="mx-auto grid max-w-[1040px] items-center gap-10 px-5 py-12 sm:px-8 md:grid-cols-2">
-        <div>
-          <h2 className="text-[26px] font-normal leading-tight text-gc-ink">{story.feature.title}</h2>
-          <div className="mt-4 space-y-4 text-[16px] leading-[1.65] text-gc-ink-muted">
-            {story.feature.text.map((t, i) => (
-              <p key={i}>{t}</p>
-            ))}
-          </div>
-          <a href={story.cta.href} className="mt-6 inline-flex h-10 items-center rounded-full border border-gc-line px-5 text-[14px] font-medium text-gc-blue-deep hover:bg-gc-surface">
-            {story.cta.label}
-          </a>
-        </div>
-        <figure>
-          <div className="overflow-hidden rounded-2xl bg-gc-ink">
-            <img src={story.img} alt="" width={1024} height={640} className="aspect-[16/10] h-auto w-full object-cover" />
-          </div>
-          <figcaption className="mt-3 text-center text-[13px] text-gc-ink-muted">{story.feature.caption}</figcaption>
-        </figure>
-      </section>
-
-      <div className="mx-auto max-w-[1040px] px-5 py-6 sm:px-8">
-        <Banner title={story.banner.title}>{story.banner.text}</Banner>
-      </div>
-
-      {story.code && (
-        <section className="mx-auto max-w-[1040px] px-5 py-6 sm:px-8">
-          <div className="overflow-hidden rounded-2xl border border-gc-line bg-gc-surface">
-            <p className="border-b border-gc-line px-5 py-3 font-mono text-[13px] text-gc-ink-muted">{story.code.title}</p>
-            <pre className="overflow-x-auto px-5 py-4 font-mono text-[13px] leading-[1.7] text-gc-ink">
-              <code>{story.code.text}</code>
-            </pre>
-          </div>
-        </section>
-      )}
-
-      {/* Key points + numbers */}
-      <section className="mx-auto grid max-w-[1040px] items-center gap-10 px-5 py-14 sm:px-8 md:grid-cols-2">
-        <div>
-          <h2 className="text-[26px] font-normal leading-tight text-gc-ink">{story.steps.title}</h2>
-          <div className="mt-5">
-            <UL>
-              {story.steps.points.map((pt) => (
-                <li key={pt}>{pt}</li>
-              ))}
-            </UL>
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          {story.stats.map((st) => (
-            <div key={st.label} className="flex flex-col items-center text-center">
-              <p className="text-[40px] font-normal leading-none text-gc-success sm:text-[48px]">{st.value}</p>
-              <div className="my-4 h-px w-3/4 bg-gc-line" />
-              <p className="text-[14px] leading-snug text-gc-ink">{st.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <StoryCards
-        title="More stories"
-        intro="Keep reading about what's new at Jenvu."
-        cards={related.map((r) => ({ title: r.title, href: `/stories/${r.slug}`, cta: "Read the story" }))}
-      />
-      <div className="pb-14 text-center">
-        <Link to="/platform" className="inline-flex items-center rounded-full bg-gc-pill px-6 py-3 text-[15px] font-medium text-gc-ink transition hover:brightness-95">
-          Explore the API Platform
-        </Link>
-      </div>
-    </PageShell>
-  );
+  return <div className="stories-page min-h-dvh bg-background text-foreground"><SiteHeader/><main className="site-edge py-12 sm:py-20">
+    <Button asChild variant="link" className="mb-9 px-0"><Link to="/stories"><ArrowLeft/>All stories</Link></Button>
+    <header className="mx-auto max-w-3xl"><p className="text-xs text-muted-foreground">{story.tag.trim() || 'MARKET GUIDES'} · {storyMinutes(story)} min read</p><h1 className="mt-5 text-4xl font-normal leading-tight sm:text-5xl">{story.title}</h1><p className="mt-6 text-lg leading-relaxed text-muted-foreground">{story.intro}</p></header>
+    <figure className="mx-auto my-10 max-w-5xl"><img src={story.img} alt={story.feature.caption} width="1024" height="640" className="aspect-[16/9] w-full rounded-lg object-cover"/><figcaption className="mt-3 text-center text-xs text-muted-foreground">{story.feature.caption}</figcaption></figure>
+    <article className="story-article mx-auto max-w-3xl"><h2>{story.feature.title}</h2>{story.feature.text.map(t => <p key={t}>{t}</p>)}<aside className="my-10 border-l-2 border-foreground pl-6"><h3 className="text-xl">{story.banner.title}</h3><p>{story.banner.text}</p></aside>
+      {story.code && <div className="my-10 overflow-hidden rounded-lg border border-border bg-muted"><div className="border-b border-border px-5 py-3 text-xs text-muted-foreground">{story.code.title}</div><pre className="overflow-x-auto p-5 font-code text-xs leading-relaxed"><code>{story.code.text}</code></pre></div>}
+      <h2>{story.steps.title}</h2><ul className="my-6 list-disc space-y-3 pl-5 text-base leading-relaxed text-muted-foreground">{story.steps.points.map(pt => <li key={pt}>{pt}</li>)}</ul>
+      <div className="my-10 grid grid-cols-3 gap-4 border-y border-border py-8">{story.stats.map(st => <div key={st.label}><strong className="text-2xl font-normal sm:text-3xl">{st.value}</strong><p className="mt-2 text-xs leading-relaxed text-muted-foreground">{st.label}</p></div>)}</div><Button asChild size="lg" className="rounded-full"><a href={story.cta.href}>{story.cta.label}<ArrowRight/></a></Button>
+    </article><section className="mt-24 border-t border-border pt-12"><h2 className="mb-8 text-3xl">More stories</h2><div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">{related.map(r => r && <StoryTile key={r.slug} story={r}/>)}</div></section>
+  </main><SiteFooter/></div>;
 }

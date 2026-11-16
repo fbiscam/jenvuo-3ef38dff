@@ -86,14 +86,14 @@ const columns: FooterGroup[][] = [
     ] },
   ],
   [
-    { label: "Solutions", links: [
-      { to: "/strategies/ict-gold-trading", label: "ICT Gold Trading" },
+    { label: "Explore", links: [
       { to: "/killzones", label: "Killzones" },
       { to: "/development", label: "Development" },
       { to: "/founding", label: "Founding Program" },
     ] },
     { label: "Resources", links: [
       { to: "/insights", label: "Blog" },
+      { to: "/stories", label: "Stories" },
       { to: "/scam-check", label: "Scam Check" },
     ] },
   ],

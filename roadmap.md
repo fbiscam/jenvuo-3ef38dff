@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Rebuild Products with reference-style scrolling previews, detailed product copy, motion and a 19.6s product film; remove Solutions navigation/search and redirect its old address; restore Stories list and blog-style articles. Verified desktop, 390/320px phones, article navigation/filtering, copied API code, hosted film playback, reduced motion and 11 URL tests; build OK. Film is illustrative with music, small cap text and a brief final title; reference website blocked direct access, all nine screenshots reviewed. Reported utils error absent; numeric inputs return strings. Prior email-code, credit-schedule and Docs verification limitations unchanged.
+
 - [x] Add colored code/status previews, richer motion, black icon-only workspace strip and trading-platform review marks (2 X, 7 trading marks). Desktop, 390px/320px phones, all nine portraits, FAQ and reduced motion verified; no overflow/runtime errors, build OK. Utils numeric inputs return strings; reported line 8 absent. Prior email-code, credit-schedule and Docs verification limits unchanged.
 
 - [x] Refine Why Jenvu against all seven references: floating windows, four pricing marks, nine longer masonry reviews with labelled generated portraits, FAQ and spacing. Desktop/mobile, all portraits, animation, FAQ and reduced motion checked; no overflow or runtime errors, build OK. Reported utils line 8 absent; numeric inputs return strings. Earlier email-code/credit-schedule/Docs checks remain unverified.
