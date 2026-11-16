@@ -110,7 +110,7 @@ function AboutPage() {
         <h2 className="why-heading">Community voices</h2>
         <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}<span className="block text-[10px] text-gc-ink-muted">{q.role}</span></div><ReviewPlatformMark platform={reviewPlatforms[i] ?? 'tradingview'} /></div></article>)}</div>
       </section>
-      <section className="why-wrap why-section py-24 sm:py-32">
+      <section className="why-wrap why-section py-28 sm:py-36">
         <h2 className="why-heading mb-8">FAQ</h2>
         <Accordion type="single" collapsible>{faqs.map(([q,a],i) => <AccordionItem key={q} value={`faq-${i}`} className="border-gc-line"><AccordionTrigger className="group py-6 text-[15px] font-normal hover:no-underline [&>svg]:hidden"><span className="pr-5">{q}</span><span className="ml-auto shrink-0"><Plus className="size-4 text-gc-ink-muted transition-transform group-data-[state=open]:rotate-45" /></span></AccordionTrigger><AccordionContent className="max-w-[900px] pb-6 text-[15px] leading-7 text-gc-ink-muted">{a}</AccordionContent></AccordionItem>)}</Accordion>
       </section>
