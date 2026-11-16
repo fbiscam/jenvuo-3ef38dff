@@ -110,9 +110,9 @@ function AboutPage() {
         <h2 className="why-heading">Community voices</h2>
         <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}<span className="block text-[10px] text-gc-ink-muted">{q.role}</span></div><ReviewPlatformMark platform={reviewPlatforms[i] ?? 'tradingview'} /></div></article>)}</div>
       </section>
-      <section className="why-wrap why-section py-28 sm:py-36">
-        <h2 className="why-heading mb-8">FAQ</h2>
-        <Accordion type="single" collapsible>{faqs.map(([q,a],i) => <AccordionItem key={q} value={`faq-${i}`} className="border-gc-line"><AccordionTrigger className="group py-6 text-[15px] font-normal hover:no-underline [&>svg]:hidden"><span className="pr-5">{q}</span><span className="ml-auto shrink-0"><Plus className="size-4 text-gc-ink-muted transition-transform group-data-[state=open]:rotate-45" /></span></AccordionTrigger><AccordionContent className="max-w-[900px] pb-6 text-[15px] leading-7 text-gc-ink-muted">{a}</AccordionContent></AccordionItem>)}</Accordion>
+      <section className="why-wrap why-section py-32 sm:py-44">
+        <h2 className="why-heading mb-12 text-[44px] sm:text-[56px]">FAQ</h2>
+        <Accordion type="single" collapsible>{faqs.map(([q,a],i) => <AccordionItem key={q} value={`faq-${i}`} className="border-gc-line"><AccordionTrigger className="group py-8 text-[18px] sm:text-[20px] font-normal hover:no-underline [&>svg]:hidden"><span className="pr-5">{q}</span><span className="ml-auto shrink-0"><Plus className="size-5 text-gc-ink-muted transition-transform group-data-[state=open]:rotate-45" /></span></AccordionTrigger><AccordionContent className="max-w-[960px] pb-8 text-[17px] leading-8 text-gc-ink-muted">{a}</AccordionContent></AccordionItem>)}</Accordion>
       </section>
       <section className="why-wrap py-20 text-center sm:py-28"><h2 className="why-heading">Get started</h2><p className="mx-auto mb-7 mt-5 max-w-[520px] text-[16px] leading-6">Start Free with Jenvu, or choose the plan that fits your trading desk.</p><div className="flex justify-center"><Actions /></div></section>
     </main>
