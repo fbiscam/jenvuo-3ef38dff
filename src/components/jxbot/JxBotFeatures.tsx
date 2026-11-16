@@ -109,7 +109,6 @@ export function JxBotFeatures() {
         <StopCard />
         <HoursCard />
       </div>
-      <p className="jx-feature-disclaimer">Illustrative previews · not live account data. Daily profit targets are maximum safety caps — profit is not guaranteed.</p>
     </section>
   );
 }
