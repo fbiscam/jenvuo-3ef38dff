@@ -1,7 +1,5 @@
 # Roadmap
 
-- [ ] Apply approved London/NY profit protection and additional guards to the current JX Bot only — blocked: latest uploaded V27 packages contain compiled `.ex5` only; available editable Owner v23 source is version 3.70 with obsolete license-key and lot rules, so changing it would not preserve the current strategy. Need the `.mq5` source matching the installed bot and compile/backtest verification before replacing any download. Earlier promises of zero trading impact or guaranteed protection are not verified; exit and entry guards can change trading outcomes. No live positions, settings, records or distributed bot changed.
-
 - [x] Restyle JX Bot feature cards to match the three supplied references: warm rounded two-column panels and sharp HTML/SVG MT5/checklist/target/session previews. Desktop, dark theme, 390/320px fit, reduced motion and no runtime errors verified; numeric-input utils regression passes and latest build OK. Nine Why portraits load at native 640px with no blur filter; unchanged. No licensing, account records or bot enforcement changed; previous inbox/schedule verification limits remain.
 
 - [x] Give all nine illustrative Why reviews distinct trading labels; replace Products with Docs in desktop/mobile public headers without duplicate Docs links. Nine unique labels and actual Docs navigation verified on desktop/mobile; utils numeric-input test passed and build OK. Products route remains accessible directly; no account changes.
