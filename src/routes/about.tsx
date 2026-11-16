@@ -45,7 +45,7 @@ const benefits = [
   { icon: Layers, title: 'One connected workspace', text: 'Terminal, AI, API and JX Bot, with your account and plan in one place with top models you need.' },
   { icon: ShieldCheck, title: 'Limits you can see', text: 'Clear plan allowances for API keys, daily tokens and Terminal indicator hours with daily limits.' },
   { icon: Users, title: 'A team in your corner', text: 'Account help, product guides and a Founding Program for one time 30 day Pro or Elite plan.' },
-  { icon: Newspaper, title: 'News Trading, always free', text: 'Follow the next US high-impact release, with countdowns and beat-or-miss context on every plan.' },
+  { icon: Newspaper, title: 'News Trading, always free', text: 'Follow the next US high-impact release, with countdowns and beat-or-miss context every plan.' },
 ]
 const faqs = [
   ['What is included in one workspace?', 'Terminal, JX Bot, News Trading and Platform share your Jenvu account. Use chart analysis, follow US economic releases, manage your bot and build with model APIs without separate product accounts. Each product keeps its own plan allowances.'],
