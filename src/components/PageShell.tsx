@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ArrowUpRight, BookOpen, FileText, Headphones, Mail, Sparkles, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Check, FileText, Mail } from "lucide-react";
+import { BuyNowButton } from "@/components/BuyNowButton";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -170,56 +171,53 @@ export function Banner({ title, children }: { title: string; children: ReactNode
   );
 }
 
-/** "Take the next step" box with a contact CTA and quick links. */
+/** "Take the next step": two cards — talk to the team, or start on your own. */
 export function NextStep() {
   const { user } = useAuthUser();
-  const links: { label: string; cta: string; href?: string; to?: "/pricing" | "/founding" | "/dashboard"; icon: LucideIcon }[] = user
-    ? [
-        { label: "Open your dashboard", cta: "Go to dashboard", to: "/dashboard", icon: Sparkles },
-        { label: "Compare plans and credits", cta: "See pricing", to: "/pricing", icon: BookOpen },
-      ]
-    : [
-        { label: "Join the Founding Program", cta: "Apply now", to: "/founding", icon: Sparkles },
-        { label: "Compare plans and credits", cta: "See pricing", to: "/pricing", icon: BookOpen },
-        { label: "Already a member", cta: "Sign in", href: "https://auth.jenvu.com/sign-in", icon: Headphones },
-      ];
-  const cls = "flex items-center gap-4 rounded-md bg-background/90 p-4 shadow-sm transition hover:bg-background";
+  const ghost = "inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-medium text-gc-ink hover:bg-gc-surface";
+  const card = "flex flex-col rounded-md border border-gc-line bg-background p-7 sm:p-8";
+  const ticks = (items: string[]) => (
+    <ul className="mt-5 flex-1 space-y-3 text-[15px] leading-snug text-gc-ink">
+      {items.map((t) => (
+        <li key={t} className="flex gap-2">
+          <Check className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{t}</span>
+        </li>
+      ))}
+    </ul>
+  );
   return (
-    <div className="hide-in-pwa mx-auto max-w-[1300px] px-5 pb-0 pt-4 sm:px-10">
-      <section className="overflow-hidden rounded-md border border-gc-line bg-background">
-        <div className="grid md:grid-cols-[1.1fr_1fr]">
-          <div className="px-5 py-10 sm:px-10 md:py-14">
-            <h2 className="text-[30px] font-medium tracking-tight text-gc-ink sm:text-[36px]">Take the next step</h2>
-            <p className="mt-5 max-w-[500px] text-[16px] leading-[1.6] text-gc-ink-muted">
-              Tell us what you're trading. The Jenvu team will help you find the right setup and plan.
-            </p>
-            <Link to="/contact" className={`mt-8 ${pillBlue}`}>
+    <section className="hide-in-pwa mx-auto max-w-[1200px] px-5 pb-4 pt-10 text-center sm:px-8">
+      <h2 className="text-[30px] font-medium tracking-tight text-gc-ink sm:text-[40px]">Take the next step</h2>
+      <div className="mt-10 grid gap-6 text-left md:grid-cols-2">
+        <div className={card}>
+          <h3 className="text-2xl font-medium text-gc-ink">Talk to the Jenvu team</h3>
+          {ticks(["Tell us what you trade", "Get help choosing a setup and plan", "Ask about the Founding Program"])}
+          <div className="mt-8">
+            <Link to="/contact" className={pillBlue}>
               Contact us
             </Link>
           </div>
-          <ul className="grid content-center gap-3 border-t border-gc-line p-5 sm:p-8 md:border-l md:border-t-0" style={{ backgroundImage: "var(--platform-aurora-3)" }}>
-            {links.map((l) => (
-              <li key={l.label}>
-                {(() => {
-                  const inner = (
-                    <>
-                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gc-line bg-background text-gc-ink">
-                        <l.icon className="h-5 w-5" />
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block text-[14px] text-gc-ink">{l.label}</span>
-                        <span className="mt-0.5 block text-[14px] font-medium text-gc-blue">{l.cta}</span>
-                      </span>
-                    </>
-                  );
-                  return l.to ? <Link to={l.to} className={cls}>{inner}</Link> : <a href={l.href} className={cls}>{inner}</a>;
-                })()}
-              </li>
-            ))}
-          </ul>
         </div>
-      </section>
-    </div>
+        <div className={card}>
+          <h3 className="text-2xl font-medium text-gc-ink">Start on your own</h3>
+          {ticks(["Apply to the Founding Program", "Verify your ID to open the Terminal and JX Bot", "Pick or upgrade a plan anytime from Payments"])}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <BuyNowButton className={pillOutline}>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </BuyNowButton>
+            {user && (
+              <Link to="/dashboard" className={ghost}>
+                Open dashboard
+              </Link>
+            )}
+            <Link to="/pricing" className={ghost}>
+              See pricing
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 

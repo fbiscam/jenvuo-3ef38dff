@@ -63,7 +63,6 @@ function AboutPage() {
         linkLabel="Explore the Terminal"
         href="https://dash.jenvu.com/overview"
         media={<AuroraTile n={0} icons={[CandlestickChart, LineChart, BellRing]} className="aspect-[16/10] w-full" />}
-        caption="\n"
       />
 
       {/* WHAT WE BUILD */}
