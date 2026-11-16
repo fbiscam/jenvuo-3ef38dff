@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Search, Clock, MapPin, Lock } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import { PAIR_PROFILES, type PairProfile } from "@/lib/analysis/engine";
 
 export const Route = createFileRoute("/killzones")({
@@ -405,7 +405,7 @@ function KillzonesPage() {
           Local times are converted from UTC using your device timezone. Killzones show when Gold is usually most active — they don't guarantee a setup.
         </p>
       </main>
-      <div className="hide-in-pwa"><BlogFooter /></div>
+      <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
   );
 }

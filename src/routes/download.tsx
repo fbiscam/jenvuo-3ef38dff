@@ -1,7 +1,7 @@
 import SiteHeader from "@/components/SiteHeader";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/download")({
   head: () => ({
@@ -229,7 +229,7 @@ function DownloadPage() {
           </div>
         </section>
 
-        <BlogFooter />
+        <SiteFooter />
       </div>
     </>
   );

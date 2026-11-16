@@ -1,7 +1,7 @@
 import JenvuMark from "@/components/JenvuMark";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import HeaderAuthButtons from "@/components/HeaderAuthButtons";
 import { findCollection, type Article } from "@/lib/help-content";
 
@@ -100,7 +100,7 @@ function CollectionPage() {
           </Link>
         </main>
 
-        <BlogFooter />
+        <SiteFooter />
       </div>
     </>
   );

@@ -82,3 +82,7 @@
 - [x] Welcome message: compact white card, clean icons (no blurry pictures), site font, black buttons, phone-friendly
 - [x] Signed-out buttons say Sign up (sign-up form); header Sign up / Try Jenvu split button with arrow menu; Pricing Pro shows Get Free Trial, other paid plans Sign up; info pages updated
 - [x] Sign-up / sign-in pages in the xAI reference look (choose screen, email steps, split 6-digit code); Google + Apple sign-in with the same sign-up checks and free trial (X/GitHub not available)
+- [x] Pricing: xAI-style compare table (Free trial / Pro / Elite / Ultra / Enterprise, usage tiers, model company logos, product sections with lines), Enterprise custom-plan cards, bold Terminal / JX Bot / Platform logos above Pricing
+- [x] Homepage footer on every public page (small footer removed)
+- [x] Sign-in / sign-up: "Completing sign-in / sign-up" verifying screen before the dashboard opens
+- [x] Ask Jenvu knows the plan comparison

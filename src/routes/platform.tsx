@@ -23,7 +23,7 @@ import {
   UserRound,
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { AllInOnePlatformSection } from "@/components/platform/AllInOnePlatformSection";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -615,7 +615,7 @@ function PlatformPage() {
         <Enterprise />
         <GetStartedSection />
       </main>
-      <BlogFooter />
+      <SiteFooter />
     </div>
   );
 }

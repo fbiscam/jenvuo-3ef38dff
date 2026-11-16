@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Search, Menu, X, Copy, Check, MessageSquare, ChevronDown, ListTree } from "lucide-react";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import JenvuMark from "@/components/JenvuMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { DOC_GROUPS, type DocSection } from "@/components/docs/doc-content";
@@ -311,7 +311,7 @@ function DocsPage() {
         </aside>
       </div>
 
-      <div className="hide-in-pwa"><BlogFooter /></div>
+      <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
   );
 }

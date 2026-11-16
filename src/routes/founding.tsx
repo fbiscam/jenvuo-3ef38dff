@@ -2,7 +2,7 @@ import * as React from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import {
   CALLOUT_BUTTON,
@@ -218,7 +218,7 @@ function FoundingPage() {
         </div>
       </main>
 
-      <BlogFooter />
+      <SiteFooter />
     </div>
   );
 }

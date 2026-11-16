@@ -21,7 +21,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { BuyNowButton } from "@/components/BuyNowButton";
 import { STORIES } from "@/lib/stories";
@@ -102,7 +102,7 @@ export function IndustryPage({ c }: { c: IndustryContent }) {
         {!p && <Products c={c} />}
         <GetStarted />
       </main>
-      <BlogFooter />
+      <SiteFooter />
     </div>
   );
 }

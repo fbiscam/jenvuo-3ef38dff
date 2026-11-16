@@ -1,6 +1,6 @@
 import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
-import { clearStoredAuthSessions, goAfterSignIn, restoreSharedSession } from "@/lib/cross-domain-session";
+import { clearStoredAuthSessions, goAfterSignIn as goAfterSignInRaw, restoreSharedSession } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { oauthReturnPath } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
@@ -100,7 +100,7 @@ export const Route = createFileRoute("/auth")({
       if (aal && aal.currentLevel === "aal1" && aal.nextLevel === "aal2") return;
       const dest = sanitizeRedirect(search.redirect);
       if (typeof window !== "undefined") {
-        if (await goAfterSignIn(dest, () => undefined)) return;
+        if (await goAfterSignInRaw(dest, () => undefined)) return;
       }
       throw redirect({ to: dest as "/dashboard" });
     }
@@ -172,6 +172,14 @@ function AuthPage() {
   const [signinStep, setSigninStep] = React.useState<"choose" | "email" | "password">("choose");
   const [signupStep, setSignupStep] = React.useState<"choose" | "form">("choose");
   const [socialBusy, setSocialBusy] = React.useState<SocialProvider | null>(null);
+  // "Completing sign-in / sign-up" screen while the session is checked and the next page opens.
+  const [completing, setCompleting] = React.useState<null | "in" | "up">(null);
+  const goAfterSignIn = (dest: string, fallback: () => void) => {
+    setCompleting(signedUpRef.current ? "up" : "in");
+    // Never leave the screen stuck if the next page doesn't open.
+    window.setTimeout(() => setCompleting(null), 15000);
+    return goAfterSignInRaw(dest, fallback);
+  };
   const finishSocial = useServerFn(completeSocialSignup);
   const socialCheckedRef = React.useRef<string | null>(null);
 
@@ -403,8 +411,9 @@ function AuthPage() {
       // Back from Google/Apple with a brand-new account: checks first, then continue.
       const { data } = await supabase.auth.getUser();
       if (data.user && isNewSocialUser(data.user)) {
-        if (!(await socialGate(data.user))) return;
-        if (await openMfaChallengeIfNeeded()) return;
+        setCompleting("up");
+        if (!(await socialGate(data.user))) { setCompleting(null); return; }
+        if (await openMfaChallengeIfNeeded()) { setCompleting(null); return; }
         await applyPendingReferral();
         const dest = signedUpRef.current ? "/dashboard/api" : redirectTo;
         void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true }));
@@ -1097,6 +1106,18 @@ function AuthPage() {
       : mode === "signup"
         ? otpStep ? "Verify your email" : signupStep === "form" ? "Sign up with your email" : "Create your account"
         : signinStep === "choose" ? "Log into your account" : "Log in with your email";
+
+  if (completing && !mfaChallenge && !errorMsg) {
+    return (
+      <div className={`flex min-h-dvh w-full flex-col items-center justify-center bg-background px-6 text-center text-foreground ${SANS} antialiased`} role="status" aria-live="polite">
+        <span aria-hidden className="h-6 w-6 animate-spin rounded-full border-2 border-border border-t-foreground" />
+        <h1 className="mt-5 text-[22px] font-normal tracking-[-0.02em] sm:text-[24px]">
+          {completing === "up" ? "Completing sign-up" : "Completing sign-in"}
+        </h1>
+        <p className="mt-2 text-[14px] text-muted-foreground">Verifying your device to keep your account secure…</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-dvh w-full bg-background text-foreground ${SANS} antialiased selection:bg-foreground selection:text-background`}>

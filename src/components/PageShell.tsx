@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ArrowUpRight, BookOpen, FileText, Headphones, Mail, Sparkles, type LucideIcon } from "lucide-react";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
@@ -106,7 +106,7 @@ export function PageShell({
 
       <NextStep />
 
-      <div className="hide-in-pwa"><BlogFooter /></div>
+      <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { submitContactMessage } from "@/lib/contact.functions";
 import { isValidWhatsApp } from "@/lib/contact-phone";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import {
   ArrowUpRight,
   CALLOUT_BUTTON,
@@ -221,7 +221,7 @@ function ContactPage() {
         </div>
       </main>
 
-      <BlogFooter />
+      <SiteFooter />
     </div>
   );
 }

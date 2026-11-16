@@ -8,7 +8,7 @@ import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Tables } from "@/integrations/supabase/types";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import { BlogTile } from "@/components/insights/BlogArt";
 import { insightCoverUrl } from "@/lib/insight-cover";
 
@@ -239,7 +239,7 @@ function InsightDetailPage() {
         <RelatedArticles slug={insight.slug} />
       </div>
 
-      <BlogFooter />
+      <SiteFooter />
     </div>
   );
 }

@@ -8,7 +8,7 @@ import {
 import { scamCheck, type ScamCheckResult } from "@/lib/scam-check/scam-check.functions";
 import { Button } from "@/components/ui/button";
 import SiteHeader from "@/components/SiteHeader";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 
 export const Route = createFileRoute("/scam-check")({
   head: () => ({
@@ -314,7 +314,7 @@ function ScamCheckPage() {
         </section>
       </div>
       </div>
-      <div className="hide-in-pwa"><BlogFooter /></div>
+      <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
   );
 }

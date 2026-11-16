@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-react";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import { findArticle, findCollection, type Article, type Block } from "@/lib/help-content";
 
@@ -178,7 +178,7 @@ function ArticlePage() {
           </Link>
         </main>
 
-        <BlogFooter />
+        <SiteFooter />
       </div>
     </>
   );

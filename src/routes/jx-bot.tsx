@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import { ArrowUpRight, X } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import BotCodingPreview from "@/components/jxbot/BotCodingPreview";
 import { JxFace, JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -252,7 +252,7 @@ function JxBotLanding() {
         <Faqs />
         <Closing />
       </main>
-      <BlogFooter />
+      <SiteFooter />
     </div>
   );
 }

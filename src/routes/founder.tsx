@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, AlertTriangle, ArrowRight, Check } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 import founderPhoto from "@/assets/haseeb-ijaz-founder.png.asset.json";
 
 const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif]";
@@ -125,7 +125,7 @@ function FounderPage() {
           </section>
         </main>
       </div>
-      <div className="hide-in-pwa"><BlogFooter /></div>
+      <div className="hide-in-pwa"><SiteFooter /></div>
     </div>
   );
 }

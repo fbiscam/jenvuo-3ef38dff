@@ -2,7 +2,7 @@ import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { Search, ArrowRight, ChevronDown, ChevronsUpDown, Send } from "lucide-react";
-import BlogFooter from "@/components/BlogFooter";
+import SiteFooter from "@/components/SiteFooter";
 
 import { collections, allArticles } from "@/lib/help-content";
 import { SUPPORT_GUIDES } from "@/lib/support-guides";
@@ -206,7 +206,7 @@ function HelpCenterPage() {
         </section>
       </div>
 
-      <BlogFooter />
+      <SiteFooter />
     </div>
   );
 }
