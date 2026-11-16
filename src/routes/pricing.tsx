@@ -118,7 +118,7 @@ const GROUPS: ReadonlyArray<Group> = [
     rows: [
       { f: "Live Gold, Bitcoin and EUR/USD charts", v: ALL },
       { f: "TradingView-style candlesticks, all timeframes", v: ALL },
-      { f: "Paid indicators (Fresh sweep, price action, Zone + FVG)", v: [H(TERMINAL_DAILY_HOURS.free), H(TERMINAL_DAILY_HOURS.pro), H(TERMINAL_DAILY_HOURS.elite), H(TERMINAL_DAILY_HOURS.ultra), "All day"] },
+      { f: "Indicators ( Fresh sweep, price action, Zone )", v: [H(TERMINAL_DAILY_HOURS.free), H(TERMINAL_DAILY_HOURS.pro), H(TERMINAL_DAILY_HOURS.elite), H(TERMINAL_DAILY_HOURS.ultra), "All day"] },
       { f: "Fresh liquidity sweep", v: ALL },
       { f: "Swing price action verdicts", v: ALL },
       { f: "Zone + FVG with non-overlapping BSL / SSL", v: ALL },
