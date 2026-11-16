@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Restyle JX Bot feature cards to match the three supplied references: warm rounded two-column panels and sharp HTML/SVG MT5/checklist/target/session previews. Desktop, dark theme, 390/320px fit, reduced motion and no runtime errors verified; numeric-input utils regression passes and latest build OK. Nine Why portraits load at native 640px with no blur filter; unchanged. No licensing, account records or bot enforcement changed; previous inbox/schedule verification limits remain.
+
 - [x] Give all nine illustrative Why reviews distinct trading labels; replace Products with Docs in desktop/mobile public headers without duplicate Docs links. Nine unique labels and actual Docs navigation verified on desktop/mobile; utils numeric-input test passed and build OK. Products route remains accessible directly; no account changes.
 
 - [x] Restore the earlier Products workflow as one native 2560×1920, 60fps, 24-second silent loop with a sharp matching poster; all four scenes, rollover, play/pause, offscreen/reduced-motion pause and 390/320px fit verified. Each of nine illustrative Why reviews has a distinct decorative platform mark. Stories routes/content/navigation/search/sitemap removed; direct addresses return 404 and Blog remains. Shared search, menus, themes, 18 regressions and latest build verified; reported utils error absent. Small secondary video text is naturally reduced on narrow phones. Account data and earlier email-code/credit-schedule/Docs limitations unchanged.
