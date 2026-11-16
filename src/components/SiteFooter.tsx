@@ -102,11 +102,11 @@ const columns: FooterGroup[][] = [
       { to: "/docs", label: "API Docs" },
       { to: "/models", label: "Models" },
       { to: "/dashboard/api", label: "API Keys" },
-      { to: "/dashboard/usage", label: "Usage" },
     ] },
     { label: "Business", links: [
       { to: "/pricing", label: "Pricing" },
       { to: "/contact", label: "Contact Sales" },
+      { to: "/dashboard/usage", label: "Usage" },
     ] },
   ],
   [
