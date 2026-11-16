@@ -81,3 +81,4 @@
 - [x] API launch: open sign-up, $30 + 14-day Pro trial (Terminal paid features, no JX Bot), 30 RPM trial keys, Founding reopened, Founding month from ID verification, land on API keys
 - [x] Welcome message: compact white card, clean icons (no blurry pictures), site font, black buttons, phone-friendly
 - [x] Signed-out buttons say Sign up (sign-up form); header Sign up / Try Jenvu split button with arrow menu; Pricing Pro shows Get Free Trial, other paid plans Sign up; info pages updated
+- [x] Sign-up / sign-in pages in the xAI reference look (choose screen, email steps, split 6-digit code); Google + Apple sign-in with the same sign-up checks and free trial (X/GitHub not available)

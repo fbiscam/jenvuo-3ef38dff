@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 
 import {
   createRecoveryOtp,
@@ -146,4 +147,27 @@ export const signInFailureHint = createServerFn({ method: 'POST' })
     const user = await findUserByEmail(data.email.toLowerCase())
     const exists = !!user
     return { hint: exists ? ('wrong_password' as const) : ('no_account' as const) }
+  })
+
+/** After Google / Apple sign-in: runs the sign-up checks + free trial for brand-new accounts. */
+export const completeSocialSignup = createServerFn({ method: 'POST' })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) =>
+    z
+      .object({
+        fingerprint: z.string().trim().min(32, 'Device verification failed. Refresh the page and try again.').max(128),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    if (SIGNUP_CLOSED) return { ok: false as const, isNew: false, error: SIGNUP_CLOSED_MESSAGE }
+    const { readClientIp, readTrustedCountry, readUserAgent } = await import('./request-meta.server')
+    const { finishSocialSignup } = await import('./custom-auth.server')
+    return finishSocialSignup({
+      userId: context.userId,
+      ip: readClientIp(),
+      country: readTrustedCountry(),
+      fingerprint: data.fingerprint,
+      userAgent: readUserAgent(),
+    })
   })

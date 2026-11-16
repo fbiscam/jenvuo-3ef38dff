@@ -588,3 +588,56 @@ async function assertPasswordNotLeaked(password: string) {
     if (e instanceof Error && e.message.startsWith('This password')) throw e
   }
 }
+
+/**
+ * Google / Apple sign-up: the account is created by the provider before any app
+ * code runs, so the same abuse checks and the free trial run here right after.
+ * A brand-new social account that fails the checks is removed again; an older
+ * account (or one already processed) is left untouched.
+ */
+export async function finishSocialSignup(input: { userId: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }): Promise<{ ok: boolean; isNew: boolean; error?: string }> {
+  const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
+  const { isFreshSocialSignup } = await import('./social-signup')
+  const admin = supabaseAdmin as any
+  const { data: got, error: getErr } = await supabaseAdmin.auth.admin.getUserById(input.userId)
+  const user = got?.user
+  if (getErr || !user) return { ok: false, isNew: false, error: 'Could not load your account. Please try again.' }
+
+  const { data: seen } = await admin.from('account_devices').select('id').eq('user_id', user.id).limit(1)
+  const alreadyProcessed = Array.isArray(seen) && seen.length > 0
+  const provider = String((user.app_metadata as Record<string, unknown> | undefined)?.provider || 'email')
+  if (!isFreshSocialSignup({ provider, createdAt: user.created_at, now: Date.now(), alreadyProcessed })) {
+    return { ok: true, isNew: false }
+  }
+
+  const email = normalizeEmail(user.email || '')
+  try {
+    assertPublicSignupOpen()
+    assertSignupSignals(input)
+    await assertNotVpn(input.ip)
+    if (email) {
+      await assertNoEmailAlias(email)
+      const { isDisposableEmail } = await import('./disposable-email-domains')
+      if (isDisposableEmail(email)) throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
+    }
+    await assertDeviceUnderCap(input.ip, input.fingerprint)
+  } catch (e) {
+    // Remove the just-created account so the same person can't keep it.
+    await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined)
+    return { ok: false, isNew: true, error: e instanceof Error ? e.message : 'Sign-up is not allowed on this device.' }
+  }
+
+  try {
+    await admin.from('account_devices').insert({
+      user_id: user.id,
+      ip: (input.ip || '').slice(0, 100) || null,
+      fingerprint: (input.fingerprint || '').split('_')[0].slice(0, 128) || null,
+      hw_fingerprint: (input.fingerprint || '').split('_')[1]?.slice(0, 64) || null,
+      user_agent: (input.userAgent || '').slice(0, 300) || null,
+    })
+  } catch { /* logging failure must not block signup */ }
+  try {
+    await claimProTrial(user.id, (input.fingerprint || '').split('_')[0], input.ip)
+  } catch { /* never block signup on trial bookkeeping */ }
+  return { ok: true, isNew: true }
+}
