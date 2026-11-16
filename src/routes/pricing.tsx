@@ -437,7 +437,7 @@ function TopUp({ canBuy, signedOut }: { canBuy: boolean; signedOut: boolean }) {
         search={canBuy ? ({ amount: safe } as never) : signedOut ? ({ mode: "signup" } as never) : undefined}
         className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-foreground px-5 text-[14px] font-medium text-background hover:opacity-90"
       >
-        {canBuy ? "Buy now" : signedOut ? "Sign up" : "Apply now"}
+        Buy now
       </Link>
       {amount < 5 && <p className="w-full text-[13px] text-destructive">Minimum top-up is $5.</p>}
     </div>
