@@ -6,6 +6,11 @@ import { RevealWords } from "@/components/RevealWords";
 import showController from "@/assets/home/show-imagine-controller.webp";
 import showCoast from "@/assets/home/show-imagine-coast.webp";
 import showMerch from "@/assets/home/show-imagine-merch.webp";
+import showSneaker from "@/assets/home/show-explore-sneaker.webp";
+import showPerfume from "@/assets/home/show-explore-perfume.webp";
+import showRedTop from "@/assets/home/show-explore-redtop.webp";
+import showOrchid from "@/assets/home/show-explore-orchid.webp";
+import showWatch from "@/assets/home/show-explore-watch.webp";
 import { shortTitle, type HomeArticle } from "@/lib/home-articles";
 import { insightCoverUrl } from "@/lib/insight-cover";
 import starsNebula from "@/assets/platform/stars-nebula.webp";
@@ -161,38 +166,6 @@ function ChatTile() {
   );
 }
 
-const CODE: React.ReactNode[] = [
-  <div className="font-semibold text-ent-ide-fg">&gt; Add rate limiting to all API routes.</div>,
-  <div className="text-ent-ide-purple/80">▸ Thinking...</div>,
-  <div><span className="text-ent-ide-cyan">• grep</span> <span className="text-ent-ide-amber">"fvgZone"</span> src/ <span className="opacity-40">no matches</span></div>,
-  <div><span className="text-ent-ide-green">• read_file</span> src/api/signals.ts <span className="opacity-40">42 lines</span></div>,
-  <div className="flex justify-between"><span className="opacity-70">| Scan signal handlers</span><span className="rounded bg-ent-ide-add px-1.5 text-ent-ide-green">done</span></div>,
-  <div className="text-ent-ide-purple">◆ Thought for 2.8s</div>,
-  <div className="pl-3"><b>Edit</b> <span className="text-ent-ide-cyan">src/api/signals.ts</span></div>,
-  <div><span className="opacity-40">14 </span><span className="text-ent-ide-purple">export async function</span> <span className="text-ent-ide-amber">handler</span>(req) {"{"}</div>,
-  <div className="border-l-2 border-ent-ide-green bg-ent-ide-add pl-1 text-ent-ide-green"><span className="opacity-50">15 </span>+ await rateLimit(req, {"{"} max: 100 {"}"});</div>,
-  <div className="border-l-2 border-ent-ide-red bg-ent-ide-del pl-1 text-ent-ide-red"><span className="opacity-50">33 </span>- if (!data.symbol) throw Error;</div>,
-  <div className="border-l-2 border-ent-ide-green bg-ent-ide-add pl-1 text-ent-ide-green"><span className="opacity-50">33 </span>+ return schema.parse(data);</div>,
-  <div><span className="text-ent-ide-cyan">• run</span> npm test <span className="text-ent-ide-green">12 passed</span></div>,
-  <div className="font-semibold text-ent-ide-green">✓ Ready to ship</div>,
-];
-function BuildTile() {
-  return (
-    <Link to="/docs" className={`${tile} h-[290px] bg-ent-ide font-mono text-[12px] leading-[1.7] text-ent-ide-fg antialiased`}>
-      <div className="flex items-center gap-2 border-b border-ent-ide-fg/10 bg-ent-ide-bar px-4 py-3">
-        <span className="h-3 w-3 rounded-full bg-ent-ide-red" /><span className="h-3 w-3 rounded-full bg-ent-ide-amber" /><span className="h-3 w-3 rounded-full bg-ent-ide-green" />
-        <span className="ml-4 text-ent-ide-fg/70">projects/main</span>
-        <span className="ml-auto flex items-center gap-1.5"><span className="h-1.5 w-12 overflow-hidden rounded-full bg-ent-ide-fg/15"><span className="sc-progress block h-1.5 rounded-full bg-ent-ide-cyan" /></span></span>
-      </div>
-      <div className="relative h-[200px] overflow-hidden px-4">
-        <div className="sc-scroll">
-          {[...CODE, ...CODE].map((l, i) => <React.Fragment key={i}>{l}</React.Fragment>)}
-        </div>
-      </div>
-      <TileFoot label="Build" light />
-    </Link>
-  );
-}
 
 function BotTile() {
   const step = useLoopStep(4, 1400);
@@ -234,11 +207,20 @@ const IMAGINE_LOOP = [
   { src: showCoast, alt: "Friends walking along a coastal road at sunset" },
   { src: showMerch, alt: "Black hoodie, cap, tote bag and mug laid flat" },
 ];
+const FOX_LOOP = [
+  { src: showSneaker, alt: "White running sneaker floating on grey" },
+  { src: showPerfume, alt: "Perfume bottle on pink flower petals" },
+  { src: showRedTop, alt: "Woman in a red tank top in a studio" },
+];
+const CAR_LOOP = [
+  { src: showOrchid, alt: "Orchid Bloom serum bottle beside a purple orchid" },
+  { src: showWatch, alt: "Silver wristwatch on white marble" },
+];
 
-const EXPLORE_STEPS = 7;
+const BUILD_STEPS = 7;
 /** x.ai-style agent terminal on pure black: lines appear one by one, then loop. */
-function ExploreTile() {
-  const step = useLoopStep(EXPLORE_STEPS, 1100);
+function BuildTile() {
+  const step = useLoopStep(BUILD_STEPS, 1100);
   const running = step < 6;
   return (
     <Link to="/docs" className={`${tile} flex h-[290px] flex-col bg-ent-explore font-mono text-[11.5px] leading-[1.75] text-ent-ide-fg antialiased`}>
@@ -265,7 +247,10 @@ function ExploreTile() {
         </div>
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-ent-explore to-transparent" />
       </div>
-      <span className="absolute bottom-3 right-4 z-10 inline-flex items-center gap-1 font-sans text-[14px] text-ent-ide-fg">Explore <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" /></span>
+      <div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between px-5 pb-4 font-sans text-[14px] text-ent-ide-fg">
+        <span>Build</span>
+        <span className="inline-flex items-center gap-1">Explore <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" /></span>
+      </div>
     </Link>
   );
 }
@@ -312,7 +297,15 @@ export function EntShowcase() {
           </div>
           <span className="absolute bottom-4 left-5 z-10 text-[14px] text-gc-on-night">Imagine</span>
         </Link>
-        <ExploreTile />
+        <Link to="/insights" className={`${tile} grid h-[290px] grid-rows-2 gap-1`}>
+          <div className="relative overflow-hidden rounded-[18px]">
+            <LoopImages images={FOX_LOOP} width={1152} height={960} offset={1300} />
+          </div>
+          <div className="relative overflow-hidden rounded-[18px]">
+            <LoopImages images={CAR_LOOP} width={1152} height={960} offset={2600} />
+            <span className="absolute bottom-3 right-4 z-10 inline-flex items-center gap-1 text-[14px] text-gc-on-night">Explore <ArrowRight className="h-3.5 w-3.5" /></span>
+          </div>
+        </Link>
         <VoiceTile />
       </div>
     </section>
