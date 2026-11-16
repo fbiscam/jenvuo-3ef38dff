@@ -347,10 +347,10 @@ export function UL({ children }: { children: ReactNode }) {
   );
 }
 
-/** Signed-out visitors apply; signed-in users go straight to their dashboard. */
+/** Signed-out visitors sign up; signed-in users go straight to their dashboard. */
 function HeroPrimaryCta() {
   const { user, loading } = useAuthUser();
-  if (loading) return <span className={`${pillBlue} invisible`} aria-hidden>Apply now</span>;
+  if (loading) return <span className={`${pillBlue} invisible`} aria-hidden>Sign up</span>;
   if (user) {
     return (
       <Link to="/dashboard" className={pillBlue}>
@@ -359,8 +359,8 @@ function HeroPrimaryCta() {
     );
   }
   return (
-    <Link to="/founding" className={pillBlue}>
-      Apply now
+    <Link to="/auth" search={{ mode: "signup" } as never} className={pillBlue}>
+      Sign up
     </Link>
   );
 }

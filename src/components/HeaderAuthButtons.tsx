@@ -52,10 +52,11 @@ export default function HeaderAuthButtons({ signInOnly = false }: { signInOnly?:
         Sign In
       </Link>
       <Link
-        to="/founding"
+        to="/auth"
+        search={{ mode: "signup" } as never}
         className="inline-flex items-center gap-1.5 rounded-lg bg-gc-pill px-3 py-1.5 text-xs font-medium text-foreground hover:brightness-95 sm:gap-2 sm:px-3.5 sm:text-sm"
       >
-        Apply now
+        Sign up
         <span className={`${MONO} text-[10px] opacity-70`}>→</span>
       </Link>
     </div>

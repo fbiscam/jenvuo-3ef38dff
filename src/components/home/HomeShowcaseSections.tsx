@@ -1,4 +1,5 @@
 import * as React from "react";
+import { SignUpCta } from "@/components/SignUpCta";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowUpRight,
@@ -218,9 +219,7 @@ export function HomeUseCases() {
         <h2 className={sectionTitle}>Use cases for every Gold, Bitcoin and EUR/USD trader</h2>
         <p className={sectionLead}>From your first chart to a running bot, pick where you want to start.</p>
         <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link to="/founding" className={pillDark}>
-            <Sparkles className="h-4 w-4" /> Apply now
-          </Link>
+          <SignUpCta className={pillDark} label={<><Sparkles className="h-4 w-4" /> Sign up</>} signedInLabel={<><Sparkles className="h-4 w-4" /> Go to dashboard</>} />
           <Link to="/pricing" className={pillLight}>
             <ShieldCheck className="h-4 w-4" /> See plans
           </Link>

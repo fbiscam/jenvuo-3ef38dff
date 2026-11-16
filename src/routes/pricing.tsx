@@ -169,9 +169,18 @@ function PricingPage() {
         </button>
       );
     }
+    // Signed out: Pro offers the free trial (14 days of Pro + API credit at sign-up); the
+    // other paid plans ask the visitor to sign up first.
+    if (signedOut) {
+      return (
+        <Link to="/auth" search={{ mode: "signup" } as never} className={btnStyle(solid)}>
+          {key === "pro" ? "Get Free Trial" : "Sign up"}
+        </Link>
+      );
+    }
     return (
-      <Link to={signedOut ? "/founding" : "/dashboard/pay"} className={btnStyle(solid)}>
-        {signedOut ? "Apply now" : trialPro ? "Upgrade to Pro" : currentPlan !== null && currentPlan !== "free" ? "Upgrade" : "Buy now"}
+      <Link to="/dashboard/pay" className={btnStyle(solid)}>
+        {trialPro ? "Upgrade to Pro" : currentPlan !== null && currentPlan !== "free" ? "Upgrade" : "Buy now"}
       </Link>
     );
   };
@@ -325,7 +334,7 @@ function PricingPage() {
               Top up from $5. $1 = $1 wallet, every $3 unlocks 1M tokens. Primary requests cost $0.03; senior-reviewed analysis $0.20.
             </p>
           </div>
-          <TopUp canBuy={buyGate.canBuy} />
+          <TopUp canBuy={buyGate.canBuy} signedOut={signedOut} />
         </div>
       </section>
 
@@ -410,7 +419,7 @@ function FeatureList({ title, items, muted }: { title: string; items: string[]; 
   );
 }
 
-function TopUp({ canBuy }: { canBuy: boolean }) {
+function TopUp({ canBuy, signedOut }: { canBuy: boolean; signedOut: boolean }) {
   const [amount, setAmount] = React.useState<number>(25);
   const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
   return (
@@ -440,11 +449,11 @@ function TopUp({ canBuy }: { canBuy: boolean }) {
         />
       </div>
       <Link
-        to={canBuy ? "/dashboard/pay" : "/founding"}
-        search={canBuy ? ({ amount: safe } as never) : undefined}
+        to={canBuy ? "/dashboard/pay" : signedOut ? "/auth" : "/founding"}
+        search={canBuy ? ({ amount: safe } as never) : signedOut ? ({ mode: "signup" } as never) : undefined}
         className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-foreground px-5 text-[14px] font-medium text-background hover:opacity-90"
       >
-        {canBuy ? "Buy now" : "Apply now"}
+        {canBuy ? "Buy now" : signedOut ? "Sign up" : "Apply now"}
       </Link>
       {amount < 5 && <p className="w-full text-[13px] text-destructive">Minimum top-up is $5.</p>}
     </div>

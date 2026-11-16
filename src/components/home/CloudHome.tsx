@@ -1,4 +1,5 @@
 import { openAskJenvu } from "@/components/AskJenvuWidget";
+import { SignUpCta } from "@/components/SignUpCta";
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
 import {
@@ -204,12 +205,7 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
             everywhere you trade
           </h1>
           <div className="jenvu-rise [animation-delay:100ms] mt-8 flex flex-wrap items-center justify-center gap-6">
-            <Link
-              to="/founding"
-              className="inline-flex h-11 items-center gap-1.5 rounded-full bg-gc-ink px-5 text-[15px] font-medium text-background transition hover:opacity-90"
-            >
-              Apply now
-            </Link>
+            <SignUpCta className="inline-flex h-11 items-center gap-1.5 rounded-full bg-gc-ink px-5 text-[15px] font-medium text-background transition hover:opacity-90" />
             <button
               type="button"
               onClick={() => openAskJenvu("sales")}
@@ -304,7 +300,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "Approved Founding members get 30 days of Pro or Elite and the plan's API credit once their ID is verified", to: "/founding", img: tradeNeonStart },
+      { tag: "NEW TRADERS", text: "Sign up for a free trial: $30 API credit and 14 days of Pro, including the Terminal's paid strategies", to: "/auth", img: tradeNeonStart },
       { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
       { tag: "LEARN", text: "Read daily Gold insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
@@ -330,7 +326,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
 ];
 
 const AUDIENCE_TITLE: Record<string, string> = {
-  "NEW TRADERS": "Apply now",
+  "NEW TRADERS": "Free trial",
   "JX BOT": "JX Bot for MT5",
   LEARN: "Learn Gold trading",
   "TOP-TIER MODELS": "Top-tier models",
@@ -453,15 +449,10 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Jenvu is for approved Founding Program members: Pro or Elite and the Terminal for 30 days, with the plan's API credit and JX Bot after ID verification.
+            Sign up for a free trial: $30 API credit and 14 days of Pro, including the Terminal's paid strategies. JX Bot is for verified Founding Program members.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
-            <Link
-              to="/founding"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
-            >
-              Apply now
-            </Link>
+            <SignUpCta className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover" />
             <Link to="/pricing" className="text-[15px] font-medium text-gc-blue-deep hover:underline">
               See all plans and tools
             </Link>
@@ -733,12 +724,7 @@ export function CloudFinalCta() {
               <span className="text-gc-blue">Let's start trading</span> your tomorrow, today
             </h2>
             <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                to="/founding"
-                className="inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover"
-              >
-                Apply now
-              </Link>
+              <SignUpCta className="inline-flex h-11 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover" />
               <button
                 type="button"
                 onClick={() => openAskJenvu("sales")}

@@ -5,6 +5,7 @@
  * "Explore more" illustration cards and a grey closing call to action.
  */
 import * as React from "react";
+import { SignUpCta } from "@/components/SignUpCta";
 import { Link } from "@tanstack/react-router";
 import {
   Bell,
@@ -62,9 +63,9 @@ export function BizHero() {
           everywhere you trade
         </h1>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-5">
-          <Link to="/founding" className={pillInk}>
-            Apply now <ChevronRight className="h-4 w-4" />
-          </Link>
+          <SignUpCta className={pillInk}>
+            <ChevronRight className="h-4 w-4" />
+          </SignUpCta>
           <button type="button" onClick={() => openAskJenvu("sales")} className={textLink}>
             Contact sales <ChevronRight className="h-4 w-4" />
           </button>
@@ -440,9 +441,9 @@ export function BizCta() {
       <div className="mx-auto max-w-7xl rounded-md bg-gc-panel px-6 py-20 text-center sm:py-28">
         <h2 className={`${h2} mx-auto max-w-2xl`}>Interested in seeing how Jenvu works for your trading?</h2>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-5">
-          <Link to="/founding" className="inline-flex h-10 items-center gap-1.5 rounded-full bg-gc-line/60 px-4 text-[14px] text-gc-ink hover:bg-gc-line">
-            Apply now <ChevronRight className="h-4 w-4" />
-          </Link>
+          <SignUpCta className="inline-flex h-10 items-center gap-1.5 rounded-full bg-gc-line/60 px-4 text-[14px] text-gc-ink hover:bg-gc-line">
+            <ChevronRight className="h-4 w-4" />
+          </SignUpCta>
           <button type="button" onClick={() => openAskJenvu("sales")} className="inline-flex items-center gap-0.5 text-[14px] text-gc-ink hover:text-gc-blue">
             Contact sales <ChevronRight className="h-4 w-4" />
           </button>

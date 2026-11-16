@@ -61,8 +61,8 @@ function GetBot({ label = "Use JX Bot" }: { label?: string }) {
       </Link>
     );
   return (
-    <Link to="/founding" className={pillDark}>
-      {icon} {user ? label : "Apply now"}
+    <Link to="/auth" search={{ mode: "signup" } as never} className={pillDark}>
+      {icon} Sign up
     </Link>
   );
 }

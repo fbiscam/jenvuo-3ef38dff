@@ -1,4 +1,5 @@
 import * as React from "react";
+import { SignUpCta } from "@/components/SignUpCta";
 import { Link } from "@tanstack/react-router";
 import { openAskJenvu } from "@/components/AskJenvuWidget";
 import { Pause, Play } from "lucide-react";
@@ -181,12 +182,7 @@ export function CloudStartBanner() {
               <span className="text-gc-blue-deep">Let's start trading</span> your markets, today
             </h2>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/founding"
-                className="inline-flex rounded-full bg-gc-blue-deep px-6 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-navy"
-              >
-                Apply now
-              </Link>
+              <SignUpCta className="inline-flex rounded-full bg-gc-blue-deep px-6 py-3 text-sm font-medium text-gc-on-blue hover:bg-gc-navy" />
               <button
                 type="button"
                 onClick={() => openAskJenvu("sales")}

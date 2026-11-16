@@ -13,8 +13,8 @@ const pillLight =
 function StartBuilding() {
   const { user } = useAuthUser();
   return (
-    <Link to={user ? "/dashboard/models" : "/founding"} className={pillDark}>
-      {user ? "Start Building" : "Apply now"}
+    <Link to={user ? "/dashboard/models" : "/auth"} search={user ? undefined : ({ mode: "signup" } as never)} className={pillDark}>
+      {user ? "Start Building" : "Sign up"}
     </Link>
   );
 }

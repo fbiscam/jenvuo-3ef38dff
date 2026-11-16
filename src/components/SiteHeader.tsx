@@ -135,17 +135,42 @@ export default function SiteHeader() {
               Contact Sales
             </button>
             <div className="relative hidden sm:block" onMouseLeave={() => setTryOpen(false)}>
-              <button
-                type="button"
-                aria-expanded={tryOpen}
-                aria-haspopup="menu"
-                onClick={() => setTryOpen((v) => !v)}
-                onMouseEnter={() => setTryOpen(true)}
-                className="inline-flex h-10 items-stretch overflow-hidden rounded-full bg-foreground text-[14px] font-medium text-background hover:opacity-90"
-              >
-                <span className="flex items-center pl-4 pr-3">Try Jenvu</span>
-                <span aria-hidden="true" className="flex items-center border-l border-background/20 pl-2.5 pr-3"><ChevronDown className={`h-4 w-4 transition-transform ${tryOpen ? "rotate-180" : ""}`} /></span>
-              </button>
+              {/* Split button: signed out the left part is "Sign up" (opens the sign-up form);
+                  signed in it reads "Try Jenvu" and opens the menu. The arrow always opens the menu. */}
+              <div className="inline-flex h-10 items-stretch overflow-hidden rounded-full bg-foreground text-[14px] font-medium text-background">
+                {isAuthed ? (
+                  <button
+                    type="button"
+                    aria-expanded={tryOpen}
+                    aria-haspopup="menu"
+                    onClick={() => setTryOpen((v) => !v)}
+                    onMouseEnter={() => setTryOpen(true)}
+                    className="flex items-center pl-4 pr-3 hover:opacity-90"
+                  >
+                    Try Jenvu
+                  </button>
+                ) : (
+                  <Link
+                    to="/auth"
+                    search={{ mode: "signup" } as never}
+                    onClick={() => setTryOpen(false)}
+                    className="flex items-center pl-4 pr-3 hover:opacity-90"
+                  >
+                    Sign up
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  aria-label="More ways to try Jenvu"
+                  aria-expanded={tryOpen}
+                  aria-haspopup="menu"
+                  onClick={() => setTryOpen((v) => !v)}
+                  onMouseEnter={() => setTryOpen(true)}
+                  className="flex items-center border-l border-background/20 pl-2.5 pr-3 hover:opacity-90"
+                >
+                  <ChevronDown className={`h-4 w-4 transition-transform ${tryOpen ? "rotate-180" : ""}`} />
+                </button>
+              </div>
               {tryOpen && (
                 <div role="menu" className="absolute right-0 top-full z-50 pt-2">
                   <div className="w-56 rounded-2xl border border-border bg-background p-2 text-[14px] shadow-lg">
@@ -253,11 +278,12 @@ export default function SiteHeader() {
                     Sign In
                   </Link>
                   <Link
-                    to="/pricing"
+                    to="/auth"
+                    search={{ mode: "signup" } as never}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
+                    className="inline-flex items-center justify-center rounded-lg bg-foreground px-3 py-2 text-sm font-medium text-background hover:opacity-90"
                   >
-                    Buy now
+                    Sign up
                   </Link>
                 </div>
               )}

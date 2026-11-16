@@ -337,7 +337,7 @@ export function DocsOverview() {
           This guide walks you through the basics of the Jenvu API, from getting an account to making your first request.
         </p>
         <Step n={1} title="Get a Jenvu account">
-          Accounts come from the Founding Program. <Link to="/founding" className="underline underline-offset-4">Apply here</Link>, then sign in to your dashboard.
+          <Link to="/auth" search={{ mode: "signup" } as never} className="underline underline-offset-4">Sign up</Link> to get a free trial ($30 API credit and 14 days of Pro). JX Bot needs the <Link to="/founding" className="underline underline-offset-4">Founding Program</Link>.
         </Step>
         <Step n={2} title="Generate an API key">
           Create a key on the <Link to="/dashboard/api" className="underline underline-offset-4">API keys page</Link>, then export it as an environment variable.

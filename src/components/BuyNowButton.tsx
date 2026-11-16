@@ -7,7 +7,7 @@ import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
 
 /**
- * Shared plan CTA: signed out it reads "Apply now" (Founding form); signed in it reads
+ * Shared plan CTA: signed out it reads "Sign up" (sign-up form, free trial); signed in it reads
  * "Buy now". Buying needs a verified Founding ID, so an unverified click shows a toast
  * notice instead of the payment page (the server refuses the purchase too).
  */
@@ -77,7 +77,7 @@ export function BuyNowButton({
   className,
   to = "/dashboard/pay",
   buyLabel = "Buy now",
-  applyLabel = "Apply now",
+  applyLabel = "Sign up",
   children,
 }: {
   className: string;
@@ -90,7 +90,7 @@ export function BuyNowButton({
   const navigate = useNavigate();
   if (!signedIn) {
     return (
-      <Link to="/founding" className={className}>
+      <Link to="/auth" search={{ mode: "signup" } as never} className={className}>
         {applyLabel}
         {children}
       </Link>
