@@ -5,7 +5,7 @@ import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
 
 const DISMISS_KEY = "jenvu:start-trial-banner-dismissed";
 
-/** Thin top strip offering the one-time free trial ($100 credit + 14 days Pro). */
+/** Thin top strip for the self-claim free trial; unused while the trial starts automatically at sign-up. */
 export default function StartTrialBanner() {
   const { user, eligible, starting, start } = useFreeTrial();
   const [dismissed, setDismissed] = useState(true);

@@ -39,7 +39,7 @@ export function useUpgradeLock(): UpgradeLock {
       }
       const { data } = await supabase
         .from("founding_applications")
-        .select("status, document_status, approved_at, created_at")
+        .select("status, document_status, approved_at, created_at, founding_started_at")
         .ilike("email", u.user.email)
         .order("created_at", { ascending: false })
         .limit(1)
@@ -52,8 +52,9 @@ export function useUpgradeLock(): UpgradeLock {
       }
 
       const docStatus = (data.document_status as string | null) ?? "not_submitted";
-      const approvedAt = (data.approved_at as string | null) ?? null;
-      const trialStart = approvedAt ? new Date(approvedAt) : null;
+      // The Founding month runs from ID verification (older rows: from approval).
+      const startedAt = ((data as { founding_started_at?: string | null }).founding_started_at ?? data.approved_at ?? null) as string | null;
+      const trialStart = startedAt ? new Date(startedAt) : null;
       const trialEnd = trialStart
         ? foundingTrialEnd(trialStart)
         : null;
