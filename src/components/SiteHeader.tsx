@@ -19,7 +19,6 @@ const MONO = "font-sans";
 const RESOURCES = [
   { to: "/insights", label: "Blog" },
   { to: "/help", label: "Support" },
-  { to: "/docs", label: "Docs" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -78,7 +77,7 @@ export default function SiteHeader() {
           ) : (
           <nav className="hidden min-w-0 items-center justify-start gap-0.5 whitespace-nowrap text-[14px] text-muted-foreground lg:flex [&>a]:rounded-full [&>a]:px-3 [&>a]:py-2 [&>a:hover]:bg-muted [&>a:hover]:text-foreground">
             <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
-            <Link to="/products" activeProps={ACTIVE}>Products</Link>
+            <Link to="/docs" activeProps={ACTIVE}>Docs</Link>
             <Link to="/status" activeProps={ACTIVE}>Status</Link>
             <Link to="/jx-bot" activeProps={ACTIVE}>JX Bot</Link>
             <div className="relative" onMouseLeave={() => setResOpen(false)}>
@@ -233,7 +232,7 @@ export default function SiteHeader() {
             <nav className="flex flex-col px-3 pb-4 pt-1 text-[15px] text-foreground">
               {[
                 { to: "/about", label: "Why Jenvu" },
-                { to: "/products", label: "Products" },
+                { to: "/docs", label: "Docs" },
                 { to: "/status", label: "Status" },
                 { to: "/jx-bot", label: "JX Bot" },
                 { to: "/platform", label: "Platform" },
