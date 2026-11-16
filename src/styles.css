@@ -2852,3 +2852,42 @@ html[data-ops-z] .ops-zoom {
 .product-motion-control { position: absolute; right: 16px; bottom: 16px; color: var(--product-video-ink); background: var(--product-video-surface); border-radius: 50%; }
 .why-review-platform img { width: 30px; height: 30px; object-fit: contain; background: transparent; }
 @media (max-width: 767px) { .products-copy { padding-block: 48px 36px; min-height: auto; }.products-intro { font-size: 16px; }.product-motion-control { right: 8px; bottom: 8px; } }
+
+/* Service Status: neutral overview with measured availability colors. */
+.status-page { --status-panel: oklch(.975 0 0); --status-muted: oklch(.52 0 0); --status-green: oklch(.72 .18 145); --status-green-ink: oklch(.36 .12 145); --status-green-soft: oklch(.94 .06 145); --status-yellow: oklch(.78 .16 85); --status-red: oklch(.65 .19 28); --status-unknown: oklch(.87 0 0); --status-dots: oklch(.94 0 0); background: var(--background); color: var(--foreground); min-height: 100dvh; }
+.dark .status-page { --status-panel: oklch(.2 0 0); --status-muted: oklch(.7 0 0); --status-green-ink: oklch(.84 .13 145); --status-green-soft: oklch(.28 .06 145); --status-unknown: oklch(.36 0 0); --status-dots: oklch(.23 0 0); }
+.status-header { position: sticky; top: 0; z-index: 40; background: var(--background); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 24px; padding: 14px 24px; }
+.status-overview { font-size: 13px; font-weight: 500; }
+.status-header-tools { margin-left: auto; display: flex; align-items: center; gap: 24px; font-size: 13px; }
+.status-muted { color: var(--status-muted); margin-right: 6px; }
+.status-main { max-width: 940px; margin: 0 auto; padding: 48px 20px 64px; }
+.status-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.status-heading h1 { font-size: 28px; line-height: 1.2; font-weight: 500; letter-spacing: 0; }
+.status-heading p { color: var(--status-muted); font-size: 13px; margin-top: 6px; }
+.status-summary { display: flex; align-items: center; gap: 16px; border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 40px; }
+.status-summary h2 { font-size: 17px; font-weight: 500; }
+.status-summary p { font-size: 13px; color: var(--status-muted); margin-top: 4px; }
+.status-indicator { display: inline-flex; align-items: center; justify-content: center; width: 17px; height: 17px; flex-shrink: 0; border-radius: 50%; background: var(--status-unknown); color: var(--foreground); }
+.status-indicator.status-operational { background: var(--status-green); color: var(--background); }
+.status-indicator.status-degraded { background: var(--status-yellow); }
+.status-indicator.status-unavailable { background: var(--status-red); }
+.status-summary > .status-indicator { width: 40px; height: 40px; }
+.status-summary > .status-indicator svg { width: 24px; height: 24px; }
+.status-group { padding: 24px; background: var(--status-panel); border-radius: 8px; margin-top: 36px; }
+.status-group-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.status-group-heading h2 { font-size: 18px; font-weight: 500; }
+.status-group-heading h2 span { font-size: 13px; color: var(--status-muted); margin-left: 7px; font-weight: 400; white-space: nowrap; }
+.status-badge { background: var(--status-panel); font-size: 12px; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.status-badge.status-operational { background: var(--status-green-soft); color: var(--status-green-ink); }
+.status-badge.status-degraded { color: var(--gc-amber); }.status-badge.status-unavailable { color: var(--destructive); }
+.status-bars { display: grid; grid-template-columns: repeat(90,minmax(0,1fr)); gap: 4px; height: 32px; }
+.status-bar { position: relative; background: var(--status-unknown); border-radius: 3px; }
+.status-bar.status-operational { background: var(--status-green); }.status-bar.status-degraded { background: var(--status-yellow); }.status-bar.status-unavailable { background: var(--status-red); }
+.status-bar-tip { display: none; position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--background); color: var(--foreground); font-size: 11px; white-space: nowrap; z-index: 10; }
+.status-bar:hover .status-bar-tip,.status-bar:focus .status-bar-tip { display: block; }
+.status-bar:nth-child(-n+15) .status-bar-tip { left: 0; transform: none; }.status-bar:nth-last-child(-n+15) .status-bar-tip { left: auto; right: 0; transform: none; }
+.status-history-caption { display: flex; justify-content: space-between; font-size: 10px; color: var(--status-muted); margin: 6px 0 18px; }
+.status-services { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.status-service { background: var(--background); border-radius: 0; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; min-width: 0; }
+.status-method { color: var(--status-muted); font-size: 12px; line-height: 1.7; margin-top: 24px; }
+@media(max-width:600px) { .status-header { padding: 12px 16px; gap: 16px; }.status-header-tools { gap: 12px; }.status-main { padding: 32px 18px 48px; }.status-heading h1 { font-size: 25px; }.status-summary { padding: 18px; gap: 12px; }.status-summary h2 { font-size: 15px; }.status-group-heading h2 { font-size: 15px; }.status-group-heading h2 span { font-size: 11px; margin-left: 4px; }.status-badge { font-size: 10px; padding-inline: 7px; }.status-bars { gap: 2px; height: 28px; }.status-services { grid-template-columns: 1fr; }.status-bar-tip { max-width: 270px; white-space: normal; min-width: 160px; }.status-bar:nth-child(-n+45) .status-bar-tip { left: 0; transform: none; }.status-bar:nth-last-child(-n+45) .status-bar-tip { left: auto; right: 0; transform: none; } }

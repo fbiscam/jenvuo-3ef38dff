@@ -265,7 +265,7 @@ print(chat.choices[0].message.content)`,
       { value: "3", label: "Markets: Gold, Bitcoin, EUR/USD" },
       { value: "6", label: "Checks before any setup is shown" },
     ],
-    cta: { label: "Learn about the AI engine", href: "https://jenvu.com/ai-engine" },
+    cta: { label: "Learn about the AI engine", href: "https://jenvu.com/products" },
   },
   {
     slug: "rvol-and-volume-direction",

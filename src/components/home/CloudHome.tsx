@@ -309,7 +309,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "developers",
     label: "Developers",
     cards: [
-      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build serious trading tools", to: "/ai-engine", img: devModels },
+      { tag: "TOP-TIER MODELS", text: "Top-tier AI models for developers who want to build serious trading tools", to: "/products", img: devModels },
       { tag: "API & EXTENSION", text: "Plug Jenvu models into your apps and bots with API keys in minutes", to: "/pricing", img: devExtension },
       { tag: "DEVELOPER DOCS", text: "Clear docs and guides to connect, test and ship your projects faster", to: "/help", img: devDocs },
     ],
@@ -340,7 +340,7 @@ const AUDIENCE_LINK: Record<string, string> = {
   "/auth": "Sign up",
   "/pricing": "View pricing",
   "/insights": "Read insights",
-  "/ai-engine": "View models",
+  "/products": "View models",
   "/help": "View docs",
   "/founding": "Apply now",
   "/contact": "Contact support",
@@ -505,7 +505,7 @@ export function CloudBuildWith() {
 /* ---------------- Product grid ---------------- */
 const PRODUCTS: Array<{ Icon: typeof Bot; tone: Tone; title: string; body: string; to: string }> = [
   { Icon: LineChart, tone: "blue", title: "Jenvu Terminal", body: "Live Gold, Bitcoin and EUR/USD candles with HH/HL/LH/LL structure, BOS and CHoCH that never repaint.", to: "/pricing" },
-  { Icon: Bot, tone: "red", title: "AI Desk", body: "Ask about the chart in plain language and get a focused answer to exactly what you asked.", to: "/ai-engine" },
+  { Icon: Bot, tone: "red", title: "AI Desk", body: "Ask about the chart in plain language and get a focused answer to exactly what you asked.", to: "/products" },
   { Icon: Waves, tone: "yellow", title: "Liquidity sweeps", body: "Fresh high/low sweep detection on 5M, 15M, 1H, 2H and 4H with fakeout filters.", to: "/help" },
   { Icon: Layers, tone: "green", title: "Zones + FVG", body: "Supply and demand zones paired with fair value gaps, drawn only when they score strong.", to: "/help" },
   { Icon: Chrome, tone: "blue", title: "Browser extension", body: "Bring Jenvu analysis into TradingView with a side panel that reads your chart.", to: "/download" },

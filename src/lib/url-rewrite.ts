@@ -18,6 +18,7 @@ const SUBDOMAIN_SECTIONS: Record<string, string> = {
   dash: "/dashboard",
   blogs: "/insights",
   support: "/help",
+  status: "/status",
 };
 
 // Legacy top-level dashboard children that redirect under /dashboard.
@@ -95,6 +96,7 @@ function isDash(host: string): boolean {
 const SECTION_HOSTS: Record<string, string> = {
   [`blogs.${ROOT_DOMAIN}`]: "/insights",
   [`support.${ROOT_DOMAIN}`]: "/help",
+  [`status.${ROOT_DOMAIN}`]: "/status",
 };
 
 // Internal path prefix -> the subdomain that hosts it. Used to send users to
@@ -103,6 +105,7 @@ const PATH_HOSTS: Array<[prefix: string, host: string]> = [
   ["/dashboard", `dash.${ROOT_DOMAIN}`],
   ["/help", `support.${ROOT_DOMAIN}`],
   ["/insights", `blogs.${ROOT_DOMAIN}`],
+  ["/status", `status.${ROOT_DOMAIN}`],
 ];
 
 /** Host that should serve this internal path, or null if it stays put. */
@@ -127,6 +130,8 @@ function isManagedHost(host: string): boolean {
 export const GLOBAL_PATHS = new Set([
   "about",
   "ai-engine",
+  "products",
+  "status",
   "app",
   "auth",
   "broadcasts",
@@ -173,6 +178,13 @@ export function apexRedirectTarget(url: URL): string | null {
   const p = url.pathname;
   if (isReserved(p)) return null;
 
+  if (p === '/ai-engine' && isManagedHost(host)) {
+    const next = new URL(url); next.hostname = ROOT_DOMAIN; next.pathname = '/products'; return next.toString();
+  }
+  if (host === `status.${ROOT_DOMAIN}` && p === '/status') {
+    const next = new URL(url); next.pathname = '/'; return next.toString();
+  }
+
   // Normalize www to the apex host.
   if (host === `www.${ROOT_DOMAIN}`) {
     if (isReserved(p)) return null;
@@ -209,7 +221,11 @@ export function apexRedirectTarget(url: URL): string | null {
     if (sub === "dash" || SECTION_HOSTS[host]) {
       if (isGlobalPath(p) && !(sub === "dash" && dashInternal(p))) {
         const next = new URL(url);
-        if (p === "/auth") {
+        const sectionTarget = hostForPath(p);
+        if (sectionTarget) {
+          next.hostname = sectionTarget.host;
+          next.pathname = p === sectionTarget.prefix ? '/' : p.slice(sectionTarget.prefix.length);
+        } else if (p === "/auth") {
           next.hostname = AUTH_HOST;
           next.pathname = "/sign-in";
         } else {
@@ -421,6 +437,9 @@ export function rewriteOutput(url: URL): URL | undefined {
   // clean — /insights/my-post -> blogs.jenvu.com/my-post
   const section = SECTION_HOSTS[host];
   if (section) {
+    if (p === section) {
+      const next = new URL(url); next.pathname = '/'; return next;
+    }
     if (isGlobalPath(p) || p === "/") {
       const next = new URL(url);
       next.hostname = ROOT_DOMAIN;

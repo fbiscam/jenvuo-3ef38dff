@@ -23,7 +23,7 @@ import starsPlain from "@/assets/platform/stars-plain.webp";
 /* ---------- Dark product cards (Platform "Powered by frontier models" look) ---------- */
 
 const PRODUCTS = [
-  { name: "Jenvu Terminal", a: "Live chart with sweeps, FVGs and killzones", b: "Seven engines read every candle", to: "/ai-engine", tag: "Charts", img: starsNebula, flip: "none" },
+  { name: "Jenvu Terminal", a: "Live chart with sweeps, FVGs and killzones", b: "Seven engines read every candle", to: "/products", tag: "Charts", img: starsNebula, flip: "none" },
   { name: "Ask Jenvu", a: "Plain-English answers about Gold", b: "Top AI models in one chat", to: "/llm", tag: "AI desk", img: starsPlain, flip: "none" },
   { name: "JX Bot", a: "MetaTrader 5 Expert Advisor", b: "Stop loss on every trade, daily auto-stop", to: "/download", tag: "Automation", img: starsPlain, flip: "rotate(180deg)" },
   { name: "API Platform", a: "One OpenAI-compatible key", b: "Pay as you go from your AI credit", to: "/platform", tag: "Developers", img: starsPlain, flip: "scaleX(-1)" },
@@ -166,7 +166,7 @@ export function HomeExperiences() {
           <button type="button" onClick={() => openAskJenvu()} className={pillDark}>
             Try Ask Jenvu
           </button>
-          <Link to="/ai-engine" className={pillLight}>
+          <Link to="/products" className={pillLight}>
             See the engines
           </Link>
         </div>

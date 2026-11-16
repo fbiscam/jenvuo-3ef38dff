@@ -379,6 +379,20 @@
       "when": 1794818150153,
       "tag": "0053_lower_plan_api_credit",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1794827662379,
+      "tag": "0054_public_service_status_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1794827869170,
+      "tag": "0055_service_status_daily_history",
+      "breakpoints": true
     }
   ]
 }

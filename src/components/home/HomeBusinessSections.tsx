@@ -178,7 +178,7 @@ export function BizWhatsNew() {
 /* ---------------- AI for every desk ---------------- */
 
 const DESKS = [
-  { name: "Gold traders", body: "Read Gold structure, liquidity and killzones with chart-aware AI and seven trading engines.", line: "What if you could read Gold structure in seconds", to: "/ai-engine" },
+  { name: "Gold traders", body: "Read Gold structure, liquidity and killzones with chart-aware AI and seven trading engines.", line: "What if you could read Gold structure in seconds", to: "/products" },
   { name: "Analysts", body: "Turn sessions, news and price action into clear daily notes and shareable insights.", line: "What if your morning notes wrote themselves", to: "/insights" },
   { name: "Bot users", body: "Run JX Bot on MetaTrader 5 with a stop loss on every trade, trading hours and a daily target.", line: "What if your bot stopped at your daily target", to: "/download" },
   { name: "Developers", body: "Call the top AI models behind one Jenvu API key, pay as you go.", line: "What if every top model sat behind one key", to: "/platform" },
@@ -243,8 +243,8 @@ export function BizEveryDesk() {
 /* ---------------- Complete platform ---------------- */
 
 const PRODUCTS = [
-  { key: "ask", label: "Ask Jenvu", Icon: Sparkles, body: "Ask about Gold in plain words for structure, levels and plans you can check on the chart.", to: "/ai-engine" },
-  { key: "terminal", label: "Terminal", Icon: CandlestickChart, body: "A live Gold, Bitcoin or EUR/USD chart with liquidity sweeps, fair value gaps and seven engines in one view.", to: "/ai-engine" },
+  { key: "ask", label: "Ask Jenvu", Icon: Sparkles, body: "Ask about Gold in plain words for structure, levels and plans you can check on the chart.", to: "/products" },
+  { key: "terminal", label: "Terminal", Icon: CandlestickChart, body: "A live Gold, Bitcoin or EUR/USD chart with liquidity sweeps, fair value gaps and seven engines in one view.", to: "/products" },
   { key: "bot", label: "JX Bot", Icon: Bot, body: "An EUR/USD M15 swing bot for MetaTrader 5, with a stop loss on every trade.", to: "/download" },
   { key: "api", label: "API", Icon: Code2, body: "Top AI models behind one key, at $3 per million tokens, working with the OpenAI SDK.", to: "/platform" },
 ] as const;
@@ -406,7 +406,7 @@ export function BizPlatform() {
 /* ---------------- Explore more ---------------- */
 
 const EXPLORE = [
-  { src: realTraders, label: "Traders", body: "Read Gold with seven engines", to: "/ai-engine" },
+  { src: realTraders, label: "Traders", body: "Read Gold with seven engines", to: "/products" },
   { src: realFounding, label: "Founding members", body: "Join early, shape Jenvu", to: "/founding" },
   { src: realLearners, label: "Learners", body: "ICT and SMC, step by step", to: "/strategies/ict-gold-trading" },
   { src: realApi, label: "Developers", body: "Top AI models, one key", to: "/platform" },

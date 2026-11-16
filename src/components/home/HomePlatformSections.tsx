@@ -95,7 +95,7 @@ export function HomeReadAskAutomate() {
             </p>
           </Link>
 
-          <Link to="/ai-engine" className="group block">
+          <Link to="/products" className="group block">
             <div className="flex aspect-square items-center justify-center rounded-md transition group-hover:brightness-[1.03]" style={{ backgroundImage: "var(--platform-aurora-2)" }}>
               <div className="grid grid-cols-3 gap-4">
                 <Chip><MessageSquare className="h-6 w-6" /></Chip>

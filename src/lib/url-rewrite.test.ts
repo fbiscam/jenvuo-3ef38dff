@@ -2,6 +2,24 @@ import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
 import { apexRedirectTarget, rewriteInput, rewriteOutput } from "./url-rewrite";
 
+describe('Status and Products canonical addresses', () => {
+  it('status subdomain root opens only the status overview', () => {
+    expect(rewriteInput(new URL('https://status.jenvu.com/'))?.pathname).toBe('/status');
+    expect(apexRedirectTarget(new URL('https://status.jenvu.com/'))).toBe(null);
+  });
+  it('status links target their subdomain without a redirect loop', () => {
+    expect(apexRedirectTarget(new URL('https://jenvu.com/status'))).toBe('https://status.jenvu.com/');
+    expect(rewriteOutput(new URL('https://jenvu.com/status'))?.href).toBe('https://status.jenvu.com/');
+    expect(rewriteOutput(new URL('https://status.jenvu.com/status'))?.href).toBe('https://status.jenvu.com/');
+    expect(apexRedirectTarget(new URL('https://dash.jenvu.com/status'))).toBe('https://status.jenvu.com/');
+  });
+  it('Products stays public on apex and legacy address permanently converges', () => {
+    expect(apexRedirectTarget(new URL('https://jenvu.com/products'))).toBe(null);
+    expect(apexRedirectTarget(new URL('https://support.jenvu.com/products'))).toBe('https://jenvu.com/products');
+    expect(apexRedirectTarget(new URL('https://jenvu.com/ai-engine?ref=old'))).toBe('https://jenvu.com/products?ref=old');
+  });
+});
+
 describe("section hosts never swallow global pages", () => {
   it("support.jenvu.com/docs goes to jenvu.com/docs instead of a help 404", () => {
     expect(apexRedirectTarget(new URL("https://support.jenvu.com/docs"))).toBe("https://jenvu.com/docs");

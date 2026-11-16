@@ -4,7 +4,8 @@ export type SitePage = { to: string; label: string; keywords?: string };
 export const SITE_PAGES: SitePage[] = [
   { to: "/", label: "Home", keywords: "homepage start jenvu" },
   { to: "/about", label: "Overview", keywords: "about company story team" },
-  { to: "/ai-engine", label: "Products", keywords: "ai engine features terminal api ict smc gold trading news bot" },
+  { to: "/products", label: "Products", keywords: "ai engine features terminal api ict smc gold trading news bot" },
+  { to: "/status", label: "Service Status", keywords: "operational outage availability uptime health" },
   { to: "/models", label: "Models", keywords: "ai models claude gpt gemini grok deepseek qwen llm api catalog" },
   { to: "/pricing", label: "Pricing", keywords: "plans price pro elite ultra buy upgrade cost" },
   { to: "/insights", label: "Blog", keywords: "articles insights news posts" },

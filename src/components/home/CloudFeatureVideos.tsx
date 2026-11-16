@@ -133,7 +133,7 @@ type Card = { name: string; text: React.ReactNode; to: string; Scene: React.Comp
 const CARDS: Card[] = [
   { name: "Live candles", to: "/pricing", Scene: SceneCandles, text: <><b className="font-medium text-gc-ink">Jenvu Terminal</b> streams live Gold, Bitcoin and EUR/USD candles with swing labels that stay fixed once</> },
   { name: "Fresh sweep", to: "/help", Scene: SceneSweep, text: <><b className="font-medium text-gc-ink">Fresh sweep</b> spots wicks that take prior highs or lows, then confirms only when price reverses</> },
-  { name: "AI desk", to: "/ai-engine", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
+  { name: "AI desk", to: "/products", Scene: SceneAi, text: <><b className="font-medium text-gc-ink">Jenvu AI</b> reads the same chart you see and answers exactly the question you asked</> },
   { name: "Volume RVOL", to: "/help", Scene: SceneVolume, text: <><b className="font-medium text-gc-ink">RVOL</b> colours unusual volume spikes and shows an estimated buyer and seller on every candle</> },
   { name: "JX Bot", to: "/pricing", Scene: SceneBot, text: <><b className="font-medium text-gc-ink">JX Bot</b> trades EUR/USD on MetaTrader 5 and pauses for the day at your daily target</> },
 ];

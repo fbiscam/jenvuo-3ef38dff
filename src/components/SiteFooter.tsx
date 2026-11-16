@@ -74,7 +74,7 @@ const SOCIAL = {
 const columns: FooterGroup[][] = [
   [
     { label: "Products", links: [
-      { to: "/ai-engine", label: "Ask Jenvu" },
+      { to: "/products", label: "Ask Jenvu" },
       { to: "/dashboard/terminal", label: "Jenvu Terminal" },
       { to: "/jx-bot", label: "JX Bot" },
       { to: "/models", label: "Models" },
@@ -117,6 +117,7 @@ const columns: FooterGroup[][] = [
       { to: "/contact", label: "Contact" },
     ] },
     { label: "Trust", links: [
+      { to: "/status", label: "Status" },
       { to: "/help", label: "Help Center" },
       { to: "/disclaimer", label: "Risk Disclaimer" },
       { to: "/auth", label: "Sign In" },

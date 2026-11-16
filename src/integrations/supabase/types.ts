@@ -2736,6 +2736,42 @@ export type Database = {
           },
         ]
       }
+      service_status_probe_requests: {
+        Row: {
+          request_id: number
+          requested_at: string
+          service: string
+        }
+        Insert: {
+          request_id: number
+          requested_at?: string
+          service: string
+        }
+        Update: {
+          request_id?: number
+          requested_at?: string
+          service?: string
+        }
+        Relationships: []
+      }
+      service_status_samples: {
+        Row: {
+          checked_at: string
+          service: string
+          state: string
+        }
+        Insert: {
+          checked_at: string
+          service: string
+          state: string
+        }
+        Update: {
+          checked_at?: string
+          service?: string
+          state?: string
+        }
+        Relationships: []
+      }
       signal_alert_subscribers: {
         Row: {
           created_at: string
@@ -4117,6 +4153,7 @@ export type Database = {
         Returns: string
       }
       mark_chat_read: { Args: { _session_id: string }; Returns: undefined }
+      monitor_service_status: { Args: never; Returns: undefined }
       next_first_of_month: { Args: { _t: string }; Returns: string }
       post_admin_message: {
         Args: { _content: string; _session_id: string }
@@ -4141,6 +4178,14 @@ export type Database = {
         Returns: undefined
       }
       seed_default_setups: { Args: { _user_id: string }; Returns: undefined }
+      service_status_daily_history: {
+        Args: never
+        Returns: {
+          checked_at: string
+          service: string
+          state: string
+        }[]
+      }
       set_user_plan: {
         Args: { _billing_interval?: string; _plan_id: string; _user_id: string }
         Returns: undefined
