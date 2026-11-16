@@ -79,3 +79,4 @@
 - [x] Public pages (not dashboard) 10% bigger/wider, closer to the xAI reference
 - [x] News Impact: only one section — next news, countdown, 1-hour pre-news banner, UP/DOWN cards with confidence + short verdict
 - [x] API launch: open sign-up, $30 + 14-day Pro trial (Terminal paid features, no JX Bot), 30 RPM trial keys, Founding reopened, Founding month from ID verification, land on API keys
+- [x] Welcome message: compact white card, clean icons (no blurry pictures), site font, black buttons, phone-friendly
