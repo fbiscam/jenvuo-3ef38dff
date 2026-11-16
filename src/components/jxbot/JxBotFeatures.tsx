@@ -101,7 +101,7 @@ export function JxBotFeatures() {
       <h2 id="jx-features-title" className="text-center text-[30px] font-medium text-foreground md:text-[36px]">Everything you'd want in a trading bot</h2>
       <p className="mx-auto mt-4 max-w-[650px] text-center text-[17px] leading-relaxed text-foreground md:text-[18px]">
         Download the bot, add your IP and let it run. Each IP works with one MT5 account, and your dashboard shows every
-        trade, the daily target and an ON/OFF log.
+        trade, the daily target & ON/OFF log.
       </p>
       <div className="mx-auto mt-12 grid max-w-[1200px] gap-6 md:grid-cols-2 md:gap-8">
         <WorksCard />
