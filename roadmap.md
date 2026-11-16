@@ -14,7 +14,7 @@
 - [x] Restyle Documents page with the dashboard theme
 
 - [x] Switch all app and account email senders to notify.jenvu.com
-- [ ] Verify notify.jenvu.com DNS (waiting on domain verification)
+- [x] Verify notify.jenvu.com DNS (active)
 - [x] Upgrade the vulnerable sanitizer dependency and verify the security finding is resolved
 
 - [x] Bot Usage page: move Usage tabs and the profit chart slightly left
@@ -109,3 +109,6 @@
 - [x] Replace "Plans can be bought after your ID is verified" line
 - [x] Sign-in: one-time email code option
 - [x] Two-step: authenticator and/or email code (email code confirmed before it turns on); removal blocked for 24h after a suspicious login
+
+- [x] Full A-to-Z site audit as a real user (sign-up, sign-in, forgot password, two-step, payments, database security, emails, account loopholes)
+- [ ] Signed-in audit (two-step on/off, payments, Security page) — waiting on owner: sign in once in the preview so a test session exists

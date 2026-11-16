@@ -52,7 +52,11 @@ export const createTopupOrder = createServerFn({ method: "POST" })
     const { evaluatePromo, getDepositAddresses } = await import("@/lib/payments/core.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const quote = await evaluatePromo({ userId, amountUsd: data.amountUsd, code: data.code ?? null });
+    // Plan orders are always priced on the server: the browser's amount is ignored.
+    const { isPaidPlanId, PLAN_API_CREDIT, planPrice } = await import("@/lib/plan-pricing");
+    if (data.planId && !isPaidPlanId(data.planId)) return { ok: false as const, error: "Pick a plan to continue." };
+    const amountUsd = isPaidPlanId(data.planId) ? planPrice(data.planId) : data.amountUsd;
+    const quote = await evaluatePromo({ userId, amountUsd, code: data.code ?? null });
     if (quote.error) return { ok: false as const, error: quote.error };
     if (quote.promoType === "free") return { ok: false as const, error: "Redeem this code from the promo box instead." };
 
@@ -66,7 +70,6 @@ export const createTopupOrder = createServerFn({ method: "POST" })
     const payAmount = Math.round((quote.payUsd + suffix) * 100) / 100;
 
     // A plan payment adds only that plan's API credit, so the order records that amount.
-    const { isPaidPlanId, PLAN_API_CREDIT } = await import("@/lib/plan-pricing");
     if (isPaidPlanId(data.planId)) {
       quote.creditUsd = PLAN_API_CREDIT[data.planId];
       quote.bonusUsd = 0;

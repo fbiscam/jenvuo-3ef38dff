@@ -264,7 +264,7 @@ export async function approveOrder(orderId: string, by: string) {
   if (!order) throw new Error("Order not found.");
   if (order.status === "approved") return { ok: true as const, alreadyDone: true };
 
-  const { isPaidPlanId, orderCreditToAdd } = await import("@/lib/plan-pricing");
+  const { isPaidPlanId, orderCreditToAdd, planOrderCovers, planPrice } = await import("@/lib/plan-pricing");
   const isPlanOrder = isPaidPlanId(order.target_plan_id);
   const meta = {
     order_id: order.id,
@@ -285,16 +285,26 @@ export async function approveOrder(orderId: string, by: string) {
     };
     const before = await balanceOf();
     let applied: string | null = null;
+    const payUsd = Number(order.pay_amount_usd ?? 0);
+    const covers = planOrderCovers({
+      planId: order.target_plan_id,
+      payUsd,
+      discountUsd: order.promo_code ? Number(order.bonus_usd ?? 0) : 0,
+    });
+    // A covered order (discount promos included) counts as the full plan price; an
+    // underpaid one only buys whatever plan the amount actually covers.
+    const paidForPlan = covers && isPaidPlanId(order.target_plan_id) ? Math.max(payUsd, planPrice(order.target_plan_id)) : payUsd;
     try {
-      applied = await applyPlanForPayment(order.user_id, Number(order.pay_amount_usd ?? 0), order.target_plan_id);
+      applied = await applyPlanForPayment(order.user_id, paidForPlan, order.target_plan_id);
       await ensureMt5License(order.user_id);
     } catch (e) {
       console.error("plan upgrade on approval failed", (e as Error)?.message);
     }
     const after = await balanceOf();
-    credit = orderCreditToAdd({ planId: applied ?? order.target_plan_id, topupCreditUsd: 0, gainedFromPlanSwitch: after - before });
+    const creditPlan = applied ?? (covers ? order.target_plan_id : null);
+    credit = orderCreditToAdd({ planId: creditPlan, topupCreditUsd: 0, gainedFromPlanSwitch: after - before });
     if (credit > 0) {
-      await creditWallet({ userId: order.user_id, amount: credit, reason: "plan_credit", metadata: { ...meta, plan_id: applied ?? order.target_plan_id } });
+      await creditWallet({ userId: order.user_id, amount: credit, reason: "plan_credit", metadata: { ...meta, plan_id: creditPlan } });
     }
     credit = Math.round(Math.max(0, after - before + credit) * 100) / 100;
   } else {

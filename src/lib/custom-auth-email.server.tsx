@@ -4,11 +4,12 @@ import { render } from '@react-email/render'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { RecoveryEmail } from '@/lib/email-templates/recovery'
 import { SignInCodeEmail, signInCodeSubject } from '@/lib/email-templates/sign-in-code'
+import { ExistingAccountEmail, EXISTING_ACCOUNT_SUBJECT } from '@/lib/email-templates/existing-account'
 
 type CustomAuthEmailInput = {
   to: string
-  type: 'signup' | 'recovery' | 'login' | 'second_step' | 'email_2fa_setup'
-  code: string
+  type: 'signup' | 'recovery' | 'login' | 'second_step' | 'email_2fa_setup' | 'existing_account'
+  code?: string
   siteUrl?: string
   resetLink?: string
 }
@@ -42,17 +43,19 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
         siteUrl={origin}
         recipient={to}
         confirmationUrl={`${origin}/auth`}
-        token={code}
+        token={code ?? ''}
         showLink={false}
       />
+    ) : type === 'existing_account' ? (
+      <ExistingAccountEmail />
     ) : type !== 'recovery' ? (
-      <SignInCodeEmail kind={type} token={code} />
+      <SignInCodeEmail kind={type} token={code ?? ''} />
     ) : (
       <RecoveryEmail
         siteName={SITE_NAME}
         confirmationUrl={resetLink || `${origin}/reset-password`}
         recipient={to}
-        token={code}
+        token={code ?? ''}
         showLink={Boolean(resetLink)}
       />
     )
@@ -60,7 +63,7 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
 
   const html = await render(element)
   const text = await render(element, { plainText: true })
-  const subject = type === 'signup' ? 'Confirm your email' : type === 'recovery' ? 'Reset your password' : signInCodeSubject(type)
+  const subject = type === 'signup' ? 'Confirm your email' : type === 'recovery' ? 'Reset your password' : type === 'existing_account' ? EXISTING_ACCOUNT_SUBJECT : signInCodeSubject(type)
 
   await supabaseAdmin.from('email_send_log').insert({
     message_id: messageId,

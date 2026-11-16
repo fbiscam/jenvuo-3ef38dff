@@ -47,3 +47,14 @@ export function planCoveredBy(paidUsd: number, _withBot = false): PaidPlanId | n
   for (const id of PAID_PLAN_IDS) if (paidUsd + 0.01 >= planPrice(id)) best = id;
   return best;
 }
+
+/**
+ * Whether a plan order's payment covers that plan. A discount promo (stored as the order's
+ * bonus) counts toward the price; anything else must be paid in full: an underpaid plan order
+ * must never start the plan or add its API credit.
+ */
+export function planOrderCovers(args: { planId: string | null | undefined; payUsd: number; discountUsd?: number }): boolean {
+  if (!isPaidPlanId(args.planId)) return false;
+  const paid = Math.max(0, Number(args.payUsd) || 0) + Math.max(0, Number(args.discountUsd) || 0);
+  return paid + 0.01 >= planPrice(args.planId);
+}

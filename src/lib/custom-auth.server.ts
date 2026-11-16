@@ -44,9 +44,16 @@ export function canonicalEmail(email: string): string {
 }
 
 async function assertNoEmailAlias(email: string) {
+  if (await emailAliasTaken(email)) {
+    throw new Error('An account already exists for this email inbox. Please sign in to your existing account.')
+  }
+}
+
+/** True when another spelling of the same inbox (Gmail dots, +tags) already has an account. */
+async function emailAliasTaken(email: string): Promise<boolean> {
   const canonical = canonicalEmail(email)
   const [local, domain] = canonical.split('@')
-  if (!local || !domain) return
+  if (!local || !domain) return false
   const domains = domain === 'gmail.com' ? ['gmail.com', 'googlemail.com'] : [domain]
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   for (const d of domains) {
@@ -54,10 +61,11 @@ async function assertNoEmailAlias(email: string) {
     const { data } = await (supabaseAdmin as any).from('profiles').select('email').ilike('email', pattern).limit(50)
     for (const row of (data ?? []) as { email: string | null }[]) {
       if (row.email && normalizeEmail(row.email) !== normalizeEmail(email) && canonicalEmail(row.email) === canonical) {
-        throw new Error('An account already exists for this email inbox. Please sign in to your existing account.')
+        return true
       }
     }
   }
+  return false
 }
 
 function publicSignupEnabled(): boolean {
@@ -329,7 +337,9 @@ export async function createSignupOtp(input: { email: string; password?: string;
 
   if (input.password) await assertPasswordNotLeaked(input.password)
   assertSignupSignals(input)
-  await assertNoEmailAlias(email)
+  // Taken inboxes get the same "code sent" answer as new ones (the owner is
+  // emailed a sign-in note instead), so this step can't reveal who has an account.
+  const aliasTaken = await emailAliasTaken(email)
   const signupDomain = email.split('@')[1]?.toLowerCase().trim() || ''
   await assertRealMailDomain(signupDomain)
   await assertCompanyDomainCap(signupDomain)
@@ -368,8 +378,11 @@ export async function createSignupOtp(input: { email: string; password?: string;
   }
 
   const existingUser = await findUserByEmail(email)
-  if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
-    throw new Error('An account with this email already exists. Please sign in instead.')
+  if (aliasTaken || existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
+    try {
+      await sendCustomAuthEmail({ to: email, type: 'existing_account', siteUrl: input.siteUrl })
+    } catch { /* same answer either way */ }
+    return
   }
 
   const code = generateSixDigitCode()

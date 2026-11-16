@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { planPrice, planCoveredBy, orderCreditToAdd, PLAN_API_CREDIT } from "./plan-pricing";
+import { planPrice, planCoveredBy, orderCreditToAdd, PLAN_API_CREDIT, planOrderCovers } from "./plan-pricing";
 
 describe("plan pricing", () => {
   it("charges one price per plan for everyone, JX Bot included", () => {
@@ -27,5 +27,15 @@ describe("plan pricing", () => {
   });
   it("a credit top-up adds exactly the credit bought", () => {
     expect(orderCreditToAdd({ planId: null, topupCreditUsd: 40 })).toBe(40);
+  });
+  it("an underpaid plan order never covers the plan", () => {
+    expect(planOrderCovers({ planId: "ultra", payUsd: 5.37 })).toBe(false);
+    expect(planOrderCovers({ planId: "pro", payUsd: 28.5 })).toBe(false);
+    expect(planOrderCovers({ planId: "pro", payUsd: 29.42 })).toBe(true);
+    expect(planOrderCovers({ planId: "free", payUsd: 99 })).toBe(false);
+  });
+  it("a discount promo counts toward the plan price", () => {
+    expect(planOrderCovers({ planId: "elite", payUsd: 47.2, discountUsd: 11.8 })).toBe(true);
+    expect(planOrderCovers({ planId: "elite", payUsd: 20, discountUsd: 11.8 })).toBe(false);
   });
 });
