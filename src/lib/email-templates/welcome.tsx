@@ -11,6 +11,7 @@ import {
 } from '@react-email/components'
 import { EmailHead, LogoHeader, shellStyles as s, COLORS } from './_shared'
 import type { TemplateEntry } from './registry'
+import { FREE_TRIAL_CREDIT_USD, FREE_TRIAL_DAYS } from '../free-trial'
 
 interface Props {
   recipient?: string
@@ -82,9 +83,9 @@ const WelcomeEmail = ({
               — one key for every model.
             </Text>
             <Text style={listItem}>
-              4. Verify your ID from the{' '}
-              <Link href={`${DASH}/overview`} style={linkStyle}>Dashboard</Link>{' '}
-              — your Terminal, JX Bot and your plan's API credit open after it's checked.
+              4. Free trial (one per person): ${FREE_TRIAL_CREDIT_USD} API credit and {FREE_TRIAL_DAYS} days of Pro,
+              including the Terminal&apos;s paid strategies. Want JX Bot? Apply for the{' '}
+              <Link href={`${SITE}/founding`} style={linkStyle}>Founding Program</Link>.
             </Text>
 
             <Section style={{ textAlign: 'center', marginTop: 28 }}>

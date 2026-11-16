@@ -2,6 +2,7 @@
 // Users can only trigger sends TO themselves.
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { FREE_TRIAL_CREDIT_USD, FREE_TRIAL_DAYS } from "@/lib/free-trial";
 
 export const sendWelcomeSystemMail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -20,7 +21,8 @@ export const sendWelcomeSystemMail = createServerFn({ method: "POST" })
       `Here's what you can do next:`,
       `• Open the Terminal for live Gold, Bitcoin and EUR/USD charts`,
       `• Ask anything in Chat with 60+ AI models`,
-      `• Verify your ID to open the Terminal, JX Bot and your plan's API credit (dash.jenvu.com/documents)`,
+      `• Free trial (one per person): $${FREE_TRIAL_CREDIT_USD} API credit and ${FREE_TRIAL_DAYS} days of Pro, including the Terminal's paid strategies`,
+      `• Want JX Bot? Apply for the Founding Program at jenvu.com/founding`,
       `• Reply to this message any time — support@jenvu.email is monitored by our team`,
       ``,
       `— The Jenvu Team`,
