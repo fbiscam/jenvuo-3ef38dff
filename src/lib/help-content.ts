@@ -209,7 +209,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "Confirm your plan is active on the Billing page.",
             "Check the Usage page for remaining AI wallet balance and daily tokens.",
-            "Top up your wallet if the balance has run out.",
+            "Upgrade your plan if the balance has run out.",
           ]},
 
           { type: "h2", content: "3. Supported market" },
@@ -352,11 +352,11 @@ export const collections: Collection[] = [
         summary: "Who can use the JX Bot, how to register your IP and how to install it in MetaTrader 5.",
         updatedAt: "2026-10-31",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It is only for approved Founding Program members whose ID is verified: the first Founding month is free, then a Pro, Elite or Ultra plan keeps it running. Credit alone does not unlock it. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
+          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It is included in every plan, Free too: the plan decides how many IPs you get and the daily profit target. Daily profit targets are maximum safety caps — profit is not guaranteed. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
-          { type: "ul", items: [`Pro: ${DAILY_TARGET_PCT.pro}% daily target, ${DAILY_DRAWDOWN_PCT}% drawdown guard, 1 IP (one PC or RDP).`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 2 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 5 IPs.`, "Daily target is the plan percentage of the day's starting balance, per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
+          { type: "ul", items: [`Free: $5 daily profit target, ${DAILY_DRAWDOWN_PCT}% drawdown guard, 1 IP (one PC or RDP).`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 1 IP.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 2 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 5 IPs.`, "On paid plans the daily target is the plan percentage of the day's starting balance (Free: a fixed $5), per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
           { type: "h2", content: "Trading hours and safety" },
-          { type: "ul", items: ["New trades Monday to Thursday 01:00–14:00 and Friday until 13:00 (broker server time). No trading on Saturday and Sunday.", "The bot trades only the Asia and London sessions. No new trades during the London open (06:15–09:00 UTC), and the New York session is off (no new trades after 12:00 UTC). Open trades are still managed, and a trade already in profit at 06:15 UTC is protected at break-even.", `Daily stop (fixed, can't be changed): ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance. Fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`, "Before each entry the bot checks the H1 trend, the spread (max 2 pips), a confirming candle and skips spike candles, so some days have fewer trades.", "After an update, download again, attach the bot again and load the Jenvu EURUSD 15M preset in Inputs."] },
+          { type: "ul", items: ["New trades Monday to Thursday 01:00–14:00 and Friday until 13:00 (broker server time). No trading on Saturday and Sunday.", "The bot trades only the Asia and London sessions. No new trades during the London open (06:15–09:00 UTC), and the New York session is off (no new trades after 12:00 UTC). Open trades are still managed, and a trade already in profit at 06:15 UTC is protected at break-even.", `Daily stop (fixed, can't be changed): $5 profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance. Fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`, "Before each entry the bot checks the H1 trend, the spread (max 2 pips), a confirming candle and skips spike candles, so some days have fewer trades.", "After an update, download again, attach the bot again and load the Jenvu EURUSD 15M preset in Inputs."] },
           { type: "h2", content: "Setup" },
           { type: "ol", items: ["On the PC or RDP that runs MT5, open whatismyip.com and copy the IP. Then Dashboard → JX Bot: add that IP.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA on the chart, load the Jenvu EURUSD 15M preset and type the same IP into MyIP."] },
           { type: "note", tone: "info", content: "No license key is needed: the bot trades only when it runs from the IP you added, and one IP works with one MT5 account. If your IP changes, delete the old IP and add the new one. Targets are stop limits, not promised profit. Start with a small lot size." },
@@ -460,7 +460,7 @@ export const collections: Collection[] = [
             "Priority desk support.",
           ]},
 
-          { type: "note", tone: "info", content: "These prices cover the Terminal and API. JX Bot is only for verified Founding members, whose plans add the bot cost: Pro $49, Elite $99, Ultra $169. See the Pricing page for the full feature matrix and one-time top-up packs ($1 = 3 scans). All credit expires 30 days after it is added; the oldest credit is spent first." },
+          { type: "note", tone: "info", content: "These prices are the same for everyone and include the Terminal, API credit and JX Bot. See the Pricing page for the full feature matrix. Credit top-ups are no longer sold: plans only. All credit expires 30 days after it is added; the oldest credit is spent first." },
         ],
       },
 
@@ -486,7 +486,7 @@ export const collections: Collection[] = [
             "Pro: $25 API credit added on each billing date.",
             "Elite: $59 API credit added on each billing date.",
             "Ultra: $99 API credit added on each billing date.",
-            "Top-up credit stacks on top of your plan and expires 30 days after it is added (Founding credit too). The oldest credit is spent first.",
+            "Plan credit expires 30 days after it is added (Founding credit too). The oldest credit is spent first.",
           ]},
           { type: "h2", content: "Daily token usage" },
           { type: "ul", items: [
@@ -535,7 +535,7 @@ export const collections: Collection[] = [
           { type: "ul", items: [
             "The AI desk tells you your balance is too low and stops answering until you add credits.",
             "Charts, indicators, zones and other tools keep working.",
-            "Add credits from Dashboard → Payments (top-ups from $5). Your plan also adds credit on each billing date.",
+            "Your plan adds API credit on each billing date; upgrade from Dashboard → Payments for more.",
           ]},
           { type: "note", tone: "tip", content: "See exactly what each reply cost on Dashboard → Usage." },
         ],
@@ -571,7 +571,7 @@ export const collections: Collection[] = [
             "A $3 balance provides one complete 1M-token block. If the balance falls below $3, the quota scales proportionally; $1 provides about 333K tokens.",
             "Top-ups, promo-code credit and usage automatically update this number across the dashboard and Usage page.",
             "Requests over the daily limit are rejected with a rate-limit error explaining when it resets.",
-            "If your wallet balance reaches zero, requests are rejected until you top up or renew.",
+            "If your wallet balance reaches zero, requests are rejected until your plan renews or you upgrade.",
           ]},
 
           { type: "h2", content: "Where usage is shown" },

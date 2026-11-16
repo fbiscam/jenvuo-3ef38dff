@@ -1,5 +1,5 @@
-import { evaluateIpLicense, formatBinding, isPaidBotSub, licenseCheckDue, normalizeIp, requestIp, type ValidateResult } from "@/lib/mt5-licenses";
-import { isVerifiedFoundingMember, type FoundingBotState } from "@/lib/founding-bot";
+import { evaluateIpLicense, formatBinding, licenseCheckDue, normalizeIp, requestIp, type ValidateResult } from "@/lib/mt5-licenses";
+import type { FoundingBotState } from "@/lib/founding-bot";
 
 export type FoundingBotInfo = { state: FoundingBotState; profit: number; review_at: string | null; verified_at: string | null; locked_at: string | null; milestone: boolean };
 
@@ -36,10 +36,9 @@ export async function checkBotByIp(body: any, headers: Headers): Promise<{ r: Va
   let foundingBot = false;
   if (lic) {
     const { data } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", lic.user_id).maybeSingle();
-    const founding = await foundingBotFor(db, lic.user_id);
-    // A paid plan runs JX Bot only for verified Founding members (others pay Terminal + API only).
-    sub = isVerifiedFoundingMember(founding) ? data ?? null : null;
-    if (!isPaidBotSub(sub)) foundingBot = founding.state === "active";
+    // JX Bot is plan-based for everyone: the plan (Free/Pro/Elite/Ultra or an active Founding month) sets the daily target.
+    sub = data ?? null;
+    foundingBot = (await foundingBotFor(db, lic.user_id)).state === "active";
   }
   const r = evaluateIpLicense(enteredIp, requestIp(headers), account, lic, sub, Date.now(), foundingBot);
   // Skip the per-minute rewrite: only bind a new account or refresh "last check" every few minutes.

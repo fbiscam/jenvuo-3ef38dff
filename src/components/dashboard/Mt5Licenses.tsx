@@ -29,7 +29,7 @@ export function PlanLock({ title }: { title: string }) {
     <div className="flex flex-col items-center rounded-lg border border-gc-line bg-card px-6 py-10 text-center">
       <Lock className="h-6 w-6 text-gc-ink-muted" />
       <h3 className="mt-3 text-[16px] font-medium text-gc-ink">{title} is locked</h3>
-      <p className="mt-1 max-w-md text-[13px] text-gc-ink-muted">Only for approved Founding members whose ID is verified: first month free, then a Founding plan. Credit does not unlock it.</p>
+      <p className="mt-1 max-w-md text-[13px] text-gc-ink-muted">Sign in to use JX Bot. It runs on every plan; Free has a $5 daily target.</p>
       <Link to="/dashboard/billing" className="mt-4 rounded-full bg-gc-blue px-4 py-2 text-[13px] font-medium text-gc-on-blue hover:opacity-90">Buy now</Link>
     </div>
   );
@@ -48,7 +48,7 @@ export function Mt5Licenses() {
   if (!access.allowed) return <PlanLock title="MT5 licenses" />;
 
   const bound = countIpLicenses(access.licenses);
-  const plan = isMt5Plan(access.plan) ? access.plan : "pro";
+  const plan = isMt5Plan(access.plan) ? access.plan : null;
 
   const onCreate = async () => {
     setBusy(true);
@@ -72,7 +72,7 @@ export function Mt5Licenses() {
         <div>
           <h3 className="text-[16px] font-medium text-gc-ink">MT5 licenses</h3>
           <p className="text-[12px] text-gc-ink-muted">
-            {MT5_PLANS[plan].name} plan · {bound}/{access.limit} used · daily target ${(access.dailyTarget || dailyTarget(plan)).toLocaleString()} · monthly ${(access.monthlyTarget || MT5_PLANS[plan].monthlyTarget).toLocaleString()}
+            {plan ? MT5_PLANS[plan].name : "Free"} plan · {bound}/{access.limit} used · daily target ${(access.dailyTarget || (plan ? dailyTarget(plan) : 0)).toLocaleString()}
           </p>
         </div>
       </div>

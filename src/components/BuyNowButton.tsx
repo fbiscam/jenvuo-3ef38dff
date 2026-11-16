@@ -8,8 +8,8 @@ import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
 
 /**
  * Shared plan CTA: signed out it reads "Sign up" (sign-up form, free trial); signed in it reads
- * "Buy now". Buying needs a verified Founding ID, so an unverified click shows a toast
- * notice instead of the payment page (the server refuses the purchase too).
+ * "Buy now". Plans are open to everyone; only approved Founding members still waiting on ID
+ * get a toast notice instead of the payment page (the server refuses the purchase too).
  */
 
 const cache = new Map<string, Promise<PurchaseGate>>();
@@ -28,10 +28,11 @@ export function useBuyGate(): { signedIn: boolean; loading: boolean; gate: Purch
     let p = cache.get(uid);
     if (!p) {
       p = fetchMembership()
-        .then((r) => purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified }))
+        .then((r) => purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified, kind: "plan" }))
         .catch(() => {
           cache.delete(uid);
-          return { canBuy: false, reason: "apply" } as PurchaseGate;
+          // The payment server checks again, so a failed lookup just opens Payments.
+          return { canBuy: true, reason: "ok" } as PurchaseGate;
         });
       cache.set(uid, p);
       // Refresh on the next mount after a short while (ID may get approved meanwhile).
@@ -48,15 +49,15 @@ export function useBuyGate(): { signedIn: boolean; loading: boolean; gate: Purch
 const COPY = {
   verify_id: {
     title: "Verify your ID to buy",
-    text: "Plans and credit can be bought once your ID is approved. Upload your ID; the review usually takes less than a day.",
+    text: "Your Founding plan starts once your ID is approved. Upload your ID; the review usually takes less than a day.",
     cta: "Verify ID now",
     to: "/dashboard/documents" as const,
   },
-  apply: {
-    title: "Founding members only",
-    text: "Plans are available to approved Founding Program members. Apply now; seats are limited each month.",
-    cta: "Apply now",
-    to: "/founding" as const,
+  no_topup: {
+    title: "Plans only",
+    text: "Credit top-ups are no longer offered. Pick a plan instead.",
+    cta: "See plans",
+    to: "/dashboard/pay" as const,
   },
 };
 
@@ -64,7 +65,7 @@ const COPY = {
  * Toast notice (same look as the "copied" / cancel-plan notices). No modal: a dialog
  * locks page scroll, which made the pricing page shift when Buy now was clicked.
  */
-export function showBuyBlocked(reason: "verify_id" | "apply", go: (to: "/dashboard/documents" | "/founding") => void) {
+export function showBuyBlocked(reason: Exclude<PurchaseGate["reason"], "ok">, go: (to: "/dashboard/documents" | "/dashboard/pay") => void) {
   const c = COPY[reason];
   toast.info(c.title, {
     id: "buy-blocked",
@@ -104,7 +105,7 @@ export function BuyNowButton({
         onClick={() => {
           if (!gate) return;
           if (gate.canBuy) navigate({ to });
-          else showBuyBlocked(gate.reason !== "ok" ? gate.reason : "apply", (t) => navigate({ to: t }));
+          else showBuyBlocked(gate.reason !== "ok" ? gate.reason : "verify_id", (t) => navigate({ to: t }));
         }}
       >
         {buyLabel}

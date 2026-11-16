@@ -32,9 +32,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/pay")({
   head: () => ({
     meta: [
       { title: "Add Funds · Crypto Top-Up · Jenvu" },
-      { name: "description", content: "Top up your Jenvu scan wallet with USDT on Tron, BNB Smart Chain or Ethereum. Instant on-chain verification." },
+      { name: "description", content: "Buy a Jenvu plan (Pro, Elite or Ultra) with USDT on Tron, BNB Smart Chain or Ethereum. Instant on-chain verification." },
       { property: "og:title", content: "Add Funds · Crypto Top-Up · Jenvu" },
-      { property: "og:description", content: "Top up your Jenvu scan wallet with USDT. Instant on-chain verification." },
+      { property: "og:description", content: "Buy a Jenvu plan with USDT. Instant on-chain verification." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,nofollow" },
@@ -74,11 +74,12 @@ function PayPage() {
   const cancelFn = useServerFn(cancelOrder);
   const redeemFn = useServerFn(redeemFreeCode);
 
-  const { amount: presetFromUrl, purchase, renew } = Route.useSearch();
+  const { amount: presetFromUrl, renew } = Route.useSearch();
   const credits = useCredits();
   const currentPlan = credits.plan && typeof credits.plan === 'object' ? (credits.plan as any).id : credits.plan;
   const trial = useTrial();
-  const [mode, setMode] = useState<"topup" | "upgrade">(purchase === "credits" ? "topup" : "upgrade");
+  // Plans only: credit top-ups are no longer sold.
+  const mode: string = "upgrade";
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(renew ?? null);
 
 
@@ -99,10 +100,8 @@ function PayPage() {
 
   const membershipFn = useServerFn(getFoundingMembership);
   const [foundingMember, setFoundingMember] = useState(false);
-  // Until the check answers, buying stays locked (only ID-verified Founding members and admins can pay).
+  // Until the check answers, buying stays locked (plans are open to everyone; Founding members waiting on ID verify first).
   const [gate, setGate] = useState<ReturnType<typeof purchaseGate> | null>(null);
-  // Members waiting on ID can still top up credit; only plans need the verified ID.
-  const [topupGate, setTopupGate] = useState<ReturnType<typeof purchaseGate> | null>(null);
   const [trialPlan, setTrialPlan] = useState<string | null>(null);
   useEffect(() => {
     let alive = true;
@@ -113,19 +112,16 @@ function PayPage() {
         setTrialPlan(r.trialPlan ?? null);
         const who = { isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified };
         setGate(purchaseGate({ ...who, kind: "plan" }));
-        setTopupGate(purchaseGate({ ...who, kind: "topup" }));
       })
       .catch(() => {
         if (!alive) return;
-        setGate({ canBuy: false, reason: "apply" });
-        setTopupGate({ canBuy: false, reason: "apply" });
+        setGate(purchaseGate({ isAdmin: false, member: false, verified: false, kind: "plan" }));
       });
     return () => { alive = false; };
   }, [membershipFn]);
 
   const canBuyPlan = !!gate?.canBuy;
-  const canTopup = !!topupGate?.canBuy;
-  const canBuy = mode === "upgrade" ? canBuyPlan && !isTrialPlanLocked(selectedPlanId, trialPlan) : canTopup;
+  const canBuy = canBuyPlan && !isTrialPlanLocked(selectedPlanId, trialPlan);
 
   const PLANS = [
     { id: "pro", name: "Pro", price: planPrice("pro", foundingMember), features: planFeatures("pro", foundingMember) },
@@ -282,19 +278,19 @@ function PayPage() {
         </div>
       </div>
 
-      {gate && !gate.canBuy && (mode === "upgrade" || !canTopup) && (
+      {gate && !gate.canBuy && gate.reason === "verify_id" && (
         <div className="mt-6 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 rounded-full border border-gc-line bg-gc-surface py-1.5 pl-4 pr-1.5 max-sm:rounded-2xl">
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background">
             <Lock className="h-3.5 w-3.5 text-gc-ink" aria-hidden="true" />
           </span>
           <p className="min-w-0 text-[12.5px] leading-snug text-gc-ink line-clamp-2">
-            {gate.reason === "verify_id" ? PURCHASE_BLOCK_MESSAGE.verify_id : "Plans and credit are only for approved Founding Program members."}
+            {PURCHASE_BLOCK_MESSAGE.verify_id}
           </p>
           <Link
-            to={gate.reason === "verify_id" ? "/dashboard/documents" : "/founding"}
+            to="/dashboard/documents"
             className="inline-flex h-8 shrink-0 items-center rounded-full bg-gc-blue-deep px-3.5 text-[12.5px] font-medium text-gc-on-blue hover:opacity-90"
           >
-            {gate.reason === "verify_id" ? "Verify ID" : "Apply now"}
+            Verify ID
           </Link>
         </div>
       )}
@@ -305,20 +301,6 @@ function PayPage() {
           <section className="mt-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-[20px] font-normal text-gc-ink">{mode === "upgrade" ? "Choose a plan" : "Choose an amount"}</h2>
-              <div className="inline-flex rounded-full bg-gc-surface p-1" role="tablist">
-                {(["upgrade", "topup"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    role="tab"
-                    aria-selected={mode === m}
-                    onClick={() => setMode(m)}
-                    className={`rounded-full px-4 py-1.5 text-[13px] transition-colors ${mode === m ? "bg-background font-medium text-gc-ink shadow-sm" : "text-gc-ink-muted hover:text-gc-ink"}`}
-                  >
-                    {m === "upgrade" ? "Upgrade plan" : "Top-up credits"}
-                  </button>
-                ))}
-              </div>
             </div>
 
             {mode === "upgrade" ? (
@@ -411,7 +393,7 @@ function PayPage() {
                   aria-label="Promo code"
                   className={`${field} w-48 uppercase`}
                 />
-                <button type="button" onClick={onRedeem} disabled={busy || !canTopup} className={pill}>Redeem free credit</button>
+                <button type="button" onClick={onRedeem} disabled={busy || !canBuyPlan} className={pill}>Redeem free credit</button>
                 {quote?.error && <span className="text-[13px] text-destructive">{quote.error}</span>}
                 {!quote?.error && quote?.promoCode && (
                   <span className="text-[13px] text-gc-success">

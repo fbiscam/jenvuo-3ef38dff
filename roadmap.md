@@ -97,3 +97,8 @@
 - [x] Sign-up/sign-in: Google + email only (Apple removed)
 - [x] Ask Jenvu smaller on phones (desktop unchanged)
 - [x] Why Jenvu, Docs, Support and other pages: latest plan info
+
+- [x] JX Bot on every plan (Free $5/day, Pro 2%, Elite 4%, Ultra 6%) with the no-guarantee line; one price for everyone with JX Bot included
+- [x] Founding Program = 30-day plan grant after approval + ID verification
+- [x] Credit top-ups removed everywhere (Pricing, Payments, server); plans only
+- [ ] Page speed pass (not started)

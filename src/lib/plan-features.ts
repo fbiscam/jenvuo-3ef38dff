@@ -1,24 +1,16 @@
-import { DAILY_TARGET_PCT } from "@/lib/mt5-licenses";
-import { JX_BOT_PRICE, PLAN_API_CREDIT, TERMINAL_API_PRICE } from "@/lib/plan-pricing";
+import { dailyTargetLabel, MT5_PLANS } from "@/lib/mt5-licenses";
+import { PLAN_API_CREDIT } from "@/lib/plan-pricing";
+import { PLAN_API_KEYS } from "@/lib/free-plan";
 
 export type PaidPlanId = "pro" | "elite" | "ultra";
 
-const IPS: Record<PaidPlanId, number> = { pro: 1, elite: 2, ultra: 5 };
-const WALLET = PLAN_API_CREDIT;
-const API_KEYS: Record<PaidPlanId, number> = { pro: 2, elite: 3, ultra: 5 };
-
-/**
- * Billing plan bullets. JX Bot is offered to verified Founding members only, so they see the
- * bot per plan with its cost; everyone else sees Terminal + API only.
- */
-export function planFeatures(plan: PaidPlanId, foundingMember: boolean): string[] {
-  if (foundingMember) {
-    return [
-      `Terminal + API $${TERMINAL_API_PRICE[plan]}`,
-      `JX Bot on ${IPS[plan]} IP${IPS[plan] > 1 ? "s" : ""} +$${JX_BOT_PRICE[plan]}`,
-      `${DAILY_TARGET_PCT[plan]}% daily auto-stop`,
-      `$${WALLET[plan]} API credit`,
-    ];
-  }
-  return ["Terminal paid strategies", `$${WALLET[plan]} API credit`, `${API_KEYS[plan]} API keys`];
+/** Billing plan bullets. Every plan includes JX Bot, Terminal and API credit (same for everyone). */
+export function planFeatures(plan: PaidPlanId, _foundingMember = false): string[] {
+  const ips = MT5_PLANS[plan].licenses;
+  return [
+    "Terminal paid strategies",
+    `JX Bot on ${ips} IP${ips > 1 ? "s" : ""} · ${dailyTargetLabel(plan)} daily target`,
+    `$${PLAN_API_CREDIT[plan]} API credit`,
+    `${PLAN_API_KEYS[plan]} API keys`,
+  ];
 }

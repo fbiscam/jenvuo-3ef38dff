@@ -1,4 +1,4 @@
-import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
+import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT, FREE_BOT, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
 import { showBuyBlocked } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -11,7 +11,7 @@ import { useTrial } from "@/hooks/useTrial";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
-import { JX_BOT_PRICE, PLAN_API_CREDIT, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
+import { PLAN_API_CREDIT, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { TRIAL_API_RPM } from "@/lib/free-trial";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
@@ -26,10 +26,10 @@ const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',sy
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["Is there a free plan?", `Yes. Anyone can sign up (one person, one account) and use Jenvu on the Free plan: $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key and ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). When the day's time is used up they lock until 00:00 UTC. The 14-day free trial has ended for new sign-ups. JX Bot is not part of Free: apply at jenvu.com/founding, and once approved and ID-verified you get Pro or Elite for 30 days from the verification day, with JX Bot and the plan's API credit ($25 Pro, $50 Elite).`],
-  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day, Pro $29 a month with $25 credit and ${TERMINAL_DAILY_HOURS.pro} hours, Elite $59 with $59 credit and ${TERMINAL_DAILY_HOURS.elite} hours, and Ultra $99 with $99 credit and all day (${TERMINAL_DAILY_HOURS.ultra} hours).` + " Founding members get $25 (Pro) or $50 (Elite) credit for their Founding month. JX Bot for MetaTrader 5 (1, 2 or 5 IPs, verified by IP address, no license key) is offered only to verified Founding Program members, who pay the bot's cost on top: Pro $49, Elite $99 or Ultra $169."],
-  ["Who gets JX Bot?", "JX Bot is only for approved Founding Program members. After approval and ID verification, the first month is free. After that, members keep the bot by buying Pro ($49), Elite ($99) or Ultra ($169), which include the JX Bot cost. A plan bought without Founding membership covers the Terminal and API only. Credit alone never unlocks JX Bot. Apply at jenvu.com/founding."],
-  ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
+  ["Is there a free plan?", `Yes. Anyone can sign up (one person, one account) and use Jenvu on the Free plan: $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG) and JX Bot on 1 IP with a $${FREE_BOT.dailyTargetUsd} daily profit target. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
+  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models, monthly API credit and JX Bot for MetaTrader 5: Free $0 with $${FREE_PLAN_CREDIT_USD} credit, ${TERMINAL_DAILY_HOURS.free} hours a day and a $${FREE_BOT.dailyTargetUsd} bot target; Pro $${TERMINAL_API_PRICE.pro} a month with $${PLAN_API_CREDIT.pro} credit, ${TERMINAL_DAILY_HOURS.pro} hours and a ${DAILY_TARGET_PCT.pro}% bot target; Elite $${TERMINAL_API_PRICE.elite} with $${PLAN_API_CREDIT.elite} credit, ${TERMINAL_DAILY_HOURS.elite} hours and ${DAILY_TARGET_PCT.elite}%; Ultra $${TERMINAL_API_PRICE.ultra} with $${PLAN_API_CREDIT.ultra} credit, all day and ${DAILY_TARGET_PCT.ultra}%. Plans only: credit top-ups are not sold.`],
+  ["Who gets JX Bot?", `Everyone. JX Bot is part of every plan: Free runs 1 IP and stops for the day at $${FREE_BOT.dailyTargetUsd} profit, Pro ${DAILY_TARGET_PCT.pro}% on 1 IP, Elite ${DAILY_TARGET_PCT.elite}% on 2 IPs and Ultra ${DAILY_TARGET_PCT.ultra}% on 5 IPs. ${TARGET_DISCLAIMER} The Founding Program gives approved, ID-verified members their chosen plan (Pro or Elite) free for 30 days.`],
+  ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at a fixed daily target of $${FREE_BOT.dailyTargetUsd} (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
   ["Who can use the Terminal?", `Every signed-in user can open the Terminal. Its paid indicators run for a set time each UTC day by plan: Free ${TERMINAL_DAILY_HOURS.free} hours, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite} and Ultra all day. Time counts only while one of them is switched on and the Terminal is open; when it is used up they lock and disappear until 00:00 UTC.`],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
@@ -88,7 +88,6 @@ const GROUPS: ReadonlyArray<Group> = [
       { f: "Daily token limit", v: [TOKENS("free"), TOKENS("pro"), TOKENS("elite"), TOKENS("ultra"), "Custom"] },
       { f: "Daily tokens reset at 00:00 UTC", v: ALL },
       { f: "Balance-based quota ($3 = 1M tokens)", v: ALL },
-      { f: "Wallet top-ups from $5", v: ALL },
       { f: "API requests per minute", v: [`${TRIAL_API_RPM}`, "Standard", "Standard", "Standard", "Custom"] },
       { f: "Usage page in the dashboard", v: ALL },
     ],
@@ -128,14 +127,14 @@ const GROUPS: ReadonlyArray<Group> = [
     icon: "bot",
     bot: true,
     rows: [
-      { f: "JX Bot cost (Founding members)", v: [false, `+$${JX_BOT_PRICE.pro}`, `+$${JX_BOT_PRICE.elite}`, `+$${JX_BOT_PRICE.ultra}`, "Custom"] },
-      { f: "IPs (PC or RDP)", v: [false, "1", "2", "5", "Custom"] },
-      { f: "Daily target per IP", v: [false, `${DAILY_TARGET_PCT.pro}%`, `${DAILY_TARGET_PCT.elite}%`, `${DAILY_TARGET_PCT.ultra}%`, "Custom"] },
-      { f: `Auto-stop at target or ${DAILY_DRAWDOWN_PCT}% drawdown`, v: PAID },
-      { f: "IP sign-in, no license key", v: PAID },
-      { f: "Bot Usage page with ON / OFF log", v: PAID },
-      { f: "Safe hours: London open block, New York off", v: PAID },
-      { f: "Download, presets & updates", v: PAID },
+      { f: "Included in the plan price", v: ALL },
+      { f: "IPs (PC or RDP)", v: [String(FREE_BOT.licenses), "1", "2", "5", "Custom"] },
+      { f: "Daily profit target per IP (not guaranteed)", v: [`$${FREE_BOT.dailyTargetUsd}`, `${DAILY_TARGET_PCT.pro}%`, `${DAILY_TARGET_PCT.elite}%`, `${DAILY_TARGET_PCT.ultra}%`, "Custom"] },
+      { f: `Auto-stop at target or ${DAILY_DRAWDOWN_PCT}% drawdown`, v: ALL },
+      { f: "IP sign-in, no license key", v: ALL },
+      { f: "Bot Usage page with ON / OFF log", v: ALL },
+      { f: "Safe hours: London open block, New York off", v: ALL },
+      { f: "Download, presets & updates", v: ALL },
     ],
   },
   {
@@ -172,7 +171,6 @@ const GROUPS: ReadonlyArray<Group> = [
   },
 ];
 
-const BOT_ONE_LINE: Row = { f: "JX Bot (MT5)", v: [false, "Founding only", "Founding only", "Founding only", "Founding only"] };
 
 const CUSTOM: ReadonlyArray<[string, string]> = [
   ["Custom rate limits", "Tailored throughput for your workload."],
@@ -206,20 +204,17 @@ function PricingPage() {
   const trial = useTrial();
   const signedOut = currentPlan === null;
   const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
-  // Only verified Founding members see JX Bot in the plans and pay the bot-included price.
+  // Plans are open to everyone; approved Founding members still waiting on ID verify first.
   const membershipFn = useServerFn(getFoundingMembership);
-  const [founding, setFounding] = React.useState(false);
-  // Buying is only for admins and ID-verified Founding members; others apply first.
-  const [buyGate, setBuyGate] = React.useState<PurchaseGate>({ canBuy: false, reason: "apply" });
+  const [buyGate, setBuyGate] = React.useState<PurchaseGate>({ canBuy: true, reason: "ok" });
   const navigate = useNavigate();
   React.useEffect(() => {
-    if (signedOut) { setFounding(false); setBuyGate({ canBuy: false, reason: "apply" }); return; }
+    if (signedOut) { setBuyGate({ canBuy: true, reason: "ok" }); return; }
     let alive = true;
     membershipFn()
       .then((r) => {
         if (!alive) return;
-        setFounding(!!r.verified);
-        setBuyGate(purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified }));
+        setBuyGate(purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified, kind: "plan" }));
       })
       .catch(() => {});
     return () => { alive = false; };
@@ -271,7 +266,7 @@ function PricingPage() {
     if (disabled) return <button type="button" disabled className={`${btnBase} cursor-not-allowed ${quiet}`}>Locked in trial</button>;
     if (!signedOut && !buyGate.canBuy) {
       return (
-        <button type="button" onClick={() => showBuyBlocked(buyGate.reason === "verify_id" ? "verify_id" : "apply", (t) => navigate({ to: t }))} className={btnStyle(solid)}>
+        <button type="button" onClick={() => showBuyBlocked(buyGate.reason === "ok" ? "verify_id" : buyGate.reason, (t) => navigate({ to: t }))} className={btnStyle(solid)}>
           {small ? `Get ${name(key)}` : "Buy now"}
         </button>
       );
@@ -291,7 +286,7 @@ function PricingPage() {
     );
   };
 
-  const groups = GROUPS.map((g) => (g.bot && !founding ? { ...g, rows: [BOT_ONE_LINE] } : g));
+  const groups = GROUPS;
 
   return (
     <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
@@ -336,15 +331,13 @@ function PricingPage() {
                 )}
               </div>
               <div className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-[40px] font-medium leading-none tracking-tight">${plan.key === "free" ? 0 : priceOf(planPrice(plan.key, founding))}</span>
+                <span className="text-[40px] font-medium leading-none tracking-tight">${plan.key === "free" ? 0 : priceOf(planPrice(plan.key))}</span>
                 <span className="text-[13px] text-gc-ink-muted">{suffix}</span>
               </div>
               <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
                 {plan.key === "free"
                   ? "Free forever, one account per person"
-                  : founding
-                    ? `Terminal + API $${TERMINAL_API_PRICE[plan.key]} + JX Bot $${JX_BOT_PRICE[plan.key]}`
-                    : "Terminal + API"}
+                  : "Terminal, API & JX Bot"}
               </p>
               <div className="mt-4">{plan.key === "free" ? freeCta() : planCta(plan.key)}</div>
               <p className="mt-6 min-h-[20px] text-[13px] text-gc-ink-muted">
@@ -355,17 +348,16 @@ function PricingPage() {
               <FeatureList
                 title="JX Bot (MT5)"
                 items={
-                  founding && plan.key !== "free"
-                    ? [`${plan.ips} IP${plan.ips > 1 ? "s" : ""} included`, `${DAILY_TARGET_PCT[plan.key]}% daily target per IP`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`]
-                    : [plan.key === "free" ? "Not on Free" : "Founding members only"]
+                  plan.key === "free"
+                    ? [`${FREE_BOT.licenses} IP included`, `$${FREE_BOT.dailyTargetUsd} daily profit target`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`]
+                    : [`${plan.ips} IP${plan.ips > 1 ? "s" : ""} included`, `${DAILY_TARGET_PCT[plan.key]}% daily target per IP`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`]
                 }
-                muted={!founding || plan.key === "free"}
               />
             </article>
           ))}
         </div>
         <p className="mt-5 text-center text-[13px] text-gc-ink-muted">
-          Prices in USD. Live market data is free on every plan. Terminal hours reset at 00:00 UTC. Plans can be bought after your ID is verified.
+          Prices in USD. Live market data is free on every plan. Terminal hours reset at 00:00 UTC. {TARGET_DISCLAIMER}
         </p>
       </section>
 
@@ -383,7 +375,7 @@ function PricingPage() {
                   ...(["pro", "elite", "ultra"] as const).map((k) => ({
                     key: k,
                     label: name(k),
-                    price: `$${priceOf(planPrice(k, founding))}${billing === "annual" ? "/year" : "/month"}`,
+                    price: `$${priceOf(planPrice(k))}${billing === "annual" ? "/year" : "/month"}`,
                     cta: planCta(k, true),
                   })),
                   { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },
@@ -433,19 +425,6 @@ function PricingPage() {
               </tbody>
             ))}
           </table>
-        </div>
-      </section>
-
-      {/* TOP-UPS */}
-      <section id="top-up" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-14 sm:px-8">
-        <div className="flex flex-col justify-between gap-6 rounded-2xl bg-gc-surface p-7 sm:p-9 lg:flex-row lg:items-center">
-          <div className="max-w-[620px]">
-            <h2 className="text-[24px] font-medium tracking-tight sm:text-[28px]">Need more wallet balance?</h2>
-            <p className="mt-2 text-[15px] leading-[1.6] text-gc-ink-muted">
-              Top up from $5. $1 = $1 wallet, every $3 unlocks 1M tokens. Primary requests cost $0.03; senior-reviewed analysis $0.20.
-            </p>
-          </div>
-          <TopUp canBuy={buyGate.canBuy} signedOut={signedOut} />
         </div>
       </section>
 
@@ -532,47 +511,6 @@ function FeatureList({ title, items, muted }: { title: string; items: string[]; 
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-function TopUp({ canBuy, signedOut }: { canBuy: boolean; signedOut: boolean }) {
-  const [amount, setAmount] = React.useState<number>(25);
-  const safe = Math.max(5, Math.min(1000, Number.isFinite(amount) ? amount : 5));
-  return (
-    <div className="flex shrink-0 flex-wrap items-center gap-3">
-      <div className="flex gap-1.5">
-        {[5, 10, 25, 50].map((v) => (
-          <button
-            key={v}
-            type="button"
-            onClick={() => setAmount(v)}
-            className={`h-10 rounded-full px-4 text-[14px] font-medium transition ${safe === v ? "bg-foreground text-background" : "bg-background text-foreground hover:bg-gc-pill"}`}
-          >
-            ${v}
-          </button>
-        ))}
-      </div>
-      <div className="flex h-10 items-center overflow-hidden rounded-full border border-gc-line bg-background pl-4">
-        <span className="text-[14px] text-gc-ink-muted">$</span>
-        <input
-          type="number"
-          min={5}
-          step={1}
-          aria-label="Top-up amount in dollars"
-          value={Number.isFinite(amount) ? amount : ""}
-          onChange={(e) => setAmount(parseInt(e.target.value || "0", 10))}
-          className="w-16 bg-transparent px-2 text-[14px] tabular-nums outline-none"
-        />
-      </div>
-      <Link
-        to={canBuy ? "/dashboard/pay" : signedOut ? "/auth" : "/founding"}
-        search={canBuy ? ({ amount: safe } as never) : signedOut ? ({ mode: "signup" } as never) : undefined}
-        className="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-full bg-foreground px-5 text-[14px] font-medium text-background hover:opacity-90"
-      >
-        Buy now
-      </Link>
-      {amount < 5 && <p className="w-full text-[13px] text-destructive">Minimum top-up is $5.</p>}
     </div>
   );
 }

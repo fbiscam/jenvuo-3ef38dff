@@ -16,8 +16,28 @@ export function dailyTarget(plan: Mt5PlanId) {
   return MT5_PLANS[plan].monthlyTarget / 20;
 }
 
+/**
+ * JX Bot is plan-based for every signed-in user. Free runs 1 IP and stops for the day once it
+ * has made a fixed $5; Pro/Elite/Ultra stop at their % of the day's starting balance.
+ */
+export const FREE_BOT = { name: "Free", dailyTargetUsd: 5, licenses: 1 } as const;
+export type BotPlanId = Mt5PlanId | "free";
+
+export function isBotPlan(id: string | null | undefined): id is BotPlanId {
+  return id === "free" || isMt5Plan(id);
+}
+
+/** Short daily target label: "$5" on Free, "2%" etc. on paid plans. */
+export function dailyTargetLabel(plan: BotPlanId): string {
+  return plan === "free" ? `$${FREE_BOT.dailyTargetUsd}` : `${DAILY_TARGET_PCT[plan]}%`;
+}
+
+/** Shown next to daily targets everywhere: targets are caps, not promises. */
+export const TARGET_DISCLAIMER = "Daily profit targets are maximum safety caps — profit is not guaranteed.";
+
 /** Daily/monthly target for a plan. Every account (owner included) follows its plan limit. */
-export function targetsFor(plan: Mt5PlanId, _userId?: string | null) {
+export function targetsFor(plan: BotPlanId, _userId?: string | null) {
+  if (plan === "free") return { daily: FREE_BOT.dailyTargetUsd, monthly: FREE_BOT.dailyTargetUsd * 20 };
   return { daily: dailyTarget(plan), monthly: MT5_PLANS[plan].monthlyTarget };
 }
 
@@ -29,7 +49,18 @@ export function isPaidBotSub(sub: Sub, now = Date.now()) {
 }
 
 export function licenseLimit(plan: string | null | undefined) {
+  if (plan === "free") return FREE_BOT.licenses;
   return isMt5Plan(plan) ? MT5_PLANS[plan].licenses : 0;
+}
+
+/**
+ * Which JX Bot plan a user runs: an active paid plan gives its own tier, an active Founding month
+ * gives the Founding plan, everyone else (Free, trials, lapsed plans) runs the Free tier.
+ */
+export function botPlanFor(sub: Sub, foundingActive = false, now = Date.now()): BotPlanId {
+  if (sub && isPaidBotSub(sub, now)) return String(sub.plan_id).toLowerCase() as Mt5PlanId;
+  if (foundingActive) return String(sub?.plan_id || "").toLowerCase() === "elite" ? "elite" : "pro";
+  return "free";
 }
 
 export const LICENSE_KEY_RE = /^JENV-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
@@ -76,13 +107,13 @@ export function countIpLicenses(licenses: { mt5_account: string | null; revoked_
 }
 
 export type ValidateResult =
-  | { valid: true; plan: Mt5PlanId; daily_target: number; monthly_target: number; expires_at: string | null; bind: boolean }
+  | { valid: true; plan: BotPlanId; daily_target: number; monthly_target: number; expires_at: string | null; bind: boolean }
   | { valid: false; reason: "malformed" | "not_found" | "revoked" | "ip_mismatch" | "account_mismatch" | "expired" | "no_plan" };
 
 /**
  * Pure license check. `enteredIp` is what the user typed in the bot, `callerIp` is the IP the server sees.
  * Both must equal the IP registered on the website; the first MT5 account on that IP is locked in.
- * An active paid plan or the 14-day free trial makes it valid; credit never does.
+ * Every user's registered IP is valid; the plan only decides the daily target (Free $5, paid plan %).
  */
 export function evaluateIpLicense(enteredIp: string, callerIp: string, account: string, lic: Lic | null, sub: Sub, now = Date.now(), foundingBot = false): ValidateResult {
   const ip = normalizeIp(enteredIp);
@@ -92,24 +123,11 @@ export function evaluateIpLicense(enteredIp: string, callerIp: string, account: 
   const b = parseBinding(lic.mt5_account);
   if (b.ip !== ip || normalizeIp(callerIp) !== ip) return { valid: false, reason: "ip_mismatch" };
   if (b.account && b.account !== account) return { valid: false, reason: "account_mismatch" };
-  // Verified Founding members (within their 30 days) run the bot on their Founding plan (Pro or Elite).
-  if (foundingBot && !(sub && isPaidBotSub(sub, now))) {
-    const fp = String(sub?.plan_id || "").toLowerCase() === "elite" ? "elite" : "pro";
-    const t = targetsFor(fp, lic.user_id);
-    return { valid: true, plan: fp, daily_target: t.daily, monthly_target: t.monthly, expires_at: null, bind: !b.account };
-  }
-  const plan = String(sub?.plan_id || "").toLowerCase();
-  if (!sub || !isPaidBotSub(sub, now)) return { valid: false, reason: sub?.plan_id && plan !== "free" && !sub?.is_trial ? "expired" : "no_plan" };
-  if (!isMt5Plan(plan)) return { valid: false, reason: "no_plan" };
+  // Paid plan → its tier; active Founding month → the Founding plan; otherwise the Free tier ($5/day).
+  const plan = botPlanFor(sub, foundingBot, now);
   const t = targetsFor(plan, lic.user_id);
-  return {
-    valid: true,
-    plan,
-    daily_target: t.daily,
-    monthly_target: t.monthly,
-    expires_at: sub.current_period_end,
-    bind: !b.account,
-  };
+  const paid = plan !== "free" && !!sub && isPaidBotSub(sub, now);
+  return { valid: true, plan, daily_target: t.daily, monthly_target: t.monthly, expires_at: paid ? sub!.current_period_end : null, bind: !b.account };
 }
 
 /** Caller IP as seen by the server (Cloudflare first). */
@@ -126,10 +144,10 @@ export const DAILY_DRAWDOWN_PCT = 4.7;
  * Server-enforced daily stop for one account. Start balance = balance − today's profit.
  * Stops when profit reaches the plan % target or loss reaches the 4.7% drawdown guard.
  */
-export function dailyStopFor(plan: Mt5PlanId, balance: number, todayProfit: number) {
+export function dailyStopFor(plan: BotPlanId, balance: number, todayProfit: number) {
   const start = Math.max(0, (Number(balance) || 0) - (Number(todayProfit) || 0));
   const round = (n: number) => Math.round(n * 100) / 100;
-  const target = round((start * DAILY_TARGET_PCT[plan]) / 100);
+  const target = plan === "free" ? FREE_BOT.dailyTargetUsd : round((start * DAILY_TARGET_PCT[plan]) / 100);
   const drawdown = round((start * DAILY_DRAWDOWN_PCT) / 100);
   const p = Number(todayProfit) || 0;
   return { start: round(start), target, drawdown, stop: start > 0 && (p >= target || p <= -drawdown), reason: p >= target ? "target" : p <= -drawdown ? "drawdown" : null };

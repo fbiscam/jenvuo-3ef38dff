@@ -145,7 +145,7 @@ function BotUsagePage() {
       }
     }
     const chart = Array.from(days, ([date, d]) => ({ date, v: Math.round(d.profit * 100) / 100, trades: d.trades }));
-    const target = data && isMt5Plan(data.plan) ? (data.dailyTarget || dailyTarget(data.plan)) : 0;
+    const target = data ? (data.dailyTarget || (isMt5Plan(data.plan) ? dailyTarget(data.plan) : 0)) : 0;
     const perAccount = latestList.filter((r) => r.day === today).map((r) => ({ account: r.mt5_account, ...sharedTargetStatus(target, [r.today_profit], r.target_hit) }));
     return {
       accounts,

@@ -8,7 +8,7 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "Why Jenvu — AI Gold Terminal, API and JX Bot" },
-      { name: "description", content: "Why traders use Jenvu: a Free plan with $10 API credit a month, Terminal indicators by plan hours, up to 7 API keys and JX Bot for Founding members." },
+      { name: "description", content: "Why traders use Jenvu: a Free plan with $10 API credit a month, Terminal indicators by plan hours, up to 7 API keys and JX Bot on every plan." },
       { property: "og:title", content: "Why Jenvu — AI Gold Terminal, API and JX Bot" },
       { property: "og:description", content: "Start Free with $10 API credit a month, then upgrade for more Terminal hours, API keys and credit." },
       { property: "og:url", content: "https://jenvu.com/about" },
@@ -37,7 +37,7 @@ const BUILD: { title: string; text: string; href: string; link: string; icons: L
   },
   {
     title: "Developers",
-    text: `Up to ${PLAN_API_KEYS.ultra} API keys for leading models, plus JX Bot for MetaTrader 5 (Founding members).`,
+    text: `Up to ${PLAN_API_KEYS.ultra} API keys for leading models, plus JX Bot for MetaTrader 5 on every plan ($5 daily target on Free).`,
     href: "https://jenvu.com/platform",
     link: "Explore the platform",
     icons: [Code2, Bot],

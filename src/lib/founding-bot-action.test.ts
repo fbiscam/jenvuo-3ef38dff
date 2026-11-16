@@ -3,17 +3,17 @@ import { expect } from "./chart/test-expect";
 import { isFoundingMember, jxBotAction, purchaseGate } from "./founding-bot";
 
 describe("JX Bot page button", () => {
-  it("asks non-members to apply for the Founding Program", () => {
-    expect(jxBotAction({ state: "none", allowed: false, viaFounding: false })).toEqual({ label: "Apply for Founding Program", to: "/founding" });
+  it("shows Upgrade on the Free plan", () => {
+    expect(jxBotAction({ state: "none", allowed: true, viaFounding: false, plan: "free" })).toEqual({ label: "Upgrade", to: "/dashboard/pay" });
   });
-  it("shows Upgrade to members on their free Founding month", () => {
-    expect(jxBotAction({ state: "active", allowed: true, viaFounding: true })?.label).toBe("Upgrade");
+  it("shows Upgrade to members on their Founding month", () => {
+    expect(jxBotAction({ state: "active", allowed: true, viaFounding: true, plan: "pro" })?.label).toBe("Upgrade");
   });
-  it("shows Buy now to members whose Founding month ended", () => {
-    expect(jxBotAction({ state: "locked", allowed: false, viaFounding: false })?.label).toBe("Buy now");
+  it("shows nothing on a paid plan", () => {
+    expect(jxBotAction({ state: "none", allowed: true, viaFounding: false, plan: "elite" })).toBe(null);
   });
   it("sends members without a verified ID to upload it", () => {
-    expect(jxBotAction({ state: "awaiting_id", allowed: false, viaFounding: false })?.to).toBe("/dashboard/documents");
+    expect(jxBotAction({ state: "awaiting_id", allowed: true, viaFounding: false, plan: "free" })?.to).toBe("/dashboard/documents");
   });
   it("treats only approved applicants as members", () => {
     expect(isFoundingMember("none")).toBe(false);
@@ -32,17 +32,15 @@ describe("verified Founding member (sees and runs JX Bot)", () => {
   });
 });
 
-describe("Who can pay for plans and credit", () => {
-  it("lets an ID-verified Founding member buy", () => {
-    expect(purchaseGate({ isAdmin: false, member: true, verified: true })).toEqual({ canBuy: true, reason: "ok" });
+describe("Who can pay for plans", () => {
+  it("lets any signed-in user buy a plan", () => {
+    expect(purchaseGate({ isAdmin: false, member: false, verified: false, kind: "plan" })).toEqual({ canBuy: true, reason: "ok" });
+    expect(purchaseGate({ isAdmin: false, member: true, verified: true, kind: "plan" })).toEqual({ canBuy: true, reason: "ok" });
   });
   it("makes a Founding member verify their ID before paying", () => {
-    expect(purchaseGate({ isAdmin: false, member: true, verified: false })).toEqual({ canBuy: false, reason: "verify_id" });
+    expect(purchaseGate({ isAdmin: false, member: true, verified: false, kind: "plan" })).toEqual({ canBuy: false, reason: "verify_id" });
   });
-  it("sends non-members to apply", () => {
-    expect(purchaseGate({ isAdmin: false, member: false, verified: false })).toEqual({ canBuy: false, reason: "apply" });
-  });
-  it("lets admins buy", () => {
-    expect(purchaseGate({ isAdmin: true, member: false, verified: false }).canBuy).toBe(true);
+  it("refuses credit top-ups", () => {
+    expect(purchaseGate({ isAdmin: false, member: false, verified: false, kind: "topup" })).toEqual({ canBuy: false, reason: "no_topup" });
   });
 });

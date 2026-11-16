@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { isMt5Plan, isPaidBotSub, licenseLimit, newLicenseKey, normalizeIp, parseBinding, targetsFor } from "./mt5-licenses";
+import { botPlanFor, isPaidBotSub, licenseLimit, newLicenseKey, normalizeIp, parseBinding, targetsFor } from "./mt5-licenses";
 
 export type Mt5LicenseRow = { id: string; license_key: string; mt5_account: string | null; plan_id: string; revoked_at: string | null; last_validated_at: string | null; created_at: string };
 
@@ -9,18 +9,15 @@ async function readPlan(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const db = supabaseAdmin as any;
   const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", userId).maybeSingle();
-  const subPlan = String(sub?.plan_id || "free").toLowerCase();
   const { foundingBotFor } = await import("./mt5-ip-license.server");
-  const { isVerifiedFoundingMember } = await import("./founding-bot");
   const founding = await foundingBotFor(db, userId);
-  // JX Bot is for verified Founding members only: a paid plan alone (Terminal + API) never unlocks it.
-  const paid = isPaidBotSub(sub ?? null) && isMt5Plan(subPlan) && isVerifiedFoundingMember(founding);
-  // Verified Founding members run the bot on their Founding plan (Pro or Elite) for 30 days.
+  // JX Bot is open to every signed-in user; the plan decides the target and IP count
+  // (Free $5/day on 1 IP, paid plans their %; an active Founding month runs its Founding plan).
+  const paid = isPaidBotSub(sub ?? null);
   const viaFounding = !paid && founding.state === "active";
-  const ok = paid || viaFounding;
-  const plan = paid ? subPlan : viaFounding ? (subPlan === "elite" ? "elite" : "pro") : "free";
-  const t = ok ? targetsFor(plan as any, userId) : { daily: 0, monthly: 0 };
-  return { db, plan, allowed: ok, viaFounding, founding, limit: ok ? licenseLimit(plan) : 0, expiresAt: paid ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
+  const plan = botPlanFor(sub ?? null, founding.state === "active");
+  const t = targetsFor(plan, userId);
+  return { db, plan, allowed: true, viaFounding, founding, limit: licenseLimit(plan), expiresAt: paid ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
 }
 
 export const getMt5Access = createServerFn({ method: "POST" })
@@ -61,7 +58,7 @@ export const createMt5License = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ ip: z.string().trim().refine((v) => !!normalizeIp(v), "Enter a valid IP address") }).parse(d))
   .handler(async ({ context, data }) => {
     const { db, allowed, limit, plan } = await readPlan(context.userId);
-    if (!allowed) return { ok: false as const, error: "A Pro, Elite or Ultra plan is required." };
+    if (!allowed) return { ok: false as const, error: "Sign in to use JX Bot." };
     const { data: rows } = await db.from("mt5_licenses").select("id,mt5_account").eq("user_id", context.userId).is("revoked_at", null);
     const list = rows ?? [];
     const ip = normalizeIp(data.ip);
@@ -94,7 +91,7 @@ export const getBotDownloadUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { db, allowed } = await readPlan(context.userId);
-    if (!allowed) return { ok: false as const, error: "A Pro, Elite or Ultra plan is required." };
+    if (!allowed) return { ok: false as const, error: "Sign in to use JX Bot." };
     const { data, error } = await db.storage.from("bot-files").createSignedUrl("JX-Bot-MT5.zip", 300, { download: true });
     return error || !data ? { ok: false as const, error: "Download unavailable." } : { ok: true as const, url: data.signedUrl as string };
   });

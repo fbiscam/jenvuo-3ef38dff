@@ -190,7 +190,7 @@ export function HomeGetStarted() {
             <div className="flex flex-1 flex-col p-7 sm:p-8">
               <h3 className="text-2xl font-medium text-gc-ink">Trade with Jenvu</h3>
               <div className="flex-1">
-                <Ticks items={["Free plan: $10 API credit every month", "Jenvu Terminal and AI desk", "JX Bot for MetaTrader 5 via the Founding Program"]} />
+                <Ticks items={["Free plan: $10 API credit every month", "Jenvu Terminal and AI desk", "JX Bot for MetaTrader 5 on every plan"]} />
               </div>
               <div className="mt-8">
                 <SignUpCta className={pillDark} />

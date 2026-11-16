@@ -7,7 +7,7 @@ const OPTIONS = [
   { id: "signals", title: "Live SMC & ICT signals", desc: "Sweeps, zones and fair value gaps on Gold, Bitcoin and EUR/USD.", Icon: CandlestickChart },
   { id: "ai_desk", title: "AI trading desk", desc: "Ask the chart copilot about structure, levels and news.", Icon: MessageSquareText },
   { id: "extension_api", title: "Extension & API", desc: "Bring Jenvu models into your browser and your own apps.", Icon: Code2 },
-  { id: "jx_bot", title: "JX Bot on MT5", desc: "Automate EUR/USD. Unlocks for verified Founding members.", Icon: Bot },
+  { id: "jx_bot", title: "JX Bot on MT5", desc: "Automate EUR/USD on every plan, Free included.", Icon: Bot },
 ] as const;
 
 const FONT = { fontFamily: "'Google Sans Flex','Google Sans',sans-serif" };

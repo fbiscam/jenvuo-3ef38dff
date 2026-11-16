@@ -151,11 +151,11 @@ const FAQS = [
   },
   {
     q: "Who can use JX Bot?",
-    a: "Only approved Founding Program members whose ID is verified. The first Founding month is free; after that it continues on a Founding plan (Pro $49, Elite $99, Ultra $169). Sign-up is open and every account starts on Free, but Free, credit and the plans alone do not unlock the bot. Apply at jenvu.com/founding.",
+    a: "Everyone. JX Bot is part of every plan: Free runs 1 IP and stops for the day at $5 profit; Pro (2%, 1 IP), Elite (4%, 2 IPs) and Ultra (6%, 5 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
   },
   {
     q: "How many accounts can I run?",
-    a: "Each IP works with one MT5 account. Pro allows 1 IP, Elite 2 and Ultra 5.",
+    a: "Each IP works with one MT5 account. Free and Pro allow 1 IP, Elite 2 and Ultra 5.",
   },
   {
     q: "Does JX Bot guarantee profit?",

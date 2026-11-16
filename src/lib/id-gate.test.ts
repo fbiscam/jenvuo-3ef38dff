@@ -31,8 +31,9 @@ describe("ID check: look but no actions", () => {
 });
 
 describe("Buying before and after ID check", () => {
-  it("unverified member can top up credit but not pick a plan", () => {
-    expect(purchaseGate({ isAdmin: false, member: true, verified: false, kind: "topup" }).canBuy).toBe(true);
+  it("unverified member can't pick a plan and top-ups are off for everyone", () => {
+    expect(purchaseGate({ isAdmin: false, member: true, verified: false, kind: "topup" }).canBuy).toBe(false);
+    expect(purchaseGate({ isAdmin: true, member: false, verified: false, kind: "topup" }).reason).toBe("no_topup");
     expect(purchaseGate({ isAdmin: false, member: true, verified: false, kind: "plan" }).canBuy).toBe(false);
   });
   it("verified member can buy plans other than the one in their Founding month", () => {

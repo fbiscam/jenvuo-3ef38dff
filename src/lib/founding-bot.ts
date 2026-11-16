@@ -35,8 +35,7 @@ export function reachedFoundingMilestone(profitUsd: number): boolean {
 }
 
 /**
- * Sidebar JX Bot item: open for admins, active paid plans and verified Founding members;
- * locked (lock icon, not clickable) for everyone else.
+ * Sidebar JX Bot item: open for every signed-in user (the bot is plan-based, Free included).
  */
 export function jxBotNavOpen(input: { isAdmin: boolean; allowed: boolean }): boolean {
   return input.isAdmin || input.allowed;
@@ -48,8 +47,7 @@ export function isFoundingMember(state: FoundingBotState | string | null | undef
 }
 
 /**
- * Approved Founding members whose ID was verified. Only they see JX Bot in plans, pay the
- * bot-included price, and can run JX Bot on a paid plan.
+ * Approved Founding members whose ID was verified (their Founding month runs the chosen plan).
  */
 export function isVerifiedFoundingMember(info: { state: FoundingBotState | string | null | undefined; verified_at?: string | null } | null | undefined): boolean {
   return !!info && isFoundingMember(info.state) && info.state !== "awaiting_id" && !!info.verified_at;
@@ -58,30 +56,26 @@ export function isVerifiedFoundingMember(info: { state: FoundingBotState | strin
 export type JxBotAction = { label: string; to: "/founding" | "/dashboard/documents" | "/dashboard/pay" };
 
 /**
- * JX Bot page button. JX Bot is offered to approved Founding members (first month free,
- * then a paid plan): non-members are asked to apply, members waiting on ID upload it,
- * members on their free Founding month see "Upgrade", members whose month ended see "Buy now".
+ * JX Bot page button. The bot is plan-based for everyone: Free and Founding-month users see
+ * "Upgrade" (more IPs, a % target), members still waiting on ID upload it, paid plans see nothing.
  */
-export function jxBotAction(input: { state: FoundingBotState | string | null | undefined; allowed: boolean; viaFounding: boolean }): JxBotAction | null {
-  if (!isFoundingMember(input.state)) return input.allowed ? null : { label: "Apply for Founding Program", to: "/founding" };
-  if (input.allowed) return input.viaFounding ? { label: "Upgrade", to: "/dashboard/pay" } : null;
+export function jxBotAction(input: { state: FoundingBotState | string | null | undefined; allowed: boolean; viaFounding: boolean; plan?: string | null }): JxBotAction | null {
   if (input.state === "awaiting_id") return { label: "Upload ID", to: "/dashboard/documents" };
-  return { label: "Buy now", to: "/dashboard/pay" };
+  if (input.viaFounding || !input.plan || input.plan === "free") return { label: "Upgrade", to: "/dashboard/pay" };
+  return null;
 }
 
-export type PurchaseGate = { canBuy: boolean; reason: "ok" | "apply" | "verify_id" };
+export type PurchaseGate = { canBuy: boolean; reason: "ok" | "verify_id" | "no_topup" };
 
 /**
- * Who can pay for a plan or top-up: admins and approved Founding members whose ID is
- * verified. Founding members still waiting on ID must verify first (any day of their
- * month); everyone else is sent to apply for the Founding Program.
+ * Who can pay: plans are open to every signed-in user; approved Founding members still waiting
+ * on ID verify first. Credit top-ups are no longer sold (plans only).
  */
 export function purchaseGate(input: { isAdmin: boolean; member: boolean; verified: boolean; kind?: "plan" | "topup" }): PurchaseGate {
-  if (input.isAdmin || (input.member && input.verified)) return { canBuy: true, reason: "ok" };
-  // Members still waiting on ID can use Payments for credit top-ups, but not pick a plan.
-  if (input.member && input.kind === "topup") return { canBuy: true, reason: "ok" };
-  if (input.member) return { canBuy: false, reason: "verify_id" };
-  return { canBuy: false, reason: "apply" };
+  if (input.kind === "topup") return { canBuy: false, reason: "no_topup" };
+  if (input.isAdmin) return { canBuy: true, reason: "ok" };
+  if (input.member && !input.verified) return { canBuy: false, reason: "verify_id" };
+  return { canBuy: true, reason: "ok" };
 }
 
 /**
@@ -96,6 +90,6 @@ export const TRIAL_PLAN_MESSAGE = "You already have this plan in your Founding m
 
 /** Message shown (and returned by the server) when a purchase is refused. */
 export const PURCHASE_BLOCK_MESSAGE: Record<Exclude<PurchaseGate["reason"], "ok">, string> = {
-  apply: "Plans and credit are only for approved Founding Program members. Apply at jenvu.com/founding.",
-  verify_id: "Verify your ID first. Plans can be picked once your documents are approved; credit top-ups work now.",
+  verify_id: "Verify your ID first. Plans can be picked once your documents are approved.",
+  no_topup: "Credit top-ups are no longer offered. Pick a plan instead.",
 };

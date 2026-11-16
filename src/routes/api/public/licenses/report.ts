@@ -70,13 +70,13 @@ export const Route = createFileRoute("/api/public/licenses/report")({
           );
 
           // Each license has its own daily target: only this account's profit today counts.
-          // Fixed by the server: plan % of the day's starting balance; 4.7% drawdown from the day's peak closed balance (EA inputs can't change them).
+          // Fixed by the server: Free $5, paid plans % of the day's starting balance; 4.7% drawdown from the day's peak closed balance (EA inputs can't change them).
           const profit = num(body?.today_profit);
           const d = dailyStopFor(r.plan, num(body?.balance), profit);
           const target = d.start > 0 ? d.target : r.daily_target;
           const s = sharedTargetStatus(target, [profit], body?.target_hit === true);
           const targetHit = d.reason === "target";
-          return ok({ valid: true, daily_target: target, daily_target_pct: DAILY_TARGET_PCT[r.plan], max_daily_drawdown: pd.limit, drawdown_floor: pd.floor, drawdown_pct: DAILY_DRAWDOWN_PCT, profit: s.combined, stop: s.stop || targetHit || pd.hit, stop_reason: pd.hit ? "drawdown" : targetHit || s.stop ? "target" : null });
+          return ok({ valid: true, daily_target: target, daily_target_pct: r.plan === "free" ? (d.start > 0 ? Math.round((target / d.start) * 10000) / 100 : 0) : DAILY_TARGET_PCT[r.plan], max_daily_drawdown: pd.limit, drawdown_floor: pd.floor, drawdown_pct: DAILY_DRAWDOWN_PCT, profit: s.combined, stop: s.stop || targetHit || pd.hit, stop_reason: pd.hit ? "drawdown" : targetHit || s.stop ? "target" : null });
         } catch {
           return ok({ valid: false, reason: "server_error" });
         }

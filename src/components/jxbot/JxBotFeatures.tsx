@@ -89,7 +89,7 @@ function CandlesCard() {
 
 function StopCard() {
   return (
-    <Card title="Stops at your target" text={`It pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or the ${DAILY_DRAWDOWN_PCT}% drawdown guard, and stops for the month at the monthly target.`}>
+    <Card title="Stops at your target" text={`It pauses for the day at $5 profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or the ${DAILY_DRAWDOWN_PCT}% drawdown guard, and stops for the month at the monthly target. Daily profit targets are maximum safety caps — profit is not guaranteed.`}>
       <div className="space-y-2 pt-4">
         <div className="jx-in max-w-[440px] rounded-2xl bg-muted px-4 py-3 text-[14px] text-foreground">
           Daily target reached on this account. No new trades.

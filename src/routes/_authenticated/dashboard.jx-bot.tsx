@@ -1,5 +1,5 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { FOUNDING_PROFIT_MILESTONE_USD, jxBotAction } from "@/lib/founding-bot";
+import { jxBotAction } from "@/lib/founding-bot";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, Plus, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, MT5_PLANS, countIpLicenses, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, FREE_BOT, MT5_PLANS, TARGET_DISCLAIMER, countIpLicenses, dailyTargetLabel, isBotPlan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-sans";
 
@@ -44,7 +44,7 @@ const ERRORS = [
 const HOW = [
   ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
-  ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
+  ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at $${FREE_BOT.dailyTargetUsd} profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
   ["Safe trading hours", "New trades Mon–Thu 01:00–14:00 and Fri until 13:00 (broker time); skips London and New York opens and weekends."],
   ["Entry checks", "Follows the H1 trend and skips wide spreads, weak candles and spikes, so some days have fewer trades."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
@@ -69,13 +69,13 @@ function JxBotPage() {
   const [revoking, setRevoking] = useState(false);
 
   const loading = !access;
-  const plan = access && isMt5Plan(access.plan) ? access.plan : "pro";
+  const plan = access && isBotPlan(access.plan) ? access.plan : "free";
   const licenses = [...(access?.licenses ?? [])].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
   const active = licenses.filter((l) => !l.revoked_at);
   const bound = countIpLicenses(licenses);
   const limit = access?.limit ?? 0;
   const canCreate = Boolean(access?.allowed && bound < limit);
-  const botAction = access ? jxBotAction({ state: (access as any).founding?.state, allowed: access.allowed, viaFounding: !!(access as any).viaFounding }) : null;
+  const botAction = access ? jxBotAction({ state: (access as any).founding?.state, allowed: access.allowed, viaFounding: !!(access as any).viaFounding, plan: access.plan }) : null;
 
   const copyValue = async (value: string, id: string) => {
     try {
@@ -157,7 +157,7 @@ function JxBotPage() {
   const stats = access
     ? [
         { label: "Linked IPs", value: `${bound} / ${limit}` },
-        { label: "Daily target", value: access.allowed ? `${DAILY_TARGET_PCT[plan]}% of balance` : "—" },
+        { label: "Daily target", value: plan === "free" ? `$${FREE_BOT.dailyTargetUsd} profit` : `${DAILY_TARGET_PCT[plan]}% of balance` },
         { label: "Drawdown guard", value: access.allowed ? `${DAILY_DRAWDOWN_PCT}% daily` : "—" },
       ]
     : [];
@@ -185,7 +185,7 @@ function JxBotPage() {
           )}
         </div>
       </div>
-      <p className="mt-2 text-[14px] text-muted-foreground">MetaTrader 5 bot · one IP works with one MT5 account.</p>
+      <p className="mt-2 text-[14px] text-muted-foreground">MetaTrader 5 bot · one IP works with one MT5 account. {TARGET_DISCLAIMER}</p>
 
       {access && (
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -200,22 +200,17 @@ function JxBotPage() {
 
       {access && (access as any).viaFounding && (
         <div className="console-card mt-4 px-5 py-4 text-[14px] text-foreground">
-          Founding access on your {access.plan === "elite" ? "Elite" : "Pro"} plan. Bot profit so far: <span className="font-medium tabular-nums">${Number((access as any).founding?.profit ?? 0).toFixed(2)}</span>.{" "}
-          {(access as any).founding?.review_at && <>Your Founding plan, credit and bot access end on {new Date((access as any).founding.review_at).toLocaleDateString()}. </>}
-          We will tell you then if the bot reached ${FOUNDING_PROFIT_MILESTONE_USD}, so you can take your payout and choose a paid plan.
+          Founding month on your {access.plan === "elite" ? "Elite" : "Pro"} plan — the bot runs with that plan's target.{" "}
+          {(access as any).founding?.review_at && <>It ends on {new Date((access as any).founding.review_at).toLocaleDateString()}; after that the bot moves to the Free plan unless you pick a paid plan.</>}
         </div>
       )}
 
-      {access && !access.allowed && (
+      {access && plan === "free" && !(access as any).viaFounding && (
         <div className="console-card mt-4 flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-[14px] text-foreground">
           <span>
-            {(access as any).founding?.state === "locked"
-              ? (access as any).founding?.milestone
-                ? `Your Founding bot reached the $${FOUNDING_PROFIT_MILESTONE_USD} profit milestone. Your Founding month has ended: take your payout, then choose a paid plan to keep JX Bot running.`
-                : "Your 30-day Founding plan and credit have ended. Choose a paid plan to keep using JX Bot."
-              : (access as any).founding?.state === "awaiting_id"
-                ? "Founding members get JX Bot once their ID is verified. Upload your ID in Settings → Documents."
-                : "JX Bot is for approved Founding Program members: the first month is free after your ID is verified, then it continues on a Founding plan. Credit does not unlock it."}
+            {(access as any).founding?.state === "awaiting_id"
+              ? "Your Founding plan starts once your ID is verified. Until then JX Bot runs on the Free plan."
+              : `Free plan: JX Bot runs on ${FREE_BOT.licenses} IP and stops for the day at $${FREE_BOT.dailyTargetUsd} profit. Upgrade for more IPs and a % daily target.`}
           </span>
           {botAction && <Link to={botAction.to} className="console-pill console-pill-solid">{botAction.label}</Link>}
         </div>
@@ -335,6 +330,7 @@ function JxBotPage() {
               )}
             </tbody>
           </table>
+          <p className="mt-3 text-[12px] text-muted-foreground">{TARGET_DISCLAIMER}</p>
         </div>
       </div>
 
@@ -363,18 +359,19 @@ function JxBotPage() {
               </tr>
             </thead>
             <tbody>
-              {(Object.keys(MT5_PLANS) as (keyof typeof MT5_PLANS)[]).map((k) => (
+              {(["free", ...Object.keys(MT5_PLANS)] as ("free" | keyof typeof MT5_PLANS)[]).map((k) => (
                 <tr key={k} className={`console-row ${access?.allowed && k === plan ? "font-medium" : ""} text-foreground`}>
                   <td className="py-2.5">
-                    {MT5_PLANS[k].name}
+                    {k === "free" ? FREE_BOT.name : MT5_PLANS[k].name}
                     {access?.allowed && k === plan && <span className="ml-2 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">Yours</span>}
                   </td>
-                  <td className="text-right tabular-nums">{DAILY_TARGET_PCT[k]}%</td>
-                  <td className="text-right tabular-nums">{MT5_PLANS[k].licenses}</td>
+                  <td className="text-right tabular-nums">{dailyTargetLabel(k)}</td>
+                  <td className="text-right tabular-nums">{k === "free" ? FREE_BOT.licenses : MT5_PLANS[k].licenses}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <p className="mt-3 text-[12px] text-muted-foreground">{TARGET_DISCLAIMER}</p>
         </div>
       </div>
 

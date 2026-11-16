@@ -17,7 +17,8 @@ describe("mt5 licenses", () => {
     expect(licenseLimit("pro")).toBe(1);
     expect(licenseLimit("elite")).toBe(2);
     expect(licenseLimit("ultra")).toBe(5);
-    expect(licenseLimit("free")).toBe(0);
+    expect(licenseLimit("free")).toBe(1);
+    expect(licenseLimit("none")).toBe(0);
   });
   it("a Pro legacy account-only license leaves its IP slot available", () => {
     const legacy = [{ mt5_account: "12345678", revoked_at: null }];
@@ -48,12 +49,21 @@ describe("mt5 licenses", () => {
     expect(first.valid && first.bind).toBe(true);
     expect(evaluateIpLicense(IP, IP, "222", lic, paid("pro"))).toEqual({ valid: false, reason: "account_mismatch" });
   });
-  it("free trial never unlocks the bot", () => {
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true }).valid).toBe(false);
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true, current_period_end: "2020-01-01T00:00:00Z" }).valid).toBe(false);
+  it("Free plan runs the bot with a $5 daily target", () => {
+    const r = evaluateIpLicense(IP, IP, "12345678", lic, { plan_id: "free", status: "active", is_trial: false, current_period_end: null });
+    expect(r.valid && [r.plan, r.daily_target]).toEqual(["free", 5]);
+    const none = evaluateIpLicense(IP, IP, "12345678", lic, null);
+    expect(none.valid && none.plan).toBe("free");
   });
-  it("expired period is rejected", () => {
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" })).toEqual({ valid: false, reason: "expired" });
+  it("a trial or an expired paid plan runs at the Free tier", () => {
+    const t = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true });
+    expect(t.valid && t.plan).toBe("free");
+    const e = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" });
+    expect(e.valid && e.plan).toBe("free");
+  });
+  it("an active Founding month runs its Founding plan", () => {
+    const f = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), is_trial: true }, Date.now(), true);
+    expect(f.valid && f.plan).toBe("elite");
   });
   it("malformed and revoked", () => {
     expect(evaluateIpLicense("bad", IP, "1", lic, paid("pro"))).toEqual({ valid: false, reason: "malformed" });
@@ -153,6 +163,13 @@ it("IP-only license locks only its most recent account", () => {
 });
 
 import { DAILY_TARGET_PCT, dailyStopFor } from "./mt5-licenses";
+describe("Free JX Bot daily stop", () => {
+  it("stops once the day's profit reaches $5", () => {
+    expect(dailyStopFor("free", 1005, 5).stop).toBe(true);
+    expect(dailyStopFor("free", 1004, 4).stop).toBe(false);
+    expect(dailyStopFor("free", 1005, 5).target).toBe(5);
+  });
+});
 describe("fixed % daily target and drawdown", () => {
   it("Pro is fixed at 2% of day-start balance", () => {
     expect(DAILY_TARGET_PCT.pro).toBe(2);
