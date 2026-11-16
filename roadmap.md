@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Sweep signup/email ownership across email/social entry points, Settings email change, confirmation, Founding invitation, help/docs/pricing/AI/search and live Free-plan functions; remove remaining one-person copy. Pricing/Help rendered; Docs source checked (browser navigation aborted). Cron schedule internals unavailable; function definitions checked. Existing records/settings unchanged.
+
 - [x] Remove signup device/IP/subnet/VPN account caps while preserving email ownership and verification
 - [x] Redesign Why Jenvu to match the supplied startup-page references (review layout uses clearly labelled samples)
 - [x] Verify stale utils error, 28 account/security tests and desktop/mobile page; latest build OK

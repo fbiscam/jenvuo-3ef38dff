@@ -81,7 +81,7 @@ export const collections: Collection[] = [
         summary: "Sign up in a minute and start on the Free plan with $10 API credit a month.",
         updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "Anyone can create a Jenvu account (one person, one account). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. JX Bot is only for Founding members." },
+          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. JX Bot is only for Founding members." },
 
           { type: "h2", content: "Sign up" },
           { type: "ol", items: [
