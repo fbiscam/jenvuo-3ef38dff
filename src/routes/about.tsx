@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpRight, BellRing, Bot, CandlestickChart, Code2, LineChart, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
-import { PageShell, Feature, Banner, Stats, StoryCards } from "@/components/PageShell";
+import { PageShell, Feature, Stats, StoryCards } from "@/components/PageShell";
 import { AuroraTile } from "@/components/AuroraTile";
 import { FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
 
@@ -84,15 +84,6 @@ function AboutPage() {
           ))}
         </div>
       </section>
-
-      <div className="mx-auto max-w-[1200px] px-5 py-6 sm:px-8">
-        <Banner title="Honest output, every time">
-          When conditions are bad, the analysis says "wait". Every setup must clear bias,
-          structure, liquidity, premium/discount, killzone and news-risk checks before it ships.{" "}
-          <a href="https://jenvu.com/disclaimer">Read the risk disclaimer</a> to see how we
-          frame every result.
-        </Banner>
-      </div>
 
       <Stats
         title="Built for one market"
