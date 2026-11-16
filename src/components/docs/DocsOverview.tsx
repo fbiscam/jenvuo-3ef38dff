@@ -213,7 +213,7 @@ export function DocsOverview() {
         <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-10">
           <div className="min-w-0">
             <h1 className="text-[36px] font-medium leading-[1.08] tracking-[-0.8px] text-gc-ink sm:text-[48px] lg:text-[54px]">
-              Get started <span className="text-gc-ink-muted">with</span> Jenvu <span className="text-gc-ink-muted">Intelligence</span>
+              Get started <span className="text-gc-ink-muted">with</span> Jenvu <span className="text-gc-ink-muted">{"\u00a0System"}</span>
             </h1>
             <p className="mt-5 max-w-[460px] text-[16px] leading-[1.65] text-gc-ink sm:text-[18px]">
               Build with the Jenvu API: fast, cost-effective models for code, text and images — plus guides for the Terminal and JX Bot.
