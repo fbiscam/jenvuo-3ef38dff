@@ -91,3 +91,9 @@
 
 - [x] Free plan replaces the free trial for new sign-ups: $10 API credit every month, 1 API key; Terminal paid indicators 2h/8h/16h/24h a day by plan (lock until 00:00 UTC); Pricing page Free card + compare table
 - [ ] JX Bot on Free with a $5 daily target — waiting on owner: JX Bot is Founding-only today
+
+- [x] API keys per plan: Free 1, Pro 3, Elite 5, Ultra 7 (database + Pricing + dashboard)
+- [x] Pricing: title colours light black; detailed compare table with ticks; plan header row sticks while the table is on screen (xAI style)
+- [x] Sign-up/sign-in: Google + email only (Apple removed)
+- [x] Ask Jenvu smaller on phones (desktop unchanged)
+- [x] Why Jenvu, Docs, Support and other pages: latest plan info

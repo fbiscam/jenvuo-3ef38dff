@@ -81,7 +81,7 @@ export const collections: Collection[] = [
         summary: "Sign up in a minute and start on the Free plan with $10 API credit a month.",
         updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "Anyone can create a Jenvu account (one person, one account). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day, Elite 16 and Ultra all day. JX Bot is only for Founding members." },
+          { type: "p", content: "Anyone can create a Jenvu account (one person, one account). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. JX Bot is only for Founding members." },
 
           { type: "h2", content: "Sign up" },
           { type: "ol", items: [
@@ -544,9 +544,9 @@ export const collections: Collection[] = [
         slug: "api-keys",
         title: "API keys and limits",
         summary: "Create a Jenvu API key, use it anywhere, and track its daily token quota.",
-        updatedAt: "2026-09-18",
+        updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "A Jenvu API key lets you use Jenvu outside the built-in trading terminal — from your own scripts, apps or any OpenAI-compatible client. Keys are available on paid plans." },
+          { type: "p", content: "A Jenvu API key lets you use Jenvu outside the built-in trading terminal — from your own scripts, apps or any OpenAI-compatible client. Every plan includes keys, Free too." },
 
           { type: "h2", content: "Create a key" },
           { type: "ol", items: [
@@ -558,8 +558,10 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "How many keys you get" },
           { type: "ul", items: [
-            "Free — no API keys.",
-            "Pro, Elite and Ultra — key limits are shown on the API Keys page for your plan.",
+            "Free — 1 API key (30 requests a minute).",
+            "Pro — 3 API keys.",
+            "Elite — 5 API keys.",
+            "Ultra — 7 API keys.",
           ]},
 
           { type: "h2", content: "Quota and limits" },

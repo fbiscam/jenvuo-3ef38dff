@@ -143,13 +143,13 @@ export function AskJenvuWidget() {
           onClick={() => { setView("chat"); setOpen(true); }}
           aria-label="Ask Jenvu"
           className={[
-            "ask-jenvu-root fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-[9998] flex h-12 sm:h-14 items-center justify-center gap-2.5 rounded-2xl ask-jenvu-launcher text-[15px] font-medium",
+            "ask-jenvu-root fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-[9998] flex h-10 sm:h-14 items-center justify-center gap-2 sm:gap-2.5 rounded-xl sm:rounded-2xl ask-jenvu-launcher text-[13.5px] sm:text-[15px] font-medium",
             "shadow-none border-0 ring-0 transition-all duration-300 hover:brightness-95",
-            compact ? "w-12 sm:w-14 px-0" : "px-4 sm:px-6",
+            compact ? "w-10 sm:w-14 px-0" : "px-3.5 sm:px-6",
             /^\/(auth|sign-in|sign-up)/.test(pathname) ? "max-md:hidden" : "",
           ].join(" ")}
         >
-          <JenvuMark className="h-5 w-5 shrink-0" />
+          <JenvuMark className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
           {!compact && <span className="whitespace-nowrap">Ask Jenvu</span>}
         </button>
       )}
@@ -161,19 +161,19 @@ export function AskJenvuWidget() {
           aria-hidden={!open}
           inert={!open}
           className={[
-            "ask-jenvu-root fixed inset-x-2 bottom-2 top-16 z-[9999] flex flex-col overflow-hidden rounded-2xl bg-[var(--ask-bg)] text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:top-auto sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
+            "ask-jenvu-root fixed inset-x-2 bottom-2 h-[min(480px,calc(100dvh-5rem))] z-[9999] flex flex-col overflow-hidden rounded-2xl bg-[var(--ask-bg)] text-gc-ink shadow-[0_4px_12px_rgba(60,64,67,0.2),0_16px_48px_rgba(60,64,67,0.25)] ring-1 ring-gc-line sm:inset-x-auto sm:right-4 sm:bottom-4 sm:h-[min(560px,calc(100vh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
             "[contain:layout_paint] will-change-[opacity,transform] transition-[opacity,transform,visibility] duration-200 ease-out",
             open ? "visible translate-y-0 opacity-100" : "pointer-events-none invisible translate-y-4 opacity-0",
           ].join(" ")}
         >
           {/* Header */}
-          <div className="relative flex h-14 shrink-0 items-center gap-2 px-5">
+          <div className="relative flex h-12 shrink-0 items-center gap-2 px-4 sm:h-14 sm:px-5">
             {view !== "chat" ? (
               <button type="button" onClick={() => setView("chat")} className="-ml-2 flex items-center gap-3 rounded-full py-1.5 pl-2 pr-3 text-[15px] hover:bg-gc-surface">
                 <ArrowLeft className="h-5 w-5" /> Return to conversation
               </button>
             ) : (
-              <span className="text-[16px]">Ask Jenvu</span>
+              <span className="text-[15px] sm:text-[16px]">Ask Jenvu</span>
             )}
             <div className="ml-auto flex items-center">
               {!empty && (
@@ -206,15 +206,15 @@ export function AskJenvuWidget() {
             <SalesForm onDone={() => setView("chat")} />
           ) : (
             <>
-              <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-6 pb-4">
+              <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-4 pb-3 sm:px-6 sm:pb-4">
                 {empty ? (
                   <div className="flex min-h-full flex-col justify-center py-4">
-                    <h2 className="mx-auto max-w-[460px] text-center text-[26px] font-normal leading-[1.3]">
+                    <h2 className="mx-auto max-w-[460px] text-center text-[20px] font-normal leading-[1.3] sm:text-[26px]">
                       What would you like to know about ?
                     </h2>
-                    <div className="mt-6 space-y-2.5">
+                    <div className="mt-4 space-y-2 sm:mt-6 sm:space-y-2.5">
                       {STARTERS.map((s) => (
-                        <button key={s} type="button" onClick={() => send(s)} className="flex w-full items-center justify-between gap-3 rounded-full bg-gc-surface px-6 py-4 text-left text-[14px] transition hover:bg-gc-blue-soft">
+                        <button key={s} type="button" onClick={() => send(s)} className="flex w-full items-center justify-between gap-3 rounded-full bg-gc-surface px-4 py-2.5 text-left text-[13px] sm:px-6 sm:py-4 sm:text-[14px] transition hover:bg-gc-blue-soft">
                           <span>{s}</span>
                           <CornerDownRight className="h-5 w-5 shrink-0" />
                         </button>
@@ -249,10 +249,10 @@ export function AskJenvuWidget() {
                 )}
               </div>
 
-              <div className="shrink-0 px-5 pb-3">
+              <div className="shrink-0 px-3 pb-2 sm:px-5 sm:pb-3">
                 <form
                   onSubmit={(e) => { e.preventDefault(); void send(input); }}
-                  className="flex items-center gap-3 rounded-full bg-background py-2 pl-5 pr-2 shadow-[0_1px_3px_rgba(60,64,67,0.2),0_2px_8px_rgba(60,64,67,0.15)] ring-1 ring-gc-line"
+                  className="flex items-center gap-2 rounded-full bg-background py-1 pl-4 pr-1.5 sm:gap-3 sm:py-2 sm:pl-5 sm:pr-2 shadow-[0_1px_3px_rgba(60,64,67,0.2),0_2px_8px_rgba(60,64,67,0.15)] ring-1 ring-gc-line"
                 >
                   <SearchCheck className="h-5 w-5 shrink-0 text-gc-ink-muted" />
                   <textarea
@@ -271,12 +271,12 @@ export function AskJenvuWidget() {
                     type="submit"
                     aria-label="Send"
                     disabled={busy || !input.trim()}
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gc-blue text-gc-on-blue transition disabled:bg-gc-surface disabled:text-gc-ink-muted"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gc-blue sm:h-10 sm:w-10 text-gc-on-blue transition disabled:bg-gc-surface disabled:text-gc-ink-muted"
                   >
                     <ArrowUp className="h-5 w-5" />
                   </button>
                 </form>
-                <p className="mt-2.5 text-center text-[12px] text-gc-ink-muted">Built with Jenvu AI</p>
+                <p className="mt-1.5 text-center text-[11px] text-gc-ink-muted sm:mt-2.5 sm:text-[12px]">Built with Jenvu AI</p>
               </div>
             </>
           )}

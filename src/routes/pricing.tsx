@@ -14,7 +14,7 @@ import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
 import { JX_BOT_PRICE, PLAN_API_CREDIT, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { TRIAL_API_RPM } from "@/lib/free-trial";
-import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
+import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
 import { MODEL_CATALOG } from "@/lib/model-catalog";
 import { JxBotLogo, PlatformLogo, TerminalLogo } from "@/components/brand/ProductLogos";
 import openAiLogo from "@/assets/model-logos/openai.svg";
@@ -72,6 +72,12 @@ type Group = { title: string; icon: GroupIcon; rows: Row[]; bot?: boolean };
 const TOKENS = (id: string) => `${PLAN_DAILY_TOKEN_LIMITS[id] / 1_000_000}M`;
 const MODEL_COUNT = MODEL_CATALOG.length;
 
+const K = (n: number) => `${n} key${n > 1 ? "s" : ""}`;
+const H = (h: number) => (h >= 24 ? "All day" : `${h}h a day`);
+const ALL: [Mark, Mark, Mark, Mark, Mark] = [true, true, true, true, true];
+const PAID: [Mark, Mark, Mark, Mark, Mark] = [false, true, true, true, true];
+const ELITE_UP: [Mark, Mark, Mark, Mark, Mark] = [false, false, true, true, true];
+
 const GROUPS: ReadonlyArray<Group> = [
   {
     title: "Usage",
@@ -80,18 +86,24 @@ const GROUPS: ReadonlyArray<Group> = [
       { f: "Usage", v: ["Limited", "Basic", "3x Pro", "6x Pro", "Pooled"] },
       { f: "Monthly API credit", v: [`$${FREE_PLAN_CREDIT_USD}`, `$${PLAN_API_CREDIT.pro}`, `$${PLAN_API_CREDIT.elite}`, `$${PLAN_API_CREDIT.ultra}`, "Custom"] },
       { f: "Daily token limit", v: [TOKENS("free"), TOKENS("pro"), TOKENS("elite"), TOKENS("ultra"), "Custom"] },
-      { f: "Balance-based quota ($3 = 1M tokens)", v: [true, true, true, true, true] },
+      { f: "Daily tokens reset at 00:00 UTC", v: ALL },
+      { f: "Balance-based quota ($3 = 1M tokens)", v: ALL },
+      { f: "Wallet top-ups from $5", v: ALL },
       { f: "API requests per minute", v: [`${TRIAL_API_RPM}`, "Standard", "Standard", "Standard", "Custom"] },
+      { f: "Usage page in the dashboard", v: ALL },
     ],
   },
   {
     title: "Top AI Models",
     icon: "models",
     rows: [
-      { f: "ChatGPT 5.5 Pro primary analysis", logo: openAiLogo, invert: true, v: [true, true, true, true, true] },
-      { f: "Grok 4.6 chat", logo: grokLogo, invert: true, v: [true, true, true, true, true] },
-      { f: "Claude Fable 5.1 senior review", logo: claudeLogo, v: [false, false, true, true, true] },
-      { f: `${MODEL_COUNT} latest models (Claude, Gemini, DeepSeek & more)`, logo: geminiLogo, v: [true, true, true, true, true] },
+      { f: "ChatGPT 5.5 Pro primary analysis", logo: openAiLogo, invert: true, v: ALL },
+      { f: "Grok 4.6 chat", logo: grokLogo, invert: true, v: ALL },
+      { f: "Claude Fable 5.1 senior review", logo: claudeLogo, v: ELITE_UP },
+      { f: `${MODEL_COUNT} latest models (Claude, Gemini, DeepSeek & more)`, logo: geminiLogo, v: ALL },
+      { f: "Dashboard Chat playground", v: ALL },
+      { f: "Images, documents and file uploads in Chat", v: ALL },
+      { f: "Live web and Google Maps data in Chat", v: ALL },
       { f: "Chat / primary request", v: ["$0.03", "$0.03", "$0.03", "$0.03", "Volume"] },
       { f: "Senior-reviewed analysis", v: [false, false, "$0.20", "$0.20", "Volume"] },
     ],
@@ -100,9 +112,15 @@ const GROUPS: ReadonlyArray<Group> = [
     title: "Jenvu Terminal",
     icon: "terminal",
     rows: [
-      { f: "Live Gold, Bitcoin and EUR/USD charts", v: [true, true, true, true, true] },
-      { f: "Paid indicators (Fresh sweep, price action, Zone + FVG)", v: [`${TERMINAL_DAILY_HOURS.free}h a day`, `${TERMINAL_DAILY_HOURS.pro}h a day`, `${TERMINAL_DAILY_HOURS.elite}h a day`, "24h a day", "24h a day"] },
-      { f: "Ask Jenvu on the chart", v: [true, true, true, true, true] },
+      { f: "Live Gold, Bitcoin and EUR/USD charts", v: ALL },
+      { f: "TradingView-style candlesticks, all timeframes", v: ALL },
+      { f: "Paid indicators (Fresh sweep, price action, Zone + FVG)", v: [H(TERMINAL_DAILY_HOURS.free), H(TERMINAL_DAILY_HOURS.pro), H(TERMINAL_DAILY_HOURS.elite), H(TERMINAL_DAILY_HOURS.ultra), "All day"] },
+      { f: "Fresh liquidity sweep", v: ALL },
+      { f: "Swing price action verdicts", v: ALL },
+      { f: "Zone + FVG with non-overlapping BSL / SSL", v: ALL },
+      { f: "Time left shown on the chart", v: ALL },
+      { f: "Ask Jenvu on the chart", v: ALL },
+      { f: "News Impact countdown and UP / DOWN cards", v: ALL },
     ],
   },
   {
@@ -113,25 +131,41 @@ const GROUPS: ReadonlyArray<Group> = [
       { f: "JX Bot cost (Founding members)", v: [false, `+$${JX_BOT_PRICE.pro}`, `+$${JX_BOT_PRICE.elite}`, `+$${JX_BOT_PRICE.ultra}`, "Custom"] },
       { f: "IPs (PC or RDP)", v: [false, "1", "2", "5", "Custom"] },
       { f: "Daily target per IP", v: [false, `${DAILY_TARGET_PCT.pro}%`, `${DAILY_TARGET_PCT.elite}%`, `${DAILY_TARGET_PCT.ultra}%`, "Custom"] },
-      { f: `Auto-stop at target or ${DAILY_DRAWDOWN_PCT}% drawdown`, v: [false, true, true, true, true] },
-      { f: "Safe hours: London open block, New York off", v: [false, true, true, true, true] },
-      { f: "Download, presets & updates", v: [false, true, true, true, true] },
+      { f: `Auto-stop at target or ${DAILY_DRAWDOWN_PCT}% drawdown`, v: PAID },
+      { f: "IP sign-in, no license key", v: PAID },
+      { f: "Bot Usage page with ON / OFF log", v: PAID },
+      { f: "Safe hours: London open block, New York off", v: PAID },
+      { f: "Download, presets & updates", v: PAID },
     ],
   },
   {
     title: "Platform & API",
     icon: "platform",
     rows: [
-      { f: "Active API keys", v: [`${FREE_PLAN_API_KEYS}`, "2", "3", "5", "Custom"] },
-      { f: "API access & webhooks", v: [false, false, true, true, true] },
-      { f: "API usage controls & request logs", v: [false, false, true, true, true] },
+      { f: "Active API keys", v: [K(PLAN_API_KEYS.free), K(PLAN_API_KEYS.pro), K(PLAN_API_KEYS.elite), K(PLAN_API_KEYS.ultra), "Custom"] },
+      { f: "OpenAI-compatible API endpoint", v: ALL },
+      { f: "MCP server for AI assistants", v: ALL },
+      { f: "Key rotation and instant revoke", v: ALL },
+      { f: "API access & webhooks", v: ELITE_UP },
+      { f: "API usage controls & request logs", v: ELITE_UP },
+      { f: "Invoices and billing history", v: ALL },
+    ],
+  },
+  {
+    title: "Security",
+    icon: null,
+    rows: [
+      { f: "Two-factor sign-in (authenticator app)", v: ALL },
+      { f: "New sign-in alerts", v: ALL },
+      { f: "One account per person, bot protection", v: ALL },
     ],
   },
   {
     title: "Support",
     icon: null,
     rows: [
-      { f: "Help center & email support", v: [true, true, true, true, true] },
+      { f: "Help center, docs & Ask Jenvu", v: ALL },
+      { f: "Email support", v: ALL },
       { f: "Priority desk support", v: [false, false, false, true, true] },
       { f: "Named account team", v: [false, false, false, false, true] },
     ],
@@ -198,9 +232,9 @@ function PricingPage() {
 
   const plans: Array<{ key: CardKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
     { key: "free", name: "Free", description: "Try the Terminal & API", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: 0, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
-    { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: `$${PLAN_API_CREDIT.pro}`, bigLabel: "API credit every month", ips: 1, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.pro}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", "1.5M daily tokens", "2 API keys"] },
-    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: `$${PLAN_API_CREDIT.elite}`, bigLabel: "API credit & senior review", ips: 2, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.elite}h a day`, "Claude Fable 5.1 senior review", "5M daily tokens", "3 API keys, webhooks & logs"] },
-    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: `$${PLAN_API_CREDIT.ultra}`, bigLabel: "API credit & priority desk", ips: 5, features: ["Terminal paid indicators all day", "10M daily tokens", "5 API keys", "Priority desk support"] },
+    { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: `$${PLAN_API_CREDIT.pro}`, bigLabel: "API credit every month", ips: 1, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.pro}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", "1.5M daily tokens", `${PLAN_API_KEYS.pro} API keys`] },
+    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: `$${PLAN_API_CREDIT.elite}`, bigLabel: "API credit & senior review", ips: 2, features: [`Terminal paid indicators ${TERMINAL_DAILY_HOURS.elite}h a day`, "Claude Fable 5.1 senior review", "5M daily tokens", `${PLAN_API_KEYS.elite} API keys, webhooks & logs`] },
+    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: `$${PLAN_API_CREDIT.ultra}`, bigLabel: "API credit & priority desk", ips: 5, features: ["Terminal paid indicators all day", "10M daily tokens", `${PLAN_API_KEYS.ultra} API keys`, "Priority desk support"] },
   ];
 
   const bigBase = "flex h-10 w-full items-center justify-center rounded-full text-[15px] font-medium transition";
@@ -339,11 +373,11 @@ function PricingPage() {
       {/* COMPARE */}
       <section id="compare" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <h2 className="text-center text-[30px] font-medium leading-tight tracking-tight sm:text-[40px]">Compare features across plans</h2>
-        <div className="mt-12 overflow-x-auto">
+        <div className="mt-12 overflow-x-auto lg:overflow-visible">
           <table className="w-full min-w-[860px] border-collapse text-[14px]">
             <thead>
               <tr className="border-b border-gc-line">
-                <th className="w-[28%] pb-5 text-left align-bottom text-[14px] font-normal text-gc-ink-muted">Feature</th>
+                <th className="w-[28%] bg-background pb-5 pt-4 text-left align-bottom text-[14px] font-normal text-gc-ink-muted lg:sticky lg:top-[60px] lg:z-20">Feature</th>
                 {[
                   { key: "free", label: "Free", price: "$0/month", cta: freeCta(true) },
                   ...(["pro", "elite", "ultra"] as const).map((k) => ({
@@ -354,7 +388,7 @@ function PricingPage() {
                   })),
                   { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },
                 ].map((c) => (
-                  <th key={c.key} className="px-1.5 pb-5 text-center align-bottom font-normal">
+                  <th key={c.key} className="bg-background px-1.5 pb-5 pt-4 text-center align-bottom font-normal lg:sticky lg:top-[60px] lg:z-20">
                     <div className="text-[15px] font-medium text-gc-ink">
                       {c.label}
                       {currentPlan === c.key && <span className="ml-1 text-[11px] font-normal text-gc-ink-muted">· current</span>}

@@ -1318,7 +1318,6 @@ function AuthPage() {
                     <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
                     <span>Sign up with email</span>
                   </button>
-                  {socialButton("apple", "Sign up", "light")}
                 </div>
                 <p className="text-center text-[13px] leading-snug text-muted-foreground">
                   Every new account starts on Free with $10 API credit a month.
@@ -1379,7 +1378,6 @@ function AuthPage() {
           ) : signinStep === "choose" ? (
             <div className="mt-8 space-y-3">
               {socialButton("google", "Login", "google-light")}
-              {socialButton("apple", "Login", "light")}
               <button type="button" onClick={() => { setSigninStep("email"); setErrorMsg(null); }} disabled={!!socialBusy} className={pillLight}>
                 <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
                 <span>Login with email</span>

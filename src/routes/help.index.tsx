@@ -60,9 +60,10 @@ function HelpCenterPage() {
 
   const faqs = [
     { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
-    { q: "How do I get a Jenvu account?", a: "Sign-up and the free trial are closed. Apply for the Founding Program at jenvu.com/founding; approved members get an email to set their password, then verify their ID within 2 days." },
-    { q: "Who can use the Terminal?", a: "The Terminal is reserved for approved Founding Program members, free of cost. Pro, Elite and Ultra plans cover JX Bot for MT5 and the Top AI Models; credit pays for API and AI use, and all other pages stay open." },
-    { q: "How do I get JX Bot?", a: "Choose Pro, Elite or Ultra, then open Dashboard → JX Bot to download it, add the IP of the PC or RDP that runs MT5 and follow the install steps." },
+    { q: "How do I get a Jenvu account?", a: "Sign up at jenvu.com with Google or your email (one account per person). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators." },
+    { q: "Who can use the Terminal?", a: "Every signed-in account can open the Terminal. Its paid indicators (Fresh sweep, price action, Zone + FVG) run a set time each UTC day: Free 2 hours, Pro 8, Elite 16 and Ultra all day, then lock until 00:00 UTC. Credit never unlocks the Terminal." },
+    { q: "How do I get JX Bot?", a: "JX Bot is for verified Founding members on Pro, Elite or Ultra. Apply at jenvu.com/founding; once your ID is verified, open Dashboard → JX Bot to download it, add the IP of the PC or RDP that runs MT5 and follow the install steps." },
+    { q: "How many API keys do I get?", a: "Free 1, Pro 3, Elite 5 and Ultra 7. Create and revoke them on Dashboard → API Keys." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
   ];
   const [open, setOpen] = React.useState<number[]>([]);

@@ -151,7 +151,7 @@ const FAQS = [
   },
   {
     q: "Who can use JX Bot?",
-    a: "Only approved Founding Program members whose ID is verified. The first Founding month is free; after that it continues on a Founding plan (Pro $49, Elite $99, Ultra $169). Sign-up and the free trial are closed, and credit alone does not unlock the bot. Apply at jenvu.com/founding.",
+    a: "Only approved Founding Program members whose ID is verified. The first Founding month is free; after that it continues on a Founding plan (Pro $49, Elite $99, Ultra $169). Sign-up is open and every account starts on Free, but Free, credit and the plans alone do not unlock the bot. Apply at jenvu.com/founding.",
   },
   {
     q: "How many accounts can I run?",

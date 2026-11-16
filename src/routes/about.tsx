@@ -2,14 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowUpRight, BellRing, Bot, CandlestickChart, Code2, LineChart, ShieldCheck, Sparkles, type LucideIcon } from "lucide-react";
 import { PageShell, Feature, Banner, Stats, StoryCards } from "@/components/PageShell";
 import { AuroraTile } from "@/components/AuroraTile";
+import { FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Jenvu — Our Mission" },
-      { name: "description", content: "Meet Jenvu — the mission, philosophy and team behind the AI trading terminal for Gold, BTC/USD and EUR/USD." },
-      { property: "og:title", content: "Who We Are — Jenvu" },
-      { property: "og:description", content: "The mission, philosophy and team behind Jenvu's AI-powered trading terminal." },
+      { title: "Why Jenvu — AI Gold Terminal, API and JX Bot" },
+      { name: "description", content: "Why traders use Jenvu: a Free plan with $10 API credit a month, Terminal indicators by plan hours, up to 7 API keys and JX Bot for Founding members." },
+      { property: "og:title", content: "Why Jenvu — AI Gold Terminal, API and JX Bot" },
+      { property: "og:description", content: "Start Free with $10 API credit a month, then upgrade for more Terminal hours, API keys and credit." },
       { property: "og:url", content: "https://jenvu.com/about" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -36,7 +37,7 @@ const BUILD: { title: string; text: string; href: string; link: string; icons: L
   },
   {
     title: "Developers",
-    text: "One API key for leading models, plus JX Bot for MetaTrader 5.",
+    text: `Up to ${PLAN_API_KEYS.ultra} API keys for leading models, plus JX Bot for MetaTrader 5 (Founding members).`,
     href: "https://jenvu.com/platform",
     link: "Explore the platform",
     icons: [Code2, Bot],
@@ -115,9 +116,9 @@ function AboutPage() {
           { value: "7", label: "Deterministic trading engines" },
           { value: "3", label: "Markets: Gold, Bitcoin, EUR/USD" },
           { value: "6", label: "Checks before any setup ships" },
-          { value: "30", label: "Days of Pro or Elite for Founding members" },
-          { value: "$25–$50", label: "Plan API credit after ID verification" },
-          { value: "100", label: "Founding seats every month" },
+          { value: `$${FREE_PLAN_CREDIT_USD}`, label: "Free API credit every month" },
+          { value: `${TERMINAL_DAILY_HOURS.free}–${TERMINAL_DAILY_HOURS.ultra}h`, label: "Terminal indicator hours a day by plan" },
+          { value: `${PLAN_API_KEYS.free}–${PLAN_API_KEYS.ultra}`, label: "API keys, Free to Ultra" },
         ]}
       />
 

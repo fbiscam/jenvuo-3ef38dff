@@ -7,6 +7,8 @@ export const FREE_PLAN_CREDIT_USD = 10;
 export const FREE_PLAN_CREDIT_DAYS = 30;
 /** Active API keys on Free (DB `plans.extension_key_limit` for `free` must match). */
 export const FREE_PLAN_API_KEYS = 1;
+/** Active API keys per plan (DB `plans.extension_key_limit` must match). */
+export const PLAN_API_KEYS = { free: FREE_PLAN_API_KEYS, pro: 3, elite: 5, ultra: 7 } as const;
 
 export type StrategyTier = "free" | "pro" | "elite" | "ultra" | "unlimited";
 

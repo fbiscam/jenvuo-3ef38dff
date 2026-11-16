@@ -47,7 +47,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "sign up register signup login sign in founding apply",
         body: (
           <>
-            <p>Anyone can create a Jenvu account (one person, one account). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators.</p>
+            <p>Anyone can create a Jenvu account (one person, one account). Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. Pro gives 3 API keys and 8 hours a day, Elite 5 keys and 16 hours, Ultra 7 keys and all day.</p>
             <ol>
               <li>Open <a href="https://auth.jenvu.com/sign-in?mode=signup">auth.jenvu.com/sign-in</a> and choose Create an account.</li>
               <li>Enter the 6-digit code we email you.</li>
@@ -435,7 +435,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <p>
             Open <strong>API</strong> in the dashboard to create a key. Keep it private — anyone with your key can use your credit.
-            You can delete a key at any time, and your plan sets how many keys you can have.
+            You can delete a key at any time, and your plan sets how many keys you can have: Free 1, Pro 3, Elite 5, Ultra 7.
           </p>
         ),
       },
