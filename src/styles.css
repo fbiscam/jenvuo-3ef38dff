@@ -2112,9 +2112,9 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
   }
 }
 
-/* Sign-in / sign-out page: 10% larger on laptop/desktop, still fits one screen. */
+/* Sign-in / sign-up page on laptop/desktop: the old 1.1 scale made 7% smaller (1.1 x 0.93). */
 @media (min-width: 1024px) {
-  .auth-zoom-desktop { zoom: 1.1; }
+  .auth-zoom-desktop { zoom: 1.023; }
 }
 
 /* Homepage showcase: animated Chat/Build/Bot/Voice tiles. */
