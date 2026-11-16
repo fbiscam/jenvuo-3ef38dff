@@ -82,7 +82,9 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
                 message: entitlement.error,
                 type: entitlement.status === 429 ? "rate_limit_error" : "insufficient_quota",
                 code:
-                  entitlement.status === 429
+                  entitlement.rateLimited
+                    ? "rate_limit_exceeded"
+                    : entitlement.status === 429
                     ? "daily_token_limit_reached"
                     : entitlement.status === 402
                       ? "low_balance"

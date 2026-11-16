@@ -16,9 +16,20 @@ describe("Terminal access (Founding members only)", () => {
     expect(r.allowed).toBe(false);
     expect(r.reason).toBe("not_founding");
   });
-  it("a running free trial does not open the Terminal", () => {
-    const trial = evaluatePlanAccess(sub({ plan_id: "pro", status: "trialing", is_trial: true, trial_ends_at: iso(now + day) }), now);
+  it("a running free trial opens the Terminal with the paid strategies", () => {
+    const trial = evaluatePlanAccess(sub({ plan_id: "pro", status: "active", is_trial: true, trial_ends_at: iso(now + day) }), now);
+    expect(evaluateTerminalAccess(trial).allowed).toBe(true);
+    expect(evaluateStrategyAccess(trial).allowed).toBe(true);
+  });
+  it("an ended free trial locks the Terminal again", () => {
+    const trial = evaluatePlanAccess(sub({ plan_id: "pro", status: "active", is_trial: true, trial_ends_at: iso(now - day) }), now);
     expect(evaluateTerminalAccess(trial).allowed).toBe(false);
+  });
+  it("the Founding month runs 30 days from ID verification, not approval", () => {
+    const row = { id: "a", approved_at: iso(now - 40 * day), founding_started_at: iso(now - 20 * day), created_at: null, document_status: "verified" };
+    expect(evaluateTerminalAccess(evaluateFoundingRow(row, now)).allowed).toBe(true);
+    const ended = { ...row, founding_started_at: iso(now - 30 * day) };
+    expect(evaluateFoundingRow(ended, now).reason).toBe("founding_ended");
   });
   it("an active paid plan opens the Terminal", () => {
     const plan = evaluatePlanAccess(sub({ plan_id: "pro", status: "active", current_period_end: iso(now + day) }), now);

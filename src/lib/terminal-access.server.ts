@@ -61,14 +61,13 @@ export function evaluatePlanAccess(sub: Sub | null, now = Date.now()): TerminalA
 }
 
 /**
- * Terminal rule: the Terminal is only for approved Founding members (who must send
- * their ID within 2 days of approval), admins and accounts on an active paid plan
- * (plans can only be bought by ID-verified Founding members). A free trial or credit
- * never opens it.
+ * Terminal rule: the Terminal is for approved Founding members (who must send their ID
+ * within 2 days of approval), admins, accounts on an active paid plan and a running
+ * free trial (with the paid Terminal features, like a plan). Credit alone never opens it.
  */
 export function evaluateTerminalAccess(plan: TerminalAccess | null): TerminalAccess {
   const base = plan ?? { allowed: false, reason: "not_founding", idDeadline: null, idSubmitted: false, trialEndsAt: null };
-  const allowed = base.allowed && (base.reason === "admin" || base.reason === "founding" || base.reason === "paid");
+  const allowed = base.allowed && (base.reason === "admin" || base.reason === "founding" || base.reason === "paid" || base.reason === "trial");
   if (allowed) return base;
   return { ...base, allowed: false, reason: KEPT_LOCK_REASONS.includes(base.reason) ? base.reason : "not_founding" };
 }
@@ -77,20 +76,22 @@ function escapeLike(v: string) {
   return v.replace(/[\\%_]/g, (m) => `\\${m}`);
 }
 
-type Row = { id: string; approved_at: string | null; created_at: string | null; document_status: string | null };
+type Row = { id: string; approved_at: string | null; created_at: string | null; document_status: string | null; founding_started_at?: string | null };
 
 /**
  * Founding rule: the Terminal (and JX Bot) open only once the ID is verified, and the
- * Founding month ends 30 days after approval. Before verification the member has 2 days
- * to send the ID; after 30 days they need a paid plan.
+ * Founding month runs 30 days from the day the ID is verified (`founding_started_at`,
+ * set by `start_founding_month()`; older rows fall back to approval). Before verification
+ * the member has 2 days from approval to send the ID; after the month they need a paid plan.
  */
 export function evaluateFoundingRow(row: Row, now = Date.now()): TerminalAccess {
   const doc = (row.document_status || "").toLowerCase();
-  const start = Date.parse(row.approved_at || row.created_at || "") || now;
+  const start = Date.parse(row.founding_started_at || row.approved_at || row.created_at || "") || now;
+  const approved = Date.parse(row.approved_at || row.created_at || "") || now;
   if (now >= start + FOUNDING_PERIOD_MS) return { allowed: false, reason: "founding_ended", idDeadline: null, idSubmitted: doc === "verified" };
   if (doc === "verified") return { allowed: true, reason: "founding", idDeadline: null, idSubmitted: true };
   if (ID_SENT_STATUSES.includes(doc)) return { allowed: false, reason: "id_pending", idDeadline: null, idSubmitted: true };
-  const deadline = start + ID_VERIFICATION_GRACE_MS;
+  const deadline = approved + ID_VERIFICATION_GRACE_MS;
   const iso = new Date(deadline).toISOString();
   if (now > deadline) return { allowed: false, reason: "id_overdue", idDeadline: iso, idSubmitted: false };
   return { allowed: false, reason: "id_required", idDeadline: iso, idSubmitted: false };
@@ -110,7 +111,7 @@ export async function checkPlanAccess(
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const statuses = [...TERMINAL_UNLOCK_STATUSES];
-  const fields = "id, approved_at, created_at, document_status";
+  const fields = "id, approved_at, created_at, document_status, founding_started_at";
   const byUser = await (supabaseAdmin as any)
     .from("founding_applications")
     .select(fields)
@@ -151,7 +152,7 @@ export async function checkPlanAccess(
   return plan;
 }
 
-/** Terminal access: Founding members (2-day ID rule), admins and paid plans only. */
+/** Terminal access: Founding members (2-day ID rule), admins, paid plans and the free trial. */
 export async function checkTerminalAccess(
   supabase: SupabaseClient<any>,
   userId: string,

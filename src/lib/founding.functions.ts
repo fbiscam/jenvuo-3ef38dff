@@ -998,6 +998,12 @@ export const adminUpdateDocumentStatus = createServerFn({ method: "POST" })
         if (uid) await linkApplicationToUser(admin, data.id, uid);
       }
       if (uid) {
+        // First verification starts the 30-day Founding month today (plan, Terminal, JX Bot),
+        // also renewing a free trial or an ended approval month; re-saving "verified" never restarts it.
+        if (prior?.document_status !== "verified") {
+          const { error: monthErr } = await admin.rpc("start_founding_month" as any, { _user_id: uid });
+          if (monthErr) console.error("[founding] month start on ID verify failed:", monthErr.message);
+        }
         const { error: creditErr } = await admin.rpc("release_founding_credit" as any, { _user_id: uid });
         if (creditErr) console.error("[founding] credit on ID verify failed:", creditErr.message);
       }

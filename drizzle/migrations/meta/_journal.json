@@ -323,6 +323,20 @@
       "when": 1794733634481,
       "tag": "0045_public_home_stats",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1794798955302,
+      "tag": "0046_free_trial_30_and_founding_month_from_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1794798978291,
+      "tag": "0047_founding_month_no_subscription_fix",
+      "breakpoints": true
     }
   ]
 }

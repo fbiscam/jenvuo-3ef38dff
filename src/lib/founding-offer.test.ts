@@ -49,6 +49,12 @@ describe("Founding JX Bot", () => {
     expect(foundingBotState(app(), day31)).toBe("locked");
     expect(foundingBotState(app({ documents_verified_at: null }), day31)).toBe("locked");
   });
+  it("runs 30 days from the ID verification day when that is recorded", () => {
+    const late = app({ documents_verified_at: "2026-10-20T00:00:00.000Z" });
+    const started = { ...late, founding_started_at: "2026-10-20T00:00:00.000Z" };
+    expect(foundingBotState(started, day31)).toBe("active");
+    expect(foundingBotState(started, Date.parse("2026-11-19T00:00:00.000Z"))).toBe("locked");
+  });
   it("$200 profit is the milestone for the 30-day notice", () => {
     expect(reachedFoundingMilestone(200)).toBe(true);
     expect(reachedFoundingMilestone(199.99)).toBe(false);

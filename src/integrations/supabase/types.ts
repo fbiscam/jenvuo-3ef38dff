@@ -1348,6 +1348,7 @@ export type Database = {
           email: string
           experience_years: number | null
           first_profit_at: string | null
+          founding_started_at: string | null
           full_name: string
           id: string
           ip_address: string | null
@@ -1383,6 +1384,7 @@ export type Database = {
           email: string
           experience_years?: number | null
           first_profit_at?: string | null
+          founding_started_at?: string | null
           full_name: string
           id?: string
           ip_address?: string | null
@@ -1418,6 +1420,7 @@ export type Database = {
           email?: string
           experience_years?: number | null
           first_profit_at?: string | null
+          founding_started_at?: string | null
           full_name?: string
           id?: string
           ip_address?: string | null
@@ -4081,6 +4084,8 @@ export type Database = {
         }
         Returns: number
       }
+      start_founding_month: { Args: { _user_id: string }; Returns: boolean }
+      start_signup_trial: { Args: { _user_id: string }; Returns: Json }
       user_has_plan_feature: {
         Args: { _feature: string; _user_id: string }
         Returns: boolean

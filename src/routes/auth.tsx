@@ -147,10 +147,12 @@ function AuthPage() {
   const freshTurnstile = () => setTurnstileReset((n) => n + 1);
   const search = Route.useSearch();
   const redirectTo = sanitizeRedirect(search.redirect);
-  // Sign-up is closed: the page always opens on sign-in (old ?mode=signup links included).
+  // ?mode=signup opens the sign-up form (free trial); everything else opens on sign-in.
   const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
-    "signin",
+    search.mode === "signup" ? "signup" : "signin",
   );
+  // A brand-new account goes straight to API keys to create its first key.
+  const signedUpRef = React.useRef(false);
 
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -345,7 +347,7 @@ function AuthPage() {
                   const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
                   if (res?.valid) {
                     await applyPendingReferral();
-                    void goAfterSignIn(redirectTo, () => navigate({ to: redirectTo as "/dashboard", replace: true }));
+                    { const dest = signedUpRef.current ? "/dashboard/api" : redirectTo; void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true })); }
                     return;
                   }
                   // Stale/expired — clear it so we don't retry every login.
@@ -368,7 +370,7 @@ function AuthPage() {
             }
           }
           await applyPendingReferral();
-          void goAfterSignIn(redirectTo, () => navigate({ to: redirectTo as "/dashboard", replace: true }));
+          { const dest = signedUpRef.current ? "/dashboard/api" : redirectTo; void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true })); }
         })();
       }
     });
@@ -719,12 +721,14 @@ function AuthPage() {
       triggerOtpError(result.error || "Verification failed. Try again.");
       return;
     }
+    signedUpRef.current = true;
     const { error: sessionError } = await supabase.auth.setSession({
       access_token: result.session.access_token,
       refresh_token: result.session.refresh_token,
     });
     setLoading(false);
     if (sessionError) {
+      signedUpRef.current = false;
       setErrorMsg(sessionError.message);
       return;
     }
@@ -1106,9 +1110,9 @@ function AuthPage() {
                         </div>
 
                         <p className="text-[12px] leading-snug text-muted-foreground">
-                          Founding Program: Get 1 Month Pro or Elite with API Credit.{" "}
+                          Free trial: $30 API credit and 14 days of Pro Terminal features. Want JX Bot?{" "}
                           <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
-                            Apply now
+                            Apply for the Founding Program
                           </Link>
                         </p>
 
@@ -1381,10 +1385,15 @@ function AuthPage() {
                   {mode === "signin" && !mfaChallenge && (
                     <div className="mt-6 space-y-1.5 text-center text-[13px] text-muted-foreground">
                       <p>
-                        New here? Sign-up is closed.{" "}
-                        <Link to="/founding" className="font-medium text-foreground underline underline-offset-2">
-                          Apply for the Founding Program
-                        </Link>
+                        New here?{" "}
+                        <button
+                          type="button"
+                          onClick={() => { setMode("signup"); setErrorMsg(null); }}
+                          className="font-medium text-foreground underline underline-offset-2"
+                        >
+                          Create an account
+                        </button>{" "}
+                        ($30 free API credit)
                       </p>
                       <p>
                         Forgot your password?{" "}

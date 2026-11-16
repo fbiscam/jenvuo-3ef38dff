@@ -1,4 +1,5 @@
 import { estimateCostUsd, logAiCost } from '@/lib/ai-cost-log.server'
+import { trialRateBlock } from '@/lib/free-trial'
 import { getEffectiveDailyTokenLimit, getPlanCapabilities, tokensToUsd, TOKEN_RATE_USD_PER_MILLION } from '@/lib/plan-entitlements'
 
 export const EXTENSION_BASE_FEE_USD = 0
@@ -59,9 +60,24 @@ export async function getExtensionEntitlement(userId: string) {
   const tokensRemainingToday = Math.max(0, dailyTokenLimit - tokensUsedToday)
   const overDailyTokens = dailyTokenLimit > 0 && tokensUsedToday >= dailyTokenLimit
   const planOk = active && capabilities.extensionAi && keyLimit > 0
+  // Free-trial accounts (not Founding members) get a per-minute request cap.
+  let rateBlock: string | null = null
+  if (planOk && sub?.is_trial) {
+    const { data: founding } = await admin.rpc('is_founding_member', { _user_id: userId })
+    if (!founding) {
+      const { count } = await admin
+        .from('credit_ledger')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('reason', 'extension_api')
+        .gte('created_at', new Date(Date.now() - 60_000).toISOString())
+      rateBlock = trialRateBlock({ isFreeTrial: true, requestsLastMinute: Number(count ?? 0) })
+    }
+  }
   const result = {
-    allowed: planOk && balance > 0 && !overDailyTokens,
-    status: !planOk ? 403 : balance <= 0 ? 402 : overDailyTokens ? 429 : 200,
+    allowed: planOk && balance > 0 && !overDailyTokens && !rateBlock,
+    status: !planOk ? 403 : balance <= 0 ? 402 : overDailyTokens || rateBlock ? 429 : 200,
+    rateLimited: !!rateBlock && planOk && balance > 0 && !overDailyTokens,
     plan: planId,
     keyLimit,
     balance,
@@ -76,6 +92,8 @@ export async function getExtensionEntitlement(userId: string) {
   return {
     ...result,
     error: result.allowed ? undefined
+      : result.rateLimited
+        ? rateBlock!
       : result.status === 429
         ? `Daily token limit reached (${dailyTokenLimit.toLocaleString()} tokens). Add credits to increase the balance-based allowance, or wait until 00:00 UTC.`
         : result.status === 402
@@ -93,7 +111,8 @@ export async function chargeExtensionUsage(params: {
   calls: ModelCall[]
 }): Promise<{ ok: boolean; charged: number; balance?: number; error?: string }> {
   const entitlement = await getExtensionEntitlement(params.userId)
-  if (!entitlement.allowed) return { ok: false, charged: 0, error: entitlement.error }
+  // The per-minute cap only stops new calls; a call that already ran is always charged.
+  if (!entitlement.allowed && !entitlement.rateLimited) return { ok: false, charged: 0, error: entitlement.error }
   const rawCost = params.calls.reduce((sum, call) => sum + estimateCostUsd(call.model, call.usage.promptTokens, call.usage.completionTokens), 0)
   const hasSeniorReview = params.calls.some((call) => call.stage === 'extension-senior-review' || call.stage === 'extension-candle-senior-review' || call.stage === 'senior-review')
 

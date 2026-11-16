@@ -1,6 +1,6 @@
 /**
  * Founding JX Bot rule (the database function `founding_bot_check` applies the same rule):
- * approved Founding members get the bot after ID verification. 30 days after approval the
+ * approved Founding members get the bot after ID verification. 30 days after that verification the
  * Founding plan, credit and bot access all end; the member is told whether the bot reached
  * the $200 profit milestone, and a paid plan is needed to keep using it.
  */
@@ -14,6 +14,8 @@ export type FoundingBotInput = {
   approved_at: string | null;
   documents_verified_at: string | null;
   bot_locked_at: string | null;
+  /** Day the ID was verified and the Founding month began (older rows: null, use approval). */
+  founding_started_at?: string | null;
 } | null;
 
 const APPROVED = new Set(["approved", "active", "graduated", "verified"]);
@@ -21,7 +23,7 @@ const APPROVED = new Set(["approved", "active", "graduated", "verified"]);
 export function foundingBotState(app: FoundingBotInput, now = Date.now()): FoundingBotState {
   if (!app || !app.approved_at || !APPROVED.has(String(app.status))) return "none";
   if (app.bot_locked_at) return "locked";
-  const review = Date.parse(app.approved_at) + FOUNDING_BOT_REVIEW_DAYS * 86400000;
+  const review = Date.parse(app.founding_started_at || app.approved_at) + FOUNDING_BOT_REVIEW_DAYS * 86400000;
   if (now >= review) return "locked";
   if (!app.documents_verified_at) return "awaiting_id";
   return "active";

@@ -489,7 +489,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
     }
   } catch { /* logging failure must not block signup */ }
 
-  // 14-day Pro trial abuse guard: one trial per device fingerprint / IP.
+  // Free trial: one per device fingerprint / IP (and one per account in the database).
   try {
     if (uid) await claimProTrial(uid, (input.fingerprint || '').split('_')[0], input.ip)
   } catch { /* never block signup on trial bookkeeping */ }
@@ -499,8 +499,8 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 }
 
 /**
- * Records the 14-day Pro trial against this device/IP. If the same device or IP
- * already consumed a trial, the freshly granted trial is revoked and the account
+ * Starts the free trial for a new account and records it against this device/IP.
+ * If the same device or IP already had a trial, no trial is given and the account
  * starts on Free instead.
  */
 async function claimProTrial(userId: string, fingerprint?: string, ip?: string) {
@@ -525,12 +525,16 @@ async function claimProTrial(userId: string, fingerprint?: string, ip?: string) 
     }
   }
 
+  // Same device or network already had a trial: the account starts on Free, no credit.
   if (alreadyUsed) {
     await admin.rpc('revoke_pro_trial', { _user_id: userId, _reason: 'duplicate_device' })
     return
   }
 
   await admin.from('trial_claims').insert({ user_id: userId, fingerprint: fp, ip_hash: ipHash })
+  // Free trial (FREE_TRIAL_DAYS of Pro + FREE_TRIAL_CREDIT_USD credit), once per account, server-side only.
+  const { error } = await admin.rpc('start_signup_trial', { _user_id: userId })
+  if (error) console.error('[signup] free trial start failed:', error.message)
 }
 
 async function sha256Hex(input: string): Promise<string> {

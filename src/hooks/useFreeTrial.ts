@@ -6,9 +6,9 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 
 /**
- * Free trial ($100 credit + 14 days Pro). Closed: the Terminal, plans and credit are only
- * for approved Founding members, so `eligible` is always false and the database refuses
- * new claims.
+ * Self-claim banner for the free trial. The trial ($30 credit + 14 days Pro, see
+ * free-trial.ts) now starts automatically on sign-up, server-side, so this banner stays
+ * off and the database refuses self-claims.
  */
 export const FREE_TRIAL_OPEN = false;
 
@@ -39,7 +39,7 @@ export function useFreeTrial() {
     }
     queryClient.setQueryData(key, false);
     void refresh();
-    toast.success("Your free trial has started: $100 credit and 14 days of Pro.");
+    toast.success("Your free trial has started: $30 credit and 14 days of Pro.");
     return true;
   };
 

@@ -56,8 +56,8 @@ export const signInWithTurnstile = createServerFn({ method: 'POST' })
     return res.ok ? res : { ...res, captcha: false }
   })
 
-/** Public sign-up is closed; approved Founding applicants get their account by email. */
-export const SIGNUP_CLOSED = true
+/** Public sign-up is open (free trial: see free-trial.ts); abuse checks run in custom-auth.server.ts. */
+export const SIGNUP_CLOSED = false
 export const SIGNUP_CLOSED_MESSAGE = 'Sign-up is closed. Apply for the Founding Program at jenvu.com/founding; approved members get their account by email.'
 
 export const requestSignupOtp = createServerFn({ method: 'POST' })
@@ -74,7 +74,6 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
       .parse(data),
   )
   .handler(async ({ data }) => {
-    // Sign-up is closed: accounts are created only when a Founding application is approved.
     if (SIGNUP_CLOSED) return { ok: false as const, error: SIGNUP_CLOSED_MESSAGE }
     try {
       const check = await passTurnstile(data.turnstileToken)

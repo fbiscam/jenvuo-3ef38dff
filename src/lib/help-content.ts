@@ -78,12 +78,19 @@ export const collections: Collection[] = [
       {
         slug: "create-account",
         title: "Create your account",
-        summary: "Jenvu access is invite-only through the Founding Trader Program.",
-        updatedAt: "2026-09-22",
+        summary: "Sign up in a minute and get a free trial with $30 API credit.",
+        updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "New Jenvu accounts are currently invite-only. Apply to the Founding Trader Program and the team will review your application." },
+          { type: "p", content: "Anyone can create a Jenvu account (one person, one account). Every new account starts with a free trial: $30 API credit and 14 days of Pro features, including the Terminal's paid strategies. JX Bot is only for Founding members." },
 
-          { type: "h2", content: "Apply for access" },
+          { type: "h2", content: "Sign up" },
+          { type: "ol", items: [
+            "Open auth.jenvu.com/sign-in and choose Create an account.",
+            "Enter your name, email and a password, then the 6-digit code we email you.",
+            "You land on API keys, ready to create your first key.",
+          ]},
+
+          { type: "h2", content: "Want JX Bot? Apply for the Founding Program" },
           { type: "ol", items: [
             "Open the Founding Trader Program page from the top-right of any page.",
             "Choose your preferred plan and complete the short application.",
@@ -94,7 +101,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "What happens next" },
           { type: "ul", items: [
             "Approved applicants receive a private account invitation by email.",
-            "Your selected plan is prepared after approval.",
+            "Your Founding month (30 days, JX Bot included) starts on the day your ID is verified.",
             "You can then sign in and access your dashboard and trading terminal.",
           ]},
 

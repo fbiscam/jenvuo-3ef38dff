@@ -47,22 +47,24 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "sign up register signup login sign in founding apply",
         body: (
           <>
-            <p>Public sign-up is closed. Jenvu accounts are created only for approved Founding Program members.</p>
+            <p>Anyone can create a Jenvu account (one person, one account). Every new account starts with a free trial: $30 API credit and 14 days of Pro features.</p>
             <ol>
-              <li>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</li>
-              <li>When you're approved, we email you a secure link to set your password.</li>
-              <li>Sign in at <a href="https://auth.jenvu.com/sign-in">auth.jenvu.com/sign-in</a> and verify your ID on the Documents page within 2 days.</li>
+              <li>Open <a href="https://auth.jenvu.com/sign-in">auth.jenvu.com/sign-in</a> and choose Create an account.</li>
+              <li>Enter the 6-digit code we email you.</li>
+              <li>You land on API keys: create your first key and start building.</li>
             </ol>
+            <p>Want JX Bot? Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>. Once approved, verify your ID on the Documents page within 2 days.</p>
           </>
         ),
       },
       {
         id: "free-trial",
-        title: "Founding Program & access",
+        title: "Free trial & Founding Program",
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The free trial is closed. Approved Founding Program members get Pro or Elite for 30 days instead, with the plan's API credit ($25 Pro, $50 Elite) added once their ID is verified. Plans can be bought after your ID is verified.</p>
+            <p>The free trial gives every new account $30 API credit and 14 days of Pro features, including the Terminal's paid strategies. Free-trial API keys can send up to 30 requests per minute. JX Bot is not part of the trial.</p>
+            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($25 Pro, $50 Elite). Plans can be bought after your ID is verified.</p>
           </>
         ),
       },

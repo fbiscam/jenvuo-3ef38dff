@@ -19,10 +19,10 @@ export function seatsFullMessage(now: Date = new Date()): string {
 }
 
 /**
- * Master switch for new Founding applications. Owner closed them on Nov 8, 2026
- * until further notice; set back to true to reopen the form.
+ * Master switch for new Founding applications. Reopened on Nov 16, 2026 so free-trial
+ * users can apply for JX Bot; set to false to close the form again.
  */
-export const FOUNDING_APPLICATIONS_OPEN = false;
+export const FOUNDING_APPLICATIONS_OPEN = true;
 
 export const FOUNDING_CLOSED_MESSAGE =
   "Founding applications are closed for now. We'll reopen them soon.";

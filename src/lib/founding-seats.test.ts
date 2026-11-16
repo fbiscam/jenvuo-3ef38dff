@@ -19,7 +19,7 @@ describe("Founding seats", () => {
 import { FOUNDING_APPLICATIONS_OPEN } from "./founding-seats";
 
 describe("Founding applications switch", () => {
-  it("stays closed until the owner asks to reopen", () => {
-    expect(FOUNDING_APPLICATIONS_OPEN).toBe(false);
+  it("is open so free-trial users can apply for JX Bot", () => {
+    expect(FOUNDING_APPLICATIONS_OPEN).toBe(true);
   });
 });
