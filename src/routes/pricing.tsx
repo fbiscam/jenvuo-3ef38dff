@@ -259,15 +259,12 @@ function PricingPage() {
 
       {/* HEADER */}
       <section className="mx-auto max-w-[900px] px-5 pb-10 pt-16 text-center sm:px-8 sm:pt-24">
-        <div className="mx-auto flex items-end justify-center gap-5 sm:gap-7">
+        <div className="mx-auto flex items-center justify-center gap-3.5" aria-label="Terminal, JX Bot and Platform">
           {([["Terminal", TerminalLogo], ["JX Bot", JxBotLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
-            <div key={label} className="flex flex-col items-center gap-2">
-              <Logo framed className="h-11 w-11 sm:h-12 sm:w-12" />
-              <span className="text-[12px] font-medium text-gc-ink-muted">{label}</span>
-            </div>
+            <Logo key={label} className="h-[22px] w-[22px] text-foreground" />
           ))}
         </div>
-        <h1 className="mt-6 text-[2.8rem] font-medium leading-[1.05] tracking-tight sm:text-[4rem]">Pricing</h1>
+        <h1 className="mt-4 text-[2.8rem] font-medium leading-[1.05] tracking-tight sm:text-[4rem]">Pricing</h1>
         <p className="mx-auto mt-4 max-w-[600px] text-[17px] leading-[1.6] text-gc-ink-muted">One subscription. Access to everything.</p>
         <div className="mx-auto mt-8 inline-flex items-center rounded-full bg-gc-pill p-1" role="group" aria-label="Billing cycle">
           {(["monthly", "annual"] as const).map((b) => (
