@@ -104,7 +104,7 @@ const GROUPS: ReadonlyArray<Group> = [
       { f: "ChatGPT 5.5 Pro primary analysis", logo: openAiLogo, invert: true, v: ALL },
       { f: "Grok 4.6 chat", logo: grokLogo, invert: true, v: ALL },
       { f: "Claude Fable 5.1 senior review", logo: claudeLogo, v: ELITE_UP },
-      { f: `${MODEL_COUNT} models (Claude, Gemini, DeepSeek & more)`, logo: geminiLogo, v: ALL },
+      { f: `${MODEL_COUNT} models (Claude, Gemini, Open AI )`, logo: geminiLogo, v: ALL },
       { f: "Dashboard Chat playground", v: ALL },
       { f: "Images, documents and file uploads in Chat", v: ALL },
       { f: "Live web and Google Maps data in Chat", v: ALL },
