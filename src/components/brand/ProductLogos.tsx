@@ -47,3 +47,18 @@ export function PlatformLogo({ className = "h-4 w-4", framed }: Props) {
     </Frame>
   );
 }
+
+/** News Trading mark: a folded newspaper with a headline, text lines and an up arrow cut out. */
+export function NewsLogo({ className = "h-4 w-4", framed }: Props) {
+  return (
+    <Frame framed={framed} className={className}>
+      <svg viewBox="0 0 24 24" className={framed ? "h-[54%] w-[54%]" : "h-full w-full"} fill="currentColor">
+        <path
+          fillRule="evenodd"
+          d="M4.5 3h12A1.5 1.5 0 0 1 18 4.5v14a2.5 2.5 0 0 0 2.5 2.5h-15A2.5 2.5 0 0 1 3 18.5v-14A1.5 1.5 0 0 1 4.5 3ZM6 6.5h9v3H6Zm0 5h9v1.6H6Zm0 3.3h4.5v1.6H6Zm5.8 1.6 1.8-2.8 1.8 2.8Z"
+        />
+        <path d="M19 8h1.5A1.5 1.5 0 0 1 22 9.5v9a2.5 2.5 0 0 1-1.4 2.25A2.4 2.4 0 0 1 19 18.5Z" opacity=".7" />
+      </svg>
+    </Frame>
+  );
+}

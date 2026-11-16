@@ -64,7 +64,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>The Free plan gives every account $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. Free includes JX Bot on 1 IP with a $5 daily target.</p>
-            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($25 Pro, $50 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
+            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($19 Pro, $39 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
           </>
         ),
       },
@@ -165,7 +165,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <ul>
               <li>After approval you have <strong>2 days</strong> to verify your ID. If it isn't sent in time, the Terminal locks until you send it.</li>
               <li>Credit alone never unlocks the Terminal.</li>
-              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The Terminal and JX Bot open once the ID is verified, and the plan's API credit is added ($25 Pro, $50 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
+              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The Terminal and JX Bot open once the ID is verified, and the plan's API credit is added ($19 Pro, $39 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>

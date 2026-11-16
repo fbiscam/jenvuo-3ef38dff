@@ -16,7 +16,8 @@ import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
 import { MODEL_CATALOG } from "@/lib/model-catalog";
-import { JxBotLogo, PlatformLogo, TerminalLogo } from "@/components/brand/ProductLogos";
+import { JxBotLogo, NewsLogo, PlatformLogo, TerminalLogo } from "@/components/brand/ProductLogos";
+import { RELEASES_PER_EVENT } from "@/lib/news-impact";
 import openAiLogo from "@/assets/model-logos/openai.svg";
 import grokLogo from "@/assets/model-logos/grok.svg";
 import claudeLogo from "@/assets/model-logos/claude-color.svg";
@@ -31,6 +32,7 @@ export const FAQ = [
   ["Who gets JX Bot?", `Everyone. JX Bot is part of every plan: Free runs 1 IP and stops for the day at $${FREE_BOT.dailyTargetUsd} profit, Pro ${DAILY_TARGET_PCT.pro}% on ${MT5_PLANS.pro.licenses} IPs, Elite ${DAILY_TARGET_PCT.elite}% on ${MT5_PLANS.elite.licenses} IPs and Ultra ${DAILY_TARGET_PCT.ultra}% on ${MT5_PLANS.ultra.licenses} IPs. ${TARGET_DISCLAIMER} The Founding Program gives approved, ID-verified members their chosen plan (Pro or Elite) free for 30 days.`],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at a fixed daily target of $${FREE_BOT.dailyTargetUsd} (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
   ["Who can use the Terminal?", `Every signed-in user can open the Terminal. Its paid indicators run for a set time each UTC day by plan: Free ${TERMINAL_DAILY_HOURS.free} hours, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite} and Ultra all day. Time counts only while one of them is switched on and the Terminal is open; when it is used up they lock and disappear until 00:00 UTC.`],
+  ["Is News Trading free?", `Yes. The News Trading page is free on every plan, including Free. It counts down to the next US high-impact release (NFP, CPI, FOMC, PCE, PPI, GDP) and shows how Gold moved after the same kind of result in the last ${RELEASES_PER_EVENT} real releases. It is a read of past reactions, not a promise of the next move.`],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
 ];
@@ -66,11 +68,14 @@ type CardKey = "free" | PlanKey;
 type Mark = boolean | string;
 /** One comparison row: values for Free, Pro, Elite, Ultra and Enterprise. */
 type Row = { f: string; v: [Mark, Mark, Mark, Mark, Mark]; logo?: string; invert?: boolean };
-type GroupIcon = "terminal" | "bot" | "platform" | "models" | null;
+type GroupIcon = "terminal" | "bot" | "news" | "platform" | "models" | null;
 type Group = { title: string; icon: GroupIcon; rows: Row[]; bot?: boolean };
 
 const TOKENS = (id: string) => `${PLAN_DAILY_TOKEN_LIMITS[id] / 1_000_000}M`;
 const MODEL_COUNT = MODEL_CATALOG.length;
+
+/** News Trading bullets on every plan card: the page is free for every signed-in account. */
+const NEWS_ITEMS = ["Free on every plan", "Next US news countdown", "Gold UP / DOWN read"];
 
 const K = (n: number) => `${n} key${n > 1 ? "s" : ""}`;
 const H = (h: number) => (h >= 24 ? "All day" : `${h}h a day`);
@@ -119,7 +124,6 @@ const GROUPS: ReadonlyArray<Group> = [
       { f: "Zone + FVG with non-overlapping BSL / SSL", v: ALL },
       { f: "Time left shown on the chart", v: ALL },
       { f: "Ask Jenvu on the chart", v: ALL },
-      { f: "News Impact countdown and UP / DOWN cards", v: ALL },
     ],
   },
   {
@@ -135,6 +139,19 @@ const GROUPS: ReadonlyArray<Group> = [
       { f: "Bot Usage page with ON / OFF log", v: ALL },
       { f: "Safe hours: London open block, New York off", v: ALL },
       { f: "Download, presets & updates", v: ALL },
+    ],
+  },
+  {
+    title: "News Trading",
+    icon: "news",
+    rows: [
+      { f: "Free on every plan, no extra cost", v: ALL },
+      { f: "NFP, CPI, FOMC, PCE, PPI and GDP releases", v: ALL },
+      { f: "Live countdown to the next US high-impact release", v: ALL },
+      { f: "Last-hour pre-news banner", v: ALL },
+      { f: "Gold UP / DOWN read if the number beats or misses", v: ALL },
+      { f: `Confidence from the last ${RELEASES_PER_EVENT} real releases`, v: ALL },
+      { f: "Measured 5-minute price reactions", v: ALL },
     ],
   },
   {
@@ -183,6 +200,7 @@ const CUSTOM: ReadonlyArray<[string, string]> = [
 function GroupMark({ icon }: { icon: GroupIcon }) {
   if (icon === "terminal") return <TerminalLogo className="h-[18px] w-[18px]" />;
   if (icon === "bot") return <JxBotLogo className="h-[18px] w-[18px]" />;
+  if (icon === "news") return <NewsLogo className="h-[18px] w-[18px]" />;
   if (icon === "platform") return <PlatformLogo className="h-[18px] w-[18px]" />;
   if (icon === "models") {
     return (
@@ -294,8 +312,8 @@ function PricingPage() {
 
       {/* HEADER */}
       <section className="mx-auto max-w-[900px] px-5 pb-10 pt-16 text-center sm:px-8 sm:pt-24">
-        <div className="mx-auto flex items-center justify-center gap-3.5" aria-label="Terminal, JX Bot and Platform">
-          {([["Terminal", TerminalLogo], ["JX Bot", JxBotLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
+        <div className="mx-auto flex items-center justify-center gap-3.5" aria-label="Terminal, JX Bot, News Trading and Platform">
+          {([["Terminal", TerminalLogo], ["JX Bot", JxBotLogo], ["News Trading", NewsLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
             <Logo key={label} className="h-[22px] w-[22px] text-foreground" />
           ))}
         </div>
@@ -353,6 +371,7 @@ function PricingPage() {
                     : [`${plan.ips} IP${plan.ips > 1 ? "s" : ""} included`, `${DAILY_TARGET_PCT[plan.key]}% daily target per IP`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`]
                 }
               />
+              <FeatureList title="News Trading" items={NEWS_ITEMS} />
             </article>
           ))}
         </div>
@@ -500,7 +519,7 @@ function FeatureList({ title, items, muted }: { title: string; items: string[]; 
   return (
     <div className="mt-6">
       <p className="flex items-center gap-2 border-b border-gc-line pb-2.5 text-[13px] text-gc-ink-muted">
-        {title.startsWith("JX") ? <JxBotLogo className="h-3.5 w-3.5" /> : title.includes("Terminal") ? <TerminalLogo className="h-3.5 w-3.5" /> : <PlatformLogo className="h-3.5 w-3.5" />}
+        {title.startsWith("JX") ? <JxBotLogo className="h-3.5 w-3.5" /> : title.startsWith("News") ? <NewsLogo className="h-3.5 w-3.5" /> : title.includes("Terminal") ? <TerminalLogo className="h-3.5 w-3.5" /> : <PlatformLogo className="h-3.5 w-3.5" />}
         {title}
       </p>
       <ul className="mt-3.5 space-y-2.5 text-[13.5px]">

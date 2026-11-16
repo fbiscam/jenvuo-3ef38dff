@@ -434,7 +434,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Pro — $29 / month" },
           { type: "ul", items: [
             "4,000,000 tokens per day.",
-            "$25 API credit per month.",
+            "$19 API credit per month.",
             "AI terminal chat billed from the included wallet.",
             "Personal API keys for the Jenvu API endpoint.",
             "Full Gold signal engine.",
@@ -445,7 +445,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Elite — $59 / month" },
           { type: "ul", items: [
             "5,000,000 tokens per day.",
-            "$59 API credit per month.",
+            "$39 API credit per month.",
             "Everything in Pro, plus senior review on analysis.",
             "Dedicated Gold scanner with DXY overlay.",
             "API access and webhooks.",
@@ -455,7 +455,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Ultra — $99 / month" },
           { type: "ul", items: [
             "10,000,000 tokens per day.",
-            "$99 API credit per month.",
+            "$59 API credit per month.",
             "Everything in Elite.",
             "Priority desk support.",
           ]},
@@ -483,9 +483,9 @@ export const collections: Collection[] = [
           { type: "h2", content: "How wallets refresh" },
           { type: "ul", items: [
             "Free: $2 wallet each month (~5 scans).",
-            "Pro: $25 API credit added on each billing date.",
-            "Elite: $59 API credit added on each billing date.",
-            "Ultra: $99 API credit added on each billing date.",
+            "Pro: $19 API credit added on each billing date.",
+            "Elite: $39 API credit added on each billing date.",
+            "Ultra: $59 API credit added on each billing date.",
             "Plan credit expires 30 days after it is added (Founding credit too). The oldest credit is spent first.",
           ]},
           { type: "h2", content: "Daily token usage" },
@@ -508,7 +508,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is open to every signed-in account. Its paid indicators run for a set time each UTC day by plan (Free 2 hours, Pro 8, Elite 16, Ultra all day) and lock until 00:00 UTC once the time is used; approved Founding Program members (100 seats a month) get their plan's hours. Founding members have 2 days after approval to upload their ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds the plan's API credit ($25 Pro, $50 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal. Plans are open to everyone and can be picked or upgraded anytime from Payments (credit top-ups are no longer sold). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal is open to every signed-in account. Its paid indicators run for a set time each UTC day by plan (Free 2 hours, Pro 8, Elite 16, Ultra all day) and lock until 00:00 UTC once the time is used; approved Founding Program members (100 seats a month) get their plan's hours. Founding members have 2 days after approval to upload their ID; the Terminal and JX Bot open once it is verified, and the Jenvu team then adds the plan's API credit ($19 Pro, $39 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the Terminal, JX Bot and Founding credit close until you buy a plan and your payment is approved. Credit never unlocks the Terminal. Plans are open to everyone and can be picked or upgraded anytime from Payments (credit top-ups are no longer sold). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [

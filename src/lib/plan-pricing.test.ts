@@ -15,15 +15,15 @@ describe("plan pricing", () => {
     expect(planCoveredBy(59)).toBe("elite");
     expect(planCoveredBy(99, false)).toBe("ultra");
   });
-  it("a plan payment adds only the plan's API credit: Pro $25, Elite $59, Ultra $99", () => {
-    expect(PLAN_API_CREDIT.elite).toBe(59);
-    expect(orderCreditToAdd({ planId: "elite", topupCreditUsd: 99 })).toBe(59);
-    expect(orderCreditToAdd({ planId: "pro", topupCreditUsd: 49 })).toBe(25);
-    expect(orderCreditToAdd({ planId: "ultra", topupCreditUsd: 169 })).toBe(99);
+  it("a plan payment adds only the plan's API credit: Pro $19, Elite $39, Ultra $59", () => {
+    expect(PLAN_API_CREDIT.elite).toBe(39);
+    expect(orderCreditToAdd({ planId: "elite", topupCreditUsd: 59 })).toBe(39);
+    expect(orderCreditToAdd({ planId: "pro", topupCreditUsd: 29 })).toBe(19);
+    expect(orderCreditToAdd({ planId: "ultra", topupCreditUsd: 99 })).toBe(59);
   });
   it("credit already added by the plan switch counts toward the plan credit", () => {
-    expect(orderCreditToAdd({ planId: "elite", topupCreditUsd: 0, gainedFromPlanSwitch: 59 })).toBe(0);
-    expect(orderCreditToAdd({ planId: "elite", topupCreditUsd: 0, gainedFromPlanSwitch: 9 })).toBe(50);
+    expect(orderCreditToAdd({ planId: "elite", topupCreditUsd: 0, gainedFromPlanSwitch: 39 })).toBe(0);
+    expect(orderCreditToAdd({ planId: "elite", topupCreditUsd: 0, gainedFromPlanSwitch: 9 })).toBe(30);
   });
   it("a credit top-up adds exactly the credit bought", () => {
     expect(orderCreditToAdd({ planId: null, topupCreditUsd: 40 })).toBe(40);

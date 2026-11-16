@@ -11,7 +11,7 @@ describe("billing plan features", () => {
   it("lists Terminal, API credit and keys", () => {
     const f = planFeatures("ultra");
     expect(f).toContain("Terminal paid strategies");
-    expect(f).toContain("$99 API credit");
+    expect(f).toContain("$59 API credit");
     expect(f).toContain("7 API keys");
   });
 });

@@ -1805,7 +1805,7 @@ function DashboardHero({
       copy: "Capture any chart, get Claude Opus 5 analysis, and unlock a mandatory \nClaude Fable 5.1 senior review on eligible plans.",
       action: "Compare plans",
       to: "/pricing" as const,
-      note: "Plans from $29 · $25 API credit included",
+      note: "Plans from $29 · $19 API credit included",
     },
     {
       variant: "model" as const,

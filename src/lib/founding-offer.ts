@@ -6,11 +6,11 @@ export type FoundingPlan = (typeof FOUNDING_PLANS)[number];
 export const FOUNDING_PLAN: FoundingPlan = "pro";
 export const FOUNDING_MONTHS = 1;
 export const FOUNDING_PLAN_DAYS = 30;
-/** Founding members get only their plan's API credit (Pro $25, Elite $50), not a separate bonus. */
+/** Founding members get only their plan's API credit (Pro $19, Elite $39), not a separate bonus. */
 export function foundingCreditFor(plan: string | null | undefined): number {
   return FOUNDING_API_CREDIT[foundingPlanFor(plan)];
 }
-/** "$25 (Pro) or $50 (Elite)" for copy that doesn't know the member's plan. */
+/** "$19 (Pro) or $39 (Elite)" for copy that doesn't know the member's plan. */
 export const FOUNDING_CREDIT_LABEL = `$${FOUNDING_API_CREDIT.pro} (Pro) or $${FOUNDING_API_CREDIT.elite} (Elite)`;
 /** Founding credit ends together with the Founding plan. */
 export const FOUNDING_CREDIT_DAYS = 30;

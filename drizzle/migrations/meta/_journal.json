@@ -372,6 +372,13 @@
       "when": 1794815134380,
       "tag": "0052_lock_cancel_user_plan",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1794818150153,
+      "tag": "0053_lower_plan_api_credit",
+      "breakpoints": true
     }
   ]
 }
