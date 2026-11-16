@@ -18,7 +18,7 @@ function StartBuilding({ className = pillLight }: { className?: string }) {
     );
   }
   return (
-    <Link to="/auth" className={className}>
+    <Link to="/auth" search={{ mode: "signup" } as never} className={className}>
       Start building <ArrowUpRight className="h-3.5 w-3.5" />
     </Link>
   );

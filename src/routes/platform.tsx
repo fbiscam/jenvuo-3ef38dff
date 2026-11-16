@@ -91,7 +91,7 @@ function StartBuilding({ className = pillLight }: { className?: string }) {
     );
   }
   return (
-    <Link to="/auth" className={className}>
+    <Link to="/auth" search={{ mode: "signup" } as never} className={className}>
       Start building <ArrowUpRight className="h-3.5 w-3.5" />
     </Link>
   );
@@ -142,7 +142,7 @@ function StartMenu() {
             </>
           ) : (
             <>
-              <Link to="/auth" className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
+              <Link to="/auth" search={{ mode: "signup" } as never} className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">
                 Get an API key
               </Link>
               <Link to="/models" className="block rounded-xl px-3 py-2.5 text-sm hover:bg-gc-surface">

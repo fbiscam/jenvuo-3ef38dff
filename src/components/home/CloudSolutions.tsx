@@ -61,9 +61,7 @@ export function CloudSolutions() {
               <span className="hidden sm:inline">the way you trade Gold, Bitcoin and EUR/USD.</span>
               <span className="sm:hidden">how you trade.</span>
             </p>
-            <Link to="/auth" className="mt-5 inline-flex rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy">
-              Start for free
-            </Link>
+            <SignUpCta label="Start for free" className="mt-5 inline-flex rounded-full bg-gc-blue-deep px-5 py-2.5 text-sm font-medium text-gc-on-blue hover:bg-gc-navy" />
           </div>
         </div>
 

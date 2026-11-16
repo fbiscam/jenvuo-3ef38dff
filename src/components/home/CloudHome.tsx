@@ -337,7 +337,7 @@ const AUDIENCE_TITLE: Record<string, string> = {
   SUPPORT: "Support",
 };
 const AUDIENCE_LINK: Record<string, string> = {
-  "/auth": "Get started",
+  "/auth": "Sign up",
   "/pricing": "View pricing",
   "/insights": "Read insights",
   "/ai-engine": "View models",
@@ -376,6 +376,7 @@ export function CloudAudiences() {
             <p className="mt-7 flex-1 text-base leading-relaxed text-gc-ink">{c.text}</p>
             <Link
               to={c.to}
+              search={c.to === "/auth" ? ({ mode: "signup" } as never) : undefined}
               className="mt-9 inline-flex w-fit items-center gap-1 border-b border-gc-ink pb-0.5 text-[17px] text-gc-ink hover:opacity-70"
             >
               {AUDIENCE_LINK[c.to] ?? "Learn more"} <ArrowUpRight className="h-4 w-4" />

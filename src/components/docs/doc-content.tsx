@@ -49,7 +49,7 @@ export const DOC_GROUPS: DocGroup[] = [
           <>
             <p>Anyone can create a Jenvu account (one person, one account). Every new account starts with a free trial: $30 API credit and 14 days of Pro features.</p>
             <ol>
-              <li>Open <a href="https://auth.jenvu.com/sign-in">auth.jenvu.com/sign-in</a> and choose Create an account.</li>
+              <li>Open <a href="https://auth.jenvu.com/sign-in?mode=signup">auth.jenvu.com/sign-in</a> and choose Create an account.</li>
               <li>Enter the 6-digit code we email you.</li>
               <li>You land on API keys: create your first key and start building.</li>
             </ol>
