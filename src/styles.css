@@ -2787,8 +2787,14 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
   .why-hero h1 { font-size: 40px; }
   .why-scene { margin-top: 42px; aspect-ratio: 1.05; }
   .why-float-code { height: 210px; width: 47%; }
-  .why-float-code .why-code-compact { font-size: 10px; }
-  .why-window-label { font-size: 9px; }
+  .why-float-code .why-code-compact { font-size: 9px; line-height: 1.6; }
+  .why-window-label { font-size: 10px; margin-bottom: 8px; }
+  .why-floating { padding: 10px; border-radius: 10px; }
+  .why-chat-bubble { font-size: 10px; padding: 7px; margin: 0 0 8px; }
+  .why-thinking { font-size: 9px; }
+  .why-bot-chip { font-size: 10px; padding: 3px; gap: 5px; margin-top: 3px; }
+  .why-status-icon { width: 16px; height: 16px; }
+  .why-float-bot { top: 58%; }
   .why-window-dots { gap: 3px; }
   .why-window-dots i { width: 6px; height: 6px; }
   .why-float-chat { width: 40%; }
