@@ -8,7 +8,9 @@ import ProductPreview, { type ProductId } from "./ProductPreview";
 import { PUBLIC_API_MODEL_IDS } from "@/lib/public-api-models";
 import { DAILY_DRAWDOWN_PCT, dailyTargetLabel, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
 import JenvuMark from "@/components/JenvuMark";
-import productFilm from "@/assets/videos/jenvu-products.mp4.asset.json";
+import { TerminalLogo, JxBotLogo, NewsLogo, PlatformLogo } from "@/components/brand/ProductLogos";
+
+const productMarks = { terminal: TerminalLogo, bot: JxBotLogo, news: NewsLogo, api: PlatformLogo };
 
 const products = [
   { id: "terminal", title: "Terminal", icon: ChartCandlestick, intro: "See the market clearly. Live candles, rule-based analysis and conversational AI on one trading desk.", points: ["Gold, Bitcoin and EUR/USD, with multiple timeframes", "Structure, liquidity sweeps, zones and fair value gaps", "Ask about the chart; get answers grounded in its analysis"], href: "https://dash.jenvu.com/terminal", cta: "Open Terminal" },
@@ -38,7 +40,7 @@ export default function ProductsPage() {
       let distance = Infinity;
       rows.current.forEach((row, id) => {
         const rect = row.getBoundingClientRect();
-        const next = Math.abs(rect.top + Math.min(rect.height * .3, 100) - target);
+        const next = rect.top <= target && rect.bottom > target ? 0 : Math.min(Math.abs(rect.top - target), Math.abs(rect.bottom - target));
         if (next < distance) { distance = next; closest = id; }
       });
       setActive(closest);
@@ -62,16 +64,14 @@ export default function ProductsPage() {
       <section className="products-showcase" aria-label="Jenvu products">
         <div className="products-mobile-tabs" role="tablist" aria-label="Products">{products.map(p => <Button key={p.id} role="tab" aria-selected={active === p.id} variant="ghost" onClick={() => {setActive(p.id); rows.current.get(p.id)?.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block:'start'});}}>{p.title}</Button>)}</div>
         <div className="products-copy-list">{products.map(p => <section key={p.id} data-product={p.id} ref={el => { if(el) rows.current.set(p.id,el); else rows.current.delete(p.id); }} className={`products-copy ${active === p.id ? 'is-active' : ''}`}>
-          <h2><p.icon size={29}/>{p.title}</h2><p className="products-intro">{p.intro}</p>
+          <h2>{(() => { const Mark = productMarks[p.id]; return <Mark className="size-8 shrink-0"/>; })()}{p.title}</h2><p className="products-intro">{p.intro}</p>
           <ul>{p.points.map(point => <li key={point}><Check size={15}/><span>{point}</span></li>)}</ul>
           {p.id === 'bot' && <p className="mt-5 text-xs leading-relaxed text-muted-foreground">{TARGET_DISCLAIMER}</p>}
-          <Button asChild variant="link" className="mt-5 px-0"><a href={p.href}>{p.cta}<ArrowRight/></a></Button>
+          <Button asChild variant="secondary" className="mt-7 rounded-full px-6"><a href={p.href}>{p.cta}<ArrowRight/></a></Button>
           <div className="products-inline-preview"><ProductPreview product={p.id}/></div>
         </section>)}</div>
         <div className="products-sticky-preview"><ProductPreview key={active} product={active}/><p className="mt-3 text-center text-xs text-muted-foreground">Illustrative product preview</p></div>
       </section>
-
-      <section className="products-section products-film"><div className="mb-8 flex flex-wrap items-end justify-between gap-4"><h2>Meet the Jenvu workspace</h2><p className="text-sm text-muted-foreground">Terminal. JX Bot. News Trading. Platform & API.</p></div><video controls playsInline preload="metadata" aria-label="Jenvu products film" className="aspect-video w-full rounded-2xl bg-foreground" src={new URL(productFilm.url, "https://jenvu.com").href}/><p className="mt-3 text-xs leading-relaxed text-muted-foreground">Illustrative product film with music. Saved Terminal views; simulated bot status, chart labels and news values. Not a live account recording.</p></section>
 
       <section className="products-section"><h2>And much more</h2><p className="mt-4 text-base">The tools behind your trading workspace — from market analysis to your next app.</p><div className="products-feature-grid">{features.map(([Icon,title,text]) => <div key={title} className="flex items-start gap-3"><Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"/><div><h3 className="text-sm font-medium">{title}</h3><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{text}</p></div></div>)}</div></section>
 

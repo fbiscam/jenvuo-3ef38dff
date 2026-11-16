@@ -9,15 +9,15 @@ import { PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from '@/lib/free-plan'
 import { WhyProductPreview, WhyWorkspaceScene } from '@/components/WhyWorkspaceScene'
 import { JxBotLogo, NewsLogo, PlatformLogo, TerminalLogo } from '@/components/brand/ProductLogos'
 import { ReviewPlatformMark, type ReviewPlatform } from '@/components/brand/ReviewPlatformMark'
-import portrait1 from '@/assets/why-profile-1.jpg'
-import portrait2 from '@/assets/why-profile-2.jpg'
-import portrait3 from '@/assets/why-profile-3.jpg'
-import portrait4 from '@/assets/why-profile-4.jpg'
-import portrait5 from '@/assets/why-profile-5.jpg'
-import portrait6 from '@/assets/why-profile-6.jpg'
-import portrait7 from '@/assets/why-profile-7.jpg'
-import portrait8 from '@/assets/why-profile-8.jpg'
-import portrait9 from '@/assets/why-profile-9.jpg'
+import portrait1 from '@/assets/why-profile-hd-1.jpg'
+import portrait2 from '@/assets/why-profile-hd-2.jpg'
+import portrait3 from '@/assets/why-profile-hd-3.jpg'
+import portrait4 from '@/assets/why-profile-hd-4.jpg'
+import portrait5 from '@/assets/why-profile-hd-5.jpg'
+import portrait6 from '@/assets/why-profile-hd-6.jpg'
+import portrait7 from '@/assets/why-profile-hd-7.jpg'
+import portrait8 from '@/assets/why-profile-hd-8.jpg'
+import portrait9 from '@/assets/why-profile-hd-9.jpg'
 
 export const Route = createFileRoute('/about')({
   head: () => ({
@@ -68,7 +68,7 @@ const samples = [
   { name: 'Sophie', image: portrait6, quote: 'Starting on Free gives me room to understand the workspace before choosing a plan. I can look at the Terminal, explore News Trading and try the API with the monthly credit. Then compare the actual allowances rather than buying a collection of unrelated tools. For me, the useful part is the connection between them: research, chart context and account controls together, while Gold analysis stays separate from the EUR/USD bot. That distinction makes the whole desk easier to understand.' },
   { name: 'Marcus', image: portrait9, quote: 'Less switching between tools, more attention on the question in front of me. A simple workspace with clear product boundaries is a good starting point.' },
 ]
-const reviewPlatforms: ReviewPlatform[] = ['x', 'mt5', 'tradingview', 'binance', 'ctrader', 'bybit', 'tradingview', 'mt5', 'x']
+const reviewPlatforms: ReviewPlatform[] = ['x', 'mt5', 'tradingview', 'binance', 'tradingview', 'binance', 'tradingview', 'mt5', 'x']
 
 function Actions() {
   const { user } = useAuthUser()
