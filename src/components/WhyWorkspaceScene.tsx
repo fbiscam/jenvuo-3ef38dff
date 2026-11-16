@@ -1,4 +1,5 @@
 import { Bot, Check, Cloud, GitBranch, ShieldCheck, Sparkles } from 'lucide-react'
+import { JxBotLogo, PlatformLogo } from '@/components/brand/ProductLogos'
 
 function WindowDots() { return <span className="why-window-dots" aria-hidden><i /><i /><i /></span> }
 function CodeSnippet({ compact = false }: { compact?: boolean }) {
@@ -17,7 +18,7 @@ export function WhyWorkspaceScene() {
     </div>
     <div className="why-floating why-float-chat"><div className="why-window-label">Jenvu AI<Sparkles size={13} /></div><div className="why-chat-bubble">Explain the Gold market structure.</div><div className="why-thinking"><span><i /><i /><i /></span> Thinking</div></div>
     <div className="why-floating why-float-bot"><div className="why-window-label">JX Bot</div><div className="why-bot-chip"><span className="why-status-icon why-status-success"><Bot size={12} /></span> EUR/USD</div><div className="why-bot-chip"><span className="why-status-icon why-status-neutral"><ShieldCheck size={12} /></span> Risk controls</div><div className="why-bot-chip"><span className="why-status-icon why-status-warm"><Check size={12} /></span> IP verification</div></div>
-    <div className="why-app-tile why-app-main"><Cloud className="size-10 text-gc-blue" strokeWidth={1.75} /></div><div className="why-app-tile why-app-small"><Bot className="size-10 text-gc-blue" strokeWidth={1.75} /></div>
+    <div className="why-app-tile why-app-main"><PlatformLogo className="size-10" /></div><div className="why-app-tile why-app-small"><JxBotLogo className="size-10" /></div>
   </div>
 }
 
