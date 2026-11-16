@@ -351,6 +351,13 @@
       "when": 1794809913615,
       "tag": "0049_terminal_usage_tick_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1794812028114,
+      "tag": "0050_founding_end_notice_bot_free",
+      "breakpoints": true
     }
   ]
 }

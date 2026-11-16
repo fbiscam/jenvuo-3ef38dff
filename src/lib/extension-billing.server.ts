@@ -95,7 +95,7 @@ export async function getExtensionEntitlement(userId: string) {
       : result.rateLimited
         ? rateBlock!
       : result.status === 429
-        ? `Daily token limit reached (${dailyTokenLimit.toLocaleString()} tokens). Add credits to increase the balance-based allowance, or wait until 00:00 UTC.`
+        ? `Daily token limit reached (${dailyTokenLimit.toLocaleString()} tokens). Upgrade your plan for a higher allowance, or wait until 00:00 UTC.`
         : result.status === 402
           ? 'Low balance. Add funds to continue using extension AI.'
           : 'Extension AI is not included in your current plan. Upgrade to Pro, Elite, or Ultra to continue.',

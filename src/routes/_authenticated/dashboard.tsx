@@ -1931,7 +1931,7 @@ function UsageAnalytics({
   const totalScans = points.reduce((s, p) => s + p.scans, 0);
   const totalSpent = points.reduce((s, p) => s + p.spent, 0);
   const totalTokens = points.reduce((s, p) => s + p.tokens, 0);
-  // Show the real wallet balance (same number as the Billing page). Top-ups can
+  // Show the real wallet balance (same number as the Billing page). Plan credit can
   // push it above the monthly allowance, so never cap it for display.
   const balance = stats ? Math.max(0, stats.balance) : 0;
   const remainingPct =
@@ -2052,7 +2052,7 @@ function UsageAnalytics({
               className="mt-3 w-fit bg-foreground text-background hover:bg-foreground/85"
             >
               <Link to="/dashboard/pay">
-                <CreditCard className="h-3.5 w-3.5" /> Add credits
+                <CreditCard className="h-3.5 w-3.5" /> Upgrade plan
               </Link>
             </Button>
           </div>

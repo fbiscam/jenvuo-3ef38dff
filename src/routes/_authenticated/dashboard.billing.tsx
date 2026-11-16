@@ -183,7 +183,7 @@ function Billing() {
               ) : (
                 <Link to="/pricing" className={pill}>Choose a plan</Link>
               )}
-              <Link to="/dashboard/pay" search={{ purchase: "credits" }} className={pillSolid}>Add credits</Link>
+              <Link to="/dashboard/pay" className={pillSolid}>Upgrade plan</Link>
             </div>
           </div>
 

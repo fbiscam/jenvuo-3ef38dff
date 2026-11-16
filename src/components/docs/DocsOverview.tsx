@@ -392,7 +392,7 @@ export function DocsOverview() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl bg-gc-surface p-5">
             <p className="flex items-center gap-2 text-[16px] font-medium text-gc-ink"><Waves className="h-4 w-4" /> Billing and availability</p>
-            <p className="mt-2 text-[14px] leading-[1.6] text-gc-ink-muted">Usage is taken from your credit balance. When credit runs out, requests stop until you top up or your plan renews.</p>
+            <p className="mt-2 text-[14px] leading-[1.6] text-gc-ink-muted">Usage is taken from your credit balance. When credit runs out, requests stop until your plan renews or you upgrade.</p>
           </div>
           <div className="rounded-2xl bg-gc-surface p-5">
             <p className="text-[16px] font-medium text-gc-ink">Plans</p>

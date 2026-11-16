@@ -501,7 +501,7 @@ function TerminalPage() {
       addMessage({
         role: "assistant",
         text: /INSUFFICIENT_CREDITS|Low balance/i.test(message)
-          ? "Your credit balance is too low for AI replies. Add credits from Payments and try again. Charts, indicators and zones keep working without credits."
+          ? "Your credit balance is too low for AI replies. Upgrade your plan from Payments or wait for your monthly credit. Charts, indicators and zones keep working without credits."
           : /Daily token limit/i.test(message)
             ? message
             : /not included|Upgrade to/i.test(message)

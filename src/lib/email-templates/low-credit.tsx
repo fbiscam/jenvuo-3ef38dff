@@ -45,7 +45,7 @@ const LowCreditEmail = ({
           <Text style={s.text}>
             Heads up <span style={mono}>{recipient}</span> — your{' '}
             <strong style={{ color: COLORS.ink }}>{plan}</strong> plan has
-            dropped below {threshold} credits. Top up or upgrade to keep your
+            dropped below {threshold} credits. Upgrade your plan to keep your
             voice desk and alerts running without interruption.
           </Text>
 
@@ -60,7 +60,7 @@ const LowCreditEmail = ({
               <tr>
                 <td style={{ paddingRight: '10px' }}>
                   <Link href={topUpUrl} style={s.button}>
-                    Top Up Credits →
+                    Upgrade plan →
                   </Link>
                 </td>
                 <td>

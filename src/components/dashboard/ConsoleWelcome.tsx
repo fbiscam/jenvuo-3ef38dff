@@ -35,13 +35,13 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
       <div className="mt-8 grid gap-4 md:grid-cols-2">
         <div className="console-card flex min-h-[184px] flex-col justify-between p-6">
           <p className="text-[16px] font-medium text-foreground">
-            {balance > 0 ? "Your API credit balance." : "Add credits to start using the API."}
+            {balance > 0 ? "Your API credit balance." : "Pick a plan to get more API credit."}
           </p>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
             <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
               {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}
             </p>
-            <Link to="/dashboard/billing" className="console-pill console-pill-solid">Add credits</Link>
+            <Link to="/dashboard/pay" className="console-pill console-pill-solid">Upgrade plan</Link>
           </div>
         </div>
 

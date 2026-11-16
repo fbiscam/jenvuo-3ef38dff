@@ -47,6 +47,7 @@ function RefundPage() {
       <section className="space-y-3">
         <H2>4. Credit top-ups</H2>
         <UL>
+          <li>Credit top-ups are no longer sold; these rules cover top-ups bought earlier.</li>
           <li>Credit top-ups are non-refundable once any credit from that top-up has been used.</li>
           <li>A <strong>fully unused</strong> top-up may be refunded within 7 days of purchase, at our discretion, on written request.</li>
           <li>Top-ups do not expire while your account remains active, but they are not transferable between accounts.</li>

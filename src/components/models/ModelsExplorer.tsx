@@ -315,7 +315,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api", inShell = f
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <Link to="/dashboard/billing" className="console-pill h-8 px-3.5 text-[13px]">See plans</Link>
-            <Link to="/dashboard/billing" className="console-pill console-pill-solid h-8 px-3.5 text-[13px]">Top up</Link>
+            <Link to="/dashboard/pay" className="console-pill console-pill-solid h-8 px-3.5 text-[13px]">Upgrade</Link>
           </div>
         </div>
 
