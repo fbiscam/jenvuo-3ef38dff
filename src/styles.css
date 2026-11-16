@@ -2710,8 +2710,8 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
 .why-wordmark { font-size: 12px; font-weight: 700; }
 .why-bybit { font-size: 13px; }
 .why-bybit span { color: var(--why-brand-gold); }
-.why-scene { position: relative; width: 100%; aspect-ratio: 1.15; perspective: 900px; }
-.why-floating { position: absolute; border: 1px solid var(--gc-line); background: var(--why-surface); box-shadow: var(--why-shadow); border-radius: 8px; padding: 17px; animation: why-float 7s ease-in-out infinite; }
+.why-scene { position: relative; width: 100%; aspect-ratio: 1.15; }
+.why-floating { position: absolute; border: 1px solid var(--gc-line); background: var(--why-surface); box-shadow: var(--why-shadow); border-radius: 14px; padding: 18px; animation: why-float 7s ease-in-out infinite; }
 .why-window-label { font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 14px; }
 .why-window-dots { display: inline-flex; gap: 5px; flex-shrink: 0; }
 .why-window-dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--why-dot-red); }
@@ -2721,33 +2721,33 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
 .why-syntax-string { color: var(--why-code-string); }
 .why-syntax-function { color: var(--why-code-function); }
 .why-syntax-property { color: var(--why-code-property); }
-.why-float-code .why-code-compact { padding: 0; font-size: 9px; line-height: 1.85; white-space: pre-wrap; overflow-wrap: anywhere; }
-.why-float-code { left: 0; top: 13%; width: 42%; height: 206px; transform: rotate(-2deg) rotateY(5deg); }
-.why-float-chat { right: 3%; top: 7%; width: 38%; height: 132px; transform: rotate(3deg) rotateY(-5deg); animation-delay: -2s; }
-.why-float-bot { right: 15%; top: 54%; width: 36%; height: 162px; transform: rotate(-2deg) rotateY(-4deg); animation-delay: -4s; }
+.why-float-code .why-code-compact { padding: 0; font-size: 11.5px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+.why-float-code { left: 0; top: 13%; width: 42%; height: 236px; overflow: hidden; }
+.why-float-chat { right: 3%; top: 7%; width: 38%; height: auto; animation-delay: -2s; }
+.why-float-bot { right: 15%; top: 54%; width: 36%; height: auto; animation-delay: -4s; }
 .why-code-lines { display: flex; gap: 5px; margin-block: 9px; }
 .why-code-lines i { display: block; width: 22%; height: 5px; background: var(--gc-line); border-radius: 3px; }
 .why-code-lines i:nth-child(3n) { width: 40%; }
 .why-code-stack { flex-wrap: wrap; padding-inline: 12px; gap: 8px 5px; }
 .why-code-stack i:nth-child(2n) { width: 56%; }
-.why-chat-bubble { background: var(--background); border-radius: 8px; padding: 10px; margin: 0 0 15px 12px; font-size: 10px; line-height: 1.5; }
+.why-chat-bubble { background: var(--background); border-radius: 8px; padding: 10px; margin: 0 0 14px 12px; font-size: 13px; line-height: 1.5; }
 .why-chat-bubble i { height: 5px; display: block; background: var(--gc-line); border-radius: 3px; margin-bottom: 5px; }
 .why-chat-bubble i:last-child { width: 65%; }
-.why-thinking { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--gc-ink-muted); }
+.why-thinking { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--gc-ink-muted); }
 .why-thinking > span { display: flex; gap: 3px; }
 .why-thinking i { width: 6px; height: 6px; background: var(--why-pulse); border-radius: 50%; animation: why-think 1.4s ease-in-out infinite; }
 .why-thinking i:nth-child(2) { animation-delay: .2s; }
 .why-thinking i:nth-child(3) { animation-delay: .4s; }
-.why-bot-chip { display: flex; align-items: center; gap: 8px; padding: 5px; margin-top: 5px; background: var(--gc-pill); border-radius: 20px; font-size: 11px; }
+.why-bot-chip { display: flex; align-items: center; gap: 8px; padding: 5px; margin-top: 5px; background: var(--gc-pill); border-radius: 20px; font-size: 13px; }
 .why-status-icon { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; }
 .why-status-success { background: var(--gc-green-soft); color: var(--gc-green); }
 .why-status-neutral { background: color-mix(in oklab, var(--why-neutral) 12%, var(--background)); color: var(--why-neutral); }
 .why-status-warm { background: color-mix(in oklab, var(--why-warm) 12%, var(--background)); color: var(--why-warm); }
-.why-app-tile { position: absolute; display: grid; place-items: center; width: 67px; height: 67px; border-radius: 8px; background: var(--foreground); color: var(--background); box-shadow: var(--why-shadow); transform: rotate(-8deg); animation: why-float 8s ease-in-out infinite; }
+.why-app-tile { position: absolute; display: grid; place-items: center; width: 67px; height: 67px; border-radius: 8px; background: var(--foreground); color: var(--background); box-shadow: var(--why-shadow); animation: why-float 8s ease-in-out infinite; }
 .why-app-tile svg { width: 40px; height: 40px; }
 .why-app-main { right: -2%; top: 51%; animation-delay: -3s; }
 .why-app-tile > span { color: var(--background); }
-.why-app-small { left: 25%; top: 82%; width: 57px; height: 57px; transform: rotate(5deg); background: var(--background); }
+.why-app-small { left: 25%; top: 82%; width: 57px; height: 57px; background: var(--background); }
 .why-app-small > span { color: var(--foreground); }
 .why-app-small svg { width: 32px; height: 32px; }
 .why-demo-window { border: 1px solid var(--gc-line); border-radius: 8px; background: var(--background); overflow: clip; font-size: 12px; }
@@ -2766,7 +2766,9 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
 .why-prompt { padding: 10px 14px; background: var(--why-surface); margin-bottom: 22px; border-radius: 8px; width: fit-content; margin-left: auto; }
 .why-stream { font-size: 12px; line-height: 1.8; padding-block: 12px; }
 .why-stream::after { content: ''; display: inline-block; width: 2px; height: 12px; background: var(--foreground); margin-left: 3px; animation: why-think 1s infinite; }
-@keyframes why-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+@keyframes why-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+.why-floating, .why-app-tile { backface-visibility: hidden; -webkit-font-smoothing: antialiased; }
+.why-window-label { font-size: 13px; font-weight: 600; }
 @keyframes why-think { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
 @keyframes why-log { 0%, 100% { translate: 0 0; } 50% { translate: 3px -2px; } }
 @keyframes why-ready { 0%, 100% { box-shadow: 0 0 0 0 transparent; } 50% { box-shadow: 0 0 0 3px var(--gc-green-soft); } }
@@ -2774,7 +2776,7 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
   .why-hero { min-height: 560px; gap: 16px; }
   .why-hero h1 { font-size: 44px; }
   .why-floating { padding: 12px; }
-  .why-float-code { height: 206px; }
+  .why-float-code { height: 230px; }
   .why-float-bot { width: 44%; }
   .why-benefit { padding: 24px; }
   .why-review-columns { columns: 2; }
@@ -2784,13 +2786,13 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
   .why-hero { min-height: auto; display: block; padding-block: 54px 24px; }
   .why-hero h1 { font-size: 40px; }
   .why-scene { margin-top: 42px; aspect-ratio: 1.05; }
-  .why-float-code { height: 196px; width: 47%; }
-  .why-float-code .why-code-compact { font-size: 8px; }
+  .why-float-code { height: 210px; width: 47%; }
+  .why-float-code .why-code-compact { font-size: 10px; }
   .why-window-label { font-size: 9px; }
   .why-window-dots { gap: 3px; }
   .why-window-dots i { width: 6px; height: 6px; }
   .why-float-chat { width: 40%; }
-  .why-float-bot { height: 150px; width: 43%; right: 11%; }
+  .why-float-bot { width: 43%; right: 11%; }
   .why-app-main { width: 49px; height: 49px; right: -1%; }
   .why-app-small { width: 46px; height: 46px; }
   .why-app-tile svg { width: 30px; height: 30px; }
