@@ -146,13 +146,13 @@ function PricingPage() {
 
   const plans: Array<{ key: PlanKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
     { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: "$25", bigLabel: "API credit every month", ips: 1, features: ["Terminal paid strategies", "ChatGPT 5.5 Pro and Grok 4.6", "1.5M daily tokens", "2 API keys"] },
-    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: "$59", bigLabel: "API credit & senior review", ips: 2, features: ["Everything in Pro", "Claude Fable 5.1 senior review", "5M daily tokens", "3 API keys, webhooks & logs"] },
-    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: "$99", bigLabel: "API credit & priority desk", ips: 5, features: ["Everything in Elite", "10M daily tokens", "5 API keys", "Priority desk support"] },
+    { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: "$59", bigLabel: "API credit & senior review", ips: 2, features: ["Claude Fable 5.1 senior review", "5M daily tokens", "3 API keys, webhooks & logs"] },
+    { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: "$99", bigLabel: "API credit & priority desk", ips: 5, features: ["10M daily tokens", "5 API keys", "Priority desk support"] },
   ];
 
-  const btnBase = "flex h-11 w-full items-center justify-center rounded-full text-[15px] font-medium transition";
+  const btnBase = "flex h-10 w-full items-center justify-center rounded-full text-[15px] font-medium transition";
   const btnStyle = (solid: boolean) =>
-    solid ? `${btnBase} bg-foreground text-background hover:opacity-90` : `${btnBase} border border-gc-line bg-background text-foreground hover:bg-gc-surface`;
+    solid ? `${btnBase} bg-foreground text-background hover:opacity-90` : `${btnBase} border border-gc-line bg-background text-foreground hover:bg-gc-pill`;
 
   const planCta = (key: PlanKey) => {
     const solid = key === "elite";
@@ -160,9 +160,9 @@ function PricingPage() {
     const isCurrent = currentPlan === key && !trialPro;
     const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
     // Pro during a running free trial shows the trial as the user's status.
-    if (trialPro) return <div className={`${btnBase} border border-gc-line bg-gc-surface`}>You Got Free Trial</div>;
-    if (isCurrent) return <div className={`${btnBase} border border-gc-line bg-gc-surface`}>Current plan</div>;
-    if (disabled) return <button type="button" disabled className={`${btnBase} cursor-not-allowed border border-gc-line bg-gc-surface text-gc-ink-muted`}>Locked in trial</button>;
+    if (trialPro) return <div className={`${btnBase} border border-gc-line bg-background text-gc-ink-muted`}>You Got Free Trial</div>;
+    if (isCurrent) return <div className={`${btnBase} border border-gc-line bg-background text-gc-ink-muted`}>Current plan</div>;
+    if (disabled) return <button type="button" disabled className={`${btnBase} cursor-not-allowed border border-gc-line bg-background text-gc-ink-muted`}>Locked in trial</button>;
     if (!signedOut && !buyGate.canBuy) {
       return (
         <button type="button" onClick={() => showBuyBlocked(buyGate.reason === "verify_id" ? "verify_id" : "apply", (t) => navigate({ to: t }))} className={btnStyle(solid)}>
@@ -222,25 +222,27 @@ function PricingPage() {
           {plans.map((plan) => (
             <article
               key={plan.key}
-              className={`relative flex flex-col rounded-2xl border bg-background p-6 ${plan.key === "elite" ? "border-foreground" : "border-gc-line"}`}
+              className="relative flex flex-col rounded-[20px] bg-gc-surface p-6 sm:p-7"
             >
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-[20px] font-medium tracking-tight">{plan.name}</h3>
+                <h3 className="text-[15px] font-medium">{plan.name}</h3>
                 {plan.key === "elite" && (
-                  <span className="rounded-full bg-gc-pill px-2.5 py-0.5 text-[12px] font-medium text-foreground">Most popular</span>
+                  <span className="rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium text-gc-ink-muted">Most popular</span>
                 )}
               </div>
-              <p className="mt-1.5 lg:min-h-[44px] text-[14px] leading-[1.55] text-gc-ink-muted">{plan.description}</p>
-              <div className="mt-5 flex items-baseline gap-1.5">
-                <span className="text-[44px] font-medium leading-none tracking-tight">${priceOf(planPrice(plan.key, founding))}</span>
-                <span className="text-[14px] text-gc-ink-muted">{suffix}</span>
+              <div className="mt-3 flex items-baseline gap-1.5">
+                <span className="text-[40px] font-medium leading-none tracking-tight">${priceOf(planPrice(plan.key, founding))}</span>
+                <span className="text-[13px] text-gc-ink-muted">{suffix}</span>
               </div>
               <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
                 {founding
                   ? `Terminal + API $${TERMINAL_API_PRICE[plan.key]} + JX Bot $${JX_BOT_PRICE[plan.key]}`
                   : "Terminal + API"}
               </p>
-              <div className="mt-5">{planCta(plan.key)}</div>
+              <div className="mt-4">{planCta(plan.key)}</div>
+              <p className="mt-6 min-h-[20px] text-[13px] text-gc-ink-muted">
+                {plan.key === "elite" ? "Everything in Pro, and:" : plan.key === "ultra" ? "Everything in Elite, and:" : plan.description}
+              </p>
               <Summary big={plan.big} label={plan.bigLabel} />
               <FeatureList title="Platform & AI" items={plan.features} />
               <FeatureList
@@ -372,9 +374,9 @@ function PricingPage() {
 
 function Summary({ big, label }: { big: string; label: string }) {
   return (
-    <div className="mt-6 border-t border-gc-line pt-5">
-      <p className="text-[26px] font-medium leading-none tracking-tight">{big}</p>
-      <p className="mt-1.5 text-[13px] text-gc-ink-muted">{label}</p>
+    <div className="mt-2">
+      <p className="text-[24px] font-medium leading-tight tracking-tight">{big}</p>
+      <p className="mt-0.5 text-[13px] text-gc-ink">{label}</p>
     </div>
   );
 }
@@ -383,7 +385,7 @@ function FeatureList({ title, items, muted }: { title: string; items: string[]; 
   const Icon = title.includes("AI") ? Layers : title.includes("Terminal") ? LineChart : Cpu;
   return (
     <div className="mt-6">
-      <p className="flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-wide text-gc-ink-muted">
+      <p className="flex items-center gap-1.5 border-b border-gc-line pb-2.5 text-[13px] text-gc-ink-muted">
         {title.startsWith("JX") ? (
           <JxFace className="h-4 w-4 shrink-0 bg-gc-ink" eyes="bg-background" />
         ) : (
@@ -391,7 +393,7 @@ function FeatureList({ title, items, muted }: { title: string; items: string[]; 
         )}{" "}
         {title}
       </p>
-      <ul className="mt-3 space-y-2.5 text-[14px]">
+      <ul className="mt-3.5 space-y-2.5 text-[13.5px]">
         {items.map((it) => (
           <li key={it} className={`flex items-start gap-2.5 ${muted ? "text-gc-ink-muted" : "text-gc-ink"}`}>
             {muted ? <Minus className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> : <Check className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />}
