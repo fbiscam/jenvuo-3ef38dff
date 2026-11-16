@@ -3,24 +3,18 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
 import {
   ArrowUpRight,
-  BookOpen,
   Braces,
   Check,
   ChevronDown,
   Code2,
   FileText,
   Globe,
-  Headphones,
   Image as ImageIcon,
   LineChart,
   Mail,
   MessageSquare,
-  PenTool,
   Plug,
   Sparkles,
-  Telescope,
-  Terminal,
-  UserRound,
 } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -490,63 +484,6 @@ function ExperiencesSection() {
   );
 }
 
-/* ---------- 6. Use cases ---------- */
-
-const USE_CASES = [
-  { icon: Terminal, t: "Coding", b: "Speed up development with models that write, review, debug and refactor code.", ex: "“Refactor this function and add tests.”", g: 1 },
-  { icon: Headphones, t: "Customer support", b: "Answer customer questions faster and route the hard ones to your team.", ex: "“Summarise this ticket and draft a reply.”", g: 2 },
-  { icon: UserRound, t: "Personalized recommendations", b: "Suggest the right product or content for each customer.", ex: "“Recommend three plans for this user’s usage.”", g: 3 },
-  { icon: Telescope, t: "Research & data analysis", b: "Turn complex data into clear insights and summaries.", ex: "“Find the trend in this CSV and explain it.”", g: 2 },
-  { icon: PenTool, t: "Content generation", b: "Write product copy, articles and posts in your brand’s voice.", ex: "“Write a 100-word product description.”", g: 3 },
-  { icon: BookOpen, t: "Education", b: "Build tutors and lesson tools that explain ideas step by step.", ex: "“Explain a liquidity sweep to a beginner.”", g: 1 },
-];
-
-function UseCaseCard({ u }: { u: (typeof USE_CASES)[number] }) {
-  const [open, setOpen] = React.useState(false);
-  return (
-    <div className="flex flex-col rounded-md bg-gc-surface p-2 text-left">
-      <div
-        className="flex aspect-[16/9] items-center justify-center rounded-sm"
-        style={{ backgroundImage: `var(--platform-aurora-${u.g})` }}
-      >
-        <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-background text-gc-ink">
-          <u.icon className="h-7 w-7" />
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col px-3 pb-3 pt-5">
-        <h3 className="text-xl font-medium">{u.t}</h3>
-        <p className="mt-2 flex-1 text-[15px] leading-relaxed text-gc-ink-muted">{u.b}</p>
-        {open && <p className="mt-3 rounded-lg bg-background px-4 py-3 text-sm italic text-gc-ink-muted">{u.ex}</p>}
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          className="mt-4 inline-flex w-full items-center justify-center gap-1 rounded-full bg-gc-panel py-2.5 text-sm hover:bg-gc-line/60"
-        >
-          {open ? "Hide example" : "View example prompt"}
-          <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function UseCases() {
-  return (
-    <section className="mx-auto max-w-6xl px-5 py-20 text-center">
-      <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">Use cases driven by our platform</h2>
-      <div className="mt-7 flex flex-wrap justify-center gap-3">
-        <ContactSales className={pillDark} />
-        <StartBuilding className={pillLight} />
-      </div>
-      <div className="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-        {USE_CASES.map((u) => (
-          <UseCaseCard key={u.t} u={u} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
 /* ---------- 7. Enterprise-grade features ---------- */
 
 const ENTERPRISE = [
@@ -611,7 +548,6 @@ function PlatformPage() {
         <StartSection />
         <AllInOnePlatformSection />
         <ExperiencesSection />
-        <UseCases />
         <Enterprise />
         <GetStartedSection />
       </main>

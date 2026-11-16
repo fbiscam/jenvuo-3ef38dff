@@ -1,28 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import terminalVideo from "@/assets/products/terminal.mp4?url";
-import botVideo from "@/assets/products/bot.mp4?url";
-import newsVideo from "@/assets/products/news.mp4?url";
-import apiVideo from "@/assets/products/api.mp4?url";
-import terminalPoster from "@/assets/products/terminal-poster.jpg";
-import botPoster from "@/assets/products/bot-poster.jpg";
-import newsPoster from "@/assets/products/news-poster.jpg";
-import apiPoster from "@/assets/products/api-poster.jpg";
+import featureVideo from "@/assets/videos/features-loop.mp4.asset.json";
+import featurePoster from "@/assets/videos/features-loop-poster.jpg.asset.json";
 
 export type ProductId = "terminal" | "bot" | "news" | "api";
-const clips = {
-  terminal: { video: terminalVideo, poster: terminalPoster, name: "Terminal research" },
-  bot: { video: botVideo, poster: botPoster, name: "JX Bot account checks" },
-  news: { video: newsVideo, poster: newsPoster, name: "News Trading release context" },
-  api: { video: apiVideo, poster: apiPoster, name: "Platform and API response" },
-};
 
-export default function ProductPreview({ product }: { product: ProductId }) {
+export default function ProductPreview() {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
-  const clip = clips[product];
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
@@ -44,9 +31,9 @@ export default function ProductPreview({ product }: { product: ProductId }) {
       observer.disconnect(); motion.removeEventListener("change", update);
       document.removeEventListener("visibilitychange", update); video.pause();
     };
-  }, [product, paused]);
-  return <div className="product-motion" data-preview={product}>
-    <video ref={ref} key={product} src={clip.video} poster={clip.poster} muted loop playsInline preload="metadata" aria-label={`${clip.name}, illustrative text animation`} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
+  }, [paused]);
+  return <div className="product-motion" data-preview="feature-loop">
+    <video ref={ref} src={new URL(featureVideo.url, "https://jenvu.com").href} poster={new URL(featurePoster.url, "https://jenvu.com").href} muted loop playsInline preload="metadata" aria-label="Terminal, Bot, News Trading and API, illustrative feature animation" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />
     <Button variant="ghost" size="icon-sm" className="product-motion-control" title={playing ? "Pause animation" : "Play animation"} aria-label={playing ? "Pause animation" : "Play animation"} onClick={() => {
       const video = ref.current;
       if (!video) return;

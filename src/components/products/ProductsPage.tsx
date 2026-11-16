@@ -62,15 +62,14 @@ export default function ProductsPage() {
       </section>
 
       <section className="products-showcase" aria-label="Jenvu products">
+        <div className="products-sticky-preview"><ProductPreview/><p className="mt-3 text-center text-xs text-muted-foreground">Illustrative product preview</p></div>
         <div className="products-mobile-tabs" role="tablist" aria-label="Products">{products.map(p => <Button key={p.id} role="tab" aria-selected={active === p.id} variant="ghost" onClick={() => {setActive(p.id); rows.current.get(p.id)?.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block:'start'});}}>{p.title}</Button>)}</div>
         <div className="products-copy-list">{products.map(p => <section key={p.id} data-product={p.id} ref={el => { if(el) rows.current.set(p.id,el); else rows.current.delete(p.id); }} className={`products-copy ${active === p.id ? 'is-active' : ''}`}>
           <h2>{(() => { const Mark = productMarks[p.id]; return <Mark className="size-8 shrink-0"/>; })()}{p.title}</h2><p className="products-intro">{p.intro}</p>
           <ul>{p.points.map(point => <li key={point}><Check size={15}/><span>{point}</span></li>)}</ul>
           {p.id === 'bot' && <p className="mt-5 text-xs leading-relaxed text-muted-foreground">{TARGET_DISCLAIMER}</p>}
           <Button asChild variant="secondary" className="mt-7 rounded-full px-6"><a href={p.href}>{p.cta}<ArrowRight/></a></Button>
-          <div className="products-inline-preview"><ProductPreview product={p.id}/></div>
         </section>)}</div>
-        <div className="products-sticky-preview"><ProductPreview key={active} product={active}/><p className="mt-3 text-center text-xs text-muted-foreground">Illustrative product preview</p></div>
       </section>
 
       <section className="products-section"><h2>And much more</h2><p className="mt-4 text-base">The tools behind your trading workspace — from market analysis to your next app.</p><div className="products-feature-grid">{features.map(([Icon,title,text]) => <div key={title} className="flex items-start gap-3"><Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"/><div><h3 className="text-sm font-medium">{title}</h3><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{text}</p></div></div>)}</div></section>
