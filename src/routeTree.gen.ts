@@ -71,8 +71,6 @@ import { Route as OpsX9k27m4nScanAuditRouteImport } from './routes/ops-x9k2-7m4n
 import { Route as OpsX9k27m4nSubscribersRouteImport } from './routes/ops-x9k2-7m4n.subscribers'
 import { Route as OpsX9k27m4nTuningRouteImport } from './routes/ops-x9k2-7m4n.tuning'
 import { Route as OpsX9k27m4nTvMismatchRouteImport } from './routes/ops-x9k2-7m4n.tv-mismatch'
-import { Route as StoriesIndexRouteImport } from './routes/stories.index'
-import { Route as StoriesSlugRouteImport } from './routes/stories.$slug'
 import { Route as StrategiesIctGoldTradingRouteImport } from './routes/strategies.ict-gold-trading'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
@@ -448,16 +446,6 @@ const OpsX9k27m4nTvMismatchRoute = OpsX9k27m4nTvMismatchRouteImport.update({
   id: '/tv-mismatch',
   path: '/tv-mismatch',
   getParentRoute: () => OpsX9k27m4nRoute,
-} as any)
-const StoriesIndexRoute = StoriesIndexRouteImport.update({
-  id: '/stories/',
-  path: '/stories/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StoriesSlugRoute = StoriesSlugRouteImport.update({
-  id: '/stories/$slug',
-  path: '/stories/$slug',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const StrategiesIctGoldTradingRoute =
   StrategiesIctGoldTradingRouteImport.update({
@@ -892,13 +880,11 @@ export interface FileRoutesByFullPath {
   '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
   '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
   '/ops-x9k2-7m4n/tv-mismatch': typeof OpsX9k27m4nTvMismatchRoute
-  '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
-  '/stories/': typeof StoriesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1017,13 +1003,11 @@ export interface FileRoutesByTo {
   '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
   '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
   '/ops-x9k2-7m4n/tv-mismatch': typeof OpsX9k27m4nTvMismatchRoute
-  '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help': typeof HelpIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n': typeof OpsX9k27m4nIndexRoute
-  '/stories': typeof StoriesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1148,13 +1132,11 @@ export interface FileRoutesById {
   '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
   '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
   '/ops-x9k2-7m4n/tv-mismatch': typeof OpsX9k27m4nTvMismatchRoute
-  '/stories/$slug': typeof StoriesSlugRoute
   '/strategies/ict-gold-trading': typeof StrategiesIctGoldTradingRoute
   '/help/': typeof HelpIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/jenvu-ops-x9k2/': typeof JenvuOpsX9k2IndexRoute
   '/ops-x9k2-7m4n/': typeof OpsX9k27m4nIndexRoute
-  '/stories/': typeof StoriesIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1279,13 +1261,11 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/subscribers'
     | '/ops-x9k2-7m4n/tuning'
     | '/ops-x9k2-7m4n/tv-mismatch'
-    | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
-    | '/stories/'
     | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
@@ -1404,13 +1384,11 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/subscribers'
     | '/ops-x9k2-7m4n/tuning'
     | '/ops-x9k2-7m4n/tv-mismatch'
-    | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help'
     | '/insights'
     | '/jenvu-ops-x9k2'
     | '/ops-x9k2-7m4n'
-    | '/stories'
     | '/.lovable/oauth/consent'
     | '/dashboard/analytics'
     | '/dashboard/api'
@@ -1534,13 +1512,11 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/subscribers'
     | '/ops-x9k2-7m4n/tuning'
     | '/ops-x9k2-7m4n/tv-mismatch'
-    | '/stories/$slug'
     | '/strategies/ict-gold-trading'
     | '/help/'
     | '/insights/'
     | '/jenvu-ops-x9k2/'
     | '/ops-x9k2-7m4n/'
-    | '/stories/'
     | '/.lovable/oauth/consent'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/api'
@@ -1646,10 +1622,8 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiChatImageRoute: typeof ApiChatImageRoute
   ApiCommunityMediaRoute: typeof ApiCommunityMediaRoute
-  StoriesSlugRoute: typeof StoriesSlugRoute
   StrategiesIctGoldTradingRoute: typeof StrategiesIctGoldTradingRoute
   HelpIndexRoute: typeof HelpIndexRoute
-  StoriesIndexRoute: typeof StoriesIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicGoldRoute: typeof ApiPublicGoldRoute
   HelpCollectionSlugRoute: typeof HelpCollectionSlugRoute
@@ -2112,20 +2086,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/ops-x9k2-7m4n/tv-mismatch'
       preLoaderRoute: typeof OpsX9k27m4nTvMismatchRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
-    }
-    '/stories/': {
-      id: '/stories/'
-      path: '/stories'
-      fullPath: '/stories/'
-      preLoaderRoute: typeof StoriesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/stories/$slug': {
-      id: '/stories/$slug'
-      path: '/stories/$slug'
-      fullPath: '/stories/$slug'
-      preLoaderRoute: typeof StoriesSlugRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/strategies/ict-gold-trading': {
       id: '/strategies/ict-gold-trading'
@@ -2802,10 +2762,8 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiChatImageRoute: ApiChatImageRoute,
   ApiCommunityMediaRoute: ApiCommunityMediaRoute,
-  StoriesSlugRoute: StoriesSlugRoute,
   StrategiesIctGoldTradingRoute: StrategiesIctGoldTradingRoute,
   HelpIndexRoute: HelpIndexRoute,
-  StoriesIndexRoute: StoriesIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicGoldRoute: ApiPublicGoldRoute,
   HelpCollectionSlugRoute: HelpCollectionSlugRoute,

@@ -9,7 +9,6 @@ export const SITE_PAGES: SitePage[] = [
   { to: "/models", label: "Models", keywords: "ai models claude gpt gemini grok deepseek qwen llm api catalog" },
   { to: "/pricing", label: "Pricing", keywords: "plans price pro elite ultra buy upgrade cost" },
   { to: "/insights", label: "Blog", keywords: "articles insights news posts" },
-  { to: "/stories", label: "Stories", keywords: "product stories guides terminal bot api" },
   { to: "/help", label: "Support", keywords: "help center support guides faq questions" },
   { to: "/docs", label: "Docs", keywords: "documentation api reference developers" },
   { to: "/contact", label: "Contact us", keywords: "contact sales email phone support team live chat message" },

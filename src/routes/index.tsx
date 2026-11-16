@@ -24,7 +24,7 @@ import {
   CloudHero,
 
 } from "@/components/home/CloudHome";
-import { EntHero, EntShowcase, EntStories } from "@/components/home/EnterpriseHome";
+import { EntHero, EntShowcase, EntLatestNews } from "@/components/home/EnterpriseHome";
 import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
@@ -410,7 +410,7 @@ function HomePage() {
           <DevApiSection />
           <BotStatsBar />
           <EcosystemGridSection />
-          <EntStories articles={homeArticles} />
+          <EntLatestNews articles={homeArticles} />
           <GetStartedSection />
         </main>
       </div>

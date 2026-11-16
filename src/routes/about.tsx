@@ -68,7 +68,7 @@ const samples = [
   { name: 'Sophie', image: portrait6, quote: 'Starting on Free gives me room to understand the workspace before choosing a plan. I can look at the Terminal, explore News Trading and try the API with the monthly credit. Then compare the actual allowances rather than buying a collection of unrelated tools. For me, the useful part is the connection between them: research, chart context and account controls together, while Gold analysis stays separate from the EUR/USD bot. That distinction makes the whole desk easier to understand.' },
   { name: 'Marcus', image: portrait9, quote: 'Less switching between tools, more attention on the question in front of me. A simple workspace with clear product boundaries is a good starting point.' },
 ]
-const reviewPlatforms: ReviewPlatform[] = ['x', 'mt5', 'tradingview', 'binance', 'tradingview', 'binance', 'tradingview', 'mt5', 'x']
+const reviewPlatforms: ReviewPlatform[] = ['mt5', 'tradingview', 'binance', 'etoro', 'webull', 'trading212', 'coinbase', 'robinhood', 'kucoin']
 
 function Actions() {
   const { user } = useAuthUser()

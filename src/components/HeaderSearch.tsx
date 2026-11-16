@@ -11,7 +11,7 @@ import JenvuMark from "@/components/JenvuMark";
 
 /**
  * Header search that opens in place of the top menu (Google Cloud style).
- * Shows matching pages, help guides and stories as you type; when nothing on
+ * Shows matching pages and help guides as you type; when nothing on
  * the site matches (or on Enter) it shows an Ask Jenvu answer in the panel.
  */
 export default function HeaderSearch({ onClose }: { onClose: () => void }) {
@@ -133,7 +133,7 @@ export default function HeaderSearch({ onClose }: { onClose: () => void }) {
         )}
 
         {showPanel && jenvuHits.length > 0 && (
-          <Section title="Help and stories">
+          <Section title="Help and guides">
             {jenvuHits.map((h) => (
               <Row key={h.url} onClick={() => openHit(h)} icon={<FileText className="h-4 w-4" />} title={h.title} sub={h.description} />
             ))}

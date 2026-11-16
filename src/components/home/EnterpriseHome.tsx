@@ -507,7 +507,7 @@ export function EntFacts() {
 const newsDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
-export function EntStories({ articles: items }: { articles: HomeArticle[] }) {
+export function EntLatestNews({ articles: items }: { articles: HomeArticle[] }) {
   if (items.length === 0) return null;
   return (
     <section className="px-5 py-24">

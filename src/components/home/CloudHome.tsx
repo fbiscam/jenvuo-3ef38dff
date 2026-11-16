@@ -5,7 +5,6 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   ArrowUpRight,
-  ChevronLeft,
   ChevronRight,
   ChevronDown,
   Check,
@@ -27,7 +26,6 @@ import {
 import tradeDesk from "@/assets/home/trade-desk.jpg";
 import tradeChart from "@/assets/home/trade-chart.jpg";
 import tradeGold from "@/assets/home/trade-gold.jpg";
-import { STORIES } from "@/lib/stories";
 import tradeNeonStart from "@/assets/home/trade-neon-start.jpg";
 import tradeNeonPractice from "@/assets/home/trade-neon-practice.jpg";
 import tradeNeonLearn from "@/assets/home/trade-neon-learn.jpg";
@@ -160,39 +158,7 @@ function HeroMockup({ price, delta }: { price: string; delta: string }) {
   );
 }
 
-/** Stories rendered three times so the rail can loop endlessly in both directions. */
-const LOOP_STORIES = [0, 1, 2].flatMap((copy) => STORIES.map((s) => ({ ...s, copy })));
-
 export function CloudHero({ price: _price, delta: _delta }: { price: string; delta: string }) {
-  const railRef = React.useRef<HTMLDivElement>(null);
-  // Width of one full set of stories (cards + gaps).
-  const setWidth = React.useCallback(() => {
-    const el = railRef.current;
-    if (!el) return 0;
-    const first = el.children[0] as HTMLElement | undefined;
-    const middle = el.children[STORIES.length] as HTMLElement | undefined;
-    return first && middle ? middle.offsetLeft - first.offsetLeft : 0;
-  }, []);
-  // Start on the middle copy so there's room to move either way.
-  React.useLayoutEffect(() => {
-    const el = railRef.current;
-    if (el) el.scrollLeft = setWidth();
-  }, [setWidth]);
-  // When the rail drifts into the first or last copy, jump silently by one set.
-  const onScroll = () => {
-    const el = railRef.current;
-    const w = setWidth();
-    if (!el || !w) return;
-    if (el.scrollLeft < w * 0.5) el.scrollLeft += w;
-    else if (el.scrollLeft > w * 1.5) el.scrollLeft -= w;
-  };
-  const scrollRail = (dir: 1 | -1) => {
-    const el = railRef.current;
-    if (!el) return;
-    const card = el.children[0] as HTMLElement | undefined;
-    const step = card ? card.offsetWidth + 24 : 320;
-    el.scrollBy({ left: dir * step, behavior: "smooth" });
-  };
   return (
     <section className="overflow-hidden bg-background">
       <div className="bg-gradient-to-b from-gc-blue-soft/40 to-background pb-0 pt-14 text-center sm:pt-20">
@@ -217,48 +183,11 @@ export function CloudHero({ price: _price, delta: _delta }: { price: string; del
         </div>
         <HeroVideoFan />
       </div>
-      <div ref={railRef} onScroll={onScroll} className="flex gap-6 overflow-x-auto px-5 [overscroll-behavior-x:contain] [scrollbar-width:none] sm:px-8 [&::-webkit-scrollbar]:hidden">
-        {LOOP_STORIES.map((s, i) => (
-          <Link
-            key={`${s.copy}-${s.slug}`}
-            to="/stories/$slug"
-            params={{ slug: s.slug }}
-            aria-hidden={s.copy !== 1 || undefined}
-            tabIndex={s.copy !== 1 ? -1 : undefined}
-            className="jenvu-story-in group relative h-[300px] w-[85vw] max-w-[448px] shrink-0 overflow-hidden rounded-3xl bg-gc-ink"
-            style={{ animationDelay: `${Math.min(i % 8, 5) * 60}ms` }}
-          >
-            <img
-              src={s.img}
-              alt=""
-              width={1024}
-              height={640}
-              loading={i === STORIES.length ? "eager" : "lazy"}
-              className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-gc-ink/80 via-gc-ink/10 to-transparent" />
-            <div className="absolute inset-x-8 bottom-8 text-left text-gc-on-blue">
-              <div className="text-[13px] font-medium tracking-wide">{s.tag}</div>
-              <div className="mt-1 text-[20px] font-medium leading-[1.4]">{s.title}</div>
-            </div>
-          </Link>
-        ))}
-      </div>
-      <div className="px-5 pb-10 pt-6 sm:px-8 md:px-[72px]">
-        <div className="inline-flex items-center rounded-full bg-gc-surface p-1">
-          <button type="button" aria-label="Previous stories" onClick={() => scrollRail(-1)} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-line/60">
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button type="button" aria-label="Next stories" onClick={() => scrollRail(1)} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gc-ink hover:bg-gc-line/60">
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
     </section>
   );
 }
 
-/* ---------------- AI model logo strip (under the hero stories) ---------------- */
+/* ---------------- AI model logo strip (under the hero) ---------------- */
 const MODEL_LOGOS: Array<{ name: string; src: string; mono?: boolean }> = [
   { name: "OpenAI", src: openAiLogo, mono: true },
   { name: "Claude", src: claudeLogo },

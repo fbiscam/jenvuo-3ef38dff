@@ -18,7 +18,6 @@ const MONO = "font-sans";
 /** Resources menu items (desktop dropdown + phone menu). */
 const RESOURCES = [
   { to: "/insights", label: "Blog" },
-  { to: "/stories", label: "Stories" },
   { to: "/help", label: "Support" },
   { to: "/docs", label: "Docs" },
   { to: "/contact", label: "Contact" },

@@ -93,7 +93,6 @@ const columns: FooterGroup[][] = [
     ] },
     { label: "Resources", links: [
       { to: "/insights", label: "Blog" },
-      { to: "/stories", label: "Stories" },
       { to: "/scam-check", label: "Scam Check" },
     ] },
   ],

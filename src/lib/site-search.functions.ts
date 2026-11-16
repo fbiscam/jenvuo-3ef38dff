@@ -10,7 +10,6 @@ export const siteSearch = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data }): Promise<SearchResult> => {
     const { collections } = await import("@/lib/help-content");
-    const { STORIES } = await import("@/lib/stories");
     const words = data.q.toLowerCase().split(/\W+/).filter((w) => w.length > 2 && !["what", "the", "how", "jenvu", "and", "for", "does"].includes(w));
     const aboutJenvu = /jenvu/i.test(data.q);
 
@@ -22,10 +21,6 @@ export const siteSearch = createServerFn({ method: "POST" })
     for (const c of collections) for (const a of c.articles) {
       const s = score(a.title) * 3 + score(a.summary);
       if (s > 0 || (aboutJenvu && words.length === 0)) local.push({ s, title: a.title, url: `/help/${c.slug}/${a.slug}`, path: ["help", c.slug, a.slug], description: a.summary, source: "jenvu" });
-    }
-    for (const st of STORIES) {
-      const s = score(st.title) * 3 + score(st.intro);
-      if (s > 0) local.push({ s, title: st.title, url: `/stories/${st.slug}`, path: ["stories", st.slug], description: st.intro, source: "jenvu" });
     }
     local.sort((a, b) => b.s - a.s);
     const jenvu = local.slice(0, aboutJenvu ? 8 : 4).map(({ s: _s, ...h }) => h);

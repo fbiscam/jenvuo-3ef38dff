@@ -11,8 +11,6 @@ import {
   Bot,
   TrendingUp,
   ShieldCheck,
-  Newspaper,
-  BookOpen,
   MessageSquare,
   FileText,
   Image as ImageIcon,
@@ -24,7 +22,6 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { BuyNowButton } from "@/components/BuyNowButton";
-import { STORIES } from "@/lib/stories";
 
 /**
  * Solutions and Products pages, styled like the API Platform page: big centred
@@ -49,8 +46,6 @@ export type IndustryContent = {
   why: { title: string; text: string }[];
   whyCardTitle: string;
   whyCardText: string;
-  storiesTitle: string;
-  storySlugs: string[];
   productsTitle: string;
   products: { title: string; text: string; href: string }[];
   /** Products page only: "what you get" section with four icon cards. */
@@ -64,7 +59,6 @@ const SECTIONS = [
   { id: "solutions", label: "Solutions" },
   { id: "topics", label: "Topics" },
   { id: "why", label: "Why Jenvu" },
-  { id: "stories", label: "Stories" },
   { id: "products", label: "Products" },
 ];
 
@@ -72,7 +66,6 @@ const SECTIONS = [
 /** Same aurora gradients as the Platform page tiles. */
 const AURORAS = ["var(--platform-aurora-1)", "var(--platform-aurora-2)", "var(--platform-aurora-3)"];
 const SOLUTION_ICONS: LucideIcon[] = [CandlestickChart, TrendingUp, BellRing, Code2, Bot, ShieldCheck];
-const STORY_ICONS: LucideIcon[] = [Newspaper, BookOpen, TrendingUp];
 const ICON_SETS: LucideIcon[][] = [
   [CandlestickChart, Sparkles, BellRing],
   [MessageSquare, FileText, ImageIcon],
@@ -98,7 +91,6 @@ export function IndustryPage({ c }: { c: IndustryContent }) {
         {p && <ProductsHighlights c={c} />}
         {!p && <TopicsTabs c={c} />}
         {!p && <WhyList c={c} />}
-        {p ? <StoriesRows c={c} /> : <StoriesCards c={c} />}
         {!p && <Products c={c} />}
         <GetStarted />
       </main>
@@ -263,10 +255,6 @@ function Wrap({ id, children, wide = false }: { id: string; children: ReactNode;
   );
 }
 
-function storyList(c: IndustryContent) {
-  return c.storySlugs.map((s) => STORIES.find((x) => x.slug === s)).filter((x) => !!x);
-}
-
 function Kicker({ children }: { children: ReactNode }) {
   return <p className="text-xs font-medium uppercase tracking-[0.2em] text-gc-ink-muted">{children}</p>;
 }
@@ -387,27 +375,6 @@ function WhyList({ c }: { c: IndustryContent }) {
   );
 }
 
-function StoriesCards({ c }: { c: IndustryContent }) {
-  return (
-    <Wrap id="stories" wide>
-      <SectionHead title={c.storiesTitle} />
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {storyList(c).map((s, n) => (
-          <AuroraCard
-            key={s.slug}
-            n={n + 1}
-            icon={STORY_ICONS[n % STORY_ICONS.length]}
-            tag={s.tag}
-            title={s.title}
-            link="Read now"
-            href={`/stories/${s.slug}`}
-          />
-        ))}
-      </div>
-    </Wrap>
-  );
-}
-
 /* ---------- Products page layout ---------- */
 
 function ProductsHero({ c }: { c: IndustryContent }) {
@@ -489,28 +456,6 @@ function ProductsHighlights({ c }: { c: IndustryContent }) {
         </div>
       </div>
     </section>
-  );
-}
-
-function StoriesRows({ c }: { c: IndustryContent }) {
-  return (
-    <Wrap id="stories">
-      <SectionHead title={c.storiesTitle} />
-      <div className="mt-12 divide-y divide-gc-line border-y border-gc-line text-left">
-        {storyList(c).map((s, n) => (
-          <a key={s.slug} href={`/stories/${s.slug}`} className="group grid items-center gap-5 py-7 sm:grid-cols-[240px_1fr_auto]">
-            <AuroraArt n={n} icons={[STORY_ICONS[n % STORY_ICONS.length]]} className="aspect-[16/10]" />
-            <div>
-              <Kicker>{s.tag}</Kicker>
-              <h3 className="mt-2 text-2xl font-medium leading-snug tracking-tight">{s.title}</h3>
-            </div>
-            <span className={underlineLink}>
-              Read now <ArrowUpRight className="h-3.5 w-3.5" />
-            </span>
-          </a>
-        ))}
-      </div>
-    </Wrap>
   );
 }
 

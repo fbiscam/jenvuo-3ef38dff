@@ -99,7 +99,7 @@ export default function DashboardTopBar({
       .slice(0, 6);
   }, [q, links]);
 
-  // Site-wide results (help articles, stories, web) — debounced so typing stays light.
+  // Site-wide results (help articles, web) — debounced so typing stays light.
   useEffect(() => {
     const t = q.trim();
     if (t.length < 3) { setHits([]); setSearched(""); setLoading(false); return; }

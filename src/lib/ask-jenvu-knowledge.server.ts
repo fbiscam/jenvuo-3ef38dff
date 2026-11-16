@@ -1,9 +1,8 @@
 import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 // Builds the knowledge text the "Ask Jenvu" assistant answers from.
-// Sources: hand-written core facts + Help Center articles + support guides + stories.
+// Sources: hand-written core facts + Help Center articles + support guides.
 import { collections, type Block } from "@/lib/help-content";
 import { SUPPORT_GUIDES } from "@/lib/support-guides";
-import { STORIES } from "@/lib/stories";
 
 const CORE_FACTS = `
 # Jenvu core facts
@@ -44,8 +43,6 @@ export function getJenvuKnowledge(): string {
   }
   parts.push("\n# Platform guides");
   for (const g of SUPPORT_GUIDES) parts.push(`- ${g.title}: ${g.text}`);
-  parts.push("\n# Stories");
-  for (const s of STORIES) parts.push(`- ${s.title}: ${s.intro}`);
   cached = parts.join("\n").slice(0, 60000);
   return cached;
 }
@@ -74,7 +71,6 @@ function getSections(): Section[] {
     }
   }
   for (const g of SUPPORT_GUIDES) out.push(`### Guide — ${g.title}\n${g.text}`);
-  for (const s of STORIES) out.push(`### Story — ${s.title}\n${s.intro}`);
   sections = out.map((text) => ({ text, words: new Set(tokenize(text)) }));
   return sections;
 }
