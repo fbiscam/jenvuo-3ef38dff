@@ -119,7 +119,6 @@ const columns: FooterGroup[][] = [
       { to: "/status", label: "Status" },
       { to: "/help", label: "Help Center" },
       { to: "/disclaimer", label: "Risk Disclaimer" },
-      { to: "/auth", label: "Sign In" },
     ] },
   ],
   [
