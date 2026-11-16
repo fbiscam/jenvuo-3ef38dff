@@ -122,18 +122,16 @@ function PricingPage() {
   // Only verified Founding members see JX Bot in the plans and pay the bot-included price.
   const membershipFn = useServerFn(getFoundingMembership);
   const [founding, setFounding] = React.useState(false);
-  const [member, setMember] = React.useState(false);
   // Buying is only for admins and ID-verified Founding members; others apply first.
   const [buyGate, setBuyGate] = React.useState<PurchaseGate>({ canBuy: false, reason: "apply" });
   const navigate = useNavigate();
   React.useEffect(() => {
-    if (signedOut) { setFounding(false); setMember(false); setBuyGate({ canBuy: false, reason: "apply" }); return; }
+    if (signedOut) { setFounding(false); setBuyGate({ canBuy: false, reason: "apply" }); return; }
     let alive = true;
     membershipFn()
       .then((r) => {
         if (!alive) return;
         setFounding(!!r.verified);
-        setMember(!!r.member);
         setBuyGate(purchaseGate({ isAdmin: !!r.isAdmin, member: !!r.member, verified: !!r.verified }));
       })
       .catch(() => {});
@@ -160,6 +158,8 @@ function PricingPage() {
     const trialPro = trial.active && key === "pro";
     const isCurrent = currentPlan === key && !trialPro;
     const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
+    // Pro during a running free trial shows the trial as the user's status.
+    if (trialPro) return <div className={`${btnBase} border border-gc-line bg-gc-surface`}>You Got Free Trial</div>;
     if (isCurrent) return <div className={`${btnBase} border border-gc-line bg-gc-surface`}>Current plan</div>;
     if (disabled) return <button type="button" disabled className={`${btnBase} cursor-not-allowed border border-gc-line bg-gc-surface text-gc-ink-muted`}>Locked in trial</button>;
     if (!signedOut && !buyGate.canBuy) {
@@ -170,17 +170,17 @@ function PricingPage() {
       );
     }
     // Signed out: Pro offers the free trial (14 days of Pro + API credit at sign-up); the
-    // other paid plans ask the visitor to sign up first.
+    // other paid plans say Buy now and send the visitor to sign up first.
     if (signedOut) {
       return (
         <Link to="/auth" search={{ mode: "signup" } as never} className={btnStyle(solid)}>
-          {key === "pro" ? "Get Free Trial" : "Sign up"}
+          {key === "pro" ? "Get Free Trial" : "Buy now"}
         </Link>
       );
     }
     return (
       <Link to="/dashboard/pay" className={btnStyle(solid)}>
-        {trialPro ? "Upgrade to Pro" : currentPlan !== null && currentPlan !== "free" ? "Upgrade" : "Buy now"}
+        {currentPlan !== null && currentPlan !== "free" ? "Upgrade" : "Buy now"}
       </Link>
     );
   };
@@ -217,29 +217,7 @@ function PricingPage() {
 
       {/* PLAN CARDS */}
       <section id="plans" className="scroll-mt-24 mx-auto max-w-7xl px-5 pb-16 sm:px-8">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Founding */}
-          <article className="flex flex-col rounded-2xl border border-gc-line bg-background p-6">
-            <h3 className="text-[20px] font-medium tracking-tight">Founding</h3>
-            <p className="mt-1.5 lg:min-h-[44px] text-[14px] leading-[1.55] text-gc-ink-muted">Invite-only first month for free</p>
-            <div className="mt-5 flex items-baseline gap-1.5">
-              <span className="text-[44px] font-medium leading-none tracking-tight">$0</span>
-              <span className="text-[14px] text-gc-ink-muted">/ 30 days</span>
-            </div>
-            {/* Same-height price note as the paid cards so every button sits on one line. */}
-            <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">Invite only · ID verified</p>
-            <div className="mt-5">
-              {member ? (
-                <div className={`${btnBase} border border-gc-line bg-gc-surface`}>You're a member</div>
-              ) : (
-                <Link to="/founding" className={btnStyle(false)}>Apply now</Link>
-              )}
-            </div>
-            <Summary big="$25–$50" label="Founding API credit after ID check" />
-            <FeatureList title="Platform & AI" items={["Pro or Elite for 30 days", "Terminal after ID verification", "100 seats each month"]} />
-            <FeatureList title="JX Bot (MT5)" items={["First month free", "Unlocked after ID verification"]} />
-          </article>
-
+        <div className="mx-auto grid max-w-[1100px] gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {plans.map((plan) => (
             <article
               key={plan.key}
