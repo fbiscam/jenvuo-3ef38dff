@@ -42,7 +42,7 @@ const products = [
 ]
 const workspaceMarks = [['Terminal', TerminalLogo], ['JX Bot', JxBotLogo], ['News Trading', NewsLogo], ['Platform', PlatformLogo]] as const
 const benefits = [
-  { icon: Layers, title: 'One connected workspace', text: 'Terminal, AI, API and JX Bot, with your account and plan in one place.' },
+  { icon: Layers, title: 'One connected workspace', text: 'Terminal, AI, API and JX Bot, with your account and plan in one place with top models you need.' },
   { icon: ShieldCheck, title: 'Limits you can see', text: 'Clear plan allowances for API keys, daily tokens and Terminal indicator hours. Profit is not guaranteed.' },
   { icon: Users, title: 'A team in your corner', text: 'Account help, product guides and a Founding Program for a one-time 30-day Pro or Elite plan after approval and ID verification.' },
   { icon: Newspaper, title: 'News Trading, always free', text: 'Follow the next US high-impact release, with countdowns and beat-or-miss context on every plan.' },
