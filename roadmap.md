@@ -1,7 +1,5 @@
 # Roadmap
 
-- [ ] Update only the discussed JX Bot protections (London/NY green-basket profit securing, high-impact news guard, spread protection and Friday exit), preserving entry signals and lot sizing — blocked: original editable EA `.mq5`/`.mqh` source is not present in the project or available uploads. Website rules are not an installed EA update. Compile and backtest the actual EA before replacing its download; exits and entry guards can change trading results and cannot guarantee profit protection.
-
 - [x] Restyle JX Bot feature cards to match the three supplied references: warm rounded two-column panels and sharp HTML/SVG MT5/checklist/target/session previews. Desktop, dark theme, 390/320px fit, reduced motion and no runtime errors verified; numeric-input utils regression passes and latest build OK. Nine Why portraits load at native 640px with no blur filter; unchanged. No licensing, account records or bot enforcement changed; previous inbox/schedule verification limits remain.
 
 - [x] Give all nine illustrative Why reviews distinct trading labels; replace Products with Docs in desktop/mobile public headers without duplicate Docs links. Nine unique labels and actual Docs navigation verified on desktop/mobile; utils numeric-input test passed and build OK. Products route remains accessible directly; no account changes.
