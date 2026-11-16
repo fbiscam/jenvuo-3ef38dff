@@ -316,7 +316,7 @@ async function assertCompanyDomainCap(domain: string) {
   if (verdict) throw new Error(verdict)
 }
 
-export async function createSignupOtp(input: { email: string; password: string; fullName: string; siteUrl?: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }) {
+export async function createSignupOtp(input: { email: string; password?: string; fullName?: string; siteUrl?: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }) {
   assertPublicSignupOpen()
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const email = normalizeEmail(input.email)
@@ -327,7 +327,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
     throw new Error('Disposable email addresses are not allowed. Please use a permanent email.')
   }
 
-  await assertPasswordNotLeaked(input.password)
+  if (input.password) await assertPasswordNotLeaked(input.password)
   assertSignupSignals(input)
   await assertNoEmailAlias(email)
   const signupDomain = email.split('@')[1]?.toLowerCase().trim() || ''
@@ -386,7 +386,7 @@ export async function createSignupOtp(input: { email: string; password: string; 
     email,
     purpose: 'signup',
     code_hash: codeHash,
-    full_name: input.fullName.trim(),
+    full_name: input.fullName?.trim() || null,
     expires_at: new Date(Date.now() + OTP_TTL_MINUTES * 60_000).toISOString(),
   })
   if (error) throw new Error(error.message)
@@ -426,7 +426,20 @@ export async function createRecoveryOtp(input: { email: string; siteUrl?: string
 
 
 
-export async function verifySignupOtp(input: { email: string; code: string; password: string; ip?: string; country?: string; fingerprint: string; userAgent?: string }): Promise<CustomAuthResult> {
+/** Step 2 of email sign-up: checks the emailed code without using it up, so the name/password step can follow. Wrong codes still count toward the attempt limit. */
+export async function checkSignupOtp(input: { email: string; code: string }): Promise<{ ok: boolean; error?: string }> {
+  assertPublicSignupOpen()
+  const email = normalizeEmail(input.email)
+  const verified = await verifyCustomOtp(email, 'signup', input.code)
+  if (!verified.ok) return { ok: false, error: verified.error }
+  const existingUser = await findUserByEmail(email)
+  if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
+    return { ok: false, error: 'Account already exists. Please sign in.' }
+  }
+  return { ok: true }
+}
+
+export async function verifySignupOtp(input: { email: string; code: string; password: string; fullName?: string; emailUpdates?: boolean; ip?: string; country?: string; fingerprint: string; userAgent?: string }): Promise<CustomAuthResult> {
   assertPublicSignupOpen()
   const email = normalizeEmail(input.email)
   const verified = await verifyCustomOtp(email, 'signup', input.code)
@@ -434,7 +447,10 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 
   const { supabaseAdmin } = await import('@/integrations/supabase/client.server')
   const password = input.password
-  const fullName = verified.row.full_name?.trim() || undefined
+  const fullName = input.fullName?.trim() || verified.row.full_name?.trim() || undefined
+  const meta: Record<string, unknown> = {}
+  if (fullName) meta.full_name = fullName
+  if (typeof input.emailUpdates === 'boolean') meta.email_updates = input.emailUpdates
   const existingUser = await findUserByEmail(email)
 
   if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
@@ -443,6 +459,7 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
 
   // Re-check device cap at the confirm step, in case someone tried to bypass the request step.
   try {
+    await assertPasswordNotLeaked(password)
     assertSignupSignals(input)
     await assertNotVpn(input.ip)
     await assertNoEmailAlias(email)
@@ -460,13 +477,13 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
     ? await supabaseAdmin.auth.admin.updateUserById(existingUser.id, {
         password,
         email_confirm: true,
-        user_metadata: fullName ? { full_name: fullName } : undefined,
+        user_metadata: Object.keys(meta).length ? meta : undefined,
       })
     : await supabaseAdmin.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
-        user_metadata: fullName ? { full_name: fullName } : undefined,
+        user_metadata: Object.keys(meta).length ? meta : undefined,
       })
 
   if (userResult.error) return { ok: false, error: userResult.error.message }

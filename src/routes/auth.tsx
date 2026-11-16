@@ -14,6 +14,7 @@ import {
   confirmRecoveryOtp,
   completeSocialSignup,
   confirmSignupOtp,
+  checkSignupCode,
   getTurnstileSiteKey,
   requestRecoveryOtp,
   requestSignupOtp,
@@ -146,6 +147,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const sendSignupOtp = useServerFn(requestSignupOtp);
   const verifySignupCode = useServerFn(confirmSignupOtp);
+  const checkCode = useServerFn(checkSignupCode);
   const sendRecoveryOtp = useServerFn(requestRecoveryOtp);
   const verifyRecoveryCode = useServerFn(confirmRecoveryOtp);
   const signInHint = useServerFn(signInFailureHint);
@@ -170,7 +172,7 @@ function AuthPage() {
   // A brand-new account goes straight to API keys to create its first key.
   const signedUpRef = React.useRef(false);
   const [signinStep, setSigninStep] = React.useState<"choose" | "email" | "password">("choose");
-  const [signupStep, setSignupStep] = React.useState<"choose" | "form">("choose");
+  const [signupStep, setSignupStep] = React.useState<"choose" | "form" | "details">("choose");
   const [socialBusy, setSocialBusy] = React.useState<SocialProvider | null>(null);
   // "Completing sign-in / sign-up" screen while the session is checked and the next page opens.
   const [completing, setCompleting] = React.useState<null | "in" | "up">(null);
@@ -183,7 +185,10 @@ function AuthPage() {
   const finishSocial = useServerFn(completeSocialSignup);
   const socialCheckedRef = React.useRef<string | null>(null);
 
-  const [fullName, setFullName] = React.useState("");
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [emailUpdates, setEmailUpdates] = React.useState(false);
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [rememberLogin, setRememberLogin] = React.useState(true);
@@ -522,9 +527,12 @@ function AuthPage() {
     email: z.string().trim().email("Enter a valid email").max(255),
     password: z.string().min(1, "Password is required"),
   });
-  const signUpSchema = z.object({
-    fullName: z.string().trim().min(1, "Name is required").max(100),
+  const signUpEmailSchema = z.object({
     email: z.string().trim().email("Enter a valid email").max(255),
+  });
+  const signUpDetailsSchema = z.object({
+    firstName: z.string().trim().min(1, "First name is required").max(50),
+    lastName: z.string().trim().min(1, "Last name is required").max(50),
     password: z.string().min(8, "Password must be at least 8 characters").max(72),
   });
 
@@ -609,7 +617,7 @@ function AuthPage() {
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
-    const parsed = signUpSchema.safeParse({ fullName, email, password });
+    const parsed = signUpEmailSchema.safeParse({ email });
     if (!parsed.success) {
       setErrorMsg(parsed.error.issues[0]?.message ?? "Invalid input");
       return;
@@ -622,7 +630,7 @@ function AuthPage() {
     const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
     const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { ...parsed.data, siteUrl: window.location.origin, fingerprint, turnstileToken },
+      data: { email: parsed.data.email, siteUrl: window.location.origin, fingerprint, turnstileToken },
     });
     if (turnstileSiteKey) freshTurnstile();
     setLoading(false);
@@ -816,15 +824,50 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
-    const fingerprint = await getDeviceFingerprint();
-    const result = await verifySignupCode({ data: { email, code: otpCode, password, fingerprint } });
-    if (!result.ok || !result.session) {
-      setLoading(false);
-      triggerOtpError(result.error || "Verification failed. Try again.");
+    const check = await checkCode({ data: { email, code: otpCode } });
+    setLoading(false);
+    if (!check.ok) {
+      triggerOtpError(check.error || "Verification failed. Try again.");
       return;
     }
+    // Code is right: next step collects name + password (code is used up there).
+    setOtpStep(false);
+    setSignupStep("details");
+  };
+
+  const completeSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg(null);
+    const parsed = signUpDetailsSchema.safeParse({ firstName, lastName, password });
+    if (!parsed.success) {
+      setErrorMsg(parsed.error.issues[0]?.message ?? "Invalid input");
+      return;
+    }
+    setLoading(true);
     signedUpRef.current = true;
+    setCompleting("up");
+    const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
+    const fingerprint = await getDeviceFingerprint();
+    const result = await verifySignupCode({
+      data: { email, code: otpCode, password, fullName, emailUpdates, fingerprint },
+    });
+    if (!result.ok || !result.session) {
+      setLoading(false);
+      setCompleting(null);
+      signedUpRef.current = false;
+      const msg = result.error || "Could not complete sign up. Try again.";
+      // Expired / used-up code: send the user back to enter a fresh one.
+      if (/code|attempts/i.test(msg)) {
+        setOtpCode("");
+        lastSubmittedOtpRef.current = "";
+        setSignupStep("form");
+        setOtpStep(true);
+        setOtpError(humanizeOtpError(msg));
+      } else {
+        setErrorMsg(msg);
+      }
+      return;
+    }
     const { error: sessionError } = await supabase.auth.setSession({
       access_token: result.session.access_token,
       refresh_token: result.session.refresh_token,
@@ -832,6 +875,7 @@ function AuthPage() {
     setLoading(false);
     if (sessionError) {
       signedUpRef.current = false;
+      setCompleting(null);
       setErrorMsg(sessionError.message);
       return;
     }
@@ -863,7 +907,7 @@ function AuthPage() {
     const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
     const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { email, password, fullName, siteUrl: window.location.origin, fingerprint },
+      data: { email, siteUrl: window.location.origin, fingerprint },
     });
     setResending(false);
     if (!result.ok) {
@@ -1104,7 +1148,7 @@ function AuthPage() {
     : mode === "forgot"
       ? forgotStep === "code" ? "Check your email" : forgotStep === "reset" ? "Set a new password" : "Reset your password"
       : mode === "signup"
-        ? otpStep ? "Verify your email" : signupStep === "form" ? "Sign up with your email" : "Create your account"
+        ? otpStep ? "Verify your email" : signupStep === "details" ? "Complete your sign up" : signupStep === "form" ? "Sign up with your email" : "Create your account"
         : signinStep === "choose" ? "Log into your account" : "Log in with your email";
 
   if (completing && !mfaChallenge && !errorMsg) {
@@ -1203,21 +1247,49 @@ function AuthPage() {
                 </div>
                 <div className="pt-3">{terms}</div>
               </form>
-            ) : signupStep === "form" ? (
-              <form onSubmit={signUp} className="mt-6 space-y-4">
-                <div>
-                  <label htmlFor="signup-name" className={label}>Full name</label>
-                  <input type="text" id="signup-name" required autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} className={field} />
+            ) : signupStep === "details" ? (
+              <form onSubmit={completeSignup} className="mt-6 space-y-4">
+                <div className="flex justify-center">
+                  <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-border px-3.5 py-1.5 text-[14px] text-foreground">
+                    <Mail className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <span className="truncate">{email}</span>
+                  </span>
                 </div>
-                <div>
-                  <label htmlFor="signup-email" className={label}>Email</label>
-                  <input type="email" id="signup-email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
-                  {flashInline("email")}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="signup-first" className={label}>First name</label>
+                    <input type="text" id="signup-first" required autoComplete="given-name" value={firstName} onChange={(e) => setFirstName(e.target.value)} className={field} autoFocus />
+                  </div>
+                  <div>
+                    <label htmlFor="signup-last" className={label}>Last name</label>
+                    <input type="text" id="signup-last" required autoComplete="family-name" value={lastName} onChange={(e) => setLastName(e.target.value)} className={field} />
+                  </div>
                 </div>
                 <div>
                   <label htmlFor="signup-password" className={label}>Password</label>
                   {passwordInput("signup-password", password, setPassword, showPassword, () => setShowPassword((v) => !v), "new-password")}
                   {flashInline("password")}
+                </div>
+                <label className="flex cursor-pointer select-none items-start gap-2.5 text-[14px] leading-snug text-muted-foreground">
+                  <input type="checkbox" checked={emailUpdates} onChange={(e) => setEmailUpdates(e.target.checked)} disabled={loading} className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-foreground" />
+                  <span>Receive email updates on new features and offers</span>
+                </label>
+                {errorBox}
+                <div className="space-y-3 pt-1">
+                  <button type="submit" disabled={loading} className={pillDark}>
+                    {loading ? btnLoading("Creating account…") : "Complete sign up"}
+                  </button>
+                  <button type="button" onClick={() => { setSignupStep("form"); setOtpStep(true); setErrorMsg(null); }} disabled={loading} className={pillLight}>
+                    Go back
+                  </button>
+                </div>
+              </form>
+            ) : signupStep === "form" ? (
+              <form onSubmit={signUp} className="mt-6 space-y-4">
+                <div>
+                  <label htmlFor="signup-email" className={label}>Email</label>
+                  <input type="email" id="signup-email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
+                  {flashInline("email")}
                 </div>
                 <p className="text-center text-[13px] leading-snug text-muted-foreground">
                   Free trial: $30 API credit and 14 days of Pro Terminal features.
@@ -1379,7 +1451,7 @@ function AuthPage() {
               <button type="button" onClick={goSignup} className="font-medium text-foreground hover:underline">Sign up</button>
             </p>
           )}
-          {!mfaChallenge && mode === "signup" && !otpStep && (
+          {!mfaChallenge && mode === "signup" && !otpStep && signupStep !== "details" && (
             <p className="mt-7 text-center text-[15px] text-muted-foreground">
               Already have an account?{" "}
               <button type="button" onClick={goSignin} className="font-medium text-foreground hover:underline">Sign in</button>

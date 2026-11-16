@@ -5,6 +5,7 @@ import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
 import {
   createRecoveryOtp,
   createSignupOtp,
+  checkSignupOtp,
   verifyRecoveryOtp,
   verifySignupOtp,
 } from './custom-auth.server'
@@ -65,9 +66,7 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
   .inputValidator((data) =>
     z
       .object({
-        fullName: z.string().trim().min(1, 'Name is required').max(100),
         email: z.string().trim().email('Enter a valid email').max(255),
-        password: z.string().min(8, 'Password must be at least 8 characters').max(72),
         siteUrl: siteUrlSchema,
         fingerprint: z.string().trim().min(32, 'Device verification failed. Refresh the page and try again.').max(128),
         turnstileToken: turnstileTokenSchema,
@@ -89,6 +88,25 @@ export const requestSignupOtp = createServerFn({ method: 'POST' })
     }
   })
 
+/** Email sign-up step 2: check the code before the name/password step (code is used up only at confirm). */
+export const checkSignupCode = createServerFn({ method: 'POST' })
+  .inputValidator((data) =>
+    z
+      .object({
+        email: z.string().trim().email('Enter a valid email').max(255),
+        code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    if (SIGNUP_CLOSED) return { ok: false as const, error: SIGNUP_CLOSED_MESSAGE }
+    try {
+      return await checkSignupOtp(data)
+    } catch (error) {
+      return { ok: false as const, error: error instanceof Error ? error.message : 'Verification failed. Try again.' }
+    }
+  })
+
 export const confirmSignupOtp = createServerFn({ method: 'POST' })
   .inputValidator((data) =>
     z
@@ -96,6 +114,8 @@ export const confirmSignupOtp = createServerFn({ method: 'POST' })
         email: z.string().trim().email('Enter a valid email').max(255),
         code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
         password: z.string().min(8, 'Password must be at least 8 characters').max(72),
+        fullName: z.string().trim().min(1, 'Name is required').max(100),
+        emailUpdates: z.boolean().optional(),
         fingerprint: z.string().trim().min(32, 'Device verification failed. Refresh the page and try again.').max(128),
       })
       .parse(data),
