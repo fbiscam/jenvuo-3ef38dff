@@ -8,10 +8,10 @@ import { useCredits } from "@/hooks/useCredits";
 type Product = { title: string; text: string; to: string; img?: string; aurora?: number; icon?: LucideIcon; badge?: string };
 
 const PRODUCTS: Product[] = [
-  { title: "Chat API", text: "Build with Jenvu models through one compatible API.", to: "/dashboard/api", aurora: 1, icon: MessagesSquare },
-  { title: "Models", text: "Compare context size and price per million tokens.", to: "/dashboard/models", aurora: 2, icon: BrainCircuit, badge: "New" },
-  { title: "JX Bot", text: "EUR/USD M15 Expert Advisor for MT5 with a stop loss.", to: "/dashboard/jx-bot", aurora: 3, icon: Bot },
-  { title: "Terminal", text: "Sweeps, zones and FVGs on XAU/USD with an AI desk.", to: "/dashboard/terminal", aurora: 1, icon: CandlestickChart },
+  { title: "Chat API", text: "One API for all Jenvu models.", to: "/dashboard/api", aurora: 1, icon: MessagesSquare },
+  { title: "Models", text: "Compare model pricing & limits.", to: "/dashboard/models", aurora: 2, icon: BrainCircuit, badge: "New" },
+  { title: "JX Bot", text: "EUR/USD M15 automated EA.", to: "/dashboard/jx-bot", aurora: 3, icon: Bot },
+  { title: "Terminal", text: "Live SMC sweeps, zones and desk.", to: "/dashboard/terminal", aurora: 1, icon: CandlestickChart },
 ];
 
 /** xAI console-style dashboard home: welcome line, two start cards, product grid. */
@@ -91,7 +91,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
                 {p.title}
                 <ArrowUpRight className="h-4 w-4 opacity-60 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true" />
               </p>
-              <p className="mt-1.5 text-[14px] leading-relaxed text-muted-foreground">{p.text}</p>
+              <p className="mt-1.5 truncate text-[14px] leading-relaxed text-muted-foreground" title={p.text}>{p.text}</p>
             </div>
           </Link>
         ))}
