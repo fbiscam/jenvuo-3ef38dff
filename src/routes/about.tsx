@@ -58,7 +58,7 @@ const faqs = [
   ['What happens when my API credit runs out?', 'API usage stops when there is insufficient credit. Plans are available from Payments; separate credit top-ups are not offered.'],
 ]
 const samples = [
-  { name: 'Arjun', image: portrait1, quote: 'The appeal of Jenvu is having the whole research workflow in one place. Start with Gold market structure in the Terminal, look at the liquidity around the current range, then ask the AI to explain the context. No promises, no magic signal — just a clearer way to organize a trading idea before making your own decision.' },
+  { name: 'Arjun', image: portrait1, quote: 'Trading CFDs with FORAX has been smooth for me. The platform is easy to navigate, execution is quick, and the account setup was straightforward. I still do my own research before every trade, but having a reliable broker makes a real difference.' },
   { name: 'Daniel', image: portrait3, quote: 'One workspace for the chart, the news calendar and the questions I want to research. That is the kind of trading desk I would want to build.' },
   { name: 'Maya', image: portrait8, quote: 'Knowing exactly what each plan includes matters. The API keys, daily tokens and Terminal hours are visible before choosing anything. I would rather work with clear limits than find out halfway through a session that the tool I need has a different subscription.' },
   { name: 'Lina', image: portrait2, quote: 'The API side is what interests me most. A familiar request format, different models to explore and a place to check usage. I could keep a small research tool beside the Terminal instead of piecing together a completely separate account for every part of the workflow.' },
