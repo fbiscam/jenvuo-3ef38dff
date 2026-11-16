@@ -80,7 +80,7 @@ export function EcosystemGridSection() {
           Start building with the API <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
 
-        <div className="mt-14 grid grid-cols-2 border-l border-t border-border sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-14 grid grid-cols-2 overflow-hidden rounded-2xl border-l border-t border-border sm:grid-cols-3 lg:grid-cols-6">
           {TILES.map((t) => {
             const cls =
               "group relative flex h-28 items-center justify-center border-b border-r border-border px-4 transition-colors";
