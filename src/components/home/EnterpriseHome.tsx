@@ -512,16 +512,16 @@ export function EntLatestNews({ articles: items }: { articles: HomeArticle[] }) 
   return (
     <section className="px-5 py-24">
       <div className="mx-auto max-w-7xl">
-        <div className="flex items-end justify-between gap-4">
-          <h2 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]"><RevealWords>Latest news</RevealWords></h2>
-          <Link to="/insights" className="inline-flex items-center gap-0.5 text-[15px] font-medium text-foreground/80 hover:text-foreground">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-[28px] font-medium leading-none tracking-tight text-foreground sm:text-[32px]"><RevealWords>Latest news</RevealWords></h2>
+          <Link to="/insights" className="inline-flex shrink-0 items-center gap-0.5 leading-none text-[15px] font-medium text-foreground/80 hover:text-foreground">
             All posts <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
         <div className="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((a) => (
             <Link key={a.id} to="/insights/$slug" params={{ slug: a.slug }} className="group block">
-              <div className="aspect-[16/9] overflow-hidden rounded-[14px] border border-border bg-muted">
+              <div className="aspect-[16/9] overflow-hidden rounded-[22px] border border-border bg-muted">
                 <img
                   src={a.image_url || insightCoverUrl(a.title, a.category ?? undefined)}
                   alt={a.title}
