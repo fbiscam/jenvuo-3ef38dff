@@ -11,7 +11,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { COLORS, EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface InviteEmailProps {
   siteName: string
@@ -55,4 +55,4 @@ export const InviteEmail = ({
 
 export default InviteEmail
 
-const linkStyle = { color: COLORS.ink, textDecoration: 'underline' }
+const linkStyle = s.link

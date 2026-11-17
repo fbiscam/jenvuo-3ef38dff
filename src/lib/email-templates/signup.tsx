@@ -11,7 +11,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { COLORS, EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface SignupEmailProps {
   siteName: string
@@ -70,4 +70,4 @@ export const SignupEmail = ({
 
 export default SignupEmail
 
-const linkStyle = { color: COLORS.ink, textDecoration: 'underline' }
+const linkStyle = s.link

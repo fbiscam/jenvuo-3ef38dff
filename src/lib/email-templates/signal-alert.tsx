@@ -84,7 +84,7 @@ const Email = ({
                 <tr>
                   <td style={{ verticalAlign: 'middle' }}>
                     <Img
-                      src={`${SITE}/favicon.png`}
+                      src={`${SITE}/email-logo.png`}
                       width={24}
                       height={24}
                       alt="Jenvu"

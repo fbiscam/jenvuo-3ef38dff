@@ -2,7 +2,8 @@ import * as React from 'react'
 import { Head, Img, Section, Text } from '@react-email/components'
 
 export const SITE_URL = 'https://jenvu.com'
-export const LOGO_URL = `${SITE_URL}/favicon.png`
+/** Borderless J mark (no outer rounded box), used in every email masthead. */
+export const LOGO_URL = `${SITE_URL}/email-logo.png`
 
 /**
  * Shared design tokens for Jenvu emails — clean, minimal, professional.
@@ -26,6 +27,8 @@ export const COLORS = {
   border: '#dadce0',
   hairline: '#dadce0',
   accent: '#111111',
+  link: '#1a0dab',
+  codeBg: '#f1f3f4',
 }
 
 /** Load Google Sans inside <Head>. Falls back to system sans-serif when web fonts are blocked. */
@@ -63,13 +66,13 @@ export const LogoHeader = (_props: { tagline?: string } = {}) => (
           <td style={{ verticalAlign: 'middle' }}>
             <Img
               src={LOGO_URL}
-              width="32"
-              height="32"
+              width="26"
+              height="26"
               alt="Jenvu"
-              style={{ display: 'block', borderRadius: '7px' }}
+              style={{ display: 'block', border: 0, outline: 'none' }}
             />
           </td>
-          <td style={{ paddingLeft: '12px', verticalAlign: 'middle' }}>
+          <td style={{ paddingLeft: '10px', verticalAlign: 'middle' }}>
             <Text style={logoWord}>Jenvu</Text>
           </td>
         </tr>
@@ -106,7 +109,7 @@ export const shellStyles = {
     maxWidth: '560px',
     margin: '0 auto',
     backgroundColor: COLORS.card,
-    borderRadius: '8px',
+    borderRadius: '10px',
     border: `1px solid ${COLORS.border}`,
     overflow: 'hidden' as const,
   },
@@ -133,9 +136,9 @@ export const shellStyles = {
   },
   text: {
     fontFamily: INTER,
-    fontSize: '14px',
-    color: COLORS.body,
-    lineHeight: '1.7',
+    fontSize: '15px',
+    color: COLORS.ink,
+    lineHeight: '1.65',
     margin: '0 0 16px',
     fontWeight: 400 as const,
   },
@@ -161,7 +164,7 @@ export const shellStyles = {
 
   actionWrap: {
     textAlign: 'center' as const,
-    margin: '24px 0 4px',
+    margin: '24px 0 20px',
   },
 
   footer: {
@@ -171,6 +174,11 @@ export const shellStyles = {
     lineHeight: '1.6',
     margin: '0 0 10px',
     fontWeight: 400 as const,
+  },
+  link: {
+    color: COLORS.link,
+    textDecoration: 'underline',
+    textUnderlineOffset: '2px',
   },
   footerLink: {
     color: COLORS.body,
@@ -187,12 +195,12 @@ export const shellStyles = {
     fontWeight: 400 as const,
   },
   codeBox: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: '8px',
-    padding: '20px 20px',
+    backgroundColor: COLORS.codeBg,
+    borderRadius: '10px',
+    padding: '22px 20px',
     margin: '18px 0 22px',
     textAlign: 'center' as const,
-    border: `1px solid ${COLORS.border}`,
+    border: 'none',
   },
   codeLabel: {
     fontFamily: INTER,

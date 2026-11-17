@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Body, Container, Heading, Html, Preview, Section, Text } from '@react-email/components'
+import { Body, Container, Heading, Html, Link, Preview, Section, Text } from '@react-email/components'
 import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 export const EXISTING_ACCOUNT_SUBJECT = 'You already have a Jenvu account'
@@ -16,8 +16,11 @@ export const ExistingAccountEmail = () => (
         <Section style={s.card}>
           <Heading style={s.h1}>You already have an account</Heading>
           <Text style={s.text}>
-            Someone tried to sign up to Jenvu with this email, but this inbox already has an account. Please sign in at
-            auth.jenvu.com/sign-in instead. If you forgot your password, use "Forgot password" on the sign-in page.
+            Someone tried to sign up to Jenvu with this email, but this inbox already has an account. Please sign in at{' '}
+            <Link href="https://auth.jenvu.com/sign-in" style={s.link}>
+              auth.jenvu.com/sign-in
+            </Link>{' '}
+            instead. If you forgot your password, use "Forgot password" on the sign-in page.
           </Text>
           <Text style={s.footer}>If this wasn't you, you can ignore this email. Your account has not changed.</Text>
           <Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
