@@ -19,8 +19,9 @@ export function useCurrentPlan() {
       if (!mounted) return;
       const expiry = data?.trial_ends_at || data?.current_period_end;
       const trialValid = !data?.is_trial || (Boolean(expiry) && new Date(expiry as string).getTime() > Date.now());
+      // Signed-in accounts without a running paid plan or trial are on Free (null means signed out).
       if (data && (data.status === "active" || data.status === "trialing") && trialValid) setPlan(data.plan_id);
-      else setPlan(null);
+      else setPlan("free");
     };
     load();
     const { data: sub } = supabase.auth.onAuthStateChange(() => load());
