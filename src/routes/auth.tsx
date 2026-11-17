@@ -1462,7 +1462,7 @@ function AuthPage() {
               <p className="text-center text-[15px] leading-relaxed text-muted-foreground">
                 {codeFor === "login"
                   ? <>If <span className="text-foreground">{email}</span> has a Jenvu account, we've emailed it a one-time sign-in code. Enter it below:</>
-                  : <>Your account asks for an email code. We've sent a 6-digit security code to <span className="text-foreground">{email}</span>. Enter it below:</>}
+                  : <>Your account asks for email code. We've sent a 6-digit security code to <span className="text-foreground">{email}</span>. Enter it below:</>}
               </p>
               {otpBoxes(otpInputRef, "signin-code-error")}
               {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} appearance="interaction-only" />}
