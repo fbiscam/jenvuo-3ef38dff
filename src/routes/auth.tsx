@@ -1346,11 +1346,6 @@ function AuthPage() {
                   <input type="email" id="signup-email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className={field} />
                   {flashInline("email")}
                 </div>
-                <p className="text-center text-[13px] leading-snug text-muted-foreground">
-                  Free plan: $10 API credit every month and 2 hours a day of the paid Terminal indicators.
-                  <br />
-                  JX Bot included on 1 IP with a $5 daily target.
-                </p>
                 {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} />}
                 {errorBox}
                 <div className="space-y-3 pt-1">
