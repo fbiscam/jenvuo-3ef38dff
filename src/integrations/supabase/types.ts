@@ -3760,7 +3760,7 @@ export type Database = {
         Row: {
           billing_interval: string
           created_at: string
-          current_period_end: string
+          current_period_end: string | null
           current_period_start: string
           id: string
           is_trial: boolean
@@ -3777,7 +3777,7 @@ export type Database = {
         Insert: {
           billing_interval?: string
           created_at?: string
-          current_period_end?: string
+          current_period_end?: string | null
           current_period_start?: string
           id?: string
           is_trial?: boolean
@@ -3794,7 +3794,7 @@ export type Database = {
         Update: {
           billing_interval?: string
           created_at?: string
-          current_period_end?: string
+          current_period_end?: string | null
           current_period_start?: string
           id?: string
           is_trial?: boolean
@@ -4012,6 +4012,7 @@ export type Database = {
         }[]
       }
       current_profile_plan: { Args: { _user_id: string }; Returns: string }
+      ensure_free_account: { Args: { _user_id: string }; Returns: boolean }
       error_fingerprint: {
         Args: { _message: string; _stack: string }
         Returns: string
@@ -4166,6 +4167,7 @@ export type Database = {
       process_founding_bot_milestones: { Args: never; Returns: number }
       process_founding_renewals: { Args: never; Returns: number }
       process_free_monthly_credit: { Args: never; Returns: number }
+      process_paid_plan_expiry: { Args: never; Returns: number }
       public_home_stats: { Args: never; Returns: Json }
       release_founding_credit: { Args: { _user_id: string }; Returns: boolean }
       renew_founding_plan: {

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
+import { entriesForOrigin, requestHost, sitemapOriginForHost } from "@/lib/sitemap-hosts";
 
 const BASE_URL = "https://jenvu.com";
 const BLOG_URL = "https://blogs.jenvu.com";
@@ -16,7 +17,7 @@ interface SitemapEntry {
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/founding", changefreq: "daily", priority: "0.95" },
@@ -89,7 +90,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           // ignore — sitemap still serves with static routes
         }
 
-        const urls = entries.map((e) =>
+        const origin = sitemapOriginForHost(requestHost(request));
+        const urls = entriesForOrigin(entries, origin).map((e) =>
           [
             `  <url>`,
             `    <loc>${e.origin ?? BASE_URL}${e.path}</loc>`,

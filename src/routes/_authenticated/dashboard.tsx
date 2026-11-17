@@ -28,7 +28,6 @@ import SiteAnnouncementBar from "@/components/dashboard/SiteAnnouncementBar";
 import ConsoleWelcome from "@/components/dashboard/ConsoleWelcome";
 import JenvuMark from "@/components/JenvuMark";
 import TwoFactorReminder from "@/components/dashboard/TwoFactorReminder";
-import WelcomeOnboarding from "@/components/dashboard/WelcomeOnboarding";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
@@ -1534,7 +1533,6 @@ function DashboardLayout() {
           </div>
         )}
         <div className="flex min-h-0 w-full flex-1 flex-col overflow-clip bg-background">
-        <WelcomeOnboarding />
         {drawerMode && <RenewalNotice />}
         {/* Notices float over the reserved top space so the page never jumps when they show or close. */}
         <div className="relative z-20 h-0">

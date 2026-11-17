@@ -39,6 +39,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductsRouteImport } from './routes/products'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ScamCheckRouteImport } from './routes/scam-check'
 import { Route as ScamToolRouteImport } from './routes/scam-tool'
 import { Route as SearchRouteImport } from './routes/search'
@@ -283,6 +284,11 @@ const RefundRoute = RefundRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScamCheckRoute = ScamCheckRouteImport.update({
@@ -852,6 +858,7 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
   '/search': typeof SearchRoute
@@ -976,6 +983,7 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
   '/search': typeof SearchRoute
@@ -1104,6 +1112,7 @@ export interface FileRoutesById {
   '/products': typeof ProductsRoute
   '/refund': typeof RefundRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/scam-check': typeof ScamCheckRoute
   '/scam-tool': typeof ScamToolRoute
   '/search': typeof SearchRoute
@@ -1233,6 +1242,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/refund'
     | '/reset-password'
+    | '/robots.txt'
     | '/scam-check'
     | '/scam-tool'
     | '/search'
@@ -1357,6 +1367,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/refund'
     | '/reset-password'
+    | '/robots.txt'
     | '/scam-check'
     | '/scam-tool'
     | '/search'
@@ -1484,6 +1495,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/refund'
     | '/reset-password'
+    | '/robots.txt'
     | '/scam-check'
     | '/scam-tool'
     | '/search'
@@ -1613,6 +1625,7 @@ export interface RootRouteChildren {
   ProductsRoute: typeof ProductsRoute
   RefundRoute: typeof RefundRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   ScamCheckRoute: typeof ScamCheckRoute
   ScamToolRoute: typeof ScamToolRoute
   SearchRoute: typeof SearchRoute
@@ -1861,6 +1874,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scam-check': {
@@ -2752,6 +2772,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsRoute: ProductsRoute,
   RefundRoute: RefundRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   ScamCheckRoute: ScamCheckRoute,
   ScamToolRoute: ScamToolRoute,
   SearchRoute: SearchRoute,

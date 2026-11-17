@@ -400,6 +400,13 @@
       "when": 1794833368809,
       "tag": "0056_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1794888337838,
+      "tag": "0057_free_plan_for_every_account",
+      "breakpoints": true
     }
   ]
 }

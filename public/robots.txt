@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /jenvu-ops-x9k2
-Disallow: /jenvu-ops-x9k2/
-
-Sitemap: https://jenvu.com/sitemap.xml
