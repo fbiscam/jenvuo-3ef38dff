@@ -10,6 +10,13 @@ export const MAX_ACCOUNTS_PER_SUBNET_DAY = Infinity
 export const MAX_ACCOUNTS_PER_IP = Infinity
 export const EMAIL_ALREADY_LINKED = 'This email is already linked to another account. Please remove it from that account first, or sign in.'
 
+export const EMAIL_ALREADY_REGISTERED = 'This email is already registered. Please sign in instead.'
+
+/** Sign-up is refused for an address that already belongs to a confirmed account. */
+export function signupEmailBlock(existing: { email_confirmed_at?: string | null; confirmed_at?: string | null } | null | undefined): string | null {
+  return existing?.email_confirmed_at || existing?.confirmed_at ? EMAIL_ALREADY_REGISTERED : null
+}
+
 /** Exact addresses are unique; different addresses may belong to the same person. */
 export function emailOwnershipConflict(ownerId: string | null, requestingUserId?: string): boolean {
   return ownerId !== null && ownerId !== requestingUserId

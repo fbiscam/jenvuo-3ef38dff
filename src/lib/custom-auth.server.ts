@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Session, User } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { sendCustomAuthEmail } from './custom-auth-email.server'
-import { EMAIL_ALREADY_LINKED } from './signup-guard'
+import { EMAIL_ALREADY_LINKED, signupEmailBlock } from './signup-guard'
 
 type OtpPurpose = 'signup' | 'recovery' | 'login' | 'second_step' | 'email_2fa_setup'
 
@@ -210,10 +210,12 @@ export async function createSignupOtp(input: { email: string; password?: string;
 
   if (input.password) await assertPasswordNotLeaked(input.password)
   assertSignupSignals(input)
-  // Taken inboxes get the same "code sent" answer as new ones (the owner is
-  // emailed a sign-in note instead), so this step can't reveal who has an account.
+  // Owner choice: a registered address is told so plainly (Turnstile guards this step).
   const signupDomain = email.split('@')[1]?.toLowerCase().trim() || ''
   await assertRealMailDomain(signupDomain)
+
+  const blocked = signupEmailBlock(await findUserByEmail(email))
+  if (blocked) throw new Error(blocked)
 
   // Limit code resends per email, not accounts per shared network.
   const recent = await latestValidOtp(email, 'signup')
@@ -222,13 +224,6 @@ export async function createSignupOtp(input: { email: string; password?: string;
     await (supabaseAdmin as any).from('signup_attempts').insert({ ip: (input.ip || '').slice(0, 100) || null, email, country: input.country || null })
   } catch { /* audit failure must not block signup */ }
 
-  const existingUser = await findUserByEmail(email)
-  if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
-    try {
-      await sendCustomAuthEmail({ to: email, type: 'existing_account', siteUrl: input.siteUrl })
-    } catch { /* same answer either way */ }
-    return
-  }
 
   const code = generateSixDigitCode()
   const codeHash = await hmacCode(email, 'signup', code)

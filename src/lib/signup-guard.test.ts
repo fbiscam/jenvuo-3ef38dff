@@ -1,9 +1,17 @@
 import { describe, it as test } from 'node:test'
 import { expect } from './chart/test-expect'
-import { emailOwnershipConflict, companyDomainVerdict, ipSubnet, isDisposableMx, splitFingerprint, trustedSignupIpCap } from './signup-guard'
+import { EMAIL_ALREADY_REGISTERED, signupEmailBlock, emailOwnershipConflict, companyDomainVerdict, ipSubnet, isDisposableMx, splitFingerprint, trustedSignupIpCap } from './signup-guard'
 import { isDisposableEmail } from './disposable-email-domains'
 
 describe('signup guard', () => {
+  test('an already registered email cannot sign up again', () => {
+    expect(signupEmailBlock({ email_confirmed_at: '2026-11-01T00:00:00Z' })).toBe(EMAIL_ALREADY_REGISTERED)
+    expect(signupEmailBlock({ confirmed_at: '2026-11-01T00:00:00Z' })).toBe(EMAIL_ALREADY_REGISTERED)
+  })
+  test('a new or unconfirmed email can sign up', () => {
+    expect(signupEmailBlock(null)).toBe(null)
+    expect(signupEmailBlock({ email_confirmed_at: null, confirmed_at: null })).toBe(null)
+  })
   test('company domain allows multiple accounts', () => {
     expect(companyDomainVerdict(4, 0)).toBe(null)
     expect(companyDomainVerdict(500, 0)).toBe(null)

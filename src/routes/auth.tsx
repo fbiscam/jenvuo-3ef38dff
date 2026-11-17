@@ -962,8 +962,9 @@ function AuthPage() {
     const { getDeviceFingerprint } = await import("@/lib/device-fingerprint");
     const fingerprint = await getDeviceFingerprint();
     const result = await sendSignupOtp({
-      data: { email, siteUrl: window.location.origin, fingerprint },
+      data: { email, siteUrl: window.location.origin, fingerprint, turnstileToken },
     });
+    if (turnstileSiteKey) freshTurnstile();
     setResending(false);
     if (!result.ok) {
       setErrorMsg(result.error || "Could not send code");
@@ -1132,7 +1133,7 @@ function AuthPage() {
                   return (
                     <span
                       key={i}
-                      className={`flex h-[46px] w-[42px] items-center justify-center text-[20px] font-medium ${j > 0 ? "border-l border-border" : ""} ${otpError ? "text-red-600" : "text-foreground"} ${active ? "bg-background ring-2 ring-inset ring-foreground/70" : ""}`}
+                      className={`flex h-[46px] w-[42px] items-center justify-center text-[20px] font-medium ${j > 0 ? "border-l border-border" : ""} ${otpError ? "text-red-600" : "text-foreground"} ${active ? "bg-background" : ""}`}
                     >
                       {otpCode[i] ?? ""}
                     </span>
@@ -1290,6 +1291,7 @@ function AuthPage() {
                   We've emailed a one time security code to <span className="text-foreground">{email}</span>. It should arrive in the next few minutes. If you don't see it, check your spam folder. Enter it below:
                 </p>
                 {otpBoxes(otpInputRef, "otp-error")}
+                {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} appearance="interaction-only" />}
                 {resendLine(resendCode)}
                 {errorBox}
                 <div className="space-y-3">
@@ -1463,7 +1465,7 @@ function AuthPage() {
                   : <>Your account asks for an email code. We've sent a 6-digit security code to <span className="text-foreground">{email}</span>. Enter it below:</>}
               </p>
               {otpBoxes(otpInputRef, "signin-code-error")}
-              {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} />}
+              {turnstileSiteKey && <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} resetKey={turnstileReset} appearance="interaction-only" />}
               {resendLine(() => void resendSigninCode())}
               {errorBox}
               <div className="space-y-3">

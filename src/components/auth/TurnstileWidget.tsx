@@ -38,11 +38,14 @@ export function TurnstileWidget({
   siteKey,
   onToken,
   resetKey,
+  appearance = "always",
 }: {
   siteKey: string;
   onToken: (token: string | null) => void;
   /** Change this value to force a fresh challenge (e.g. after a failed attempt). */
   resetKey?: number;
+  /** "interaction-only" stays hidden unless Cloudflare needs the visitor to click. */
+  appearance?: "always" | "interaction-only";
 }) {
   const box = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
@@ -59,6 +62,7 @@ export function TurnstileWidget({
           sitekey: siteKey,
           theme: dark ? "dark" : "light",
           size: "flexible",
+          appearance,
           callback: (t: string) => cb.current(t),
           "expired-callback": () => cb.current(null),
           "error-callback": () => cb.current(null),
@@ -79,5 +83,5 @@ export function TurnstileWidget({
     cb.current(null);
   }, [resetKey]);
 
-  return <div ref={box} className="min-h-[65px] w-full" />;
+  return <div ref={box} className={appearance === "always" ? "min-h-[65px] w-full" : "w-full empty:hidden"} />;
 }
