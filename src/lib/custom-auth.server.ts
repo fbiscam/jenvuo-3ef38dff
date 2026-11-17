@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import type { Session, User } from '@supabase/supabase-js'
 import type { Database } from '@/integrations/supabase/types'
 import { sendCustomAuthEmail } from './custom-auth-email.server'
-import { EMAIL_ALREADY_LINKED, signupEmailBlock } from './signup-guard'
+import { signupEmailBlock } from './signup-guard'
 
 type OtpPurpose = 'signup' | 'recovery' | 'login' | 'second_step' | 'email_2fa_setup'
 
@@ -285,10 +285,8 @@ export async function checkSignupOtp(input: { email: string; code: string }): Pr
   const email = normalizeEmail(input.email)
   const verified = await verifyCustomOtp(email, 'signup', input.code)
   if (!verified.ok) return { ok: false, error: verified.error }
-  const existingUser = await findUserByEmail(email)
-  if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
-    return { ok: false, error: EMAIL_ALREADY_LINKED }
-  }
+  const blocked = signupEmailBlock(await findUserByEmail(email))
+  if (blocked) return { ok: false, error: blocked }
   return { ok: true }
 }
 
@@ -306,9 +304,8 @@ export async function verifySignupOtp(input: { email: string; code: string; pass
   if (typeof input.emailUpdates === 'boolean') meta.email_updates = input.emailUpdates
   const existingUser = await findUserByEmail(email)
 
-  if (existingUser?.email_confirmed_at || existingUser?.confirmed_at) {
-    return { ok: false, error: EMAIL_ALREADY_LINKED }
-  }
+  const blocked = signupEmailBlock(existingUser)
+  if (blocked) return { ok: false, error: blocked }
 
   // Re-check email, password and browser verification at confirmation.
   try {
