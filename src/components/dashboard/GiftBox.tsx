@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { GIFT_REASONS, countUnseenGifts, giftTitle } from "@/lib/gifts";
 import { shortTitle } from "@/lib/notice-text";
 
@@ -26,7 +27,7 @@ export default function GiftBox() {
   const seenKey = uid ? `jenvu:gifts:seen:${uid}` : null;
 
   const load = useCallback(async () => {
-    const { data: u } = await supabase.auth.getUser();
+    const { data: u } = await readSessionUser();
     const id = u.user?.id;
     if (!id) return;
     setUid(id);

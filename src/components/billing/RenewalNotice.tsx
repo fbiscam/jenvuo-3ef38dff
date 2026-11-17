@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { renewalState, type RenewalRow, type RenewalState } from "@/lib/renewal";
 
 const name = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
@@ -13,7 +14,7 @@ export default function RenewalNotice() {
   useEffect(() => {
     let live = true;
     const load = async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await readSessionUser();
       if (!u.user) return;
       const { data } = await (supabase as any)
         .from("user_subscriptions")

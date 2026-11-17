@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Terminal opens on Free (no lock screen or sidebar lock); paid strategies keep plan hours. Profile page shows the default NFT picture when no photo is set. Dashboard no longer repeats ~8 sign-in checks on open and shows the last balance instantly. Free plan promises (keys, credit, bot, Terminal hours) checked against settings; verified on a real Free account.
+
 - [x] Every new account (any sign-up path) starts on Free with $10 automatically; Free credit renews every 30 days; regular paid plans move to Free when their period ends. Missing Free for the newest account backfilled; new test account verified on Billing. Age/goal welcome pop-up removed. Each public site now has its own sitemap/robots; blog, help and status sitemaps sent to Google. Publish needed for the new per-site sitemaps to go live.
 
 - [x] Restyle JX Bot feature cards to match the three supplied references: warm rounded two-column panels and sharp HTML/SVG MT5/checklist/target/session previews. Desktop, dark theme, 390/320px fit, reduced motion and no runtime errors verified; numeric-input utils regression passes and latest build OK. Nine Why portraits load at native 640px with no blur filter; unchanged. No licensing, account records or bot enforcement changed; previous inbox/schedule verification limits remain.

@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client'
+import { readSessionUser } from '@/lib/session-user'
 
 /**
  * New accounts should start with a clean alert feed: they must only ever see
@@ -10,7 +10,7 @@ let cached: string | null | undefined
 export async function getAlertCutoff(): Promise<string | null> {
   if (cached !== undefined) return cached
   try {
-    const { data } = await supabase.auth.getUser()
+    const { data } = await readSessionUser()
     cached = data.user?.created_at ?? null
   } catch {
     cached = null

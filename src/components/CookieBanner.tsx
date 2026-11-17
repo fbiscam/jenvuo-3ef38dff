@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 
 const STORAGE_KEY = "jenvu:cookie-consent";
 
@@ -10,7 +11,7 @@ async function persist(choice: Choice) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ choice, ts: Date.now() }));
   } catch {}
   try {
-    const { data } = await supabase.auth.getUser();
+    const { data } = await readSessionUser();
     if (data.user) {
       await supabase.from("cookie_consents").upsert({
         user_id: data.user.id,

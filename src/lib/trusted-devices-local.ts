@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { revokeTrustedDeviceByToken } from "@/lib/trusted-devices.functions";
 
 export const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
@@ -10,7 +11,7 @@ export const TRUSTED_DEVICE_KEY = (uid: string) => `mfa_trusted_device:${uid}`;
  */
 export async function revokeCurrentTrustedDevice(): Promise<void> {
   try {
-    const { data } = await supabase.auth.getUser();
+    const { data } = await readSessionUser();
     const uid = data.user?.id;
     if (!uid) return;
     const key = TRUSTED_DEVICE_KEY(uid);

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
 import { readCachedAvatar, writeCachedAvatar, AVATAR_TTL_SECONDS } from "@/lib/avatar-cache";
+import { getDefaultAvatar } from "@/lib/default-avatar";
 
 const PROFILE_CACHE_KEY = "jenvu:profile:basics";
 import { useVerification } from "@/hooks/useVerification";
@@ -221,8 +222,13 @@ function Profile() {
             aria-label={avatarPath ? "Change profile photo" : "Upload profile photo"}
             className="group relative h-11 w-11 shrink-0 cursor-pointer overflow-hidden rounded-full bg-gc-surface outline-none focus-visible:ring-2 focus-visible:ring-gc-ink-muted"
           >
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+            {avatarUrl || email || userId ? (
+              <img
+                src={avatarUrl || getDefaultAvatar(email || userId)}
+                alt="Profile"
+                className="h-full w-full object-cover"
+                onError={() => { if (avatarUrl) { setAvatarUrl(null); writeCachedAvatar(null); } }}
+              />
             ) : (
               <span className="flex h-full w-full items-center justify-center text-[17px] font-medium text-gc-ink">{initial}</span>
             )}

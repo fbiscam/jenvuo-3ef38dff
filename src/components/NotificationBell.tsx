@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import {
   listNotifications,
   markNotificationRead,
@@ -119,7 +120,7 @@ export default function NotificationBell() {
     let channel: ReturnType<typeof supabase.channel> | null = null;
     let cancelled = false;
     (async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data } = await readSessionUser();
       const uid = data.user?.id;
       if (!uid || cancelled) return;
       channel = supabase

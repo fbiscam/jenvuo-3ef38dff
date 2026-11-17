@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 
 export function useCurrentPlan() {
   const [plan, setPlan] = useState<string | null>(null);
@@ -7,7 +8,7 @@ export function useCurrentPlan() {
   useEffect(() => {
     let mounted = true;
     const load = async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await readSessionUser();
       if (!u.user) {
         return;
       }

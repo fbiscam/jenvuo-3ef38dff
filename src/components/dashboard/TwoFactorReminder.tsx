@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
 
 const DISMISS_KEY = "jenvu_2fa_reminder_day";
@@ -17,7 +18,7 @@ export default function TwoFactorReminder() {
     if (localStorage.getItem(DISMISS_KEY) === today()) return;
     let live = true;
     void (async () => {
-      const { data: u } = await supabase.auth.getUser();
+      const { data: u } = await readSessionUser();
       const created = u.user?.created_at ? new Date(u.user.created_at).getTime() : 0;
       // New accounts see the reminder only 5 hours after sign-up.
       if (!created || Date.now() - created < FIRST_SHOW_AFTER_MS) return;

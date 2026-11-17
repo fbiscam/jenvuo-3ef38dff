@@ -12,9 +12,6 @@ const ID_SENT_STATUSES = ["received", "pending"];
 /** The Founding month: Terminal and JX Bot end this long after approval (unless a paid plan is bought). */
 export const FOUNDING_PERIOD_MS = 30 * 24 * 60 * 60 * 1000;
 
-/** Locked reasons that keep their own message instead of the generic "apply" one. */
-const KEPT_LOCK_REASONS = ["id_required", "id_pending", "id_overdue", "founding_ended"];
-
 export type TerminalAccess = {
   allowed: boolean;
   reason:
@@ -61,15 +58,13 @@ export function evaluatePlanAccess(sub: Sub | null, now = Date.now()): TerminalA
 }
 
 /**
- * Terminal rule: the Terminal is for approved Founding members (who must send their ID
- * within 2 days of approval), admins, accounts on an active paid plan and a running
- * free trial (with the paid Terminal features, like a plan). Credit alone never opens it.
+ * Terminal rule: the Terminal itself is open to every signed-in account, Free included
+ * (owner, Nov 17 2026). Only the paid chart strategies are limited, by plan hours
+ * (`evaluateStrategyAccess`). The reason is kept so notices (ID deadline, trial) still show.
  */
 export function evaluateTerminalAccess(plan: TerminalAccess | null): TerminalAccess {
-  const base = plan ?? { allowed: false, reason: "not_founding", idDeadline: null, idSubmitted: false, trialEndsAt: null };
-  const allowed = base.allowed && (base.reason === "admin" || base.reason === "founding" || base.reason === "paid" || base.reason === "trial");
-  if (allowed) return base;
-  return { ...base, allowed: false, reason: KEPT_LOCK_REASONS.includes(base.reason) ? base.reason : "not_founding" };
+  const base = plan ?? { allowed: false, reason: "no_plan", idDeadline: null, idSubmitted: false, trialEndsAt: null };
+  return { ...base, allowed: true };
 }
 
 function escapeLike(v: string) {
@@ -152,7 +147,7 @@ export async function checkPlanAccess(
   return plan;
 }
 
-/** Terminal access: Founding members (2-day ID rule), admins, paid plans and the free trial. */
+/** Terminal access: open to every signed-in account; reason tells which plan rule applies. */
 export async function checkTerminalAccess(
   supabase: SupabaseClient<any>,
   userId: string,

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Lock, ShieldAlert, ShieldCheck } from "lucide-react";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
 import { getTerminalAccess } from "@/lib/terminal-access.functions";
 import { BANNER_PRIORITY, useBannerSlot } from "@/lib/banner-slot";
 
@@ -16,7 +16,7 @@ export type TerminalAccessState = {
 
 const INITIAL: TerminalAccessState = { loading: true, allowed: false, reason: null, idDeadline: null, idSubmitted: false, trialEndsAt: null };
 
-/** Terminal access for the signed-in user (approved Founding members and admins). */
+/** Terminal access state for the signed-in user (the Terminal is open to everyone; reason drives notices). */
 export function useTerminalAccess(userId: string | null | undefined): TerminalAccessState {
   const fetchAccess = useServerFn(getTerminalAccess);
   const [state, setState] = useState<TerminalAccessState>(INITIAL);
@@ -78,7 +78,7 @@ export function IdVerificationDeadlineNotice({ access }: { access: TerminalAcces
     <VerifyNotice
       tone="warn"
       title={`Verify your ID · ${formatLeft(left)} left`}
-      text={`Send it by ${when}. The Terminal and JX Bot open once it is approved.`}
+      text={`Send it by ${when}. Your Founding plan starts once it is approved.`}
       action="Verify ID now"
     />
   );
@@ -116,7 +116,7 @@ export function VerifyNotice({ tone = "info", title, text, action }: { tone?: "i
 
 /** Whether the Founding ID-deadline notice is showing (then the general banner is hidden). */
 export function showsIdDeadline(access: TerminalAccessState): boolean {
-  return !access.loading && !access.allowed && access.reason === "id_required" && !!access.idDeadline;
+  return !access.loading && access.reason === "id_required" && !!access.idDeadline;
 }
 
 /** Small banner while the Pro free trial is running. */
@@ -126,7 +126,7 @@ export function TerminalTrialNotice({ access }: { access: TerminalAccessState })
   return (
     <div className="mb-3 flex flex-col gap-3 rounded-md border border-gc-line bg-gc-blue-soft px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <span className="text-sm text-gc-ink">
-        <strong>Free Terminal trial:</strong> {formatLeft(left)} left (until {new Date(access.trialEndsAt).toLocaleDateString()}). Upgrade to keep using the Terminal after that.
+        <strong>Free Terminal trial:</strong> {formatLeft(left)} left (until {new Date(access.trialEndsAt).toLocaleDateString()}). Upgrade to keep the paid strategies after that.
       </span>
       <Link to="/pricing" className="inline-flex shrink-0 items-center justify-center rounded-full bg-gc-blue px-4 py-2 text-xs font-semibold text-gc-on-blue hover:bg-gc-blue-hover">
         Upgrade
@@ -135,72 +135,3 @@ export function TerminalTrialNotice({ access }: { access: TerminalAccessState })
   );
 }
 
-const LOCK_COPY: Record<string, { title: string; text: string; cta: string; to: "/dashboard/documents" | "/founding" | "/dashboard/pay" }> = {
-  id_required: {
-    title: "Verify your ID to open the Terminal",
-    text: "Your Founding application is approved. Send your ID within 2 days; the Terminal and JX Bot open as soon as it is approved.",
-    cta: "Verify ID now",
-    to: "/dashboard/documents",
-  },
-  id_pending: {
-    title: "Your ID is being reviewed",
-    text: "Thanks, we have your documents. The Terminal and JX Bot open automatically once your ID is approved.",
-    cta: "View documents",
-    to: "/dashboard/documents",
-  },
-  id_overdue: {
-    title: "Terminal is locked",
-    text: "Your 2-day window to send your ID has ended. Send it now and the Terminal opens once it is approved.",
-    cta: "Verify ID now",
-    to: "/dashboard/documents",
-  },
-  founding_ended: {
-    title: "Your Founding month has ended",
-    text: "Your 30 days are over, so the Terminal, JX Bot and Founding credit are closed. Buy a plan to open them again; it starts once your payment is approved.",
-    cta: "Buy a plan",
-    to: "/dashboard/pay",
-  },
-  not_founding: {
-    title: "Terminal is locked",
-    text: "The Terminal is only for approved Founding Program members whose ID is verified.",
-    cta: "Apply for Founding",
-    to: "/founding",
-  },
-};
-
-export function TerminalLocked({ reason }: { reason?: string | null }) {
-  const copy = LOCK_COPY[reason || ""] ?? LOCK_COPY.not_founding;
-  return (
-    <div className="flex h-full w-full items-center justify-center bg-white px-4 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100">
-          <Lock className="h-5 w-5 text-zinc-700" />
-        </div>
-        <h1 className="mt-4 text-xl font-semibold text-zinc-900">{copy.title}</h1>
-        <p className="mt-2 text-sm text-zinc-600">{copy.text}</p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-          <Link
-            to={copy.to}
-            className={copy.to === "/dashboard/documents" ? "verify-cta inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold" : "inline-flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800"}
-          >
-            {copy.cta}
-          </Link>
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-800 hover:bg-zinc-50"
-          >
-            Back to dashboard
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function TerminalChecking() {
-  return (
-    <div className="flex h-full w-full items-center justify-center bg-white text-sm text-zinc-500">
-      Checking access…
-    </div>
-  );
-}

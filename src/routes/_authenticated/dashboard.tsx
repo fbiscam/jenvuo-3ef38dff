@@ -8,12 +8,13 @@ import { useVerification } from "@/hooks/useVerification";
 import { VerificationBanner } from "@/components/VerificationGate";
 import { IdViewOnly } from "@/components/IdViewOnly";
 import { idActionsLocked, idViewOnly } from "@/lib/id-gate";
-import { TerminalLocked, TerminalChecking, useTerminalAccess, IdVerificationDeadlineNotice, showsIdDeadline } from "@/components/TerminalLockGate";
+import { useTerminalAccess, IdVerificationDeadlineNotice, showsIdDeadline } from "@/components/TerminalLockGate";
 import { Lock as TerminalLockIcon } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { toast } from "sonner";
 import SiteFooter from "@/components/SiteFooter";
 import DashboardFooter from "@/components/DashboardFooter";
@@ -745,7 +746,6 @@ function DashboardLayout() {
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const terminalAccess = useTerminalAccess(authUser?.id);
-  const terminalLocked = !terminalAccess.loading && !terminalAccess.allowed;
   // JX Bot opens for every signed-in user (plan-based; Free runs the $5 daily target).
   const jxBotNavFn = useServerFn(getJxBotNavAccess);
   const [jxBotOpen, setJxBotOpen] = useState<boolean | null>(null);
@@ -1370,15 +1370,14 @@ function DashboardLayout() {
                     const count = t.countKey
                       ? (newCounts as Record<string, number>)[t.countKey]
                       : undefined;
-                    const lockedTerminal = t.to === "/dashboard/terminal" && terminalLocked;
                     const lockedBot = t.to === "/dashboard/jx-bot" && jxBotLocked;
-                    if (lockedTerminal || lockedBot) {
+                    if (lockedBot) {
                       return (
                         <span
                           key={t.to}
                           role="link"
                           aria-disabled="true"
-                          title={lockedBot ? "JX Bot is loading your plan." : "Terminal is locked: it opens for verified Founding members and paid plans."}
+                          title="JX Bot is loading your plan."
                           className={`dashboard-sidebar-link relative flex cursor-not-allowed select-none items-center text-[14px] font-normal text-gc-ink opacity-50 ${navCollapsed ? "justify-center rounded-full px-2 py-2" : "gap-3 rounded-lg px-3 py-2"}`}
                         >
                           <Icon
@@ -1559,8 +1558,6 @@ function DashboardLayout() {
         >
           {pathname === "/dashboard" ? (
             <ConsoleWelcome name={fullName} keysCount={extKeyCount} />
-          ) : pathname === "/dashboard/terminal" && !terminalAccess.allowed ? (
-            terminalAccess.loading ? <TerminalChecking /> : <TerminalLocked reason={terminalAccess.reason} />
           ) : viewOnly && pathname !== "/dashboard/terminal" ? (
             <IdViewOnly onVerify={() => void navigateTo({ to: "/dashboard/documents" })}>
               <Outlet />
@@ -2427,7 +2424,7 @@ function ReferralSnapshot() {
 
     let channel: ReturnType<typeof supabase.channel> | null = null;
     (async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data } = await readSessionUser();
       const uid = data.user?.id;
       if (!uid || cancelled) return;
       channel = supabase

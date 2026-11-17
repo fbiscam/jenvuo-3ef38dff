@@ -6,6 +6,18 @@ import { getCreditState, spendCredits, CREDIT_COSTS, type CreditAction } from "@
 import { useAuthUser } from "./useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 
+const CREDIT_SNAPSHOT_PREFIX = "jenvu:page-cache:credit-state:";
+
+/** Last credit state saved in this browser for this user (same per-user snapshot idea as `page-cache.ts`). */
+function readCreditSnapshot(key: string | null): any {
+  if (!key || typeof window === "undefined") return undefined;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 export function useCredits() {
   const { user, loading: authLoading } = useAuthUser();
@@ -13,13 +25,25 @@ export function useCredits() {
   const fetchState = useServerFn(getCreditState);
   const spendFn = useServerFn(spendCredits);
 
+  const snapshotKey = user?.id ? `${CREDIT_SNAPSHOT_PREFIX}${user.id}` : null;
   const query = useQuery({
     queryKey: ["credit-state", user?.id],
     queryFn: () => fetchState(),
     enabled: !authLoading && !!user,
     retry: 2,
     staleTime: 15_000,
+    // Paint the last known balance/plan at once; the fresh copy replaces it a moment later.
+    placeholderData: () => readCreditSnapshot(snapshotKey),
   });
+
+  useEffect(() => {
+    if (!snapshotKey || !query.data || query.isPlaceholderData) return;
+    try {
+      window.localStorage.setItem(snapshotKey, JSON.stringify(query.data));
+    } catch {
+      /* storage full or blocked */
+    }
+  }, [snapshotKey, query.data, query.isPlaceholderData]);
 
   // Realtime: refresh whenever wallet, ledger, or subscription changes for this user
   useEffect(() => {
