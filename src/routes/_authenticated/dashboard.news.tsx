@@ -84,14 +84,15 @@ function NewsImpactPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-[30px] font-normal tracking-tight sm:text-[34px]">News Impact</h1>
-          <p className="mt-1 max-w-[600px] text-[18px] text-muted-foreground">
-            The next US high-impact news and which way Gold went after the same kind of result in the last {RELEASES_PER_EVENT} releases.
-          </p>
         </div>
         <button type="button" onClick={() => void refetch()} aria-label="Refresh news data" className="console-pill self-start sm:self-auto">
           <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} /> Refresh
         </button>
       </div>
+      <p className="mt-1 text-[13px] text-muted-foreground lg:whitespace-nowrap lg:text-[18px]">
+        <span className="block lg:inline">The next US high-impact news and which way Gold went</span>{" "}
+        <span className="block lg:inline">after the same kind of result in the last {RELEASES_PER_EVENT} releases.</span>
+      </p>
 
       {data?.feedError && (
         <div className="console-card mt-4 px-4 py-3 text-[13px] text-muted-foreground">The news feed did not answer this time; showing the last saved results.</div>
