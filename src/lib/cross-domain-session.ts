@@ -1,6 +1,15 @@
 import { supabase } from "@/integrations/supabase/client";
 import { dashExternal } from "@/lib/url-rewrite";
-import { addSignedOut, decideSync, isSignedOut, parseSignedOut, SIGNED_OUT_COOKIE, tokenClaims } from "@/lib/session-sync";
+import {
+  addSignedOut,
+  decideSync,
+  isSignedOut,
+  parseSignedOut,
+  shouldTakeNewerShared,
+  SIGNED_OUT_COOKIE,
+  tokenClaims,
+  tokenTimes,
+} from "@/lib/session-sync";
 
 // Shares the auth session across jenvu.com subdomains (dash, support, blogs,
 // leads). localStorage is per-origin, so without this a user signed in on
@@ -201,6 +210,56 @@ function clearStoredLocalTokens() {
   }
 }
 
+/**
+ * Copy a newer refresh of this same sign-in (made on another jenvu.com
+ * address) into this address's stored session, synchronously, before the
+ * auth client reads it. Refresh tokens are one-time: refreshing with an
+ * already-used one makes the backend end the sign-in everywhere.
+ */
+function pullNewerSharedTokens(): boolean {
+  if (signOutInProgress || !isJenvuHost()) return false;
+  const shared = readSessionCookie();
+  if (!shared) return false;
+  const marker = readSignedOutMarker();
+  let changed = false;
+  try {
+    const storage = window.localStorage;
+    for (let i = storage.length - 1; i >= 0; i -= 1) {
+      const key = storage.key(i);
+      if (!key?.startsWith("sb-") || !key.endsWith("-auth-token")) continue;
+      const raw = storage.getItem(key);
+      if (!raw) continue;
+      let stored: Record<string, unknown>;
+      try {
+        stored = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        continue;
+      }
+      const localToken = typeof stored.access_token === "string" ? stored.access_token : null;
+      if (!shouldTakeNewerShared({ localToken, sharedToken: shared.access_token, signedOut: marker })) continue;
+      const { expiresAt } = tokenTimes(shared.access_token);
+      stored.access_token = shared.access_token;
+      stored.refresh_token = shared.refresh_token;
+      if (expiresAt) {
+        stored.expires_at = expiresAt;
+        stored.expires_in = Math.max(0, expiresAt - Math.round(Date.now() / 1000));
+      }
+      storage.setItem(key, JSON.stringify(stored));
+      changed = true;
+    }
+  } catch {
+    return false;
+  }
+  if (changed) {
+    try {
+      void supabase.realtime.setAuth(shared.access_token);
+    } catch {
+      // live updates pick the new token up on their next reconnect
+    }
+  }
+  return changed;
+}
+
 /** Supabase forbids awaiting its own calls inside the auth callback. */
 function syncSoon() {
   window.setTimeout(() => void syncNow(), 0);
@@ -209,6 +268,28 @@ function syncSoon() {
 export function initCrossDomainSession() {
   if (initialized || !isJenvuHost()) return;
   initialized = true;
+
+  // Before the auth client first reads its stored session.
+  pullNewerSharedTokens();
+  // Every token read (app calls, live updates, request headers) checks the
+  // shared copy first, so a background tab never refreshes with a used token.
+  const auth = supabase.auth as typeof supabase.auth & { __jenvuShared?: boolean };
+  if (!auth.__jenvuShared) {
+    const original = auth.getSession.bind(auth);
+    auth.getSession = (() => {
+      pullNewerSharedTokens();
+      return original();
+    }) as typeof auth.getSession;
+    auth.__jenvuShared = true;
+  }
+  // Capture phase on window runs before the auth client's own
+  // visibilitychange handler, which refreshes right away when a tab returns.
+  for (const evt of ["visibilitychange", "focus", "pageshow"]) {
+    window.addEventListener(evt, () => void pullNewerSharedTokens(), true);
+  }
+  // The auth client refreshes on a 30s tick; checking every 5s (inside the
+  // backend's 10s reuse window) keeps two open addresses from colliding.
+  window.setInterval(() => void pullNewerSharedTokens(), 5_000);
 
   supabase.auth.onAuthStateChange((evt, session) => {
     if (signOutInProgress) {

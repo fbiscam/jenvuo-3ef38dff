@@ -82,3 +82,42 @@ export function decideSync(input: {
   if (sharedLive && differs) return "adopt-shared";
   return "keep";
 }
+
+/** Issue and expiry times (seconds) of a sign-in token, if present. */
+export function tokenTimes(token: string | null | undefined): { issuedAt: number | null; expiresAt: number | null } {
+  const empty = { issuedAt: null, expiresAt: null };
+  if (!token) return empty;
+  const part = token.split(".")[1];
+  if (!part) return empty;
+  try {
+    const claims = JSON.parse(decodeBase64Url(part)) as { iat?: unknown; exp?: unknown };
+    return {
+      issuedAt: typeof claims.iat === "number" ? claims.iat : null,
+      expiresAt: typeof claims.exp === "number" ? claims.exp : null,
+    };
+  } catch {
+    return empty;
+  }
+}
+
+/**
+ * Every refresh hands out a new one-time refresh token. When another address
+ * already refreshed this same sign-in, our copy holds a used token; refreshing
+ * with it makes the backend end the whole sign-in on every address (the
+ * repeated logouts). Take the newer copy first.
+ */
+export function shouldTakeNewerShared(input: {
+  localToken: string | null;
+  sharedToken: string | null;
+  signedOut: string[];
+}): boolean {
+  if (!input.localToken || !input.sharedToken) return false;
+  if (isSignedOut(input.sharedToken, input.signedOut)) return false;
+  const local = tokenClaims(input.localToken);
+  const shared = tokenClaims(input.sharedToken);
+  if (!local.sessionId || local.sessionId !== shared.sessionId) return false;
+  if (!local.userId || local.userId !== shared.userId) return false;
+  const li = tokenTimes(input.localToken).issuedAt;
+  const si = tokenTimes(input.sharedToken).issuedAt;
+  return li !== null && si !== null && si > li;
+}

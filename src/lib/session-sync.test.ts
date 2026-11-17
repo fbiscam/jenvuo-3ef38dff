@@ -1,6 +1,6 @@
 import { describe, it as test } from "node:test";
 import { expect } from "./chart/test-expect";
-import { addSignedOut, decideSync, parseSignedOut, SIGNED_OUT_KEEP, tokenClaims } from "./session-sync";
+import { addSignedOut, decideSync, parseSignedOut, shouldTakeNewerShared, SIGNED_OUT_KEEP, tokenClaims, tokenTimes } from "./session-sync";
 
 function token(sub: string, sid: string): string {
   const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -53,5 +53,35 @@ describe("session sync across jenvu.com addresses", () => {
     expect(list[0]).toBe(S1);
     expect(list.length).toBe(SIGNED_OUT_KEEP);
     expect(parseSignedOut(list.join(".")).length).toBe(SIGNED_OUT_KEEP);
+  });
+});
+
+function timedToken(sub: string, sid: string, iat: number): string {
+  const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return `${b64({ alg: "HS256" })}.${b64({ sub, session_id: sid, iat, exp: iat + 3600 })}.sig`;
+}
+
+describe("refreshed sign-in shared between addresses", () => {
+  test("a newer refresh of the same sign-in made elsewhere is taken", () => {
+    expect(shouldTakeNewerShared({ localToken: timedToken(A, S1, 1000), sharedToken: timedToken(A, S1, 4600), signedOut: [] })).toBe(true);
+  });
+
+  test("an older or equal shared copy is ignored", () => {
+    expect(shouldTakeNewerShared({ localToken: timedToken(A, S1, 4600), sharedToken: timedToken(A, S1, 1000), signedOut: [] })).toBe(false);
+    expect(shouldTakeNewerShared({ localToken: timedToken(A, S1, 4600), sharedToken: timedToken(A, S1, 4600), signedOut: [] })).toBe(false);
+  });
+
+  test("a different sign-in or user is never copied this way", () => {
+    expect(shouldTakeNewerShared({ localToken: timedToken(A, S1, 1000), sharedToken: timedToken(A, S2, 4600), signedOut: [] })).toBe(false);
+    expect(shouldTakeNewerShared({ localToken: timedToken(A, S1, 1000), sharedToken: timedToken(B, S1, 4600), signedOut: [] })).toBe(false);
+  });
+
+  test("a signed-out shared copy is never taken", () => {
+    expect(shouldTakeNewerShared({ localToken: timedToken(A, S1, 1000), sharedToken: timedToken(A, S1, 4600), signedOut: [S1] })).toBe(false);
+  });
+
+  test("reads issue and expiry times", () => {
+    expect(tokenTimes(timedToken(A, S1, 1000)).issuedAt).toBe(1000);
+    expect(tokenTimes(timedToken(A, S1, 1000)).expiresAt).toBe(4600);
   });
 });
