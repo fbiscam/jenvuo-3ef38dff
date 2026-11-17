@@ -7,6 +7,7 @@ import {
   parseSignedOut,
   shouldTakeNewerShared,
   SIGNED_OUT_COOKIE,
+  sharedSignInEnded,
   tokenClaims,
   tokenTimes,
 } from "@/lib/session-sync";
@@ -181,10 +182,13 @@ async function syncNow() {
       clearStoredLocalTokens();
     } else if (action === "adopt-shared" && shared) {
       const { error } = await supabase.auth.setSession(shared);
-      if (error) {
-        // The shared sign-in is no longer valid; forget it and any stale copy.
+      // A network hiccup is not a sign-out: keep everything and try next time.
+      if (error && sharedSignInEnded(error)) {
         clearSessionCookie();
-        if (local) {
+        if (local && !isSignedOut(local.access_token, readSignedOutMarker())) {
+          // Our own sign-in is still good: keep it and share it instead.
+          writeSessionCookie(local.access_token, local.refresh_token);
+        } else if (local) {
           droppingLocal = true;
           try {
             await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
@@ -355,7 +359,8 @@ export async function restoreSharedSession(): Promise<boolean> {
   }
   const { data, error } = await supabase.auth.setSession(tokens);
   if (error || !data.session) {
-    clearSessionCookie();
+    // Keep the shared copy through a network hiccup so the next page can retry.
+    if (!error || sharedSignInEnded(error)) clearSessionCookie();
     return false;
   }
   return true;

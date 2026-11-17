@@ -1,6 +1,6 @@
 import { describe, it as test } from "node:test";
 import { expect } from "./chart/test-expect";
-import { addSignedOut, decideSync, parseSignedOut, shouldTakeNewerShared, SIGNED_OUT_KEEP, tokenClaims, tokenTimes } from "./session-sync";
+import { addSignedOut, decideSync, parseSignedOut, sharedSignInEnded, shouldTakeNewerShared, SIGNED_OUT_KEEP, tokenClaims, tokenTimes } from "./session-sync";
 
 function token(sub: string, sid: string): string {
   const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -83,5 +83,19 @@ describe("refreshed sign-in shared between addresses", () => {
   test("reads issue and expiry times", () => {
     expect(tokenTimes(timedToken(A, S1, 1000)).issuedAt).toBe(1000);
     expect(tokenTimes(timedToken(A, S1, 1000)).expiresAt).toBe(4600);
+  });
+});
+
+describe("failed restore of a shared sign-in", () => {
+  test("an ended or invalid sign-in counts as signed out", () => {
+    expect(sharedSignInEnded({ name: "AuthApiError", status: 400 })).toBe(true);
+    expect(sharedSignInEnded({ name: "AuthSessionMissingError", status: 400 })).toBe(true);
+  });
+
+  test("a network blink, rate limit or server error never signs anyone out", () => {
+    expect(sharedSignInEnded({ name: "AuthRetryableFetchError", status: 0 })).toBe(false);
+    expect(sharedSignInEnded({ name: "AuthApiError", status: 429 })).toBe(false);
+    expect(sharedSignInEnded({ name: "AuthApiError", status: 503 })).toBe(false);
+    expect(sharedSignInEnded(null)).toBe(false);
   });
 });

@@ -121,3 +121,16 @@ export function shouldTakeNewerShared(input: {
   const si = tokenTimes(input.sharedToken).issuedAt;
   return li !== null && si !== null && si > li;
 }
+
+/**
+ * Did restoring a shared sign-in fail because that sign-in is really over?
+ * Network failures, rate limits and server errors are not a sign-out: treating
+ * them as one logged people out whenever the connection blinked.
+ */
+export function sharedSignInEnded(error: { name?: string; status?: number } | null | undefined): boolean {
+  if (!error) return false;
+  if (error.name === "AuthRetryableFetchError") return false;
+  const status = error.status;
+  if (typeof status === "number" && (status === 0 || status === 408 || status === 429 || status >= 500)) return false;
+  return true;
+}
