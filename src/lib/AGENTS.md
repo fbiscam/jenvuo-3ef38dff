@@ -33,3 +33,5 @@
 - Community photos and post media are served only through `/api/community-media` tokens (`community-media-token.server.ts`), which re-check blocks and post deletion on every load; mail signs only the viewer's own avatar: long-lived storage links outlived blocks.
 - Plan orders are priced on the server (`createTopupOrder` uses `planPrice`, ignoring the browser amount) and approval starts a plan or adds its API credit only when `planOrderCovers` (`plan-pricing.ts`, tested) says the payment covers it: a client-set amount once let an underpaid order collect plan credit.
 - The first sign-up step (`createSignupOtp`) refuses a confirmed address with `signupEmailBlock` (`signup-guard.ts`, tested) before any code is made; Turnstile guards that step: owner wants a clear already-registered error.
+
+- Each public host serves its own `/sitemap.xml` + `/robots.txt` (`sitemap-hosts.ts`, tested): Google missed subdomain pages listed on the apex.

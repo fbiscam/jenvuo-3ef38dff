@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Every new account (any sign-up path) starts on Free with $10 automatically; Free credit renews every 30 days; regular paid plans move to Free when their period ends. Missing Free for the newest account backfilled; new test account verified on Billing. Age/goal welcome pop-up removed. Each public site now has its own sitemap/robots; blog, help and status sitemaps sent to Google. Publish needed for the new per-site sitemaps to go live.
+
 - [x] Restyle JX Bot feature cards to match the three supplied references: warm rounded two-column panels and sharp HTML/SVG MT5/checklist/target/session previews. Desktop, dark theme, 390/320px fit, reduced motion and no runtime errors verified; numeric-input utils regression passes and latest build OK. Nine Why portraits load at native 640px with no blur filter; unchanged. No licensing, account records or bot enforcement changed; previous inbox/schedule verification limits remain.
 
 - [x] Give all nine illustrative Why reviews distinct trading labels; replace Products with Docs in desktop/mobile public headers without duplicate Docs links. Nine unique labels and actual Docs navigation verified on desktop/mobile; utils numeric-input test passed and build OK. Products route remains accessible directly; no account changes.
