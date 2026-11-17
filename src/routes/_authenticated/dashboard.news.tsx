@@ -99,7 +99,7 @@ function NewsImpactPage() {
 
       <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
 
-      <p className="mt-6 text-[12px] leading-relaxed text-muted-foreground">
+      <p className="mt-6 text-[14px] leading-relaxed text-muted-foreground">
         Release results come from a public economic calendar. Gold reactions use 5-minute PAXG/USDT candles (a gold-backed token that tracks spot gold), measured from the open of the release candle. Past reactions do not guarantee future moves; spreads widen and slippage is common at release time.
       </p>
     </div>
