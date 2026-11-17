@@ -84,7 +84,7 @@ function NewsImpactPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-[30px] font-normal tracking-tight sm:text-[34px]">News Impact</h1>
-          <p className="mt-1 max-w-[600px] text-[16px] text-muted-foreground">
+          <p className="mt-1 max-w-[600px] text-[18px] text-muted-foreground">
             The next US high-impact news and which way Gold went after the same kind of result in the last {RELEASES_PER_EVENT} releases.
           </p>
         </div>
@@ -99,7 +99,7 @@ function NewsImpactPage() {
 
       <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
 
-      <p className="mt-6 text-[14px] leading-relaxed text-muted-foreground">
+      <p className="mt-6 text-[16px] leading-relaxed text-muted-foreground">
         Release results come from a public economic calendar. Gold reactions use 5-minute PAXG/USDT candles (a gold-backed token that tracks spot gold), measured from the open of the release candle. Past reactions do not guarantee future moves; spreads widen and slippage is common at release time.
       </p>
     </div>
