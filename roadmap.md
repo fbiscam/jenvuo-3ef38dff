@@ -1,6 +1,6 @@
 # Roadmap
 
-- [x] Terminal opens on Free (no lock screen or sidebar lock); paid strategies keep plan hours. Profile page shows the default NFT picture when no photo is set. Dashboard no longer repeats ~8 sign-in checks on open and shows the last balance instantly. Free plan promises (keys, credit, bot, Terminal hours) checked against settings; verified on a real Free account.
+- [x] Terminal opens on Free (no lock screen or sidebar lock; Docs, Help, guide, Ask Jenvu and Start-on-your-own copy updated); paid strategies keep plan hours. Profile page shows the default NFT picture when no photo is set. Dashboard no longer repeats ~8 sign-in checks on open and shows the last balance instantly. Free plan promises (keys, credit, bot, Terminal hours) checked against settings; verified on a real Free account.
 
 - [x] Every new account (any sign-up path) starts on Free with $10 automatically; Free credit renews every 30 days; regular paid plans move to Free when their period ends. Missing Free for the newest account backfilled; new test account verified on Billing. Age/goal welcome pop-up removed. Each public site now has its own sitemap/robots; blog, help and status sitemaps sent to Google. Publish needed for the new per-site sitemaps to go live.
 
