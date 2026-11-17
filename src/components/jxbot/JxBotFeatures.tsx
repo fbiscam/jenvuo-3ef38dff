@@ -84,7 +84,7 @@ function StopCard() {
 
 function HoursCard() {
   return (
-    <Card title="Trades at safe hours" text="New entries stay in the Asia and London sessions. The London open is blocked, New York entries are off, and existing trades continue to be managed.">
+    <Card title="Trades at safe hours" text="New entries stay in the Asia and London sessions. The London open is blocked, New York entries are off, and existing trades continues.">
       <div className="jx-preview-window jx-schedule-window"><WindowBar title="Session schedule · UTC" /><div className="jx-preview-heading"><span><Clock3 size={14} /> Trading windows</span><span className="jx-status-pill">Session guard</span></div>
         <div className="jx-session-row"><span className="jx-session-icon"><Clock3 size={15} /></span><div><strong>Asia</strong><p>Entry window</p></div><span className="jx-session-tag">Allowed</span></div>
         <div className="jx-session-row"><span className="jx-session-icon"><Clock3 size={15} /></span><div><strong>London</strong><p>Open block · 06:15–09:00</p></div><span className="jx-session-tag">Filtered</span></div>
