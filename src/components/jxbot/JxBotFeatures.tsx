@@ -71,7 +71,7 @@ function CandlesCard() {
 
 function StopCard() {
   return (
-    <Card title="Stops at your target" text={`Stops at $${FREE_BOT.dailyTargetUsd} on Free, ${DAILY_TARGET_PCT.pro}% Pro, ${DAILY_TARGET_PCT.elite}% Elite, ${DAILY_TARGET_PCT.ultra}% Ultra, with a ${DAILY_DRAWDOWN_PCT}% drawdown guard.`}>
+    <Card title="Stops at your target" text={`Free stops at $${FREE_BOT.dailyTargetUsd}; Pro at ${DAILY_TARGET_PCT.pro}%, Elite at ${DAILY_TARGET_PCT.elite}% and Ultra at ${DAILY_TARGET_PCT.ultra}% of each account's day-start balance. The ${DAILY_DRAWDOWN_PCT}% drawdown guard protects the day's peak closed balance.`}>
       <div className="jx-target-stage">
         <div className="jx-target-bubble">Daily target reached <Check size={14} /></div>
         <div className="jx-guard-caption"><ShieldCheck size={15} /> Your limits stay in control</div>
