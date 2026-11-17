@@ -512,7 +512,7 @@ function GetStarted() {
           <div className="flex flex-col rounded-md border border-gc-line p-7 sm:p-8">
             <h3 className="text-2xl font-medium">Start on your own</h3>
             <div className="flex-1">
-              <Ticks items={["Apply to the Founding Program", "Verify your ID to open the Terminal and JX Bot", "Pick or upgrade a plan anytime from Payments"]} />
+              <Ticks items={["Apply to the Founding Program", "Verify your ID to start your Founding plan", "Pick or upgrade a plan anytime from Payments"]} />
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <BuyNowButton className={pillLight}>

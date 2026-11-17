@@ -33,7 +33,7 @@ export const TOOLS_HOW_TO_OPEN = [
   "Open the Terminal from the dashboard menu.",
   "In the chart's left rail, the Indicators button opens the indicator list and the Jenvu SMC button opens the SMC tools. Switch each tool on or off; choices are saved.",
   "Pick a timeframe from the Timeframe button. Swing price action, Fresh sweep and Liquidity sweeps show only on 1H, 2H, 4H and 1D; their switches hide on other timeframes.",
-  "Fresh sweep, Swing price action and the Zone + FVG strategy are included with a plan (Pro, Elite, Ultra or Founding). The Terminal is locked without a plan.",
+  "Fresh sweep, Swing price action and the Zone + FVG strategy run a set time each UTC day by plan: Free 2 hours, Pro 8, Elite 16, Ultra all day. The Terminal itself is open on every plan, Free included.",
 ];
 
 export const TOOLS_WORKFLOW = [

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listMyOrders } from "@/lib/payments.functions";
 import { networkMeta, type PaymentOrder } from "@/lib/payments/shared";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { ListFilter } from "lucide-react";
 import { ConsoleSelect } from "@/components/dashboard/ConsoleSelect";
 
@@ -26,7 +27,7 @@ export default function InvoiceHistory({ variant = "list" }: { variant?: "list" 
   const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }) => {
+    readSessionUser().then(async ({ data }) => {
       setEmail(data.user?.email ?? "");
       if (!data.user) return;
       const { data: prof } = await supabase

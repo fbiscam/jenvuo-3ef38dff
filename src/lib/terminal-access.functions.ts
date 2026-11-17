@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-/** Whether the signed-in user may open the Terminal (approved Founding members + admins). */
+/** Terminal access for the signed-in user: always open; the reason drives plan notices. */
 export const getTerminalAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

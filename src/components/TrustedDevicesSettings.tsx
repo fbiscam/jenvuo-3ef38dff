@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { listTrustedDevices, revokeTrustedDevice } from "@/lib/trusted-devices.functions";
 import { revokeCurrentTrustedDevice, TRUSTED_DEVICE_KEY } from "@/lib/trusted-devices-local";
 
@@ -68,7 +69,7 @@ export function TrustedDevicesSettings() {
 
   useEffect(() => {
     void (async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data } = await readSessionUser();
       const uid = data.user?.id ?? null;
       setCurrentUid(uid);
       if (uid) setHasCurrentTrust(!!window.localStorage.getItem(TRUSTED_DEVICE_KEY(uid)));

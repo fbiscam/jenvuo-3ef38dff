@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { Trash2, BookOpen, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
@@ -454,7 +455,7 @@ function LogTradeModal({ onClose, onSaved }: { onClose: () => void; onSaved: (t:
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    const { data: userData } = await supabase.auth.getUser();
+    const { data: userData } = await readSessionUser();
     const uid = userData.user?.id;
     if (!uid) { toast.error("Not signed in"); setSaving(false); return; }
 

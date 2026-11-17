@@ -161,11 +161,10 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "access open free paid strategies founding program id verification",
         body: (
           <>
-            <p>The Terminal is only for <strong>approved Founding Program members</strong> (and accounts on a paid plan).</p>
+            <p>The Terminal is open to <strong>every signed-in account</strong>, Free included.</p>
             <ul>
-              <li>After approval you have <strong>2 days</strong> to verify your ID. If it isn't sent in time, the Terminal locks until you send it.</li>
-              <li>Credit alone never unlocks the Terminal.</li>
-              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. The Terminal and JX Bot open once the ID is verified, and the plan's API credit is added ($19 Pro, $39 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
+              <li>The paid indicators (Fresh sweep, price action, Zone + FVG) run a set time each UTC day: Free 2 hours, Pro 8, Elite 16, Ultra all day. When the time is used up they lock until 00:00 UTC.</li>
+              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. Their Founding plan (its Terminal hours and JX Bot target) starts once the ID is verified, and the plan's API credit is added ($19 Pro, $39 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>

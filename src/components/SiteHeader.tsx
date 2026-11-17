@@ -119,7 +119,18 @@ export default function SiteHeader() {
                 title="Account settings"
                 className="ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full ring-1 ring-border hover:ring-2 hover:ring-foreground/30"
               >
-                {avatarUrl && <img src={avatarUrl} alt="" className="h-full w-full object-cover" />}
+                {avatarUrl && (
+                  <img
+                    src={avatarUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    // A dead photo link falls back to the default NFT picture, never a broken image.
+                    onError={() => {
+                      const fallback = getDefaultAvatar(authUser?.email || authUser?.id);
+                      if (avatarUrl !== fallback) { writeCachedAvatar(null); setAvatarUrl(fallback); }
+                    }}
+                  />
+                )}
               </Link>
             ) : (
               <Link to="/auth" className="hidden whitespace-nowrap rounded-md px-2.5 py-2 text-[14px] text-muted-foreground hover:bg-muted hover:text-foreground xl:inline-flex">

@@ -35,8 +35,8 @@ function normalizeEmail(email: string) {
 }
 
 function publicSignupEnabled(): boolean {
-  // Public signup is open; the Terminal itself stays locked to approved
-  // Founding Program members (see terminal-access.server.ts).
+  // Public signup is open; the Terminal is open to every signed-in account
+  // (see terminal-access.server.ts).
   return true
 }
 

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { UploadCloud, Trash2, FileVideo, FileImage, FileText, Check, ShieldCheck, Lock } from "lucide-react";
 import { SettingsCard, SettingsFlat, SettingsRow } from "@/components/settings/SettingsCard";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import {
   getMyDocumentStatus,
   getMyDocumentSummary,
@@ -134,7 +135,7 @@ function DocumentsPage() {
     }
     setUploading(true);
     try {
-      const { data: session } = await supabase.auth.getUser();
+      const { data: session } = await readSessionUser();
       const uid = session?.user?.id;
       if (!uid) throw new Error("Not signed in");
       let done = 0;

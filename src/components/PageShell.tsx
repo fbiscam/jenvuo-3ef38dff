@@ -201,7 +201,7 @@ export function NextStep() {
         </div>
         <div className={card}>
           <h3 className="text-2xl font-medium text-gc-ink">Start on your own</h3>
-          {ticks(["Apply to the Founding Program", "Verify your ID to open the Terminal and JX Bot", "Pick or upgrade a plan anytime from Payments"])}
+          {ticks(["Apply to the Founding Program", "Verify your ID to start your Founding plan", "Pick or upgrade a plan anytime from Payments"])}
           <div className="mt-8 flex flex-wrap gap-3">
             <BuyNowButton className={pillOutline}>
               <ArrowUpRight className="h-3.5 w-3.5" />

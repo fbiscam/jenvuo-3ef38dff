@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { readSessionUser } from "@/lib/session-user";
 import { toast } from "sonner";
 import { getMyMailAddress } from "@/lib/mail.functions";
 import AvatarAdjuster from "@/components/AvatarAdjuster";
@@ -137,7 +138,7 @@ function Profile() {
 
   const saveProfile = async () => {
     setSaving(true);
-    const { data: user } = await supabase.auth.getUser();
+    const { data: user } = await readSessionUser();
     if (!user.user) return;
     const { error } = await supabase.from("profiles").upsert({ id: user.user.id, full_name: fullName });
     setSaving(false);

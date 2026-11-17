@@ -135,8 +135,8 @@ export const Route = createFileRoute("/_authenticated")({
 
     verifiedUserId = user.id;
 
-    // Access model: public signup is open; the Terminal is locked to approved
-    // founding members (terminal-access.server.ts).
+    // Access model: public signup is open; the Terminal is open to every
+    // signed-in account (terminal-access.server.ts).
     // Approved founding applicants sign in BEFORE their plan is activated
     // (plan activation happens when the admin marks the account "active" /
     // funded). Blocking the dashboard on user_subscriptions.status = "active"
