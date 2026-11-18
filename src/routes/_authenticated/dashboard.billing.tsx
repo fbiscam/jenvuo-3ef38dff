@@ -7,7 +7,6 @@ import { useTrial } from "@/hooks/useTrial";
 import { cancelMyPlan } from "@/lib/subscription.functions";
 import { redeemFreeCode } from "@/lib/payments.functions";
 import InvoiceHistory from "@/components/billing/InvoiceHistory";
-import { Info } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/billing")({
   head: () => ({
