@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Premium prices for everyone: Pro $69 / Elite $139 / Ultra $239, JX Bot in every paid plan (50-seat limit removed); API credit Free $20 / Pro $40 / Elite $70 / Ultra $90; Founding Pro/Elite credit $40 / $70; update every page/copy
+- [x] Premium prices for everyone: Pro $69 / Elite $139 / Ultra $239, JX Bot in every paid plan (50-seat limit removed); API credit Free $20 / Pro $40 / Elite $70 / Ultra $90; Founding Pro/Elite credit $40 / $70; update every page/copy
 
 - [x] JX Bot: 50 new bot seats per UTC month (first 50 paid buyers get Pro $29/Elite $59/Ultra $99 with bot); after 50, plans are $19/$39/$59 Terminal + API only; existing bot holders keep it on renewal; Free and no-seat plans get no bot (only seat holders + Founding); Founding seats 100 → 50; update every page/copy
 
@@ -129,7 +129,6 @@
 - [x] Pricing logos: plain black icons on white (no black tiles), dashboard Terminal icon, xAI-sized
 
 - [x] Free plan replaces the free trial for new sign-ups: $10 API credit every month, 1 API key; Terminal paid indicators 2h/8h/16h/24h a day by plan (lock until 00:00 UTC); Pricing page Free card + compare table
-- [ ] JX Bot on Free with a $5 daily target — waiting on owner: JX Bot is Founding-only today
 
 - [x] API keys per plan: Free 1, Pro 3, Elite 5, Ultra 7 (database + Pricing + dashboard)
 - [x] Pricing: title colours light black; detailed compare table with ticks; plan header row sticks while the table is on screen (xAI style)
