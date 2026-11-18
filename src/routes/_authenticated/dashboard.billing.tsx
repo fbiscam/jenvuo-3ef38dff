@@ -43,10 +43,10 @@ const pill =
 const pillSolid =
   "inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover disabled:opacity-50";
 const field =
-  "field-flat h-10 w-full rounded-lg border-0 bg-gc-surface px-3 text-[14px] text-gc-ink shadow-none outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:ring-0";
+  "field-flat h-10 w-full rounded-lg border-0 bg-background px-3 text-[14px] text-gc-ink placeholder:text-muted-foreground shadow-none outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:ring-0";
 
-// Promo box: same flat field, but on a white surface so it stands out on the grey card.
-const promoField = field.replace("bg-gc-surface", "bg-background");
+// Promo box uses the same white flat field.
+const promoField = field;
 
 function Billing() {
   const credits = useCredits();
