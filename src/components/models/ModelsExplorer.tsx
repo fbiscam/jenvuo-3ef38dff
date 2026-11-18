@@ -278,7 +278,7 @@ export default function ModelsExplorer({ apiHref = "/dashboard/api", inShell = f
         <h1 className="text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">Models</h1>
 
         {/* Featured models */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {CONSOLE_FEATURED.map((f, i) => {
             const m = MODEL_CATALOG.find((x) => x.id === f.id);
             if (!m) return null;
@@ -649,7 +649,6 @@ const CONSOLE_FEATURED: { id: string; kind: string; isNew?: boolean }[] = [
   { id: "claude-opus-5.5", kind: "Chat · Default", isNew: true },
   { id: "gpt-5.5-pro", kind: "Reasoning", isNew: true },
   { id: "gemini-3.1-pro", kind: "Long context", isNew: true },
-  { id: "deepseek-v3.2", kind: "Open chat" },
 ];
 
 const CONSOLE_CODE_CHAT = ["claude-sonnet-5", "claude-fable-5.1", "gpt-5.6-terra", "qwen3-coder-480b"];
