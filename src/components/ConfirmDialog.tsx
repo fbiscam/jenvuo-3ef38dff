@@ -13,6 +13,7 @@ export function ConfirmDialog({
   confirmLabel = "Delete",
   busyLabel = "Deleting…",
   busy = false,
+  icon,
   onConfirm,
   onCancel,
 }: {
@@ -22,6 +23,8 @@ export function ConfirmDialog({
   confirmLabel?: string;
   busyLabel?: string;
   busy?: boolean;
+  /** Icon in the red circle; defaults to a bin. */
+  icon?: ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -48,7 +51,7 @@ export function ConfirmDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10 text-destructive">
-          <Trash2 className="h-[18px] w-[18px]" />
+          {icon ?? <Trash2 className="h-[18px] w-[18px]" />}
         </div>
         <div className="mt-3 text-[15px] font-semibold text-foreground">{title}</div>
         {description ? (

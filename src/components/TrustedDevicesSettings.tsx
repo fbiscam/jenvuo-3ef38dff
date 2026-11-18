@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { readSessionUser } from "@/lib/session-user";
 import { listTrustedDevices, revokeTrustedDevice } from "@/lib/trusted-devices.functions";
@@ -113,10 +114,13 @@ export function TrustedDevicesSettings() {
     }
   };
 
+  const [askRevokeAll, setAskRevokeAll] = useState(false);
+  const [revokingAll, setRevokingAll] = useState(false);
+
   const revokeAll = async () => {
     const all = devices ?? [];
-    if (all.length === 0) return;
-    if (!window.confirm(`Revoke all ${all.length} trusted device${all.length === 1 ? "" : "s"}?`)) return;
+    if (all.length === 0) { setAskRevokeAll(false); return; }
+    setRevokingAll(true);
     for (const d of all) {
       try {
         await revokeFn({ data: { id: d.id } });
@@ -125,10 +129,24 @@ export function TrustedDevicesSettings() {
     if (currentUid) window.localStorage.removeItem(TRUSTED_DEVICE_KEY(currentUid));
     toast.success("All trusted devices revoked");
     setDevices([]);
+    setRevokingAll(false);
+    setAskRevokeAll(false);
   };
+
+  const deviceCount = devices?.length ?? 0;
 
   return (
     <div className="mt-2">
+      <ConfirmDialog
+        open={askRevokeAll}
+        title="Revoke all trusted devices?"
+        description={`All ${deviceCount} trusted device${deviceCount === 1 ? "" : "s"} will need a code on the next sign-in.`}
+        confirmLabel="Revoke all"
+        busyLabel="Revoking…"
+        busy={revokingAll}
+        onConfirm={() => void revokeAll()}
+        onCancel={() => setAskRevokeAll(false)}
+      />
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <p className="text-sm text-zinc-500 sm:max-w-2xl lg:max-w-3xl">
           Browsers where you ticked <span className="font-medium text-zinc-700">Remember this device</span> during two-factor sign-in. Revoke browser you don't recognize.
@@ -145,7 +163,7 @@ export function TrustedDevicesSettings() {
           )}
           {devices && devices.length > 0 && (
             <button
-              onClick={revokeAll}
+              onClick={() => setAskRevokeAll(true)}
               className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
             >
               Revoke all

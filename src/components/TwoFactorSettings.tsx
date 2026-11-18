@@ -1,5 +1,6 @@
 import * as React from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Shield, ShieldCheck, ShieldOff, Copy, Check, Mail, Smartphone } from "lucide-react";
@@ -35,6 +36,7 @@ function AuthenticatorSettings({ holdUntil }: { holdUntil: string | null }) {
   const [code, setCode] = React.useState("");
   const [codeError, setCodeError] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
+  const [askRemove, setAskRemove] = React.useState(false);
 
   const verified = factors.find((f) => f.status === "verified" && f.factor_type === "totp");
 
@@ -153,10 +155,10 @@ function AuthenticatorSettings({ holdUntil }: { holdUntil: string | null }) {
 
   const disable = async () => {
     if (!verified) return;
-    if (!window.confirm("Remove the authenticator app? You'll no longer need its code at sign-in.")) return;
     setBusy(true);
     const res = await removeFactor({ data: { factorId: verified.id } }).catch(() => ({ ok: false as const, error: "Could not remove the authenticator. Try again." }));
     setBusy(false);
+    setAskRemove(false);
     if (!res.ok) {
       toast.error(res.error);
       return;
@@ -275,7 +277,7 @@ function AuthenticatorSettings({ holdUntil }: { holdUntil: string | null }) {
             {holdUntil && <HoldNote until={holdUntil} />}
           </div>
           <button
-            onClick={disable}
+            onClick={() => setAskRemove(true)}
             disabled={busy || !!holdUntil}
             className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50"
           >
@@ -283,6 +285,17 @@ function AuthenticatorSettings({ holdUntil }: { holdUntil: string | null }) {
             Remove
           </button>
         </div>
+        <ConfirmDialog
+          open={askRemove}
+          title="Remove authenticator app?"
+          description="You'll no longer need its code at sign-in."
+          confirmLabel="Remove"
+          busyLabel="Removing…"
+          busy={busy}
+          icon={<ShieldOff className="h-[18px] w-[18px]" />}
+          onConfirm={() => void disable()}
+          onCancel={() => setAskRemove(false)}
+        />
       </div>
     );
   }
@@ -328,6 +341,7 @@ function EmailCodeSettings({ on, holdUntil, onChange }: { on: boolean; holdUntil
   const [sentTo, setSentTo] = React.useState<string | null>(null);
   const [code, setCode] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
+  const [askOff, setAskOff] = React.useState(false);
 
   const send = async () => {
     setBusy(true);
@@ -354,10 +368,10 @@ function EmailCodeSettings({ on, holdUntil, onChange }: { on: boolean; holdUntil
   };
 
   const off = async () => {
-    if (!window.confirm("Turn off email codes? Password sign-ins will no longer ask for an emailed code.")) return;
     setBusy(true);
     const res = await turnOff().catch(() => ({ ok: false as const, error: "Could not turn off email codes. Try again." }));
     setBusy(false);
+    setAskOff(false);
     if (!res.ok) { toast.error(res.error); return; }
     toast.success("Email codes turned off");
     onChange();
@@ -374,7 +388,7 @@ function EmailCodeSettings({ on, holdUntil, onChange }: { on: boolean; holdUntil
           {on && holdUntil && <HoldNote until={holdUntil} />}
         </div>
         {on ? (
-          <button onClick={off} disabled={busy || !!holdUntil} className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50">
+          <button onClick={() => setAskOff(true)} disabled={busy || !!holdUntil} className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-border bg-background px-4 py-1.5 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-50">
             {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldOff className="h-3.5 w-3.5" />}
             Turn off
           </button>
@@ -410,6 +424,17 @@ function EmailCodeSettings({ on, holdUntil, onChange }: { on: boolean; holdUntil
           </div>
         </form>
       )}
+      <ConfirmDialog
+        open={askOff}
+        title="Turn off email codes?"
+        description="Password sign-ins will no longer ask for an emailed code."
+        confirmLabel="Turn off"
+        busyLabel="Turning off…"
+        busy={busy}
+        icon={<ShieldOff className="h-[18px] w-[18px]" />}
+        onConfirm={() => void off()}
+        onCancel={() => setAskOff(false)}
+      />
     </div>
   );
 }
