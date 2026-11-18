@@ -44,3 +44,18 @@ describe("plan pricing", () => {
     expect(planOrderCovers({ planId: "elite", payUsd: 20, discountUsd: 11.8 })).toBe(false);
   });
 });
+
+import { paidPeriodEnd } from "./plan-pricing";
+describe("paid plan period", () => {
+  const now = Date.parse("2026-11-18T00:00:00Z");
+  it("a new or switched plan runs 30 days from payment", () => {
+    expect(paidPeriodEnd({ samePlan: false, currentEnd: "2026-11-25T00:00:00Z", now })).toBe("2026-12-18T00:00:00.000Z");
+    expect(paidPeriodEnd({ samePlan: false, currentEnd: null, now })).toBe("2026-12-18T00:00:00.000Z");
+  });
+  it("paying again for the same plan adds 30 days to the time left", () => {
+    expect(paidPeriodEnd({ samePlan: true, currentEnd: "2026-11-25T00:00:00Z", now })).toBe("2026-12-25T00:00:00.000Z");
+  });
+  it("a same-plan payment after the period ended starts from the payment", () => {
+    expect(paidPeriodEnd({ samePlan: true, currentEnd: "2026-11-01T00:00:00Z", now })).toBe("2026-12-18T00:00:00.000Z");
+  });
+});

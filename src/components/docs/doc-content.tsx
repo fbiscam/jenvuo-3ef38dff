@@ -289,7 +289,7 @@ export const DOC_GROUPS: DocGroup[] = [
           <>
             <p>
               JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
-              Free 1 IP, Pro 2, Elite 3, Ultra 5. There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
+              Pro 2 IPs, Elite 3, Ultra 4 (Free has no JX Bot). There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
             </p>
             <ul>
               <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>

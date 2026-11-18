@@ -61,3 +61,18 @@ export function planOrderCovers(args: { planId: string | null | undefined; payUs
   const paid = Math.max(0, Number(args.payUsd) || 0) + Math.max(0, Number(args.discountUsd) || 0);
   return paid + 0.01 >= planPrice(args.planId, args.withBot ?? true);
 }
+
+/** Length of one paid plan period bought on the Payments page. */
+export const PLAN_PERIOD_DAYS = 30;
+
+/**
+ * End of the paid period an approved plan order starts. Paying again for the same plan adds
+ * 30 days on top of the time left; a new or switched plan runs 30 days from the payment.
+ * Without an end date the hourly expiry job never moves the account back to Free.
+ */
+export function paidPeriodEnd(args: { samePlan: boolean; currentEnd: string | null | undefined; now?: number }): string {
+  const now = args.now ?? Date.now();
+  const end = args.currentEnd ? Date.parse(args.currentEnd) : NaN;
+  const from = args.samePlan && Number.isFinite(end) && end > now ? end : now;
+  return new Date(from + PLAN_PERIOD_DAYS * 86_400_000).toISOString();
+}

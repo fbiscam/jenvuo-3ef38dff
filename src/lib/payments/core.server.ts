@@ -225,13 +225,22 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
 
   const { data: sub } = await supabaseAdmin
     .from("user_subscriptions")
-    .select("plan_id, is_trial")
+    .select("plan_id, is_trial, current_period_end")
     .eq("user_id", userId)
     .maybeSingle();
+  const { paidPeriodEnd } = await import("@/lib/plan-pricing");
 
+  // Paying again for the plan you already have extends it by one period.
+  if (sub?.plan_id === earned.id && !(sub as any).is_trial) {
+    if (targetPlanId !== earned.id) return null;
+    await supabaseAdmin
+      .from("user_subscriptions")
+      .update({ status: "active", current_period_end: paidPeriodEnd({ samePlan: true, currentEnd: (sub as any).current_period_end }), updated_at: new Date().toISOString() } as any)
+      .eq("user_id", userId);
+    return earned.id as string;
+  }
   // Downgrades are allowed only when explicitly targeted via targetPlanId.
   // A plain wallet top-up (no target) must never demote a higher tier.
-  if (sub?.plan_id === earned.id && !(sub as any).is_trial) return null;
   if (!targetPlanId) {
     const priceOf = (id?: string | null) =>
       Number((plans ?? []).find((p: any) => p.id === id)?.price_usd ?? 0);
@@ -244,6 +253,9 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
     status: "active",
     is_trial: false,
     trial_ends_at: null,
+    // Every paid plan gets an end date so the hourly job moves it back to Free when unpaid.
+    current_period_start: new Date().toISOString(),
+    current_period_end: paidPeriodEnd({ samePlan: false, currentEnd: (sub as any)?.current_period_end }),
     updated_at: new Date().toISOString(),
   };
   if (sub) {

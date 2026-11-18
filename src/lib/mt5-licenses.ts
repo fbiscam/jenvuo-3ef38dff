@@ -2,7 +2,7 @@
 export const MT5_PLANS = {
   pro: { name: "Pro", monthlyTarget: 600, licenses: 2 },
   elite: { name: "Elite", monthlyTarget: 1500, licenses: 3 },
-  ultra: { name: "Ultra", monthlyTarget: 3000, licenses: 5 },
+  ultra: { name: "Ultra", monthlyTarget: 3000, licenses: 4 },
 } as const;
 
 export type Mt5PlanId = keyof typeof MT5_PLANS;

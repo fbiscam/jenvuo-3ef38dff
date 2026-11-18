@@ -13,10 +13,10 @@ describe("mt5 licenses", () => {
     expect(dailyTarget("elite")).toBe(75);
     expect(dailyTarget("ultra")).toBe(150);
   });
-  it("license limits per plan: Free 1, Pro 2, Elite 3, Ultra 5 IPs", () => {
+  it("license limits per plan: Free 1, Pro 2, Elite 3, Ultra 4 IPs", () => {
     expect(licenseLimit("pro")).toBe(2);
     expect(licenseLimit("elite")).toBe(3);
-    expect(licenseLimit("ultra")).toBe(5);
+    expect(licenseLimit("ultra")).toBe(4);
     expect(licenseLimit("free")).toBe(1);
     expect(licenseLimit("none")).toBe(0);
   });

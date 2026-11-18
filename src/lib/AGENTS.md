@@ -36,3 +36,4 @@
 - The first sign-up step (`createSignupOtp`) refuses a confirmed address with `signupEmailBlock` (`signup-guard.ts`, tested) before any code is made; Turnstile guards that step: owner wants a clear already-registered error.
 
 - Each public host serves its own `/sitemap.xml` + `/robots.txt` (`sitemap-hosts.ts`, tested): Google missed subdomain pages listed on the apex.
+- Every approved plan order sets `current_period_end` via `paidPeriodEnd` (`plan-pricing.ts`, tested; same plan adds 30 days to the time left, a switch runs 30 days from payment) in `applyPlanForPayment`: `process_paid_plan_expiry()` skips rows without an end date, so a plan without one never returned to Free.

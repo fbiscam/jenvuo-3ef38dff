@@ -178,11 +178,11 @@ const FAQS = [
   },
   {
     q: "Who can use JX Bot?",
-    a: "JX Bot has 50 new seats each month: the first 50 people who buy a paid plan in a month get it with their plan (Pro $29, Elite $59, Ultra $99), and seats reopen on the 1st. If you already have it, you keep it when you renew or switch plans. Free accounts and plans bought after the seats are full ($19/$39/$59, Terminal and API only) don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 2 IPs), Elite (4%, 3 IPs) and Ultra (6%, 5 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
+    a: "JX Bot has 50 new seats each month: the first 50 people who buy a paid plan in a month get it with their plan (Pro $29, Elite $59, Ultra $99), and seats reopen on the 1st. If you already have it, you keep it when you renew or switch plans. Free accounts and plans bought after the seats are full ($19/$39/$59, Terminal and API only) don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 2 IPs), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
   },
   {
     q: "How many accounts can I run?",
-    a: "Each IP works with one MT5 account. Pro allows 2 IPs, Elite 3 and Ultra 5.",
+    a: "Each IP works with one MT5 account. Pro allows 2 IPs, Elite 3 and Ultra 4.",
   },
   {
     q: "Does JX Bot guarantee profit?",
