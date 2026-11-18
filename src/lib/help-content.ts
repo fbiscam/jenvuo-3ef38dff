@@ -423,7 +423,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Free" },
           { type: "ul", items: [
             "1,000,000 tokens per day.",
-            "$2 wallet per month (~5 scans).",
+            "$20 API credit per month.",
             "AI terminal chat with starter wallet access.",
             "Full signal engine — A+ / A institutional signals.",
             "Full ICT / SMC narration.",

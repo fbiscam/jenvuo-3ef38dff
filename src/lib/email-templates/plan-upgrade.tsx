@@ -26,10 +26,10 @@ const SITE = 'https://jenvu.com'
 
 const PlanUpgradeEmail = ({
   recipient = 'trader@jenvu.com',
-  fromPlan = 'Signal',
-  toPlan = 'ICT Pro',
+  fromPlan = 'Free',
+  toPlan = 'Pro',
   effectiveDate = new Date().toUTCString(),
-  amount = '$49 / month',
+  amount = '$69 / month',
   features = [
     'AI extension chat and chart analysis',
     'Real-time ICT session alerts',
@@ -140,10 +140,10 @@ export const template: TemplateEntry = {
   displayName: 'Plan upgrade confirmation',
   previewData: {
     recipient: 'trader@jenvu.com',
-    fromPlan: 'Signal',
-    toPlan: 'ICT Pro',
+    fromPlan: 'Free',
+    toPlan: 'Pro',
     effectiveDate: new Date().toUTCString(),
-    amount: '$49 / month',
+    amount: '$69 / month',
     features: [
       'AI extension chat and chart analysis',
       'Real-time ICT session alerts',
