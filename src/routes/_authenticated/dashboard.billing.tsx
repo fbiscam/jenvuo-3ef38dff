@@ -43,7 +43,7 @@ const pill =
 const pillSolid =
   "inline-flex h-9 items-center justify-center gap-1.5 rounded-full bg-gc-blue px-4 text-[14px] font-medium text-gc-on-blue transition-colors hover:bg-gc-blue-hover disabled:opacity-50";
 const field =
-  "h-10 w-full rounded-lg border border-gc-line bg-background px-3 text-[14px] text-gc-ink outline-none focus:border-gc-ink-muted";
+  "h-10 w-full rounded-lg border-0 bg-gc-surface px-3 text-[14px] text-gc-ink shadow-none outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:ring-0";
 
 function Billing() {
   const credits = useCredits();
