@@ -1,23 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { botPlanFor, isPaidBotSub, licenseLimit, newLicenseKey, normalizeIp, parseBinding, targetsFor } from "./mt5-licenses";
+import { botAccessFor, botPlanFor, isPaidBotSub, licenseLimit, newLicenseKey, normalizeIp, parseBinding, targetsFor } from "./mt5-licenses";
 
 export type Mt5LicenseRow = { id: string; license_key: string; mt5_account: string | null; plan_id: string; revoked_at: string | null; last_validated_at: string | null; created_at: string };
 
 async function readPlan(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const db = supabaseAdmin as any;
-  const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", userId).maybeSingle();
+  const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end,bot_included").eq("user_id", userId).maybeSingle();
   const { foundingBotFor } = await import("./mt5-ip-license.server");
   const founding = await foundingBotFor(db, userId);
-  // JX Bot is open to every signed-in user; the plan decides the target and IP count
-  // (Free $5/day on 1 IP, paid plans their %; an active Founding month runs its Founding plan).
+  // JX Bot runs only for bot seat holders (a paid plan bought with the bot, see bot-seats.ts) and
+  // active Founding months; Free accounts and plans bought without a seat get no bot.
   const paid = isPaidBotSub(sub ?? null);
   const viaFounding = !paid && founding.state === "active";
+  const access = botAccessFor(sub ?? null, founding.state === "active");
   const plan = botPlanFor(sub ?? null, founding.state === "active");
   const t = targetsFor(plan, userId);
-  return { db, plan, allowed: true, viaFounding, founding, limit: licenseLimit(plan), expiresAt: paid ? (sub.current_period_end as string | null) : null, dailyTarget: t.daily, monthlyTarget: t.monthly };
+  const allowed = !!access;
+  return { db, plan, allowed, viaFounding, founding, limit: allowed ? licenseLimit(plan) : 0, expiresAt: paid ? (sub.current_period_end as string | null) : null, dailyTarget: allowed ? t.daily : 0, monthlyTarget: allowed ? t.monthly : 0 };
 }
 
 export const getMt5Access = createServerFn({ method: "POST" })
@@ -42,23 +44,20 @@ export const getFoundingMembership = createServerFn({ method: "POST" })
     return { member: isFoundingMember(info.state), verified: isVerifiedFoundingMember(info), isAdmin: !!isAdmin, trialPlan };
   });
 
-/** Sidebar: whether JX Bot opens (admin, active paid plan or verified Founding member). */
+/**
+ * Sidebar: the JX Bot page always opens, so accounts without a bot seat can see how many seats
+ * are left this month and buy a plan; downloads and IPs stay locked server-side by `readPlan`.
+ */
 export const getJxBotNavAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { jxBotNavOpen } = await import("./founding-bot");
-    const { data: isAdmin } = await (context.supabase as any).rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (isAdmin) return { open: true };
-    const { allowed } = await readPlan(context.userId);
-    return { open: jxBotNavOpen({ isAdmin: false, allowed }) };
-  });
+  .handler(async () => ({ open: true }));
 
 export const createMt5License = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ ip: z.string().trim().refine((v) => !!normalizeIp(v), "Enter a valid IP address") }).parse(d))
   .handler(async ({ context, data }) => {
     const { db, allowed, limit, plan } = await readPlan(context.userId);
-    if (!allowed) return { ok: false as const, error: "Sign in to use JX Bot." };
+    if (!allowed) return { ok: false as const, error: "JX Bot comes with a plan bought while bot seats are open. Seats reopen on the 1st of each month." };
     const { data: rows } = await db.from("mt5_licenses").select("id,mt5_account").eq("user_id", context.userId).is("revoked_at", null);
     const list = rows ?? [];
     const ip = normalizeIp(data.ip);
@@ -91,7 +90,7 @@ export const getBotDownloadUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { db, allowed } = await readPlan(context.userId);
-    if (!allowed) return { ok: false as const, error: "Sign in to use JX Bot." };
+    if (!allowed) return { ok: false as const, error: "JX Bot comes with a plan bought while bot seats are open. Seats reopen on the 1st of each month." };
     const { data, error } = await db.storage.from("bot-files").createSignedUrl("JX-Bot-MT5.zip", 300, { download: true });
     return error || !data ? { ok: false as const, error: "Download unavailable." } : { ok: true as const, url: data.signedUrl as string };
   });

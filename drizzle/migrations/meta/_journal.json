@@ -407,6 +407,13 @@
       "when": 1794888337838,
       "tag": "0057_free_plan_for_every_account",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1794990686362,
+      "tag": "0058_jx_bot_monthly_seats",
+      "breakpoints": true
     }
   ]
 }

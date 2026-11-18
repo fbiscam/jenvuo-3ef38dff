@@ -746,7 +746,7 @@ function DashboardLayout() {
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const terminalAccess = useTerminalAccess(authUser?.id);
-  // JX Bot opens for every signed-in user (plan-based; Free runs the $5 daily target).
+  // The JX Bot page opens for every signed-in user; it shows bot seats and locks downloads without one.
   const jxBotNavFn = useServerFn(getJxBotNavAccess);
   const [jxBotOpen, setJxBotOpen] = useState<boolean | null>(null);
   useEffect(() => {
@@ -1800,7 +1800,7 @@ function DashboardHero({
       copy: "Capture any chart, get Claude Opus 5 analysis, and unlock a mandatory \nClaude Fable 5.1 senior review on eligible plans.",
       action: "Compare plans",
       to: "/pricing" as const,
-      note: "Plans from $29 · $19 API credit included",
+      note: "Plans from $19 · JX Bot with the first 50 each month",
     },
     {
       variant: "model" as const,

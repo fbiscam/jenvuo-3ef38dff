@@ -1,13 +1,16 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { jxBotAction } from "@/lib/founding-bot";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getBotSeatStatus, type BotSeatStatus } from "@/lib/bot-seats.functions";
+import { BOT_SEATS_PER_MONTH } from "@/lib/bot-seats";
+import { formatSeatOpening } from "@/lib/founding-seats";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, Plus, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, FREE_BOT, MT5_PLANS, countIpLicenses, dailyTargetLabel, isBotPlan, parseBinding } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, MT5_PLANS, countIpLicenses, dailyTargetLabel, isBotPlan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-sans";
 
@@ -44,7 +47,7 @@ const ERRORS = [
 const HOW = [
   ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["EUR/USD on M15", "Runs on the EURUSD M15 chart; one IP works with one MT5 account."],
-  ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at $${FREE_BOT.dailyTargetUsd} profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
+  ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
   ["Safe trading hours", "New trades Mon–Thu 01:00–14:00 and Fri until 13:00 (broker time); skips London and New York opens and weekends."],
   ["Entry checks", "Follows the H1 trend and skips wide spreads, weak candles and spikes, so some days have fewer trades."],
   ["Monthly limit", "Stops at your plan's monthly target until the next period."],
@@ -54,6 +57,13 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString(undefined, { month
 
 function JxBotPage() {
   const { access, refresh } = useMt5Access();
+  const seatFn = useServerFn(getBotSeatStatus);
+  const [seats, setSeats] = useState<BotSeatStatus | null>(null);
+  useEffect(() => {
+    let alive = true;
+    seatFn().then((r) => { if (alive) setSeats(r); }).catch(() => {});
+    return () => { alive = false; };
+  }, [seatFn]);
   const getUrl = useServerFn(getBotDownloadUrl);
   const create = useServerFn(createMt5License);
   const revoke = useServerFn(revokeMt5License);
@@ -157,7 +167,7 @@ function JxBotPage() {
   const stats = access
     ? [
         { label: "Linked IPs", value: `${bound} / ${limit}` },
-        { label: "Daily target", value: plan === "free" ? `$${FREE_BOT.dailyTargetUsd} profit` : `${DAILY_TARGET_PCT[plan]}% of balance` },
+        { label: "Daily target", value: !access.allowed || plan === "free" ? "—" : `${DAILY_TARGET_PCT[plan]}% of balance` },
         { label: "Drawdown guard", value: access.allowed ? `${DAILY_DRAWDOWN_PCT}% daily` : "—" },
       ]
     : [];
@@ -200,18 +210,22 @@ function JxBotPage() {
       {access && (access as any).viaFounding && (
         <div className="console-card mt-4 px-5 py-4 text-[14px] text-foreground">
           Founding month on your {access.plan === "elite" ? "Elite" : "Pro"} plan — the bot runs with that plan's target.{" "}
-          {(access as any).founding?.review_at && <>It ends on {new Date((access as any).founding.review_at).toLocaleDateString()}; after that the bot moves to the Free plan unless you pick a paid plan.</>}
+          {(access as any).founding?.review_at && <>It ends on {new Date((access as any).founding.review_at).toLocaleDateString()}; after that the bot stops unless you buy a plan while bot seats are open.</>}
         </div>
       )}
 
-      {access && plan === "free" && !(access as any).viaFounding && (
+      {access && !access.allowed && (
         <div className="console-card mt-4 flex flex-wrap items-center justify-between gap-3 px-5 py-4 text-[14px] text-foreground">
           <span>
             {(access as any).founding?.state === "awaiting_id"
-              ? "Your Founding plan starts once your ID is verified. Until then JX Bot runs on the Free plan."
-              : `Free plan: JX Bot runs on ${FREE_BOT.licenses} IP and stops for the day at $${FREE_BOT.dailyTargetUsd} profit. Upgrade for more IPs and a % daily target.`}
+              ? "Your Founding plan and JX Bot start once your ID is verified."
+              : seats && seats.left > 0
+                ? `JX Bot comes with the first ${seats.total} paid plans each month: ${seats.left} of ${seats.total} seats left. Buy a plan to get it.`
+                : seats
+                  ? `This month's ${seats.total} JX Bot seats are full. Seats reopen on ${formatSeatOpening(new Date(seats.nextOpenAt))}.`
+                  : `JX Bot comes with the first ${BOT_SEATS_PER_MONTH} paid plans each month.`}
           </span>
-          {botAction && <Link to={botAction.to} className="console-pill console-pill-solid">{botAction.label}</Link>}
+          {(access as any).founding?.state !== "awaiting_id" && seats && seats.left > 0 && <Link to="/dashboard/pay" className="console-pill console-pill-solid">Buy a plan</Link>}
         </div>
       )}
 
@@ -357,14 +371,14 @@ function JxBotPage() {
               </tr>
             </thead>
             <tbody>
-              {(["free", ...Object.keys(MT5_PLANS)] as ("free" | keyof typeof MT5_PLANS)[]).map((k) => (
+              {(Object.keys(MT5_PLANS) as (keyof typeof MT5_PLANS)[]).map((k) => (
                 <tr key={k} className={`console-row ${access?.allowed && k === plan ? "font-medium" : ""} text-foreground`}>
                   <td className="py-2.5">
-                    {k === "free" ? FREE_BOT.name : MT5_PLANS[k].name}
+                    {MT5_PLANS[k].name}
                     {access?.allowed && k === plan && <span className="ml-2 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">Yours</span>}
                   </td>
                   <td className="text-right tabular-nums">{dailyTargetLabel(k)}</td>
-                  <td className="text-right tabular-nums">{k === "free" ? FREE_BOT.licenses : MT5_PLANS[k].licenses}</td>
+                  <td className="text-right tabular-nums">{MT5_PLANS[k].licenses}</td>
                 </tr>
               ))}
             </tbody>

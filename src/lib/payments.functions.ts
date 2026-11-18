@@ -55,7 +55,10 @@ export const createTopupOrder = createServerFn({ method: "POST" })
     // Plan orders are always priced on the server: the browser's amount is ignored.
     const { isPaidPlanId, PLAN_API_CREDIT, planPrice } = await import("@/lib/plan-pricing");
     if (data.planId && !isPaidPlanId(data.planId)) return { ok: false as const, error: "Pick a plan to continue." };
-    const amountUsd = isPaidPlanId(data.planId) ? planPrice(data.planId) : data.amountUsd;
+    // JX Bot comes with the plan only for bot holders or while this month's 50 seats last.
+    const { botOfferForUser } = await import("@/lib/bot-seats.server");
+    const offer = isPaidPlanId(data.planId) ? await botOfferForUser(supabase, userId) : null;
+    const amountUsd = isPaidPlanId(data.planId) ? planPrice(data.planId, offer!.withBot) : data.amountUsd;
     const quote = await evaluatePromo({ userId, amountUsd, code: data.code ?? null });
     if (quote.error) return { ok: false as const, error: quote.error };
     if (quote.promoType === "free") return { ok: false as const, error: "Redeem this code from the promo box instead." };
@@ -89,6 +92,8 @@ export const createTopupOrder = createServerFn({ method: "POST" })
         promo_code: quote.promoCode,
         target_plan_id: data.planId || null,
         is_upgrade: !!data.planId,
+        with_bot: !!offer?.withBot,
+        bot_new_seat: !!offer?.newSeat,
         expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
       })
       .select("*")
@@ -164,7 +169,7 @@ export const listMyOrders = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<PaymentOrder[]> => {
     const { data } = await context.supabase
       .from("payment_orders")
-      .select("id, network, deposit_address, pay_amount_usd, credit_usd, bonus_usd, promo_code, tx_hash, status, reject_reason, created_at, expires_at, decided_at, target_plan_id, is_upgrade")
+      .select("id, network, deposit_address, pay_amount_usd, credit_usd, bonus_usd, promo_code, tx_hash, status, reject_reason, created_at, expires_at, decided_at, target_plan_id, is_upgrade, with_bot")
       .order("created_at", { ascending: false })
       .limit(30);
     return (data ?? []) as unknown as PaymentOrder[];

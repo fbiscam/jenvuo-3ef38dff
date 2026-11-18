@@ -3,7 +3,7 @@ import { expect } from "./chart/test-expect";
 import { planPrice, planCoveredBy, orderCreditToAdd, PLAN_API_CREDIT, planOrderCovers } from "./plan-pricing";
 
 describe("plan pricing", () => {
-  it("charges one price per plan for everyone, JX Bot included", () => {
+  it("charges Pro $29, Elite $59, Ultra $99 with JX Bot", () => {
     expect(planPrice("pro")).toBe(29);
     expect(planPrice("elite")).toBe(59);
     expect(planPrice("ultra")).toBe(99);
@@ -33,6 +33,11 @@ describe("plan pricing", () => {
     expect(planOrderCovers({ planId: "pro", payUsd: 28.5 })).toBe(false);
     expect(planOrderCovers({ planId: "pro", payUsd: 29.42 })).toBe(true);
     expect(planOrderCovers({ planId: "free", payUsd: 99 })).toBe(false);
+  });
+  it("without JX Bot (seats full) plans cost Pro $19, Elite $39, Ultra $59", () => {
+    expect([planPrice("pro", false), planPrice("elite", false), planPrice("ultra", false)]).toEqual([19, 39, 59]);
+    expect(planOrderCovers({ planId: "pro", payUsd: 19.42, withBot: false })).toBe(true);
+    expect(planOrderCovers({ planId: "pro", payUsd: 19.42, withBot: true })).toBe(false);
   });
   it("a discount promo counts toward the plan price", () => {
     expect(planOrderCovers({ planId: "elite", payUsd: 47.2, discountUsd: 11.8 })).toBe(true);

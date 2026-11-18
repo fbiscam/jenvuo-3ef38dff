@@ -1,11 +1,14 @@
 import type { PaidPlanId } from "@/lib/plan-features";
+import { PLAN_PRICE_NO_BOT, PLAN_PRICE_WITH_BOT } from "@/lib/bot-seats";
 
 /**
- * Plan prices (USD per month). One price for everyone: Terminal, API credit and JX Bot are all
- * included in the plan. The server charges from these same numbers, so the page and the
- * payment check never disagree.
+ * Plan prices (USD per month). With JX Bot (one of the month's 50 bot seats, or a renewal by a
+ * bot holder) Pro $29 / Elite $59 / Ultra $99; without it (seats full) Terminal + API only
+ * $19 / $39 / $59. The server charges from these same numbers, so the page and the payment
+ * check never disagree.
  */
-export const TERMINAL_API_PRICE: Record<PaidPlanId, number> = { pro: 29, elite: 59, ultra: 99 };
+export const TERMINAL_API_PRICE: Record<PaidPlanId, number> = PLAN_PRICE_WITH_BOT;
+export const TERMINAL_API_PRICE_NO_BOT: Record<PaidPlanId, number> = PLAN_PRICE_NO_BOT;
 
 export const PAID_PLAN_IDS: PaidPlanId[] = ["pro", "elite", "ultra"];
 
@@ -13,14 +16,14 @@ export function isPaidPlanId(id: unknown): id is PaidPlanId {
   return id === "pro" || id === "elite" || id === "ultra";
 }
 
-/** Monthly price of a plan (JX Bot included for everyone). `_withBot` is kept for old callers. */
-export function planPrice(plan: PaidPlanId, _withBot = false): number {
-  return TERMINAL_API_PRICE[plan];
+/** Monthly price of a plan, with JX Bot (default) or without it. */
+export function planPrice(plan: PaidPlanId, withBot = true): number {
+  return (withBot ? PLAN_PRICE_WITH_BOT : PLAN_PRICE_NO_BOT)[plan];
 }
 
 /**
- * API credit a plan payment adds (USD). The rest of the price pays for the Terminal and
- * JX Bot access, so it is never added to the wallet.
+ * API credit a plan payment adds (USD), with or without JX Bot. The rest of the price pays for
+ * the Terminal (and JX Bot when included), so it is never added to the wallet.
  */
 export const PLAN_API_CREDIT: Record<PaidPlanId, number> = { pro: 19, elite: 39, ultra: 59 };
 
@@ -42,9 +45,9 @@ export function orderCreditToAdd(args: {
 }
 
 /** Highest plan a payment covers (or null). */
-export function planCoveredBy(paidUsd: number, _withBot = false): PaidPlanId | null {
+export function planCoveredBy(paidUsd: number, withBot = true): PaidPlanId | null {
   let best: PaidPlanId | null = null;
-  for (const id of PAID_PLAN_IDS) if (paidUsd + 0.01 >= planPrice(id)) best = id;
+  for (const id of PAID_PLAN_IDS) if (paidUsd + 0.01 >= planPrice(id, withBot)) best = id;
   return best;
 }
 
@@ -53,8 +56,8 @@ export function planCoveredBy(paidUsd: number, _withBot = false): PaidPlanId | n
  * bonus) counts toward the price; anything else must be paid in full: an underpaid plan order
  * must never start the plan or add its API credit.
  */
-export function planOrderCovers(args: { planId: string | null | undefined; payUsd: number; discountUsd?: number }): boolean {
+export function planOrderCovers(args: { planId: string | null | undefined; payUsd: number; discountUsd?: number; withBot?: boolean }): boolean {
   if (!isPaidPlanId(args.planId)) return false;
   const paid = Math.max(0, Number(args.payUsd) || 0) + Math.max(0, Number(args.discountUsd) || 0);
-  return paid + 0.01 >= planPrice(args.planId);
+  return paid + 0.01 >= planPrice(args.planId, args.withBot ?? true);
 }

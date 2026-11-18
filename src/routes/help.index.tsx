@@ -62,7 +62,7 @@ function HelpCenterPage() {
     { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
     { q: "How do I get a Jenvu account?", a: "Sign up at jenvu.com with Google or your email. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators." },
     { q: "Who can use the Terminal?", a: "Every signed-in account can open the Terminal. Its paid indicators (Fresh sweep, price action, Zone + FVG) run a set time each UTC day: Free 2 hours, Pro 8, Elite 16 and Ultra all day, then lock until 00:00 UTC. Credit never unlocks the Terminal." },
-    { q: "How do I get JX Bot?", a: "JX Bot is on every plan: Free 1 IP ($5 daily target), Pro 2 IPs, Elite 3 IPs and Ultra 5 IPs. Open Dashboard → JX Bot to download it, add the IP of the PC or RDP that runs MT5 and follow the install steps." },
+    { q: "How do I get JX Bot?", a: "JX Bot comes with the first 50 paid plans each month (Pro 2 IPs, Elite 3 IPs, Ultra 5 IPs); seats reopen on the 1st, and if you already have it you keep it when you renew. Free doesn't include it. Open Dashboard → JX Bot to download it, add the IP of the PC or RDP that runs MT5 and follow the install steps." },
     { q: "How many API keys do I get?", a: "Free 1, Pro 3, Elite 5 and Ultra 7. Create and revoke them on Dashboard → API Keys." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
   ];

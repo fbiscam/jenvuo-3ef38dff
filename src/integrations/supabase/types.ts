@@ -2385,6 +2385,7 @@ export type Database = {
         Row: {
           auto_result: Json | null
           bonus_usd: number
+          bot_new_seat: boolean
           created_at: string
           credit_usd: number
           credited_usd: number | null
@@ -2404,10 +2405,12 @@ export type Database = {
           target_plan_id: string | null
           tx_hash: string | null
           user_id: string
+          with_bot: boolean
         }
         Insert: {
           auto_result?: Json | null
           bonus_usd?: number
+          bot_new_seat?: boolean
           created_at?: string
           credit_usd: number
           credited_usd?: number | null
@@ -2427,10 +2430,12 @@ export type Database = {
           target_plan_id?: string | null
           tx_hash?: string | null
           user_id: string
+          with_bot?: boolean
         }
         Update: {
           auto_result?: Json | null
           bonus_usd?: number
+          bot_new_seat?: boolean
           created_at?: string
           credit_usd?: number
           credited_usd?: number | null
@@ -2450,6 +2455,7 @@ export type Database = {
           target_plan_id?: string | null
           tx_hash?: string | null
           user_id?: string
+          with_bot?: boolean
         }
         Relationships: [
           {
@@ -3759,6 +3765,7 @@ export type Database = {
       user_subscriptions: {
         Row: {
           billing_interval: string
+          bot_included: boolean
           created_at: string
           current_period_end: string | null
           current_period_start: string
@@ -3776,6 +3783,7 @@ export type Database = {
         }
         Insert: {
           billing_interval?: string
+          bot_included?: boolean
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string
@@ -3793,6 +3801,7 @@ export type Database = {
         }
         Update: {
           billing_interval?: string
+          bot_included?: boolean
           created_at?: string
           current_period_end?: string | null
           current_period_start?: string
@@ -4064,6 +4073,7 @@ export type Database = {
       }
       is_founding_member: { Args: { _user_id: string }; Returns: boolean }
       journal_stats: { Args: { _from?: string; _to?: string }; Returns: Json }
+      jx_bot_seats_taken: { Args: never; Returns: number }
       lg_charge_credits: {
         Args: {
           _credits: number

@@ -1,4 +1,4 @@
-import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT, FREE_BOT } from "@/lib/mt5-licenses";
+import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 import { Check, ArrowUpRight, ShieldCheck, Clock3, Monitor, CirclePause, TrendingUp } from "lucide-react";
 import * as React from "react";
 
@@ -71,7 +71,7 @@ function CandlesCard() {
 
 function StopCard() {
   return (
-    <Card title="Stops at your target" text={`Free stops at $${FREE_BOT.dailyTargetUsd}; Pro at ${DAILY_TARGET_PCT.pro}%, Elite at ${DAILY_TARGET_PCT.elite}% and Ultra at ${DAILY_TARGET_PCT.ultra}% of each account's day-start balance. The ${DAILY_DRAWDOWN_PCT}% drawdown protects the profit.`}>
+    <Card title="Stops at your target" text={`Pro stops at ${DAILY_TARGET_PCT.pro}%, Elite at ${DAILY_TARGET_PCT.elite}% and Ultra at ${DAILY_TARGET_PCT.ultra}% of each account's day-start balance. The ${DAILY_DRAWDOWN_PCT}% drawdown protects the profit.`}>
       <div className="jx-target-stage">
         <div className="jx-target-bubble">Daily target reached <Check size={14} /></div>
         <div className="jx-guard-caption"><ShieldCheck size={15} /> Your limits stay in control</div>

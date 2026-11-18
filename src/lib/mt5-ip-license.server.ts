@@ -35,8 +35,8 @@ export async function checkBotByIp(body: any, headers: Headers): Promise<{ r: Va
   let sub = null;
   let foundingBot = false;
   if (lic) {
-    const { data } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end").eq("user_id", lic.user_id).maybeSingle();
-    // JX Bot is plan-based for everyone: the plan (Free/Pro/Elite/Ultra or an active Founding month) sets the daily target.
+    const { data } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end,bot_included").eq("user_id", lic.user_id).maybeSingle();
+    // Only a plan bought with a bot seat or an active Founding month runs the bot; the plan sets the daily target.
     sub = data ?? null;
     foundingBot = (await foundingBotFor(db, lic.user_id)).state === "active";
   }

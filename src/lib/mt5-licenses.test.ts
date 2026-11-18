@@ -49,17 +49,17 @@ describe("mt5 licenses", () => {
     expect(first.valid && first.bind).toBe(true);
     expect(evaluateIpLicense(IP, IP, "222", lic, paid("pro"))).toEqual({ valid: false, reason: "account_mismatch" });
   });
-  it("Free plan runs the bot with a $5 daily target", () => {
-    const r = evaluateIpLicense(IP, IP, "12345678", lic, { plan_id: "free", status: "active", is_trial: false, current_period_end: null });
-    expect(r.valid && [r.plan, r.daily_target]).toEqual(["free", 5]);
-    const none = evaluateIpLicense(IP, IP, "12345678", lic, null);
-    expect(none.valid && none.plan).toBe("free");
+  it("Free accounts, trials, expired plans and plans bought without a bot seat get no bot", () => {
+    const no = { valid: false, reason: "no_plan" };
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, { plan_id: "free", status: "active", is_trial: false, current_period_end: null })).toEqual(no);
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, null)).toEqual(no);
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true })).toEqual(no);
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" })).toEqual(no);
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), bot_included: false })).toEqual(no);
   });
-  it("a trial or an expired paid plan runs at the Free tier", () => {
-    const t = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true });
-    expect(t.valid && t.plan).toBe("free");
-    const e = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" });
-    expect(e.valid && e.plan).toBe("free");
+  it("a paid plan bought with the bot runs its tier", () => {
+    const r = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), bot_included: true });
+    expect(r.valid && r.plan).toBe("elite");
   });
   it("an active Founding month runs its Founding plan", () => {
     const f = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), is_trial: true }, Date.now(), true);

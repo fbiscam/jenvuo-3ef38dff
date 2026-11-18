@@ -29,7 +29,7 @@ export function PlanLock({ title }: { title: string }) {
     <div className="flex flex-col items-center rounded-lg border border-gc-line bg-card px-6 py-10 text-center">
       <Lock className="h-6 w-6 text-gc-ink-muted" />
       <h3 className="mt-3 text-[16px] font-medium text-gc-ink">{title} is locked</h3>
-      <p className="mt-1 max-w-md text-[13px] text-gc-ink-muted">Sign in to use JX Bot. It runs on every plan; Free has a $5 daily target.</p>
+      <p className="mt-1 max-w-md text-[13px] text-gc-ink-muted">JX Bot comes with the first 50 paid plans each month. Seats reopen on the 1st.</p>
       <Link to="/dashboard/billing" className="mt-4 rounded-full bg-gc-blue px-4 py-2 text-[13px] font-medium text-gc-on-blue hover:opacity-90">Buy now</Link>
     </div>
   );

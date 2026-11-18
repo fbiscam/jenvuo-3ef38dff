@@ -4,12 +4,15 @@ import { PLAN_API_KEYS } from "@/lib/free-plan";
 
 export type PaidPlanId = "pro" | "elite" | "ultra";
 
-/** Billing plan bullets. Every plan includes JX Bot, Terminal and API credit (same for everyone). */
-export function planFeatures(plan: PaidPlanId, _foundingMember = false): string[] {
+/**
+ * Billing plan bullets. JX Bot is listed only when the plan comes with it (one of the month's
+ * bot seats, or a bot holder renewing); otherwise the plan is Terminal + API only.
+ */
+export function planFeatures(plan: PaidPlanId, withBot = true): string[] {
   const ips = MT5_PLANS[plan].licenses;
   return [
     "Terminal paid strategies",
-    `JX Bot on ${ips} IP${ips > 1 ? "s" : ""} · ${dailyTargetLabel(plan)} daily target`,
+    withBot ? `JX Bot on ${ips} IP${ips > 1 ? "s" : ""} · ${dailyTargetLabel(plan)} daily target` : "No JX Bot: this month's bot seats are full",
     `$${PLAN_API_CREDIT[plan]} API credit`,
     `${PLAN_API_KEYS[plan]} API keys`,
   ];

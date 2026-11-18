@@ -379,7 +379,7 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Sign up free: $10 API credit every month and 2 hours a day of the Terminal's paid indicators. JX Bot runs on every plan, with a $5 daily target on Free.
+            Sign up free: $10 API credit every month and 2 hours a day of the Terminal's paid indicators. JX Bot comes with the first 50 paid plans each month.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <SignUpCta className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover" />

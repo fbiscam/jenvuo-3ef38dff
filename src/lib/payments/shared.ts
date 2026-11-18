@@ -75,6 +75,7 @@ export type PaymentOrder = {
   promo_code: string | null;
   target_plan_id: string | null;
   is_upgrade: boolean;
+  with_bot?: boolean;
   tx_hash: string | null;
   status: OrderStatus;
   reject_reason: string | null;

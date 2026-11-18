@@ -81,7 +81,7 @@ export const collections: Collection[] = [
         summary: "Sign up in a minute and start on the Free plan with $10 API credit a month.",
         updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan, and JX Bot is included too: Free on 1 IP with a $5 daily target." },
+          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan. JX Bot is not part of Free: it comes with the first 50 paid plans each month." },
 
           { type: "h2", content: "Sign up" },
           { type: "ol", items: [
@@ -352,9 +352,9 @@ export const collections: Collection[] = [
         summary: "Who can use the JX Bot, how to register your IP and how to install it in MetaTrader 5.",
         updatedAt: "2026-10-31",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It is included in every plan, Free too: the plan decides how many IPs you get and the daily profit target. Daily profit targets are maximum safety caps — profit is not guaranteed. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
+          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It has 50 new seats each month: the first 50 people who buy a paid plan in a month (UTC) get it with their plan (Pro $29, Elite $59, Ultra $99), and seats reopen on the 1st. If you already have it, you keep it when you renew or switch plans. Plans bought after the seats are full cost $19, $39 or $59 and include the Terminal and API only; Free doesn't include the bot. The plan decides how many IPs you get and the daily profit target. Daily profit targets are maximum safety caps — profit is not guaranteed. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
-          { type: "ul", items: [`Free: $5 daily profit target, ${DAILY_DRAWDOWN_PCT}% drawdown guard, 1 IP (one PC or RDP).`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 2 IPs.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 3 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 5 IPs.`, "On paid plans the daily target is the plan percentage of the day's starting balance (Free: a fixed $5), per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
+          { type: "ul", items: [`Every plan with the bot: ${DAILY_DRAWDOWN_PCT}% drawdown guard.`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 2 IPs.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 3 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 5 IPs.`, "The daily target is the plan percentage of the day's starting balance, per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
           { type: "h2", content: "Trading hours and safety" },
           { type: "ul", items: ["New trades Monday to Thursday 01:00–14:00 and Friday until 13:00 (broker server time). No trading on Saturday and Sunday.", "The bot trades only the Asia and London sessions. No new trades during the London open (06:15–09:00 UTC), and the New York session is off (no new trades after 12:00 UTC). Open trades are still managed, and a trade already in profit at 06:15 UTC is protected at break-even.", `Daily stop (fixed, can't be changed): $5 profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance. Fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`, "Before each entry the bot checks the H1 trend, the spread (max 2 pips), a confirming candle and skips spike candles, so some days have fewer trades.", "After an update, download again, attach the bot again and load the Jenvu EURUSD 15M preset in Inputs."] },
           { type: "h2", content: "Setup" },
@@ -431,7 +431,7 @@ export const collections: Collection[] = [
             "Multi-timeframe bias engine.",
           ]},
 
-          { type: "h2", content: "Pro — $29 / month" },
+          { type: "h2", content: "Pro — $29 / month with JX Bot ($19 without)" },
           { type: "ul", items: [
             "4,000,000 tokens per day.",
             "$19 API credit per month.",
@@ -442,7 +442,7 @@ export const collections: Collection[] = [
             "Multi-timeframe bias engine.",
           ]},
 
-          { type: "h2", content: "Elite — $59 / month" },
+          { type: "h2", content: "Elite — $59 / month with JX Bot ($39 without)" },
           { type: "ul", items: [
             "5,000,000 tokens per day.",
             "$39 API credit per month.",
@@ -452,7 +452,7 @@ export const collections: Collection[] = [
             "Dedicated onboarding & SLA.",
           ]},
 
-          { type: "h2", content: "Ultra — $99 / month" },
+          { type: "h2", content: "Ultra — $99 / month with JX Bot ($59 without)" },
           { type: "ul", items: [
             "10,000,000 tokens per day.",
             "$59 API credit per month.",
@@ -508,7 +508,7 @@ export const collections: Collection[] = [
         summary: "Charts and tools are included with Terminal access; only AI replies use credits.",
         updatedAt: "2026-10-21",
         body: [
-          { type: "p", content: "The Terminal is open to every signed-in account. Its paid indicators run for a set time each UTC day by plan (Free 2 hours, Pro 8, Elite 16, Ultra all day) and lock until 00:00 UTC once the time is used; approved Founding Program members (100 seats a month) get their plan's hours. Founding members have 2 days after approval to upload their ID; their Founding plan starts once it is verified, and the Jenvu team then adds the plan's API credit ($19 Pro, $39 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the account returns to Free (the Terminal stays open with Free hours) until you buy a plan and your payment is approved. Plans are open to everyone and can be picked or upgraded anytime from Payments (credit top-ups are no longer sold). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
+          { type: "p", content: "The Terminal is open to every signed-in account. Its paid indicators run for a set time each UTC day by plan (Free 2 hours, Pro 8, Elite 16, Ultra all day) and lock until 00:00 UTC once the time is used; approved Founding Program members (50 seats a month) get their plan's hours. Founding members have 2 days after approval to upload their ID; their Founding plan starts once it is verified, and the Jenvu team then adds the plan's API credit ($19 Pro, $39 Elite). The Founding month lasts 30 days from the day the ID is verified: after that the account returns to Free (the Terminal stays open with Free hours) until you buy a plan and your payment is approved. Plans are open to everyone and can be picked or upgraded anytime from Payments (credit top-ups are no longer sold). Until then you can open every dashboard page, but actions like API keys and Chat stay locked. Apply at jenvu.com/founding." },
           { type: "p", content: "With Terminal access you can use the chart as much as you like. Only AI features use credits, because each AI reply has a real processing cost. Every charge is checked and deducted on Jenvu's servers before an answer is returned, so it cannot be skipped from the browser." },
           { type: "h2", content: "Included with Terminal access (no credits)" },
           { type: "ul", items: [

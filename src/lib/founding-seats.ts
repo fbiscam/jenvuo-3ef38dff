@@ -1,5 +1,5 @@
 /** Founding Program seats: a fixed number per calendar month (UTC), reopening on the 1st. */
-export const FOUNDING_SEATS_PER_MONTH = 100;
+export const FOUNDING_SEATS_PER_MONTH = 50;
 
 /** When seats open again: 00:00 UTC on the 1st of the next month. */
 export function nextSeatOpening(now: Date = new Date()): Date {

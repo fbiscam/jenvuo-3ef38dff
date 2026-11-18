@@ -3,8 +3,8 @@ import { expect } from "./chart/test-expect";
 import { FOUNDING_SEATS_PER_MONTH, formatSeatOpening, nextSeatOpening, seatsFullMessage } from "./founding-seats";
 
 describe("Founding seats", () => {
-  it("allows 100 seats a month", () => {
-    expect(FOUNDING_SEATS_PER_MONTH).toBe(100);
+  it("allows 50 seats a month", () => {
+    expect(FOUNDING_SEATS_PER_MONTH).toBe(50);
   });
   it("reopens on the 1st of next month at 00:00 UTC", () => {
     expect(nextSeatOpening(new Date("2026-11-07T04:23:00Z")).toISOString()).toBe("2026-12-01T00:00:00.000Z");

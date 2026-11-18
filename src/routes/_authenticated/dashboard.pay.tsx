@@ -24,6 +24,8 @@ import {
 import { planPrice, isPaidPlanId, PLAN_API_CREDIT } from "@/lib/plan-pricing";
 import { planFeatures } from "@/lib/plan-features";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
+import { getMyBotOffer, type MyBotOffer } from "@/lib/bot-seats.functions";
+import { formatSeatOpening } from "@/lib/founding-seats";
 import { purchaseGate, PURCHASE_BLOCK_MESSAGE, isTrialPlanLocked } from "@/lib/founding-bot";
 import { Lock } from "lucide-react";
 import { UsdtIcon, TronIcon, BnbIcon, EthIcon, NetworkIcon } from "@/components/pay/CoinIcons";
@@ -123,17 +125,28 @@ function PayPage() {
   const canBuyPlan = !!gate?.canBuy;
   const canBuy = canBuyPlan && !isTrialPlanLocked(selectedPlanId, trialPlan);
 
+  // Whether a plan bought now includes JX Bot (seats left this month, or already a bot holder).
+  // The server decides the real price when the order is made; this only shows it.
+  const botOfferFn = useServerFn(getMyBotOffer);
+  const [botOffer, setBotOffer] = useState<MyBotOffer | null>(null);
+  useEffect(() => {
+    let alive = true;
+    botOfferFn().then((o) => { if (alive) setBotOffer(o); }).catch(() => {});
+    return () => { alive = false; };
+  }, [botOfferFn]);
+  const withBot = botOffer ? botOffer.withBot : true;
+
   const PLANS = [
-    { id: "pro", name: "Pro", price: planPrice("pro", foundingMember), features: planFeatures("pro", foundingMember) },
-    { id: "elite", name: "Elite", price: planPrice("elite", foundingMember), features: planFeatures("elite", foundingMember) },
-    { id: "ultra", name: "Ultra", price: planPrice("ultra", foundingMember), features: planFeatures("ultra", foundingMember) },
+    { id: "pro", name: "Pro", price: planPrice("pro", withBot), features: planFeatures("pro", withBot) },
+    { id: "elite", name: "Elite", price: planPrice("elite", withBot), features: planFeatures("elite", withBot) },
+    { id: "ultra", name: "Ultra", price: planPrice("ultra", withBot), features: planFeatures("ultra", withBot) },
   ];
 
   const currentPrice = useMemo(() => {
     const p = PLANS.find(x => x.id === currentPlan);
     if (trial.active) return 0;
     return p ? p.price : 0;
-  }, [currentPlan, trial.active, foundingMember]);
+  }, [currentPlan, trial.active, withBot]);
 
   useEffect(() => {
     if (mode === "upgrade" && (!selectedPlanId || isTrialPlanLocked(selectedPlanId, trialPlan))) {
@@ -154,7 +167,7 @@ function PayPage() {
     }
     const c = Number(custom);
     return custom.trim() && Number.isFinite(c) ? Math.round(c * 100) / 100 : amount;
-  }, [amount, custom, mode, selectedPlanId, foundingMember]);
+  }, [amount, custom, mode, selectedPlanId, withBot]);
 
 
 
@@ -302,6 +315,16 @@ function PayPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-[20px] font-normal text-gc-ink">{mode === "upgrade" ? "Choose a plan" : "Choose an amount"}</h2>
             </div>
+
+            {mode === "upgrade" && botOffer && (
+              <p className="mt-2 text-[13px] text-gc-ink-muted">
+                {botOffer.holder
+                  ? "Your plan keeps JX Bot when you renew or switch plans."
+                  : botOffer.withBot
+                    ? `JX Bot included: ${botOffer.left} of ${botOffer.total} bot seats left this month.`
+                    : `This month's ${botOffer.total} JX Bot seats are full, so plans include the Terminal and API only. Seats reopen on ${formatSeatOpening(new Date(botOffer.nextOpenAt))}.`}
+              </p>
+            )}
 
             {mode === "upgrade" ? (
               <div className="mt-5 grid gap-3 sm:grid-cols-3">

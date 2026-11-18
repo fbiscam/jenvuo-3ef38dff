@@ -173,11 +173,11 @@ export async function bumpPromoUsage(code: string) {
 }
 
 /** Upgrade the user's plan to the best tier their paid amount covers, and end any trial. */
-export async function applyPlanForPayment(userId: string, paidUsd: number, targetPlanId?: string | null) {
-  // Prices come from plan-pricing.ts: one price per plan for everyone (JX Bot included),
+export async function applyPlanForPayment(userId: string, paidUsd: number, targetPlanId?: string | null, withBot = true) {
+  // Prices come from plan-pricing.ts (with or without JX Bot, as the order was priced),
   // so the payment check matches the price they were shown.
   const { planPrice, PAID_PLAN_IDS } = await import("@/lib/plan-pricing");
-  const plans = PAID_PLAN_IDS.map((id) => ({ id, price_usd: planPrice(id) }));
+  const plans = PAID_PLAN_IDS.map((id) => ({ id, price_usd: planPrice(id, withBot) }));
   const tiers = plans;
 
   let earned: any = null;
@@ -286,17 +286,23 @@ export async function approveOrder(orderId: string, by: string) {
     const before = await balanceOf();
     let applied: string | null = null;
     const payUsd = Number(order.pay_amount_usd ?? 0);
+    const withBot = (order as any).with_bot !== false;
     const covers = planOrderCovers({
       planId: order.target_plan_id,
       payUsd,
       discountUsd: order.promo_code ? Number(order.bonus_usd ?? 0) : 0,
+      withBot,
     });
     // A covered order (discount promos included) counts as the full plan price; an
     // underpaid one only buys whatever plan the amount actually covers.
-    const paidForPlan = covers && isPaidPlanId(order.target_plan_id) ? Math.max(payUsd, planPrice(order.target_plan_id)) : payUsd;
+    const paidForPlan = covers && isPaidPlanId(order.target_plan_id) ? Math.max(payUsd, planPrice(order.target_plan_id, withBot)) : payUsd;
     try {
-      applied = await applyPlanForPayment(order.user_id, paidForPlan, order.target_plan_id);
-      await ensureMt5License(order.user_id);
+      applied = await applyPlanForPayment(order.user_id, paidForPlan, order.target_plan_id, withBot);
+      // The plan now carries JX Bot only if this order was bought with it (a seat or a renewal).
+      if (applied || covers) {
+        await (supabaseAdmin as any).from("user_subscriptions").update({ bot_included: withBot }).eq("user_id", order.user_id);
+      }
+      if (withBot) await ensureMt5License(order.user_id);
     } catch (e) {
       console.error("plan upgrade on approval failed", (e as Error)?.message);
     }

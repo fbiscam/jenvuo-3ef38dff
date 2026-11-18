@@ -63,7 +63,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The Free plan gives every account $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. Free includes JX Bot on 1 IP with a $5 daily target.</p>
+            <p>The Free plan gives every account $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is not part of Free: it comes with the first 50 paid plans each month.</p>
             <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($19 Pro, $39 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
           </>
         ),
@@ -382,9 +382,9 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <ul>
-              <li><strong>Pro</strong> — $29 per month (Founding members with JX Bot: $49).</li>
-              <li><strong>Elite</strong> — $59 per month (Founding members with JX Bot: $99).</li>
-              <li><strong>Ultra</strong> — $99 per month (Founding members with JX Bot: $169).</li>
+              <li><strong>Pro</strong> — $29 per month with JX Bot (first 50 paid plans each month), $19 without it.</li>
+              <li><strong>Elite</strong> — $59 per month with JX Bot, $39 without it.</li>
+              <li><strong>Ultra</strong> — $99 per month with JX Bot, $59 without it.</li>
             </ul>
             <p>
               Each paid plan includes a monthly AI wallet. AI use is charged by actual tokens at $3 per million. See{" "}
