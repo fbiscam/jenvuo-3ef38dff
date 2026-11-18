@@ -370,7 +370,6 @@ function JxBotPage() {
               ))}
             </tbody>
           </table>
-          <p className="mt-3 text-[12px] text-muted-foreground">{TARGET_DISCLAIMER}</p>
         </div>
       </div>
 
