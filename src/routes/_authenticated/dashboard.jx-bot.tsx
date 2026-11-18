@@ -185,7 +185,6 @@ function JxBotPage() {
           )}
         </div>
       </div>
-      <p className="mt-2 text-[14px] text-muted-foreground">MetaTrader 5 bot · one IP works with one MT5 account. {TARGET_DISCLAIMER}</p>
 
       {access && (
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
