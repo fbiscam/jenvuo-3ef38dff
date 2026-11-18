@@ -2091,6 +2091,9 @@ html body .jenvu-zoom-dashboard main :is(.bg-gc-panel, .bg-gc-canvas, .bg-zinc-5
 /* Important section icons/logos in orange */
 html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg:first-child, .console-card .console-icon-chip svg) { color: #f97316 !important; }
 
+/* Dashboard home credit coin (xAI-style orange) */
+html body .console-coin { color: #f97316 !important; }
+
 /* Console table rows (API keys etc.) — hairline divider instead of borders */
 .console-row { box-shadow: inset 0 1px 0 color-mix(in oklab, var(--foreground) 8%, transparent); }
 

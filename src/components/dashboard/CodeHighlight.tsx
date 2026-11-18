@@ -2,6 +2,7 @@ import * as React from "react";
 
 const RULES: [RegExp, string][] = [
   [/^#(property|include|define)\b/, "tok-keyword"],
+  [/^https?:\/\/[^\s'"\\]+/, "tok-url"],
   [/^(#[^\n]*|\/\/[^\n]*)/, "tok-comment"],
   [/^("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)/, "tok-string"],
   [/^\$[A-Z_]+/, "tok-env"],
