@@ -12,7 +12,7 @@ import { useTrial } from "@/hooks/useTrial";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
-import { PLAN_API_CREDIT, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
+import { ANNUAL_DISCOUNT_PCT, PLAN_API_CREDIT, TERMINAL_API_PRICE, annualFullPrice, annualPrice, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
@@ -245,8 +245,9 @@ function PricingPage() {
   }, [signedOut, membershipFn]);
 
 
-  const priceOf = (price: number) =>
-    billing === "annual" && price > 0 ? Math.round((price * 12 * 0.83) / 10) * 10 : price;
+  const annual = billing === "annual";
+  const money = (n: number) => `$${n.toLocaleString("en-US")}`;
+  const priceFor = (k: PlanKey) => (annual ? annualPrice(k) : planPrice(k));
   const suffix = billing === "annual" ? "/ year" : "/ month";
   const [open, setOpen] = React.useState<number | null>(0);
 
@@ -335,7 +336,7 @@ function PricingPage() {
               onClick={() => setBilling(b)}
               className={`rounded-full px-5 py-2 text-[14px] font-medium transition ${billing === b ? "bg-background text-foreground shadow-sm" : "text-gc-ink-muted hover:text-gc-ink"}`}
             >
-              {b === "monthly" ? "Monthly" : (<>Annual <span className="ml-1 text-[12px] text-gc-ink-muted">−17%</span></>)}
+              {b === "monthly" ? "Monthly" : (<>Yearly <span className="ml-1.5 rounded-full bg-destructive px-2 py-0.5 text-[11px] font-semibold text-destructive-foreground">Save {ANNUAL_DISCOUNT_PCT}%</span></>)}
             </button>
           ))}
         </div>
@@ -356,8 +357,16 @@ function PricingPage() {
                   <span className="rounded-full bg-background px-2.5 py-0.5 text-[11px] font-medium text-gc-ink-muted">Most popular</span>
                 )}
               </div>
-              <div className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-[40px] font-medium leading-none tracking-tight">${plan.key === "free" ? 0 : priceOf(planPrice(plan.key))}</span>
+              <div className="mt-3 flex min-h-[20px] items-center gap-2">
+                {annual && plan.key !== "free" && (
+                  <>
+                    <span className="text-[14px] text-gc-ink-muted line-through">{money(annualFullPrice(plan.key))}</span>
+                    <span className="rounded-full bg-destructive px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-destructive-foreground">Save {ANNUAL_DISCOUNT_PCT}%</span>
+                  </>
+                )}
+              </div>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-[40px] font-medium leading-none tracking-tight">{plan.key === "free" ? "$0" : money(priceFor(plan.key))}</span>
                 <span className="text-[13px] text-gc-ink-muted">{suffix}</span>
               </div>
               <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
@@ -399,11 +408,13 @@ function PricingPage() {
               <tr className="border-b border-gc-line">
                 <th className="w-[28%] bg-background pb-5 pt-4 text-left align-bottom text-[14px] font-normal text-gc-ink-muted lg:sticky lg:top-[60px] lg:z-20">Feature</th>
                 {[
-                  { key: "free", label: "Free", price: "$0/month", cta: freeCta(true) },
+                  { key: "free", label: "Free", price: annual ? "$0/year" : "$0/month", cta: freeCta(true) } as { key: string; label: string; price: React.ReactNode; cta: React.ReactNode },
                   ...(["pro", "elite", "ultra"] as const).map((k) => ({
                     key: k,
                     label: name(k),
-                    price: `$${priceOf(planPrice(k))}${billing === "annual" ? "/year" : "/month"}`,
+                    price: annual
+                      ? <><span className="line-through">{money(annualFullPrice(k))}</span> {money(annualPrice(k))}/year <span className="ml-0.5 rounded-full bg-destructive px-1.5 py-px text-[10px] font-semibold text-destructive-foreground">−{ANNUAL_DISCOUNT_PCT}%</span></>
+                      : `${money(planPrice(k))}/month`,
                     cta: planCta(k, true),
                   })),
                   { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },

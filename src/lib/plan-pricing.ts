@@ -74,3 +74,16 @@ export function paidPeriodEnd(args: { samePlan: boolean; currentEnd: string | nu
   const from = args.samePlan && Number.isFinite(end) && end > now ? end : now;
   return new Date(from + PLAN_PERIOD_DAYS * 86_400_000).toISOString();
 }
+
+/** Yearly billing discount, percent off twelve monthly payments. */
+export const ANNUAL_DISCOUNT_PCT = 22;
+
+/** Full price of twelve months, before the yearly discount. */
+export function annualFullPrice(plan: PaidPlanId): number {
+  return planPrice(plan) * 12;
+}
+
+/** Yearly price after the discount, rounded down to whole dollars. */
+export function annualPrice(plan: PaidPlanId): number {
+  return Math.floor((annualFullPrice(plan) * (100 - ANNUAL_DISCOUNT_PCT)) / 100 + 1e-9);
+}

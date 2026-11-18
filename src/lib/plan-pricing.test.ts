@@ -57,3 +57,22 @@ describe("paid plan period", () => {
     expect(paidPeriodEnd({ samePlan: true, currentEnd: "2026-11-01T00:00:00Z", now })).toBe("2026-12-18T00:00:00.000Z");
   });
 });
+
+import { annualPrice, annualFullPrice, ANNUAL_DISCOUNT_PCT } from "./plan-pricing";
+describe("yearly pricing", () => {
+  it("gives 22% off twelve months", () => {
+    expect(ANNUAL_DISCOUNT_PCT).toBe(22);
+  });
+  it("Pro is $645 a year instead of $828", () => {
+    expect(annualFullPrice("pro")).toBe(828);
+    expect(annualPrice("pro")).toBe(645);
+  });
+  it("Elite is $1,301 a year instead of $1,668", () => {
+    expect(annualFullPrice("elite")).toBe(1668);
+    expect(annualPrice("elite")).toBe(1301);
+  });
+  it("Ultra is $2,237 a year instead of $2,868", () => {
+    expect(annualFullPrice("ultra")).toBe(2868);
+    expect(annualPrice("ultra")).toBe(2237);
+  });
+});
