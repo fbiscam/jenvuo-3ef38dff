@@ -299,7 +299,7 @@ function Profile() {
           </div>
         </div>
         {nameLocked && (
-          <p className="-mt-1 pb-2 pl-[30px] text-[12px] text-gc-ink-muted">Locked — your name is verified against your identity documents. Contact support to change it.</p>
+          <p className="-mt-1 pb-2 pl-[30px] text-[14px] text-gc-ink-muted">Locked — your name is verified against your identity documents. Contact support to change it.</p>
         )}
         <div className={row}>
           <span className={rowLabel}><Mail className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} /> Email</span>
