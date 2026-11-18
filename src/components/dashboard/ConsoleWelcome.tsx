@@ -65,6 +65,36 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         </div>
       </div>
 
+      <h2 className="mt-12 text-[18px] font-medium text-foreground">Explore our products</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {PRODUCTS.map((p) => (
+          <Link key={p.title} to={p.to} className="console-card group flex flex-col overflow-hidden">
+            <div className="relative aspect-[16/10] overflow-hidden">
+              {p.aurora ? (
+                <div className="flex h-full w-full items-center justify-center" style={{ backgroundImage: `var(--platform-aurora-${p.aurora})` }}>
+                  <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-background text-foreground transition duration-500 group-hover:scale-110">
+                    {p.icon && <p.icon className="h-7 w-7" aria-hidden="true" />}
+                  </span>
+                </div>
+              ) : (
+              <img
+                src={p.img}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+              />
+              )}
+              {p.badge && <span className="absolute left-3 top-3 rounded-full bg-background px-2.5 py-0.5 text-[12px] font-medium text-foreground">{p.badge}</span>}
+            </div>
+            <div className="flex flex-1 flex-col p-5">
+              <p className="flex items-center justify-between text-[16px] font-medium text-foreground">
+                {p.title}
+                <ArrowUpRight className="h-4 w-4 opacity-60 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true" />
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }
