@@ -90,7 +90,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
   };
 
   return (
-    <section className="console-home mx-auto mb-10 flex w-full max-w-[920px] flex-col lg:min-h-[calc(100vh-13rem)] lg:justify-center">
+    <section className="console-home mx-auto mb-10 flex w-full max-w-[920px] flex-col pt-2 lg:pt-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[34px]">Welcome, {name}</h1>
         <Link to="/dashboard/api" className="console-pill console-pill-solid h-10 px-5 text-[15px]">

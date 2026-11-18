@@ -2945,20 +2945,27 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
 
 /* Dashboard sidebar (xAI console look): smaller grey page names, black active item, darker group titles */
 html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .dashboard-sidebar-link {
-  font-size: 13.5px !important;
+  /* dashboard zoom scales this up (~1.2x), so it shows at about 14px like the xAI console */
+  font-size: 11.5px !important;
+  line-height: 18px !important;
   color: #5f6368 !important;
-  padding-top: 6px; padding-bottom: 6px;
+  gap: 10px !important;
+  padding-left: 10px !important; padding-right: 10px !important;
+  padding-top: 5px !important; padding-bottom: 5px !important;
 }
 html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .dashboard-sidebar-link .dashboard-sidebar-icon {
-  width: 16px !important; height: 16px !important; color: currentColor !important;
+  width: 14px !important; height: 14px !important; color: currentColor !important;
 }
+/* Page list starts a little lower under the logo, like the xAI console */
+html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) nav.sidebar-hover-scroll { padding-top: 26px !important; }
+html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .sidebar-group-label { padding-left: 10px !important; padding-right: 10px !important; }
 html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .dashboard-sidebar-link:hover,
 html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .dashboard-sidebar-link[aria-current="page"] {
   color: #000000 !important;
 }
 html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .dashboard-sidebar-link :is(span, svg):not(.bg-rose-600):not(.bg-rose-600 *) { color: inherit !important; }
 html body .jenvu-zoom-dashboard .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .sidebar-group-label {
-  font-size: 13px !important;
+  font-size: 11.5px !important;
   color: #1f1f1f !important;
 }
 html body .jenvu-zoom-dashboard.dash-dark .dashboard-sidebar-root:not(.dashboard-terminal-sidebar):not(.terminal-rail) .dashboard-sidebar-link { color: #a3a3a3 !important; }
