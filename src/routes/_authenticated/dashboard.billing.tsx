@@ -303,7 +303,7 @@ function Billing() {
             {prefField("city", "City")}
             {prefField("postalCode", "Postal code")}
             <div className="sm:col-span-2">{prefField("region", "State, county, province, or region")}</div>
-            <p className="text-[12px] text-gc-ink-muted sm:col-span-2">Saved on this browser and used for future invoices only.</p>
+            <p className="text-[12px] text-gc-ink-muted sm:col-span-2">   Saved on this browser and used for future invoices only.</p>
           </div>
         )}
 
