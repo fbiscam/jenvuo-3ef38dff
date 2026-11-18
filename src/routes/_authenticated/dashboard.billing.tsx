@@ -205,7 +205,7 @@ function Billing() {
                 {redeemingPromo ? "Applying…" : "Apply"}
               </button>
             </div>
-            <p className="mt-2 text-[13px] text-gc-ink-muted">Promo codes add API credit only. They can't be used to buy a plan.</p>
+            <p className="mt-2 text-[13px] text-gc-ink-muted">   Promo codes add API credit only. They can't be used to buy a plan.</p>
             </div>
           )}
 
