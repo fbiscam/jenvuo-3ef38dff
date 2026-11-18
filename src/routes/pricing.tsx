@@ -1,7 +1,5 @@
 import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT, MT5_PLANS, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
-import { BOT_SEATS_PER_MONTH } from "@/lib/bot-seats";
-import { getBotSeatStatus, getMyBotOffer } from "@/lib/bot-seats.functions";
-import { formatSeatOpening } from "@/lib/founding-seats";
+import { FOUNDING_SEATS_PER_MONTH } from "@/lib/founding-seats";
 import { showBuyBlocked } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
@@ -14,7 +12,7 @@ import { useTrial } from "@/hooks/useTrial";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
-import { PLAN_API_CREDIT, TERMINAL_API_PRICE, TERMINAL_API_PRICE_NO_BOT, planPrice } from "@/lib/plan-pricing";
+import { PLAN_API_CREDIT, TERMINAL_API_PRICE, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
@@ -30,9 +28,9 @@ const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',sy
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["Is there a free plan?", `Yes. Anyone can sign up and use Jenvu on the Free plan. Multiple accounts are allowed; each email can belong to only one account. Free includes $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). JX Bot is not part of Free: it comes with a paid plan while that month's bot seats last. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
-  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day; Pro $${PLAN_API_CREDIT.pro} credit and ${TERMINAL_DAILY_HOURS.pro} hours; Elite $${PLAN_API_CREDIT.elite} credit and ${TERMINAL_DAILY_HOURS.elite} hours; Ultra $${PLAN_API_CREDIT.ultra} credit, all day. The first ${BOT_SEATS_PER_MONTH} paid plans each month also include JX Bot: Pro $${TERMINAL_API_PRICE.pro}, Elite $${TERMINAL_API_PRICE.elite}, Ultra $${TERMINAL_API_PRICE.ultra} a month. Once those seats are taken, plans are Terminal and API only: Pro $${TERMINAL_API_PRICE_NO_BOT.pro}, Elite $${TERMINAL_API_PRICE_NO_BOT.elite}, Ultra $${TERMINAL_API_PRICE_NO_BOT.ultra}. Plans only: credit top-ups are not sold.`],
-  ["Who gets JX Bot?", `JX Bot has ${BOT_SEATS_PER_MONTH} new seats each month. The first ${BOT_SEATS_PER_MONTH} people who buy a paid plan in a month (UTC) get JX Bot with it; seats reopen on the 1st. If you already have JX Bot, you keep it when you renew or switch plans, without using a new seat. Free accounts and plans bought after the seats are full don't include it. Targets: Pro ${DAILY_TARGET_PCT.pro}% on ${MT5_PLANS.pro.licenses} IPs, Elite ${DAILY_TARGET_PCT.elite}% on ${MT5_PLANS.elite.licenses} IPs and Ultra ${DAILY_TARGET_PCT.ultra}% on ${MT5_PLANS.ultra.licenses} IPs. ${TARGET_DISCLAIMER} Founding members (${BOT_SEATS_PER_MONTH} seats a month) also get JX Bot during their 30-day Founding month.`],
+  ["Is there a free plan?", `Yes. Anyone can sign up and use Jenvu on the Free plan. Multiple accounts are allowed; each email can belong to only one account. Free includes $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). JX Bot is not part of Free: it comes with every paid plan. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
+  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day; Pro $${PLAN_API_CREDIT.pro} credit and ${TERMINAL_DAILY_HOURS.pro} hours; Elite $${PLAN_API_CREDIT.elite} credit and ${TERMINAL_DAILY_HOURS.elite} hours; Ultra $${PLAN_API_CREDIT.ultra} credit, all day. Every paid plan also includes JX Bot: Pro $${TERMINAL_API_PRICE.pro}, Elite $${TERMINAL_API_PRICE.elite}, Ultra $${TERMINAL_API_PRICE.ultra} a month. Plans only: credit top-ups are not sold.`],
+  ["Who gets JX Bot?", `Everyone who buys a paid plan (Pro, Elite or Ultra) gets JX Bot with it, with no limit on how many people can join. Free accounts don't include it. Targets: Pro ${DAILY_TARGET_PCT.pro}% on ${MT5_PLANS.pro.licenses} IPs, Elite ${DAILY_TARGET_PCT.elite}% on ${MT5_PLANS.elite.licenses} IPs and Ultra ${DAILY_TARGET_PCT.ultra}% on ${MT5_PLANS.ultra.licenses} IPs. ${TARGET_DISCLAIMER} Founding members (${FOUNDING_SEATS_PER_MONTH} seats a month) also get JX Bot during their 30-day Founding month.`],
   ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
   ["Who can use the Terminal?", `Every signed-in user can open the Terminal. Its paid indicators run for a set time each UTC day by plan: Free ${TERMINAL_DAILY_HOURS.free} hours, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite} and Ultra all day. Time counts only while one of them is switched on and the Terminal is open; when it is used up they lock and disappear until 00:00 UTC.`],
   ["Is News Trading free?", `Yes. The News Trading page is free on every plan, including Free. It counts down to the next US high-impact release (NFP, CPI, FOMC, PCE, PPI, GDP) and shows how Gold moved after the same kind of result in the last ${RELEASES_PER_EVENT} real releases. It is a read of past reactions, not a promise of the next move.`],
@@ -44,7 +42,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Free, Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Jenvu pricing: a Free plan with $10 monthly API credit, then Pro, Elite and Ultra. The first 50 paid plans each month include JX Bot ($29/$59/$99); after that $19/$39/$59." },
+      { name: "description", content: "Jenvu pricing: a Free plan with $20 monthly API credit, then Pro $69, Elite $139 and Ultra $239, each with JX Bot included." },
       { property: "og:title", content: "Jenvu pricing" },
       { property: "og:description", content: "Free, Pro, Elite and Ultra plans for the Terminal and Top AI Models, with daily Terminal hours by plan." },
       { property: "og:type", content: "website" },
@@ -86,10 +84,10 @@ const ALL: [Mark, Mark, Mark, Mark, Mark] = [true, true, true, true, true];
 const PAID: [Mark, Mark, Mark, Mark, Mark] = [false, true, true, true, true];
 const ELITE_UP: [Mark, Mark, Mark, Mark, Mark] = [false, false, true, true, true];
 
-function buildGroups(withBot: boolean): ReadonlyArray<Group> {
-  // JX Bot isn't on Free; paid plans include it only while the month's bot seats last.
-  const BOT: [Mark, Mark, Mark, Mark, Mark] = [false, withBot, withBot, withBot, true];
-  const botVal = (v: string): Mark => (withBot ? v : false);
+function buildGroups(): ReadonlyArray<Group> {
+  // JX Bot isn't on Free; every paid plan includes it.
+  const BOT: [Mark, Mark, Mark, Mark, Mark] = [false, true, true, true, true];
+  const botVal = (v: string): Mark => v;
   return [
   {
     title: "Usage",
@@ -138,7 +136,7 @@ function buildGroups(withBot: boolean): ReadonlyArray<Group> {
     icon: "bot",
     bot: true,
     rows: [
-      { f: `Included (first ${BOT_SEATS_PER_MONTH} paid plans each month)`, v: BOT },
+      { f: "Included with every paid plan", v: BOT },
       { f: "IPs (PC or RDP)", v: [false, botVal(String(MT5_PLANS.pro.licenses)), botVal(String(MT5_PLANS.elite.licenses)), botVal(String(MT5_PLANS.ultra.licenses)), "Custom"] },
       { f: "Daily profit target per IP (not guaranteed)", v: [false, botVal(`${DAILY_TARGET_PCT.pro}%`), botVal(`${DAILY_TARGET_PCT.elite}%`), botVal(`${DAILY_TARGET_PCT.ultra}%`), "Custom"] },
       { f: `Auto-stop at target or ${DAILY_DRAWDOWN_PCT}% drawdown`, v: BOT },
@@ -246,20 +244,6 @@ function PricingPage() {
     return () => { alive = false; };
   }, [signedOut, membershipFn]);
 
-  // JX Bot seats: the first 50 paid plans each month include the bot; holders keep it on renewal.
-  const seatFn = useServerFn(getBotSeatStatus);
-  const offerFn = useServerFn(getMyBotOffer);
-  const [seats, setSeats] = React.useState<{ left: number; total: number; nextOpenAt: string; holder: boolean } | null>(null);
-  React.useEffect(() => {
-    let alive = true;
-    const load = signedOut ? seatFn() : offerFn().catch(() => seatFn());
-    load
-      .then((r: any) => { if (alive) setSeats({ left: r.left, total: r.total, nextOpenAt: r.nextOpenAt, holder: !!r.holder }); })
-      .catch(() => {});
-    return () => { alive = false; };
-  }, [signedOut, seatFn, offerFn]);
-  const withBot = !seats || seats.holder || seats.left > 0;
-  const seatsReopen = seats ? formatSeatOpening(new Date(seats.nextOpenAt)) : "";
 
   const priceOf = (price: number) =>
     billing === "annual" && price > 0 ? Math.round((price * 12 * 0.83) / 10) * 10 : price;
@@ -327,7 +311,7 @@ function PricingPage() {
     );
   };
 
-  const groups = buildGroups(withBot);
+  const groups = buildGroups();
 
   return (
     <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
@@ -357,15 +341,6 @@ function PricingPage() {
         </div>
       </section>
 
-      {seats && (
-        <p className="mx-auto -mt-4 mb-8 max-w-[640px] px-5 text-center text-[14px] text-gc-ink-muted">
-          {seats.holder
-            ? "You already have JX Bot: it stays with your plan when you renew or switch."
-            : seats.left > 0
-              ? <>JX Bot: <span className="text-gc-ink">{seats.left} of {seats.total} seats left</span> this month. The first {seats.total} paid plans each month include it.</>
-              : <>This month's {seats.total} JX Bot seats are full. Plans are Terminal and API only until seats reopen on <span className="text-gc-ink">{seatsReopen}</span>.</>}
-        </p>
-      )}
 
       {/* PLAN CARDS */}
       <section id="plans" className="scroll-mt-24 mx-auto max-w-7xl px-5 pb-16 sm:px-8">
@@ -382,13 +357,13 @@ function PricingPage() {
                 )}
               </div>
               <div className="mt-3 flex items-baseline gap-1.5">
-                <span className="text-[40px] font-medium leading-none tracking-tight">${plan.key === "free" ? 0 : priceOf(planPrice(plan.key, withBot))}</span>
+                <span className="text-[40px] font-medium leading-none tracking-tight">${plan.key === "free" ? 0 : priceOf(planPrice(plan.key))}</span>
                 <span className="text-[13px] text-gc-ink-muted">{suffix}</span>
               </div>
               <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
                 {plan.key === "free"
                   ? "Free forever, start with your email"
-                  : withBot ? "Terminal, API & JX Bot" : "Terminal & API"}
+                  : "Terminal, API & JX Bot"}
               </p>
               <div className="mt-4">{plan.key === "free" ? freeCta() : planCta(plan.key)}</div>
               <p className="mt-6 min-h-[20px] text-[13px] text-gc-ink-muted">
@@ -398,13 +373,11 @@ function PricingPage() {
               <FeatureList title="Platform & AI" items={plan.features} />
               <FeatureList
                 title="JX Bot (MT5)"
-                muted={plan.key === "free" || !withBot}
+                muted={plan.key === "free"}
                 items={
                   plan.key === "free"
-                    ? ["Not included on Free", `Comes with the first ${BOT_SEATS_PER_MONTH} paid plans each month`]
-                    : withBot
-                      ? [`${plan.ips} IP${plan.ips > 1 ? "s" : ""} included`, `${DAILY_TARGET_PCT[plan.key]}% daily target per IP`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`]
-                      : ["Bot seats full this month", `Seats reopen ${seatsReopen}`]
+                    ? ["Not included on Free", "Comes with every paid plan"]
+                    : [`${plan.ips} IP${plan.ips > 1 ? "s" : ""} included`, `${DAILY_TARGET_PCT[plan.key]}% daily target per IP`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`]
                 }
               />
               <FeatureList title="News Trading" items={NEWS_ITEMS} />
@@ -430,7 +403,7 @@ function PricingPage() {
                   ...(["pro", "elite", "ultra"] as const).map((k) => ({
                     key: k,
                     label: name(k),
-                    price: `$${priceOf(planPrice(k, withBot))}${billing === "annual" ? "/year" : "/month"}`,
+                    price: `$${priceOf(planPrice(k))}${billing === "annual" ? "/year" : "/month"}`,
                     cta: planCta(k, true),
                   })),
                   { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },

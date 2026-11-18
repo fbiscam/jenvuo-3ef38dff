@@ -24,7 +24,7 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 50 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; the plan's API credit ($19 Pro, $39 Elite) and JX Bot unlock once their ID is verified within 2 days.",
+          "Invite-only program for 50 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; the plan's API credit ($40 Pro, $70 Elite) and JX Bot unlock once their ID is verified within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
@@ -122,7 +122,7 @@ function FoundingPage() {
 
       <main className="w-full px-5 pb-24 pt-20 sm:pt-28">
         <FormHero eyebrow="Founding" title="Founding Trader Program">
-          An invite-only program for 50 traders a month. Approved traders get 1 month of Pro or Elite. Upload your ID within 2 days: your 30-day Founding month, the Terminal and JX Bot start on the day it is verified, and we then add your plan's API credit ($19 Pro, $39 Elite). After those 30 days the plan, credit and bot access end, and we tell you whether the bot reached $200 profit so you can take your payout and choose a paid plan.
+          An invite-only program for 50 traders a month. Approved traders get 1 month of Pro or Elite. Upload your ID within 2 days: your 30-day Founding month, the Terminal and JX Bot start on the day it is verified, and we then add your plan's API credit ($40 Pro, $70 Elite). After those 30 days the plan, credit and bot access end, and we tell you whether the bot reached $200 profit so you can take your payout and choose a paid plan.
         </FormHero>
 
         <FormCallout

@@ -55,10 +55,9 @@ export const createTopupOrder = createServerFn({ method: "POST" })
     // Plan orders are always priced on the server: the browser's amount is ignored.
     const { isPaidPlanId, PLAN_API_CREDIT, planPrice } = await import("@/lib/plan-pricing");
     if (data.planId && !isPaidPlanId(data.planId)) return { ok: false as const, error: "Pick a plan to continue." };
-    // JX Bot comes with the plan only for bot holders or while this month's 50 seats last.
-    const { botOfferForUser } = await import("@/lib/bot-seats.server");
-    const offer = isPaidPlanId(data.planId) ? await botOfferForUser(supabase, userId) : null;
-    const amountUsd = isPaidPlanId(data.planId) ? planPrice(data.planId, offer!.withBot) : data.amountUsd;
+    // Every paid plan comes with JX Bot (no seat limit).
+    const withBot = isPaidPlanId(data.planId);
+    const amountUsd = isPaidPlanId(data.planId) ? planPrice(data.planId) : data.amountUsd;
     const quote = await evaluatePromo({ userId, amountUsd, code: data.code ?? null });
     if (quote.error) return { ok: false as const, error: quote.error };
     if (quote.promoType === "free") return { ok: false as const, error: "Redeem this code from the promo box instead." };
@@ -92,8 +91,8 @@ export const createTopupOrder = createServerFn({ method: "POST" })
         promo_code: quote.promoCode,
         target_plan_id: data.planId || null,
         is_upgrade: !!data.planId,
-        with_bot: !!offer?.withBot,
-        bot_new_seat: !!offer?.newSeat,
+        with_bot: withBot,
+        bot_new_seat: false,
         expires_at: new Date(Date.now() + 5 * 60_000).toISOString(),
       })
       .select("*")

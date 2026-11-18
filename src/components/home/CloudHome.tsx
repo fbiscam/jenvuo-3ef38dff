@@ -229,7 +229,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "Sign up free: $10 API credit every month and 2 hours a day of the Terminal's paid indicators", to: "/auth", img: tradeNeonStart },
+      { tag: "NEW TRADERS", text: "Sign up free: $20 API credit every month and 2 hours a day of the Terminal's paid indicators", to: "/auth", img: tradeNeonStart },
       { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
       { tag: "LEARN", text: "Read daily Gold insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
@@ -248,7 +248,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     label: "Special programs",
     cards: [
       { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for 1 month of Pro or Elite with API credit", to: "/founding", img: progFounding },
-      { tag: "PLANS", text: "Pro $29, Elite $59 or Ultra $99 with JX Bot for the first 50 each month, then $19, $39 or $59", to: "/pricing", img: progPlans },
+      { tag: "PLANS", text: "Pro $69, Elite $139 or Ultra $239, JX Bot included in every paid plan", to: "/pricing", img: progPlans },
       { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
     ],
   },
@@ -379,7 +379,7 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Sign up free: $10 API credit every month and 2 hours a day of the Terminal's paid indicators. JX Bot comes with the first 50 paid plans each month.
+            Sign up free: $20 API credit every month and 2 hours a day of the Terminal's paid indicators. JX Bot comes with every paid plan.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <SignUpCta className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover" />
@@ -562,9 +562,9 @@ export function CloudUseCases() {
 
 /* ---------------- Pricing band ---------------- */
 const PLANS = [
-  { name: "Pro", price: "$29", note: "Terminal, AI desk and JX Bot while seats last; $19 without the bot.", tone: "blue" as Tone },
-  { name: "Elite", price: "$59", note: "More AI usage and JX Bot while seats last; $39 without the bot.", tone: "green" as Tone },
-  { name: "Ultra", price: "$99", note: "The highest limits and JX Bot while seats last; $59 without the bot.", tone: "red" as Tone },
+  { name: "Pro", price: "$69", note: "Terminal, AI desk and JX Bot on 2 IPs.", tone: "blue" as Tone },
+  { name: "Elite", price: "$139", note: "More AI usage and JX Bot on 3 IPs.", tone: "green" as Tone },
+  { name: "Ultra", price: "$239", note: "The highest limits and JX Bot on 4 IPs.", tone: "red" as Tone },
 ];
 
 export function CloudPricing() {
@@ -575,7 +575,7 @@ export function CloudPricing() {
           <div>
             <h2 className="text-[32px] font-medium tracking-tight leading-[1.2] text-gc-ink sm:text-[40px]">Simple, monthly pricing</h2>
             <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
-              Every plan includes monthly API credit. The first 50 paid plans each month also include JX Bot. Extra AI usage is $3 per million tokens.
+              Every plan includes monthly API credit. Every paid plan also includes JX Bot. Extra AI usage is $3 per million tokens.
             </p>
             <div className="mt-8">
               <PrimaryButton to="/pricing">Compare plans</PrimaryButton>

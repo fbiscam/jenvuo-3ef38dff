@@ -44,8 +44,8 @@ describe("Terminal paid indicators: hours per day by plan", () => {
 });
 
 describe("Free plan", () => {
-  test("$10 API credit and 1 API key", () => {
-    expect(FREE_PLAN_CREDIT_USD).toBe(10);
+  test("$20 API credit and 1 API key", () => {
+    expect(FREE_PLAN_CREDIT_USD).toBe(20);
     expect(FREE_PLAN_API_KEYS).toBe(1);
   });
 });

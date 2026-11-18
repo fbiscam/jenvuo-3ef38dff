@@ -2,10 +2,8 @@ import type { PaidPlanId } from "@/lib/plan-features";
 import { PLAN_PRICE_NO_BOT, PLAN_PRICE_WITH_BOT } from "@/lib/bot-seats";
 
 /**
- * Plan prices (USD per month). With JX Bot (one of the month's 50 bot seats, or a renewal by a
- * bot holder) Pro $29 / Elite $59 / Ultra $99; without it (seats full) Terminal + API only
- * $19 / $39 / $59. The server charges from these same numbers, so the page and the payment
- * check never disagree.
+ * Plan prices (USD per month), one set for everyone, JX Bot included in every paid plan.
+ * The server charges from these same numbers, so the page and the payment check never disagree.
  */
 export const TERMINAL_API_PRICE: Record<PaidPlanId, number> = PLAN_PRICE_WITH_BOT;
 export const TERMINAL_API_PRICE_NO_BOT: Record<PaidPlanId, number> = PLAN_PRICE_NO_BOT;
@@ -25,7 +23,7 @@ export function planPrice(plan: PaidPlanId, withBot = true): number {
  * API credit a plan payment adds (USD), with or without JX Bot. The rest of the price pays for
  * the Terminal (and JX Bot when included), so it is never added to the wallet.
  */
-export const PLAN_API_CREDIT: Record<PaidPlanId, number> = { pro: 19, elite: 39, ultra: 59 };
+export const PLAN_API_CREDIT: Record<PaidPlanId, number> = { pro: 40, elite: 70, ultra: 90 };
 
 /** API credit Founding members get for their Founding month (Pro or Elite). */
 export const FOUNDING_API_CREDIT: Record<"pro" | "elite", number> = { pro: PLAN_API_CREDIT.pro, elite: PLAN_API_CREDIT.elite };

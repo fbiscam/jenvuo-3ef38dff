@@ -24,8 +24,6 @@ import {
 import { planPrice, isPaidPlanId, PLAN_API_CREDIT } from "@/lib/plan-pricing";
 import { planFeatures } from "@/lib/plan-features";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
-import { getMyBotOffer, type MyBotOffer } from "@/lib/bot-seats.functions";
-import { formatSeatOpening } from "@/lib/founding-seats";
 import { purchaseGate, PURCHASE_BLOCK_MESSAGE, isTrialPlanLocked } from "@/lib/founding-bot";
 import { Lock } from "lucide-react";
 import { UsdtIcon, TronIcon, BnbIcon, EthIcon, NetworkIcon } from "@/components/pay/CoinIcons";
@@ -125,16 +123,8 @@ function PayPage() {
   const canBuyPlan = !!gate?.canBuy;
   const canBuy = canBuyPlan && !isTrialPlanLocked(selectedPlanId, trialPlan);
 
-  // Whether a plan bought now includes JX Bot (seats left this month, or already a bot holder).
-  // The server decides the real price when the order is made; this only shows it.
-  const botOfferFn = useServerFn(getMyBotOffer);
-  const [botOffer, setBotOffer] = useState<MyBotOffer | null>(null);
-  useEffect(() => {
-    let alive = true;
-    botOfferFn().then((o) => { if (alive) setBotOffer(o); }).catch(() => {});
-    return () => { alive = false; };
-  }, [botOfferFn]);
-  const withBot = botOffer ? botOffer.withBot : true;
+  // Every paid plan includes JX Bot. The server decides the real price when the order is made.
+  const withBot = true;
 
   const PLANS = [
     { id: "pro", name: "Pro", price: planPrice("pro", withBot), features: planFeatures("pro", withBot) },
@@ -316,15 +306,6 @@ function PayPage() {
               <h2 className="text-[20px] font-normal text-gc-ink">{mode === "upgrade" ? "Choose a plan" : "Choose an amount"}</h2>
             </div>
 
-            {mode === "upgrade" && botOffer && (
-              <p className="mt-2 text-[13px] text-gc-ink-muted">
-                {botOffer.holder
-                  ? "Your plan keeps JX Bot when you renew or switch plans."
-                  : botOffer.withBot
-                    ? `JX Bot included: ${botOffer.left} of ${botOffer.total} bot seats left this month.`
-                    : `This month's ${botOffer.total} JX Bot seats are full, so plans include the Terminal and API only. Seats reopen on ${formatSeatOpening(new Date(botOffer.nextOpenAt))}.`}
-              </p>
-            )}
 
             {mode === "upgrade" ? (
               <div className="mt-5 grid gap-3 sm:grid-cols-3">

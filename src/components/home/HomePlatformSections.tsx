@@ -23,7 +23,7 @@ const STATS: Array<{ v: string; t: string; g: number }> = [
   { v: "7", t: "analysis engines reading every Gold candle", g: 1 },
   { v: "5", t: "timeframes from 5M to 4H, checked live", g: 2 },
   { v: "30 days", t: "of Pro or Elite for Founding members", g: 3 },
-  { v: "$19–$39", t: "plan API credit once your ID is verified", g: 1 },
+  { v: "$40–$70", t: "plan API credit once your ID is verified", g: 1 },
 ];
 
 export function HomeStats() {
@@ -190,7 +190,7 @@ export function HomeGetStarted() {
             <div className="flex flex-1 flex-col p-7 sm:p-8">
               <h3 className="text-2xl font-medium text-gc-ink">Trade with Jenvu</h3>
               <div className="flex-1">
-                <Ticks items={["Free plan: $10 API credit every month", "Jenvu Terminal and AI desk", "JX Bot with the first 50 paid plans each month"]} />
+                <Ticks items={["Free plan: $20 API credit every month", "Jenvu Terminal and AI desk", "JX Bot in every paid plan"]} />
               </div>
               <div className="mt-8">
                 <SignUpCta className={pillDark} />

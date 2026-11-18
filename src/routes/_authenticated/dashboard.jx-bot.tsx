@@ -1,10 +1,7 @@
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { jxBotAction } from "@/lib/founding-bot";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { getBotSeatStatus, type BotSeatStatus } from "@/lib/bot-seats.functions";
-import { BOT_SEATS_PER_MONTH } from "@/lib/bot-seats";
-import { formatSeatOpening } from "@/lib/founding-seats";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, Plus, Trash2, Wrench, X } from "lucide-react";
@@ -57,13 +54,6 @@ const fmtDate = (d: string) => new Date(d).toLocaleDateString(undefined, { month
 
 function JxBotPage() {
   const { access, refresh } = useMt5Access();
-  const seatFn = useServerFn(getBotSeatStatus);
-  const [seats, setSeats] = useState<BotSeatStatus | null>(null);
-  useEffect(() => {
-    let alive = true;
-    seatFn().then((r) => { if (alive) setSeats(r); }).catch(() => {});
-    return () => { alive = false; };
-  }, [seatFn]);
   const getUrl = useServerFn(getBotDownloadUrl);
   const create = useServerFn(createMt5License);
   const revoke = useServerFn(revokeMt5License);
@@ -210,7 +200,7 @@ function JxBotPage() {
       {access && (access as any).viaFounding && (
         <div className="console-card mt-4 px-5 py-4 text-[14px] text-foreground">
           Founding month on your {access.plan === "elite" ? "Elite" : "Pro"} plan — the bot runs with that plan's target.{" "}
-          {(access as any).founding?.review_at && <>It ends on {new Date((access as any).founding.review_at).toLocaleDateString()}; after that the bot stops unless you buy a plan while bot seats are open.</>}
+          {(access as any).founding?.review_at && <>It ends on {new Date((access as any).founding.review_at).toLocaleDateString()}; after that the bot stops unless you buy a plan.</>}
         </div>
       )}
 
@@ -219,13 +209,9 @@ function JxBotPage() {
           <span>
             {(access as any).founding?.state === "awaiting_id"
               ? "Your Founding plan and JX Bot start once your ID is verified."
-              : seats && seats.left > 0
-                ? `JX Bot comes with the first ${seats.total} paid plans each month: ${seats.left} of ${seats.total} seats left. Buy a plan to get it.`
-                : seats
-                  ? `This month's ${seats.total} JX Bot seats are full. Seats reopen on ${formatSeatOpening(new Date(seats.nextOpenAt))}.`
-                  : `JX Bot comes with the first ${BOT_SEATS_PER_MONTH} paid plans each month.`}
+              : "JX Bot comes with every paid plan. Buy Pro, Elite or Ultra to get it."}
           </span>
-          {(access as any).founding?.state !== "awaiting_id" && seats && seats.left > 0 && <Link to="/dashboard/pay" className="console-pill console-pill-solid">Buy a plan</Link>}
+          {(access as any).founding?.state !== "awaiting_id" && <Link to="/dashboard/pay" className="console-pill console-pill-solid">Buy a plan</Link>}
         </div>
       )}
 

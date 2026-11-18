@@ -49,16 +49,15 @@ describe("mt5 licenses", () => {
     expect(first.valid && first.bind).toBe(true);
     expect(evaluateIpLicense(IP, IP, "222", lic, paid("pro"))).toEqual({ valid: false, reason: "account_mismatch" });
   });
-  it("Free accounts, trials, expired plans and plans bought without a bot seat get no bot", () => {
+  it("Free accounts, trials and expired plans get no bot", () => {
     const no = { valid: false, reason: "no_plan" };
     expect(evaluateIpLicense(IP, IP, "12345678", lic, { plan_id: "free", status: "active", is_trial: false, current_period_end: null })).toEqual(no);
     expect(evaluateIpLicense(IP, IP, "12345678", lic, null)).toEqual(no);
     expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true })).toEqual(no);
     expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" })).toEqual(no);
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), bot_included: false })).toEqual(no);
   });
-  it("a paid plan bought with the bot runs its tier", () => {
-    const r = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), bot_included: true });
+  it("every paid plan runs its tier, even one once sold without the bot", () => {
+    const r = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), bot_included: false });
     expect(r.valid && r.plan).toBe("elite");
   });
   it("an active Founding month runs its Founding plan", () => {

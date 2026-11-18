@@ -7,9 +7,6 @@ import BotCodingPreview from "@/components/jxbot/BotCodingPreview";
 import { JxFace, JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
-import { useServerFn } from "@tanstack/react-start";
-import { getBotSeatStatus, type BotSeatStatus } from "@/lib/bot-seats.functions";
-import { formatSeatOpening } from "@/lib/founding-seats";
 
 export const Route = createFileRoute("/jx-bot")({
   head: () => ({
@@ -71,29 +68,6 @@ function GetBot({ label = "Use JX Bot" }: { label?: string }) {
 }
 
 
-/** Live count of this month's JX Bot seats (the first 50 paid plans each month include it). */
-function SeatLine() {
-  const seatFn = useServerFn(getBotSeatStatus);
-  const [seats, setSeats] = React.useState<BotSeatStatus | null>(null);
-  React.useEffect(() => {
-    let alive = true;
-    seatFn().then((r) => { if (alive) setSeats(r); }).catch(() => {});
-    return () => { alive = false; };
-  }, [seatFn]);
-  if (!seats) return <p className="mt-5 min-h-[20px] text-[14px] text-muted-foreground" aria-hidden />;
-  return (
-    <p className="mt-5 min-h-[20px] text-[14px] text-muted-foreground">
-      {seats.left > 0 ? (
-        <>
-          <span className="text-foreground">{seats.left} of {seats.total} seats left</span> this month · JX Bot comes with the first {seats.total} paid plans
-        </>
-      ) : (
-        <>All {seats.total} seats this month are taken · reopens <span className="text-foreground">{formatSeatOpening(new Date(seats.nextOpenAt))}</span></>
-      )}
-    </p>
-  );
-}
-
 /* ---------- 1. Hero + app window ---------- */
 
 function AppWindow() {
@@ -126,7 +100,6 @@ function Hero() {
           Contact sales
         </Link>
       </div>
-      <SeatLine />
       <AppWindow />
     </section>
   );
@@ -178,7 +151,7 @@ const FAQS = [
   },
   {
     q: "Who can use JX Bot?",
-    a: "JX Bot has 50 new seats each month: the first 50 people who buy a paid plan in a month get it with their plan (Pro $29, Elite $59, Ultra $99), and seats reopen on the 1st. If you already have it, you keep it when you renew or switch plans. Free accounts and plans bought after the seats are full ($19/$39/$59, Terminal and API only) don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 2 IPs), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
+    a: "JX Bot comes with every paid plan (Pro $69, Elite $139, Ultra $239 a month), with no limit on how many people can join. Free accounts don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 2 IPs), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
   },
   {
     q: "How many accounts can I run?",

@@ -17,7 +17,7 @@ export function dailyTarget(plan: Mt5PlanId) {
 }
 
 /**
- * Legacy Free bot tier ($5/day, 1 IP). Free accounts no longer get JX Bot (seat holders and
+ * Legacy Free bot tier ($5/day, 1 IP). Free accounts no longer get JX Bot (paid plans and
  * Founding months only); kept so old reports and the stop rule still read.
  */
 export const FREE_BOT = { name: "Free", dailyTargetUsd: 5, licenses: 1 } as const;
@@ -41,14 +41,10 @@ export function targetsFor(plan: BotPlanId, _userId?: string | null) {
   return { daily: dailyTarget(plan), monthly: MT5_PLANS[plan].monthlyTarget };
 }
 
-/**
- * JX Bot unlocks only on an active, paid (non-trial) plan bought with the bot (one of the month's
- * bot seats, see bot-seats.ts). Plans bought after the seats ran out (`bot_included` false) don't.
- */
+/** JX Bot unlocks on every active, paid (non-trial) plan; there is no seat limit. */
 export function isPaidBotSub(sub: Sub, now = Date.now()) {
   if (!sub || sub.is_trial || sub.status !== "active") return false;
   if (sub.current_period_end && Date.parse(sub.current_period_end) <= now) return false;
-  if (sub.bot_included === false) return false;
   return isMt5Plan(String(sub.plan_id || "").toLowerCase());
 }
 
@@ -58,9 +54,9 @@ export function licenseLimit(plan: string | null | undefined) {
 }
 
 /**
- * Which JX Bot plan a user runs, or null when they have no bot: an active paid plan bought with
- * the bot gives its own tier, an active Founding month gives the Founding plan. Free accounts,
- * trials, lapsed plans and plans bought without a bot seat get no bot.
+ * Which JX Bot plan a user runs, or null when they have no bot: an active paid plan gives its
+ * own tier, an active Founding month gives the Founding plan. Free accounts, trials and lapsed
+ * plans get no bot.
  */
 export function botAccessFor(sub: Sub, foundingActive = false, now = Date.now()): Mt5PlanId | null {
   if (sub && isPaidBotSub(sub, now)) return String(sub.plan_id).toLowerCase() as Mt5PlanId;
@@ -123,7 +119,7 @@ export type ValidateResult =
 /**
  * Pure license check. `enteredIp` is what the user typed in the bot, `callerIp` is the IP the server sees.
  * Both must equal the IP registered on the website; the first MT5 account on that IP is locked in.
- * Only bot seat holders and active Founding months pass; the plan decides the daily target %.
+ * Only active paid plans and active Founding months pass; the plan decides the daily target %.
  */
 export function evaluateIpLicense(enteredIp: string, callerIp: string, account: string, lic: Lic | null, sub: Sub, now = Date.now(), foundingBot = false): ValidateResult {
   const ip = normalizeIp(enteredIp);
@@ -133,7 +129,7 @@ export function evaluateIpLicense(enteredIp: string, callerIp: string, account: 
   const b = parseBinding(lic.mt5_account);
   if (b.ip !== ip || normalizeIp(callerIp) !== ip) return { valid: false, reason: "ip_mismatch" };
   if (b.account && b.account !== account) return { valid: false, reason: "account_mismatch" };
-  // Paid plan with a bot seat → its tier; active Founding month → the Founding plan; otherwise no bot.
+  // Active paid plan → its tier; active Founding month → the Founding plan; otherwise no bot.
   const plan = botAccessFor(sub, foundingBot, now);
   if (!plan) return { valid: false, reason: "no_plan" };
   const t = targetsFor(plan, lic.user_id);

@@ -49,7 +49,7 @@ const benefits = [
 ]
 const faqs = [
   ['What is included in one workspace?', 'Terminal, JX Bot, News Trading and Platform share your Jenvu account. Use chart analysis, follow US economic releases, manage your bot and build with model APIs without separate product accounts. Each product keeps its own plan allowances.'],
-  ['Can I start on the Free plan?', 'Yes. New accounts start on Free with one API key and free News Trading. JX Bot comes with the first 50 paid plans each month. There is no new free trial.'],
+  ['Can I start on the Free plan?', 'Yes. New accounts start on Free with one API key and free News Trading. JX Bot comes with every paid plan. There is no new free trial.'],
   ['How many Terminal indicator hours do I get?', `Free includes ${TERMINAL_DAILY_HOURS.free} hours per UTC day, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite}, and Ultra ${TERMINAL_DAILY_HOURS.ultra}. When the allowance runs out, paid indicators lock until the next UTC day. The Terminal remains accessible.`],
   ['What does the JX Bot daily target mean?', 'Pro 2%, Elite 4% and Ultra 6% per account. These are maximum safety caps, not guaranteed returns. JX Bot trades EUR/USD M15.'],
   ['How many IPs and API keys are included?', `JX Bot IPs: Pro 2, Elite 3, Ultra 4 (Free has no JX Bot). API keys: Free ${PLAN_API_KEYS.free}, Pro ${PLAN_API_KEYS.pro}, Elite ${PLAN_API_KEYS.elite}, Ultra ${PLAN_API_KEYS.ultra}. One IP is bound to one MT5 account.`],

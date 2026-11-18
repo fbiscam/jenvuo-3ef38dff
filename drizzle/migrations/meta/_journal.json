@@ -414,6 +414,20 @@
       "when": 1794990686362,
       "tag": "0058_jx_bot_monthly_seats",
       "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1794993435552,
+      "tag": "0059_premium_prices_free_20",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1794993469729,
+      "tag": "0060_founding_credit_40_70",
+      "breakpoints": true
     }
   ]
 }

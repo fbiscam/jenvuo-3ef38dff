@@ -47,7 +47,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "sign up register signup login sign in founding apply",
         body: (
           <>
-            <p>Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. Pro gives 3 API keys and 8 hours a day, Elite 5 keys and 16 hours, Ultra 7 keys and all day.</p>
+            <p>Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $20 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. Pro gives 3 API keys and 8 hours a day, Elite 5 keys and 16 hours, Ultra 7 keys and all day.</p>
             <ol>
               <li>Open <a href="https://auth.jenvu.com/sign-in?mode=signup">auth.jenvu.com/sign-in</a> and choose Create an account.</li>
               <li>Enter the 6-digit code we email you.</li>
@@ -63,8 +63,8 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The Free plan gives every account $10 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is not part of Free: it comes with the first 50 paid plans each month.</p>
-            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($19 Pro, $39 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
+            <p>The Free plan gives every account $20 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is not part of Free: it comes with every paid plan.</p>
+            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($40 Pro, $70 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
           </>
         ),
       },
@@ -164,7 +164,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <p>The Terminal is open to <strong>every signed-in account</strong>, Free included.</p>
             <ul>
               <li>The paid indicators (Fresh sweep, price action, Zone + FVG) run a set time each UTC day: Free 2 hours, Pro 8, Elite 16, Ultra all day. When the time is used up they lock until 00:00 UTC.</li>
-              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. Their Founding plan (its Terminal hours and JX Bot target) starts once the ID is verified, and the plan's API credit is added ($19 Pro, $39 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
+              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. Their Founding plan (its Terminal hours and JX Bot target) starts once the ID is verified, and the plan's API credit is added ($40 Pro, $70 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>
@@ -382,9 +382,9 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <ul>
-              <li><strong>Pro</strong> — $29 per month with JX Bot (first 50 paid plans each month), $19 without it.</li>
-              <li><strong>Elite</strong> — $59 per month with JX Bot, $39 without it.</li>
-              <li><strong>Ultra</strong> — $99 per month with JX Bot, $59 without it.</li>
+              <li><strong>Pro</strong> — $69 per month, JX Bot included.</li>
+              <li><strong>Elite</strong> — $139 per month, JX Bot included.</li>
+              <li><strong>Ultra</strong> — $239 per month, JX Bot included.</li>
             </ul>
             <p>
               Each paid plan includes a monthly AI wallet. AI use is charged by actual tokens at $3 per million. See{" "}

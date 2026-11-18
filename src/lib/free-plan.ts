@@ -3,7 +3,7 @@
  * action, Zone + FVG). The database (`start_signup_trial()` at sign-up and the hourly
  * `process_free_monthly_credit()`) must use the same credit amount.
  */
-export const FREE_PLAN_CREDIT_USD = 10;
+export const FREE_PLAN_CREDIT_USD = 20;
 export const FREE_PLAN_CREDIT_DAYS = 30;
 /** Active API keys on Free (DB `plans.extension_key_limit` for `free` must match). */
 export const FREE_PLAN_API_KEYS = 1;
