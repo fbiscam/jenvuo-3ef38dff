@@ -679,7 +679,6 @@
 @media (min-width: 1024px) { .jenvu-public-scale { zoom: 0.99; min-height: calc(100vh / 0.99); } }
 html[data-pwa="1"] .jenvu-public-scale { zoom: 1; }
 
-@media (min-width: 1024px) { .killzones-root { zoom: 1.25; } }
 @media (min-width: 1280px) and (min-height: 800px) { .jenvu-auth-zoom { zoom: 1.21; } }
 
 

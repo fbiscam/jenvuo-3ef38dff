@@ -23,14 +23,14 @@ export const Route = createFileRoute("/founder")({
 });
 
 const BIO = [
-  "Haseeb Ijaz started Jenvu at age 21 with a single conviction: structured Gold analysis should not be locked behind an expensive terminal or a Wall Street desk.",
-  "He spent years studying ICT, SMC, liquidity and market structure on Gold. The patterns were repeatable, but the tools were scattered. So he built the platform he wished he had at 18 — AI-assisted and honest about risk.",
+  "Haseeb Ijaz started Jenvu at age 21 with a single conviction: structured Gold, Bitcoin and forex analysis should not be locked behind an expensive terminal or a Wall Street desk.",
+  "He spent years studying ICT, SMC, liquidity and market structure on Gold, BTC/USD and EUR/USD. The patterns were repeatable, but the tools were scattered. So he built the platform he wished he had at 18 — AI-assisted and honest about risk.",
   "Beyond the Terminal, Haseeb has sharpened 25 skills spanning market research, product marketing, community building and AI-driven growth.",
   "Today Jenvu brings those disciplines into one platform that reads the chart live, marks the structure, and tells traders when there is no clear setup.",
 ];
 
 const IDEAS = [
-  "Analyze Gold through deeply specialized, rule-based engines",
+  "Analyze Gold, BTC/USD and EUR/USD through deeply specialized, rule-based engines",
   "Explain the setup in plain language so traders can check it",
   "Only highlight setups when bias, structure, liquidity and timing align",
   "Say so clearly when the market offers no clear edge",
@@ -67,7 +67,7 @@ function FounderPage() {
                     <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gc-blue-soft"><Award className="h-5 w-5 text-gc-blue" /></span>
                     <div>
                       <p className="text-[15px] font-medium">Founded at age 21</p>
-                      <p className="text-[13px] text-gc-ink-muted">Jenvu · XAU/USD trading platform</p>
+                      <p className="text-[13px] text-gc-ink-muted">Jenvu · AI trading platform for Gold, BTC/USD & EUR/USD</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 rounded-md border border-gc-line p-4">

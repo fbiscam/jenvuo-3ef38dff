@@ -32,15 +32,15 @@ export const Route = createFileRoute("/killzones")({
 
 const MONO = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Roboto',system-ui,sans-serif] font-normal normal-case tracking-normal";
 
-type Category = "FX";
+type Category = "Metals";
 
 const META: Record<string, { name: string; category: Category; region: string; flag: string }> = {
-  XAUUSD: { name: "Euro / US Dollar", category: "FX", region: "London / New York", flag: "🇪🇺" },
+  XAUUSD: { name: "Gold / US Dollar", category: "Metals", region: "London / New York", flag: "" },
 };
 
-const CATEGORIES: (Category | "All")[] = ["All", "FX"];
+const CATEGORIES: (Category | "All")[] = ["All", "Metals"];
 
-// Fiber market: closed Fri 22:00 UTC → Sun 22:00 UTC
+// Gold market: closed Fri 22:00 UTC → Sun 22:00 UTC
 function isMarketOpen(d: Date): boolean {
   const day = d.getUTCDay();
   const h = d.getUTCHours();
@@ -48,6 +48,10 @@ function isMarketOpen(d: Date): boolean {
   if (day === 5 && h >= 22) return false;
   if (day === 0 && h < 22) return false;
   return true;
+}
+
+function r_symbol(key: string) {
+  return key === "XAUUSD" ? "XAU/USD" : key;
 }
 
 function pad(n: number) {
@@ -187,7 +191,7 @@ function KillzonesPage() {
       .filter(
         r =>
           !q ||
-          "EURUSD".includes(q) ||
+          r.profile.key.includes(q) ||
           r.meta.name.toUpperCase().includes(q) ||
           r.meta.region.toUpperCase().includes(q),
       );
@@ -195,7 +199,7 @@ function KillzonesPage() {
 
   const grouped = useMemo(() => {
     const g: Record<Category, typeof rows> = {
-      FX: [],
+      Metals: [],
     };
     rows.forEach(r => g[r.meta.category].push(r));
     return g;
@@ -220,28 +224,28 @@ function KillzonesPage() {
   return (
     <div className="public-cloudflare killzones-root min-h-dvh w-full bg-background text-foreground font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',system-ui,sans-serif] antialiased">
       <SiteHeader />
-      <main className="jenvu-home-content mx-auto max-w-[1296px] px-5 pb-16 sm:px-8">
-        <div className="pb-10 pt-12 text-center md:pt-14">
+      <main className="jenvu-home-content mx-auto max-w-[1100px] px-5 pb-14 sm:px-8">
+        <div className="pb-8 pt-10 text-center md:pt-12">
           <span className="jenvu-rise inline-flex rounded-full bg-gc-blue-soft px-3 py-1 text-[13px] font-medium text-gc-blue-deep">Free tool · Gold</span>
-          <h1 className="jenvu-rise mt-5 text-[40px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[56px]">Gold killzones, live</h1>
-          <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-5 max-w-[720px] text-[17px] leading-[1.6] text-gc-ink-muted">
+          <h1 className="jenvu-rise mt-5 text-[32px] font-medium leading-[1.1] tracking-[-0.5px] sm:text-[44px]">Gold killzones, live</h1>
+          <p className="jenvu-rise [animation-delay:80ms] mx-auto mt-4 max-w-[640px] text-[15px] leading-[1.6] text-gc-ink-muted">
             ICT / SMC session windows for Gold — shown in UTC and your local time, with a live in/out status.
           </p>
         </div>
 
         {/* Live clock strip */}
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-md border border-gc-line bg-background p-5 ">
+          <div className="rounded-md border border-gc-line bg-background px-4 py-3">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>UTC</div>
-            <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{utcNow}</div>
+            <div className={`${MONO} text-lg sm:text-xl font-semibold mt-0.5`}>{utcNow}</div>
           </div>
-          <div className="rounded-md border border-gc-line bg-background p-5 ">
+          <div className="rounded-md border border-gc-line bg-background px-4 py-3">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>
               Local · {tzShort}
             </div>
-            <div className={`${MONO} text-xl sm:text-2xl font-semibold mt-1`}>{localNow}</div>
+            <div className={`${MONO} text-lg sm:text-xl font-semibold mt-0.5`}>{localNow}</div>
           </div>
-          <div className="col-span-2 sm:col-span-1 rounded-md border border-gc-line bg-background p-5 ">
+          <div className="col-span-2 sm:col-span-1 rounded-md border border-gc-line bg-background px-4 py-3">
             <div className={`${MONO} text-[10px] uppercase tracking-widest text-gc-ink-muted`}>
               {ipCity ? "Detected location" : "Timezone"}
             </div>
@@ -308,14 +312,14 @@ function KillzonesPage() {
                         onClick={() => {
                           navigate({ to: "/app" });
                         }}
-                        className={`group text-left rounded-3xl border p-5 transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-gc-line bg-gc-surface hover:border-gc-line" : "border-gc-line bg-background hover:border-gc-line " }`}
+                        className={`group text-left rounded-3xl border p-4 transition-all duration-300 hover:-translate-y-1 ${ locked ? "border-gc-line bg-gc-surface hover:border-gc-line" : "border-gc-line bg-background hover:border-gc-line " }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               
                               <span className={`${MONO} text-sm font-semibold ${locked ? "text-gc-ink-muted" : ""}`}>
-                                {"EURUSD"}
+                                {r_symbol(profile.key)}
                               </span>
                               {locked && (
                                 <span className={`${MONO} inline-flex items-center gap-1 rounded-md border border-gc-line bg-background px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-gc-ink-muted`}>
@@ -352,13 +356,13 @@ function KillzonesPage() {
                             return (
                               <div
                                 key={kz.name}
-                                className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-[11px] ${ active ? "bg-gc-green-soft border border-gc-green-soft" : "bg-gc-surface border border-gc-line" }`}
+                                className={`flex flex-col items-start gap-1 rounded-md px-2.5 py-1.5 text-[11px] sm:flex-row sm:items-center sm:justify-between sm:gap-2 ${ active ? "bg-gc-green-soft border border-gc-green-soft" : "bg-gc-surface border border-gc-line" }`}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
                                   <Clock className="h-3 w-3 text-gc-ink-muted shrink-0" />
-                                  <span className="text-gc-ink truncate">{kz.name}</span>
+                                  <span className="text-gc-ink">{kz.name}</span>
                                 </div>
-                                <div className={`${MONO} text-[10.5px] text-gc-ink-muted text-right`}>
+                                <div className={`${MONO} text-[10.5px] text-gc-ink-muted sm:text-right`}>
                                   <span>
                                     {fmtUTC(kz.startUTC)}–{fmtUTC(kz.endUTC)} UTC
                                   </span>
@@ -373,7 +377,7 @@ function KillzonesPage() {
                           })}
                         </div>
 
-                        <div className="mt-3 flex items-center justify-between">
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                           <div className={`${MONO} text-[10.5px] text-gc-ink-muted`}>
                             Prime: {profile.primeSession.name} ·{" "}
                             {fmtUTC(profile.primeSession.startUTC)}–
