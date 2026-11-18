@@ -231,10 +231,6 @@ function Billing() {
                 30-day Pro access ends {trial.endsAtLabel} · {trial.daysLeft > 1 ? `${trial.daysLeft}d left` : trial.hoursLeft > 1 ? `${trial.hoursLeft}h left` : "ends today"} · remaining credit becomes $0.00
               </p>
             )}
-            <p className="flex items-center gap-2 pl-4 text-[13px]">
-              <Info className="h-3.5 w-3.5 shrink-0" />
-              Chat and primary-only analysis cost $0.03; completed senior-reviewed analysis costs $0.20.
-            </p>
           </div>
         </div>
       </section>
