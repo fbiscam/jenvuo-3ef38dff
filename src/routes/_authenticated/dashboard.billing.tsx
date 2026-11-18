@@ -45,6 +45,9 @@ const pillSolid =
 const field =
   "field-flat h-10 w-full rounded-lg border-0 bg-gc-surface px-3 text-[14px] text-gc-ink shadow-none outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:ring-0";
 
+// Promo box: same flat field, but on a white surface so it stands out on the grey card.
+const promoField = field.replace("bg-gc-surface", "bg-background");
+
 function Billing() {
   const credits = useCredits();
   const trial = useTrial();
@@ -188,18 +191,21 @@ function Billing() {
 
 
           {promoOpen && (
-            <div className="flex flex-col gap-2 border-t border-gc-line px-5 py-4 sm:flex-row sm:items-center">
+            <div className="px-5 py-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
                 placeholder="Enter promo code"
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") void handleRedeemPromotion(); }}
-                className={`${field} sm:max-w-sm`}
+                className={`${promoField} sm:max-w-sm`}
                 autoFocus
               />
               <button type="button" disabled={!promoCode.trim() || redeemingPromo} onClick={() => void handleRedeemPromotion()} className={pillSolid}>
                 {redeemingPromo ? "Applying…" : "Apply"}
               </button>
+            </div>
+            <p className="mt-2 text-[13px] text-gc-ink-muted">Promo codes add API credit only. They can't be used to buy a plan.</p>
             </div>
           )}
 

@@ -413,6 +413,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Credits from top-ups and promo codes" },
           { type: "ul", items: [
             "Promo-code credit lands in the same wallet as a paid top-up, so it follows exactly the same rule.",
+            "Promo codes add API credit only — redeem them on the Billing page. They can't be used to buy or discount a plan.",
             "Every complete $3 of balance unlocks another 1,000,000 tokens of daily usage.",
             "Balances under $3 scale proportionally — $1 is roughly 333,000 tokens.",
             "Your plan ceiling still applies, so extra balance cannot push you past the plan's daily maximum.",

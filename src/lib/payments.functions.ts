@@ -13,7 +13,8 @@ export const quoteTopup = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => quoteSchema.parse(d))
   .handler(async ({ data, context }): Promise<Quote> => {
     const { evaluatePromo } = await import("@/lib/payments/core.server");
-    return evaluatePromo({ userId: context.userId, amountUsd: data.amountUsd, code: data.code ?? null });
+    // Orders never take a promo code, so the quote is always the plain price.
+    return evaluatePromo({ userId: context.userId, amountUsd: data.amountUsd, code: null });
   });
 
 /**
@@ -58,9 +59,10 @@ export const createTopupOrder = createServerFn({ method: "POST" })
     // Every paid plan comes with JX Bot (no seat limit).
     const withBot = isPaidPlanId(data.planId);
     const amountUsd = isPaidPlanId(data.planId) ? planPrice(data.planId) : data.amountUsd;
-    const quote = await evaluatePromo({ userId, amountUsd, code: data.code ?? null });
+    // Promo codes only add API credit (Billing page); orders never take one.
+    const { promoCodeForOrder } = await import("@/lib/promo-rules");
+    const quote = await evaluatePromo({ userId, amountUsd, code: promoCodeForOrder(data.code) });
     if (quote.error) return { ok: false as const, error: quote.error };
-    if (quote.promoType === "free") return { ok: false as const, error: "Redeem this code from the promo box instead." };
 
     const addresses = await getDepositAddresses();
     const address = addresses[data.network as NetworkId];
@@ -200,8 +202,8 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
 
     const quote = await evaluatePromo({ userId, amountUsd: 0, code: data.code });
     if (quote.error) return { ok: false as const, error: quote.error };
-    if (quote.promoType !== "free")
-      return { ok: false as const, error: "This code applies to a top-up — enter it on the payment form." };
+    const { promoRedeemable, PROMO_ONLY_CREDIT_MESSAGE } = await import("@/lib/promo-rules");
+    if (!promoRedeemable(quote.promoType)) return { ok: false as const, error: PROMO_ONLY_CREDIT_MESSAGE };
 
     const balance = await creditWallet({
       userId,

@@ -139,7 +139,7 @@
 - [x] JX Bot on every plan (Free $5/day, Pro 2%, Elite 4%, Ultra 6%) with the no-guarantee line; one price for everyone with JX Bot included
 - [x] Founding Program = 30-day plan grant after approval + ID verification
 - [x] Credit top-ups removed everywhere (Pricing, Payments, server); plans only
-- [ ] Page speed pass (not started)
+- [x] Page speed pass (not started)
 
 - [x] API requests/min per plan (Free 10, Pro 20, Elite 40, Ultra 80) shown as numbers in the pricing table
 - [x] Daily token limits Free 1M, Pro 4M, Elite 10M, Ultra 20M everywhere
@@ -151,3 +151,9 @@
 - [x] Full A-to-Z site audit as a real user (sign-up, sign-in, forgot password, two-step, payments, database security, emails, account loopholes)
 - [ ] Signed-in audit (two-step on/off, payments, Security page) — waiting on owner: sign in once in the preview so a test session exists
 - [x] Pricing: News Trading (free) with logo in plan cards, table and FAQ; API credit Pro $19 / Elite $39 / Ultra $59
+
+- [x] API page: better Endpoint + Quickstart look, bigger text, coloured code
+- [x] Promo codes only for API credit, never plans (server + Payments page)
+- [x] Billing promo box: white background, no border
+- [x] Whole dashboard: input boxes without grey border / click shadow
+- [x] Dashboard pages open faster

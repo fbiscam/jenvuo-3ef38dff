@@ -1706,12 +1706,16 @@ pre, pre *, code, kbd, samp {
   font-weight: 600 !important;
   letter-spacing: -0.02em !important;
 }
-.jenvu-zoom-dashboard main input:not(.bg-transparent):not(.field-flat):focus-visible,
-.jenvu-zoom-dashboard main select:not(.bg-transparent):not(.field-flat):focus-visible,
-.jenvu-zoom-dashboard main textarea:not(.bg-transparent):not(.field-flat):focus-visible {
-  border-color: var(--gc-blue) !important;
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--gc-blue) 18%, transparent) !important;
+/* Dashboard input boxes: no grey border and no click shadow/ring anywhere (owner choice) */
+html body .jenvu-zoom-dashboard main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), select, textarea),
+html body .jenvu-zoom-dashboard main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), select, textarea):is(:focus, :focus-visible, :hover) {
+  border-color: transparent !important;
+  box-shadow: none !important;
   outline: none !important;
+}
+/* Boxes sitting on the plain page get a soft fill so they stay visible without a border */
+html body .jenvu-zoom-dashboard main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), select, textarea):is(.bg-background, .bg-white):not(.console-card *):not(.bg-gc-surface *):not(.bg-white *):not(.bg-muted *) {
+  background-color: var(--console-card) !important;
 }
 /* Welcome hero: keep its own radius and no forced card border */
 .jenvu-zoom-dashboard main .dash-hero-card,
@@ -2034,7 +2038,7 @@ html body .jenvu-zoom-dashboard main input.bg-white,
 html body .jenvu-zoom-dashboard main textarea.bg-white,
 html body .jenvu-zoom-dashboard main select.bg-white {
   background-color: var(--background) !important;
-  border: 1px solid var(--console-line) !important;
+  border: 1px solid transparent !important;
 }
 html body .jenvu-zoom-dashboard main .border,
 html body .jenvu-zoom-dashboard main .border-zinc-100,

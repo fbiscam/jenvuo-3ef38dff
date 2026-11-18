@@ -10,7 +10,6 @@ import {
   submitTxHash,
   listMyOrders,
   cancelOrder,
-  redeemFreeCode,
 } from "@/lib/payments.functions";
 import {
   NETWORKS,
@@ -72,7 +71,6 @@ function PayPage() {
   const submitFn = useServerFn(submitTxHash);
   const listFn = useServerFn(listMyOrders);
   const cancelFn = useServerFn(cancelOrder);
-  const redeemFn = useServerFn(redeemFreeCode);
 
   const { amount: presetFromUrl, renew } = Route.useSearch();
   const credits = useCredits();
@@ -90,7 +88,6 @@ function PayPage() {
     presetFromUrl && !PRESET_AMOUNTS.includes(presetFromUrl) ? String(presetFromUrl) : "",
   );
   const [network, setNetwork] = useState<NetworkId>("trc20");
-  const [code, setCode] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [order, setOrder] = useState<PaymentOrder | null>(null);
   const [hash, setHash] = useState("");
@@ -173,12 +170,12 @@ function PayPage() {
     const seq = ++qSeq.current;
     const t = setTimeout(async () => {
       try {
-        const q = await quoteFn({ data: { amountUsd: effAmount, code: code.trim() || null } });
+        const q = await quoteFn({ data: { amountUsd: effAmount, code: null } });
         if (seq === qSeq.current) setQuote(q);
       } catch { /* ignore */ }
     }, 250);
     return () => clearTimeout(t);
-  }, [effAmount, code, quoteFn]);
+  }, [effAmount, quoteFn]);
 
   const secondsLeft = useCountdown(order?.status === "pending" ? order.expires_at : null);
   useEffect(() => {
@@ -195,7 +192,7 @@ function PayPage() {
         data: { 
           amountUsd: effAmount, 
           network, 
-          code: code.trim() || null,
+          code: null,
           planId: mode === "upgrade" ? selectedPlanId : null
         } 
       });
@@ -227,21 +224,6 @@ function PayPage() {
       void loadOrders();
     } catch (e: any) {
       toast.error(e?.message ?? "Could not submit the transaction.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function onRedeem() {
-    if (!code.trim()) return toast.error("Enter a promo code.");
-    setBusy(true);
-    try {
-      const res: any = await redeemFn({ data: { code: code.trim() } });
-      if (!res.ok) return toast.error(res.error);
-      toast.success(`$${Number(res.credited).toFixed(2)} added to your wallet.`);
-      setCode("");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Could not redeem this code.");
     } finally {
       setBusy(false);
     }
@@ -389,27 +371,7 @@ function PayPage() {
           <section className="mt-12">
             <h2 className="text-[20px] font-normal text-gc-ink">Summary</h2>
             <div className="mt-5 overflow-hidden rounded-xl bg-gc-surface">
-              <div className="flex flex-wrap items-center gap-2 p-5">
-                <input
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.toUpperCase())}
-                  placeholder="Promo code"
-                  aria-label="Promo code"
-                  className={`${field} w-48 uppercase`}
-                />
-                <button type="button" onClick={onRedeem} disabled={busy || !canBuyPlan} className={pill}>Redeem free credit</button>
-                {quote?.error && <span className="text-[13px] text-destructive">{quote.error}</span>}
-                {!quote?.error && quote?.promoCode && (
-                  <span className="text-[13px] text-gc-success">
-                    {quote.promoType === "discount"
-                      ? `You pay $${quote.payUsd.toFixed(2)} and receive $${quote.creditUsd.toFixed(2)}`
-                      : quote.promoType === "free"
-                        ? `Free credit code — press "Redeem free credit"`
-                        : `+$${quote.bonusUsd.toFixed(2)} bonus applied`}
-                  </span>
-                )}
-              </div>
-              <div className="flex flex-col gap-4 border-t border-gc-line p-5 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <p className="text-[14px] text-gc-ink-muted">You pay</p>
                   <div className="mt-1 flex items-center gap-2">

@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Copy, Check, Plus, Search, FileText, X, Terminal } from "lucide-react";
 import { KeyActionsMenu } from "@/components/dashboard/KeyActionsMenu";
+import { EndpointPanel, QuickstartPanel } from "@/components/dashboard/ApiDocsPanels";
 import {
   listExtensionKeys,
   createExtensionKey,
@@ -20,7 +21,6 @@ import { getPlanCapabilities } from "@/lib/plan-entitlements";
 import { readPageCache, writePageCache } from "@/lib/page-cache";
 
 const MONO = "font-sans";
-const API_BASE = "https://jenvu.com/api/public/v1";
 
 export const Route = createFileRoute("/_authenticated/dashboard/api")({
   head: () => ({
@@ -327,59 +327,8 @@ function ExtensionPage() {
         </div>
       )}
 
-      {/* Public API endpoint drawer */}
-      {showEndpoint && (
-        <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div className="text-[13px] font-medium text-zinc-900">Api endpoint</div>
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
-                OpenAI-compatible
-              </span>
-            </div>
-            <button
-              onClick={() => setShowEndpoint(false)}
-              className="rounded-full p-1 text-zinc-500 hover:bg-zinc-200"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
-            Use your key anywhere — Claude Desktop, scripts, or any OpenAI-compatible client. Usage
-            counts against your plan&apos;s daily token limit and appears on the Usage page.
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <code
-              className={`${MONO} min-w-0 flex-1 truncate rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2 text-[12px] text-zinc-900`}
-            >
-              {API_BASE}/chat/completions
-            </code>
-            <button
-              type="button"
-              onClick={() => copyValue(`${API_BASE}/chat/completions`, "endpoint")}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-2.5 py-2 text-[12px] text-zinc-700 hover:bg-zinc-50"
-            >
-              {copied === "endpoint" ? (
-                <Check className="h-3.5 w-3.5" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-              Copy
-            </button>
-          </div>
-          <pre
-            className={`${MONO} code-box mt-3 overflow-x-auto rounded-md p-3 text-[11.5px] leading-relaxed`}
-          >{`curl ${API_BASE}/chat/completions \\
-  -H "Authorization: Bearer YOUR_JENVU_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{"model":"claude-sonnet-4.5","messages":[{"role":"user","content":"XAU/USD bias today?"}]}'`}</pre>
-          <p className="mt-2 text-[12px] text-zinc-500">
-            Models: <span className={MONO}>claude-sonnet-4.5</span>,{" "}
-            <span className={MONO}>claude-haiku-4.5</span>, <span className={MONO}>glm-5</span>.
-            List them at <span className={MONO}>{API_BASE}/models</span>.
-          </p>
-        </div>
-      )}
+      {/* Public API endpoint panel */}
+      {showEndpoint && <EndpointPanel onClose={() => setShowEndpoint(false)} />}
 
       {/* API key search + table (xAI console style) */}
       <div className="mt-6">
@@ -467,43 +416,8 @@ function ExtensionPage() {
         </div>
       </div>
 
-      {/* Quickstart drawer */}
-      {showGuide && (
-        <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="text-[13px] font-medium text-zinc-900">API quickstart</div>
-            <button
-              onClick={() => setShowGuide(false)}
-              className="rounded-full p-1 text-zinc-500 hover:bg-zinc-200"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-zinc-600">
-            Usage is charged only for the tokens actually processed at $3 per 1,000,000 tokens. Your
-            wallet balance and plan daily limit apply to chat and multi-market analysis on every
-            paid plan.
-          </p>
-          <ol className="mt-3 space-y-2 text-[13px] leading-relaxed text-zinc-700">
-            <li>1. Create an API key above and copy it once.</li>
-            <li>
-              2. Send it as{" "}
-              <span className={`${MONO} rounded bg-white px-1.5 py-0.5 text-[12px]`}>
-                Authorization: Bearer &lt;your key&gt;
-              </span>
-              .
-            </li>
-            <li>3. Call the endpoints below from your own tools or scripts.</li>
-          </ol>
-          <div
-            className={`${MONO} mt-4 space-y-1 rounded-lg border border-zinc-200 bg-white p-3 text-[12px] text-zinc-700`}
-          >
-            <div>POST {origin}/api/public/extension/verify</div>
-            <div>POST {origin}/api/public/extension/analyze</div>
-            <div className="text-zinc-500">Header: Authorization: Bearer &lt;your key&gt;</div>
-          </div>
-        </div>
-      )}
+      {/* Quickstart panel */}
+      {showGuide && <QuickstartPanel origin={origin} onClose={() => setShowGuide(false)} />}
 
       {/* Create dialog */}
       {showCreate && (

@@ -37,3 +37,4 @@
 
 - Each public host serves its own `/sitemap.xml` + `/robots.txt` (`sitemap-hosts.ts`, tested): Google missed subdomain pages listed on the apex.
 - Every approved plan order sets `current_period_end` via `paidPeriodEnd` (`plan-pricing.ts`, tested; same plan adds 30 days to the time left, a switch runs 30 days from payment) in `applyPlanForPayment`: `process_paid_plan_expiry()` skips rows without an end date, so a plan without one never returned to Free.
+- Promo codes only add free API credit (`promoRedeemable`/`promoCodeForOrder` in `promo-rules.ts`, tested): `redeemFreeCode` refuses other code types and `createTopupOrder`/`quoteTopup` never pass a code: plans can never be discounted by a code.

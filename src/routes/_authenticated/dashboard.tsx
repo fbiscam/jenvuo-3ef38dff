@@ -30,7 +30,6 @@ import ConsoleWelcome from "@/components/dashboard/ConsoleWelcome";
 import JenvuMark from "@/components/JenvuMark";
 import TwoFactorReminder from "@/components/dashboard/TwoFactorReminder";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
-import { useLivePrices } from "@/hooks/useLivePrices";
 import { getMarketSnapshot } from "@/lib/gold-analysis.functions";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import {
@@ -671,6 +670,9 @@ function useLocalHour(): number {
 
 function DashboardLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Latest path for realtime handlers, so their channel isn't rebuilt on every page change.
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
   const verification = useVerification();
   const [email, setEmail] = useState<string>("");
   const [fullName, setFullName] = useState<string>(() => {
@@ -837,35 +839,30 @@ function DashboardLayout() {
           return (u.user_metadata?.full_name as string) ?? u.email?.split("@")[0] ?? "";
         });
       }
-      // Prefer name from profiles table (source of truth updated from Profile page)
+      // One profile read for name + photo (profiles is the source of truth).
       supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, avatar_url")
         .eq("id", u.id)
         .maybeSingle()
-        .then(({ data }) => {
-          const n = (data as { full_name?: string | null } | null)?.full_name;
-          if (!cancelled && n && n.trim()) {
+        .then(async ({ data }) => {
+          if (cancelled) return;
+          const row = data as { full_name?: string | null; avatar_url?: string | null } | null;
+          const n = row?.full_name;
+          if (n && n.trim()) {
             setFullName(n.trim());
             try {
               localStorage.setItem("jenvu:profile:fullName", n.trim());
             } catch {}
           }
-        });
-      // Load avatar (best-effort, non-blocking)
-      supabase
-        .from("profiles")
-        .select("avatar_url")
-        .eq("id", u.id)
-        .maybeSingle()
-        .then(async ({ data }) => {
-          if (cancelled) return;
-          const path = (data as { avatar_url?: string | null } | null)?.avatar_url;
+          const path = row?.avatar_url;
           if (!path) {
             setAvatarUrl(null);
             writeCachedAvatar(null);
             return;
           }
+          // A still-valid cached link is reused; photo changes arrive via the realtime channel below.
+          if (readCachedAvatar()) return;
           const { data: signed } = await supabase.storage
             .from("avatars")
             .createSignedUrl(path, AVATAR_TTL_SECONDS);
@@ -874,59 +871,12 @@ function DashboardLayout() {
           setAvatarUrl(signed?.signedUrl ?? null);
           writeCachedAvatar(signed?.signedUrl ?? null);
         });
-
-      const days = RANGE_DAYS[range];
-      const since =
-        days != null ? new Date(Date.now() - days * 24 * 3600 * 1000).toISOString() : null;
-
-      const savedQ = supabase.from("saved_signals").select("id", { count: "exact", head: true });
-      const alertsQ = supabase.from("signal_alerts").select("id", { count: "exact", head: true });
-      const alertCutoff = await getAlertCutoff();
-      if (alertCutoff) alertsQ.gte("created_at", alertCutoff);
-      const journalQ = supabase
-        .from("trade_journal")
-        .select("outcome, created_at, pair, direction, entry, stop_loss, take_profit")
-        .eq("user_id", u.id);
-      if (since) {
-        alertsQ.gte("created_at", since);
-        journalQ.gte("created_at", since);
-      }
-      const [saved, alerts, journal] = await Promise.all([savedQ, alertsQ, journalQ]);
-      if (cancelled) return;
-      const rows = (journal.data ?? []) as Array<{
-        outcome: string;
-        pair: string;
-        direction: "long" | "short";
-        entry: number | null;
-        stop_loss: number | null;
-        take_profit: number | null;
-      }>;
-      const decided = rows.filter((r) => r.outcome === "win" || r.outcome === "loss");
-      const wins = decided.filter((r) => r.outcome === "win").length;
-      const openTrades: OpenTrade[] = rows
-        .filter((r) => r.outcome === "open" && r.entry != null)
-        .map((r) => ({
-          pair: r.pair,
-          direction: r.direction,
-          entry: r.entry,
-          stop_loss: r.stop_loss,
-          take_profit: r.take_profit,
-        }));
-      setCounts({
-        saved: saved.count ?? 0,
-        alerts7d: alerts.count ?? 0,
-        journalTotal: rows.length,
-        journalWinRate: decided.length ? Math.round((wins / decided.length) * 100) : null,
-        closedWins: wins,
-        closedDecided: decided.length,
-        openTrades,
-      });
       setRefreshing(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, [range, refreshTick, authUser?.id, authLoading]);
+  }, [authUser?.id, authLoading]);
 
   // Realtime: refresh name/avatar as soon as Profile page saves changes
   useEffect(() => {
@@ -1063,41 +1013,19 @@ function DashboardLayout() {
     if (authLoading || !authUser) return;
     let cancelled = false;
     const load = async () => {
-      const savedSince = getLastSeen("saved");
-      const signupCutoff = await getAlertCutoff();
-      const lastSeenAlerts = getLastSeen("alerts");
-      const alertsSince =
-        signupCutoff && new Date(signupCutoff) > new Date(lastSeenAlerts)
-          ? signupCutoff
-          : lastSeenAlerts;
-      const journalSince = getLastSeen("journal");
-      const [s, a, j] = await Promise.all([
-        supabase
-          .from("saved_signals")
-          .select("id", { count: "exact", head: true })
-          .gt("created_at", savedSince),
-        supabase
-          .from("signal_alerts")
-          .select("id", { count: "exact", head: true })
-          .gt("created_at", alertsSince),
-        supabase
-          .from("trade_journal")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", authUser.id)
-          .gt("created_at", journalSince),
-      ]);
+      // Only the Saved tab shows a badge, so only saved signals are counted.
+      const s = await supabase
+        .from("saved_signals")
+        .select("id", { count: "exact", head: true })
+        .gt("created_at", getLastSeen("saved"));
       if (cancelled) return;
-      setNewCounts({ saved: s.count ?? 0, alerts7d: a.count ?? 0, journalTotal: j.count ?? 0 });
+      setNewCounts((prev) => ({ ...prev, saved: s.count ?? 0 }));
     };
     load();
     // Realtime: new signal alerts, saved signals, and trade journal entries
     // should light up the sidebar badges instantly (no refresh needed).
     const ch = supabase
       .channel(`sidebar-nav:${authUser.id}:${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "signal_alerts" }, () => {
-        if (pathname.startsWith("/dashboard/alerts")) return;
-        load();
-      })
       .on(
         "postgres_changes",
         {
@@ -1107,20 +1035,8 @@ function DashboardLayout() {
           filter: `user_id=eq.${authUser.id}`,
         },
         () => {
-          if (pathname === "/dashboard" || pathname.startsWith("/dashboard/workspace")) return;
-          load();
-        },
-      )
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "trade_journal",
-          filter: `user_id=eq.${authUser.id}`,
-        },
-        () => {
-          if (pathname.startsWith("/dashboard/journal")) return;
+          const path = pathnameRef.current;
+          if (path === "/dashboard" || path.startsWith("/dashboard/workspace")) return;
           load();
         },
       )
@@ -1129,19 +1045,7 @@ function DashboardLayout() {
       cancelled = true;
       supabase.removeChannel(ch);
     };
-  }, [authUser?.id, authLoading, getLastSeen, pathname]);
-
-  const openSymbols = useMemo(
-    () => Array.from(new Set(counts.openTrades.map((t) => t.pair.toUpperCase()))),
-    [counts.openTrades],
-  );
-  const livePrices = useLivePrices(openSymbols);
-  const liveWinRate = useMemo(() => {
-    // Only count trades that have actually closed as win/loss.
-    // Open trades and deleted trades do not affect this metric.
-    if (!counts.closedDecided) return null;
-    return Math.round((counts.closedWins / counts.closedDecided) * 100);
-  }, [counts.closedWins, counts.closedDecided]);
+  }, [authUser?.id, authLoading, getLastSeen]);
 
   const handleRefresh = () => {
     if (refreshing) return;
@@ -1212,15 +1116,16 @@ function DashboardLayout() {
   const [usageLoading, setUsageLoading] = useState(false);
   const [usageRange, setUsageRange] = useState<"24h" | "7d" | "30d">("24h");
 
+  // Only Overview shows the key count, so other pages skip this lookup entirely.
+  const onOverview = pathname === "/dashboard";
   useEffect(() => {
-    if (authLoading || !authUser) return;
+    if (authLoading || !authUser || !onOverview) return;
     let cancelled = false;
     const loadUsage = async (showLoading = false) => {
       if (showLoading) setUsageLoading(true);
       try {
-        const [u, k] = await Promise.all([fetchUsageStats(), fetchExtensionKeys()]);
+        const k = await fetchExtensionKeys();
         if (cancelled) return;
-        setUsageStats(u);
         setExtKeyCount(k.ok ? k.keys.filter((x) => !x.revoked_at).length : 0);
       } catch {
         // best-effort — cards render empty state
@@ -1277,7 +1182,7 @@ function DashboardLayout() {
       void supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authUser?.id, authLoading, refreshTick]);
+  }, [authUser?.id, authLoading, refreshTick, onOverview]);
 
   // Console-style pages: the menu is pinned on the left on desktop (xAI console look);
   // on phones and on the Terminal it stays closed until opened from the top bar.
