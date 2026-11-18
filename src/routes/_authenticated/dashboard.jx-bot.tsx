@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, Plus, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, FREE_BOT, MT5_PLANS, TARGET_DISCLAIMER, countIpLicenses, dailyTargetLabel, isBotPlan, parseBinding } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, FREE_BOT, MT5_PLANS, countIpLicenses, dailyTargetLabel, isBotPlan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-sans";
 
@@ -329,7 +329,6 @@ function JxBotPage() {
               )}
             </tbody>
           </table>
-          <p className="mt-3 text-[12px] text-muted-foreground">{TARGET_DISCLAIMER}</p>
         </div>
       </div>
 
