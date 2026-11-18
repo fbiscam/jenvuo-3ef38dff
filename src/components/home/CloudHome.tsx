@@ -248,7 +248,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     label: "Special programs",
     cards: [
       { tag: "FOUNDING PROGRAM", text: "Apply to the invite-only Founding Program for 1 month of Pro or Elite with API credit", to: "/founding", img: progFounding },
-      { tag: "PLANS", text: "Choose Pro at $29, Elite at $59 or Ultra at $99, billed every month", to: "/pricing", img: progPlans },
+      { tag: "PLANS", text: "Pro $29, Elite $59 or Ultra $99 with JX Bot for the first 50 each month, then $19, $39 or $59", to: "/pricing", img: progPlans },
       { tag: "SUPPORT", text: "Questions about plans, billing or JX Bot? Ask our support team", to: "/contact", img: progSupport },
     ],
   },
@@ -562,9 +562,9 @@ export function CloudUseCases() {
 
 /* ---------------- Pricing band ---------------- */
 const PLANS = [
-  { name: "Pro", price: "$29", note: "For traders getting started with the Terminal and AI desk.", tone: "blue" as Tone },
-  { name: "Elite", price: "$59", note: "More AI usage and daily tokens for active intraday trading.", tone: "green" as Tone },
-  { name: "Ultra", price: "$99", note: "The highest limits for full-time desks and API use.", tone: "red" as Tone },
+  { name: "Pro", price: "$29", note: "Terminal, AI desk and JX Bot while seats last; $19 without the bot.", tone: "blue" as Tone },
+  { name: "Elite", price: "$59", note: "More AI usage and JX Bot while seats last; $39 without the bot.", tone: "green" as Tone },
+  { name: "Ultra", price: "$99", note: "The highest limits and JX Bot while seats last; $59 without the bot.", tone: "red" as Tone },
 ];
 
 export function CloudPricing() {
@@ -575,7 +575,7 @@ export function CloudPricing() {
           <div>
             <h2 className="text-[32px] font-medium tracking-tight leading-[1.2] text-gc-ink sm:text-[40px]">Simple, monthly pricing</h2>
             <p className="line-clamp-2 max-sm:line-clamp-none mt-4 text-[17px] leading-[1.6] text-gc-ink-muted">
-              Every plan includes an AI wallet equal to the plan price. Extra AI usage is $3 per million tokens.
+              Every plan includes monthly API credit. The first 50 paid plans each month also include JX Bot. Extra AI usage is $3 per million tokens.
             </p>
             <div className="mt-8">
               <PrimaryButton to="/pricing">Compare plans</PrimaryButton>
