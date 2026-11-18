@@ -153,3 +153,5 @@
 - [x] Full A-to-Z site audit as a real user (sign-up, sign-in, forgot password, two-step, payments, database security, emails, account loopholes)
 - [ ] Signed-in audit (two-step on/off, payments, Security page) — waiting on owner: sign in once in the preview so a test session exists
 - [x] Pricing: News Trading (free) with logo in plan cards, table and FAQ; API credit Pro $19 / Elite $39 / Ultra $59
+
+- [x] Dashboard home: new top card text, bigger cards centered on the page; sidebar smaller grey page names (xAI look)
