@@ -1,7 +1,5 @@
 # Roadmap
 
-- [x] Dashboard home restyled like the xAI console picture: welcome + Create API key, JX Bot notice card, orange-coin credit strip, API keys quickstart with Code/Chat/Models tabs, bash/python/node and copy; light, dark and phone verified
-
 - [x] Premium prices for everyone: Pro $69 / Elite $139 / Ultra $239, JX Bot in every paid plan (50-seat limit removed); API credit Free $20 / Pro $40 / Elite $70 / Ultra $90; Founding Pro/Elite credit $40 / $70; update every page/copy
 
 - [x] JX Bot: 50 new bot seats per UTC month (first 50 paid buyers get Pro $29/Elite $59/Ultra $99 with bot); after 50, plans are $19/$39/$59 Terminal + API only; existing bot holders keep it on renewal; Free and no-seat plans get no bot (only seat holders + Founding); Founding seats 100 → 50; update every page/copy
@@ -153,5 +151,3 @@
 - [x] Full A-to-Z site audit as a real user (sign-up, sign-in, forgot password, two-step, payments, database security, emails, account loopholes)
 - [ ] Signed-in audit (two-step on/off, payments, Security page) — waiting on owner: sign in once in the preview so a test session exists
 - [x] Pricing: News Trading (free) with logo in plan cards, table and FAQ; API credit Pro $19 / Elite $39 / Ultra $59
-
-- [x] Dashboard home: new top card text, bigger cards centered on the page; sidebar smaller grey page names (xAI look)
