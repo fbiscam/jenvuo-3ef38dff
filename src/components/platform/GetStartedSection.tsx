@@ -8,7 +8,7 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 const pillDark =
   "flex h-9 w-full items-center justify-center rounded-full bg-foreground text-[14px] font-medium text-background transition hover:opacity-85";
 const pillLight =
-  "flex h-9 w-full items-center justify-center rounded-full bg-gc-pill text-[14px] font-medium text-foreground transition-colors hover:brightness-95";
+  "flex h-10 w-full items-center justify-center rounded-full border border-gc-line bg-transparent text-[14px] font-medium text-foreground transition-colors hover:bg-foreground/5";
 
 function StartBuilding() {
   const { user } = useAuthUser();
