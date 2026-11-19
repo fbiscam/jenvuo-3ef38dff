@@ -156,6 +156,8 @@
   --color-gc-canvas: var(--gc-canvas);
   --color-gc-section: var(--gc-section);
   --color-gc-success: var(--gc-success);
+  --color-pl-up: var(--pl-up);
+  --color-pl-down: var(--pl-down);
   --color-gc-nav-active: var(--gc-nav-active);
   --color-gc-notice: var(--gc-notice);
   --color-gc-night: var(--gc-night);
@@ -265,6 +267,9 @@
   --gc-canvas: #f4f4f4;
   --gc-section: #fafafa;
   --gc-success: #188038;
+  /* Profit / loss colours (JX Bot results, News Impact UP/DOWN) */
+  --pl-up: #12a150;
+  --pl-down: #e5484d;
   --gc-on-success: #ffffff;
   --gc-nav-active: #dbedfc;
   --gc-notice: #e9eef6;
@@ -278,6 +283,8 @@
 
 /* Black theme (xAI look): pitch-black canvas, near-black cards, faint white borders. */
 .dark {
+  --pl-up: #3ddc84;
+  --pl-down: #ff6369;
   --background: #000000;
   --foreground: #ffffff;
   --card: #0e0e10;
@@ -1388,6 +1395,8 @@ body:has(.terminal-dark) .dashboard-terminal-sidebar .sidebar-quick-btn:hover {
 
 /* Dashboard black theme (all dashboard pages except Overview and Terminal). */
 .dark.dash-dark {
+  --pl-up: #3ddc84;
+  --pl-down: #ff6369;
   --background: #000000;
   --foreground: oklch(0.97 0 0);
   --card: #0e0e10;
@@ -1972,8 +1981,8 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.025em; }
 
 /* Black theme: all text pure white (public pages + dashboard). Terminal keeps its own theme. */
 .dark:not(.terminal-dark) { --foreground: #ffffff; --muted-foreground: #ffffff; --card-foreground: #ffffff; --popover-foreground: #ffffff; }
-html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.dev-code-card *):not(.code-box *):not(.docs-code *),
-.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.docs-code *):not(.jx-ide *):not(.dev-code-card *) {
+html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.terminal-dark *):not([class*="bg-white"] *):not([class*="bg-zinc-900"] *):not(.bg-primary *):not(.bg-foreground *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.dev-code-card *):not(.code-box *):not(.docs-code *):not(.pl-up):not(.pl-down):not(.pl-up *):not(.pl-down *),
+.dash-dark :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcaption,blockquote):not(.bg-zinc-900 *):not(.bg-primary *):not(.bg-foreground *):not(.bg-white *):not(.bg-foreground):not(.bg-primary):not([class*="bg-white"]):not(.bg-gc-ink):not(.console-pill-solid):not(.ask-jenvu-launcher):not(.ask-jenvu-launcher *):not(.code-box *):not(.docs-code *):not(.jx-ide *):not(.dev-code-card *):not(.pl-up):not(.pl-down):not(.pl-up *):not(.pl-down *) {
   color: #ffffff !important;
 }
 
@@ -2946,3 +2955,7 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
 .status-service { background: var(--background); border-radius: 0; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; min-width: 0; }
 .status-method { color: var(--status-muted); font-size: 12px; line-height: 1.7; margin-top: 24px; }
 @media(max-width:600px) { .status-header { padding: 12px 16px; gap: 16px; }.status-header-tools { gap: 12px; }.status-main { padding: 32px 18px 48px; }.status-heading h1 { font-size: 25px; }.status-summary { padding: 18px; gap: 12px; }.status-summary h2 { font-size: 15px; }.status-group-heading h2 { font-size: 15px; }.status-group-heading h2 span { font-size: 11px; margin-left: 4px; }.status-badge { font-size: 10px; padding-inline: 7px; }.status-bars { gap: 2px; height: 28px; }.status-services { grid-template-columns: 1fr; }.status-bar-tip { max-width: 270px; white-space: normal; min-width: 160px; }.status-bar:nth-child(-n+45) .status-bar-tip { left: 0; transform: none; }.status-bar:nth-last-child(-n+45) .status-bar-tip { left: auto; right: 0; transform: none; } }
+
+/* Profit green / loss red text that keeps its colour in both themes. */
+.pl-up { color: var(--pl-up); }
+.pl-down { color: var(--pl-down); }

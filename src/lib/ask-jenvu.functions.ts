@@ -42,15 +42,13 @@ export const askJenvu = createServerFn({ method: "POST" })
     const { getOptionalUserId } = await import("@/lib/optional-auth.server");
     const userId = await getOptionalUserId().catch(() => null);
 
-    // Ask Jenvu is free for every signed-in account; visitors are asked to sign in
-    // so the paid AI service is never reachable without an account.
-    if (!userId) return { ok: false, error: "Please sign in to ask Jenvu. It's free with any account." };
-
+    // Ask Jenvu is free for everyone, visitors included (owner's choice); each
+    // signed-in account or visitor IP has its own speed limit bucket.
     const ip =
       getRequestHeader("cf-connecting-ip") ||
       getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
       "anon";
-    const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId}:${ip}`);
+    const rl = checkAnalyzeRateLimit(`ask-jenvu:${userId ?? "anon"}:${ip}`);
     if (!rl.allowed) return { ok: false, error: `You're asking quickly. Please wait ${rl.retryInSec}s and try again.` };
 
     const history = data.messages.slice(-12);

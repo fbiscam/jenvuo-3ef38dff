@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, Bot, CandlestickChart, type LucideIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
+import BotPerformanceCard from "@/components/dashboard/BotPerformanceCard";
 
 
 
@@ -32,8 +33,8 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         </Link>
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="console-card flex min-h-[184px] flex-col justify-between p-6">
+      <div className="mt-8 grid items-stretch gap-4 md:grid-cols-2">
+        <div className="console-card flex flex-col p-6">
           <p className="text-[16px] font-medium text-foreground">
             {balance > 0 ? "Your API credit balance." : "Pick a plan to get more API credit."}
           </p>
@@ -43,26 +44,26 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             </p>
             <Link to="/dashboard/pay" className="console-pill console-pill-solid">Upgrade plan</Link>
           </div>
-        </div>
 
-        <div className="console-card flex min-h-[184px] flex-col justify-between p-6">
-          <div>
+          <div className="mt-6 border-t border-border pt-6">
             <p className="text-[16px] font-medium text-foreground">
               {hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}
             </p>
             <p className="mt-2 text-[14px] text-muted-foreground">
               Use a key to send requests to Jenvu models from your code.
             </p>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-2">
-            <Link to="/dashboard/api" className="console-pill">
-              {hasKeys ? "Manage API keys" : "Create API key"}
-            </Link>
-            <Link to="/docs" className="console-pill">
-              Read the docs <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link to="/dashboard/api" className="console-pill">
+                {hasKeys ? "Manage API keys" : "Create API key"}
+              </Link>
+              <Link to="/docs" className="console-pill">
+                Read the docs <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
+
+        <BotPerformanceCard />
       </div>
 
       <h2 className="mt-12 text-[18px] font-medium text-foreground">Explore our products</h2>

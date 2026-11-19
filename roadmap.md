@@ -160,3 +160,9 @@
 
 - [x] Dashboard loads slowly / sometimes not at all: find and fix
 - [x] Whole site responsive on phones (check main public + dashboard pages)
+
+- [x] Stop News Alerts emails (bell only)
+- [x] News page redesign: weekly calendar, Gold reaction cards, latest results
+- [x] Overview: API keys under credit balance; JX Bot 30-day results card (green/red)
+- [x] Ask Jenvu open to signed-out visitors
+- [ ] News page Gold moves after releases are not being measured (all show "No data"), waiting on owner OK to fix

@@ -3,11 +3,9 @@ import { createClient } from '@supabase/supabase-js'
 
 // Economic news / event alert worker. Called every 15 min by pg_cron.
 // Auth: x-cron-secret. Finds high-impact USD/XAU releases landing within the
-// next ~75 minutes, then fans out an in-app notification + email once per event.
+// next ~75 minutes, then posts one in-app notification per event (no emails).
 
 const FF_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json'
-const SENDER_DOMAIN = 'notify.jenvu.com'
-const FROM = 'Jenvu Market Desk <news@notify.jenvu.com>'
 
 type FFEvent = {
   title: string
@@ -65,14 +63,11 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
 
         // 2. Recipients: every user with alerts enabled
         const userIds: string[] = []
-        const emailById = new Map<string, string>()
         for (let page = 1; page <= 10; page++) {
           const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
           if (error || !data?.users?.length) break
           for (const u of data.users) {
             userIds.push(u.id)
-            const em = (u.email ?? '').toLowerCase().trim()
-            if (em && /.+@.+\..+/.test(em)) emailById.set(u.id, em)
           }
           if (data.users.length < 1000) break
         }
@@ -98,8 +93,7 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
           }
         }
         const notifyIds = userIds.filter((id) => prefs.get(id)?.alerts_enabled !== false)
-        const emailIds = notifyIds.filter((id) => prefs.get(id)?.email_enabled !== false)
-
+        
         const results: Array<Record<string, unknown>> = []
 
         for (const ev of upcoming) {
@@ -146,48 +140,8 @@ export const Route = createFileRoute('/api/public/hooks/news-alerts')({
             await admin.from('user_notifications').insert(rows.slice(i, i + 500))
           }
 
-          // 4. Emails
-          let enqueued = 0
-          if (emailIds.length > 0) {
-            const { default: React } = await import('react')
-            const { render } = await import('@react-email/render')
-            const { template } = await import('@/lib/email-templates/news-event')
-
-            const templateData = {
-              title: ev.title,
-              country: ev.country,
-              impact: 'High',
-              eventTime: fmtUtc(new Date(ev.ts).toISOString()),
-              minutesUntil,
-              forecast: ev.forecast ?? '',
-              previous: ev.previous ?? '',
-              signalUrl: 'https://dash.jenvu.com/overview',
-            }
-            const element = React.createElement(template.component, templateData)
-            const html = await render(element)
-            const text = await render(element, { plainText: true })
-            const subject =
-              typeof template.subject === 'function'
-                ? template.subject(templateData)
-                : template.subject
-
-            const { sendManagedEmailLogged } = await import('@/lib/email/managed.server')
-            for (const uid of emailIds) {
-              const normalized = emailById.get(uid)
-              if (!normalized) continue
-              const ok = await sendManagedEmailLogged(admin, {
-                to: normalized,
-                from: FROM,
-                subject,
-                html,
-                text,
-                label: 'news-event',
-                templateName: 'news-event',
-                idempotencyKey: `news-${eventKey}-${normalized}`.slice(0, 200),
-              })
-              if (ok) enqueued++
-            }
-          }
+          // News alert emails were switched off by the owner; only the in-app bell gets them.
+          const enqueued = 0
 
           await admin
             .from('news_event_notifications')

@@ -40,10 +40,11 @@ beforeEach(() => {
 });
 
 describe("Ask Jenvu public access", () => {
-  test("asks visitors without a session to sign in and never calls the AI", async () => {
+  test("answers visitors without a session, limited per visitor IP", async () => {
     const res = await askJenvu(question);
-    expect(res.ok).toBe(false);
-    expect(completion).not.toHaveBeenCalled();
+    expect(res.ok).toBe(true);
+    expect(completion).toHaveBeenCalledTimes(1);
+    expect(limit).toHaveBeenCalledWith("ask-jenvu:anon:192.0.2.10");
   });
   test("retains the signed-in user's existing bucket", async () => {
     optionalUser.mockResolvedValue("user-123");
