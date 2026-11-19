@@ -1,0 +1,1 @@
+- `__root.tsx` injects analytics/ads only after window `load` and loads no unused icon webfont: they delayed the dashboard's first paint on slow phones.
