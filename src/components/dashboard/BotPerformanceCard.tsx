@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { ArrowUpRight } from "lucide-react";
 import { JxBotLogo } from "@/components/brand/ProductLogos";
 import { getBotUsage } from "@/lib/mt5-licenses.functions";
 import { botPerformance, plTone } from "@/lib/bot-performance";
@@ -50,12 +49,6 @@ export default function BotPerformanceCard() {
             "Profit from all your MT5 accounts shows here."
           )}
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Link to="/dashboard/jx-bot" className="console-pill">Manage JX Bot</Link>
-          <Link to="/dashboard/bot-usage" className="console-pill">
-            Details <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </Link>
-        </div>
       </div>
     </div>
   );
