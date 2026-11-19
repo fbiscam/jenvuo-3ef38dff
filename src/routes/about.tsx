@@ -72,9 +72,9 @@ const reviewPlatforms: ReviewPlatform[] = ['mt5', 'tradingview', 'binance', 'eto
 
 function Actions() {
   const { user } = useAuthUser()
-  return <div className="flex flex-wrap gap-3">
-    <Button asChild className="h-11 rounded-full bg-foreground px-6 text-background shadow-none hover:bg-foreground/90"><a href={user ? 'https://dash.jenvu.com/overview' : 'https://auth.jenvu.com/sign-up'}>{user ? 'Open dashboard' : 'Start for free'}<ArrowRight /></a></Button>
-    <Button asChild variant="secondary" className="h-11 rounded-full bg-gc-pill px-6 text-gc-ink shadow-none"><a href="https://jenvu.com/contact">Talk to the Jenvu team</a></Button>
+  return <div className="flex flex-nowrap gap-2 sm:flex-wrap sm:gap-3">
+    <Button asChild className="h-9 whitespace-nowrap rounded-full bg-foreground px-3.5 text-[12px] text-background shadow-none hover:bg-foreground/90 sm:h-11 sm:px-6 sm:text-sm [&_svg]:size-3.5 sm:[&_svg]:size-4"><a href={user ? 'https://dash.jenvu.com/overview' : 'https://auth.jenvu.com/sign-up'}>{user ? 'Open dashboard' : 'Start for free'}<ArrowRight /></a></Button>
+    <Button asChild variant="secondary" className="h-9 whitespace-nowrap rounded-full bg-gc-pill px-3.5 text-[12px] text-gc-ink shadow-none sm:h-11 sm:px-6 sm:text-sm"><a href="https://jenvu.com/contact">Talk to the Jenvu team</a></Button>
   </div>
 }
 function AboutPage() {
