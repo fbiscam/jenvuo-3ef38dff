@@ -1,6 +1,6 @@
 import { describe, it as test } from "node:test";
 import { expect } from "./chart/test-expect";
-import { addSignedOut, decideSync, parseSignedOut, sharedSignInEnded, shouldTakeNewerShared, SIGNED_OUT_KEEP, tokenClaims, tokenTimes } from "./session-sync";
+import { addSignedOut, decideSync, parseSignedOut, sharedSignInEnded, shouldClearSharedOnLocalEnd, shouldTakeNewerShared, SIGNED_OUT_KEEP, tokenClaims, tokenTimes } from "./session-sync";
 
 function token(sub: string, sid: string): string {
   const b64 = (o: object) => btoa(JSON.stringify(o)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -97,5 +97,19 @@ describe("failed restore of a shared sign-in", () => {
     expect(sharedSignInEnded({ name: "AuthApiError", status: 429 })).toBe(false);
     expect(sharedSignInEnded({ name: "AuthApiError", status: 503 })).toBe(false);
     expect(sharedSignInEnded(null)).toBe(false);
+  });
+});
+
+describe("an address's own copy ends", () => {
+  test("an old expired copy ending never wipes a newer shared sign-in", () => {
+    expect(shouldClearSharedOnLocalEnd({ endedSessionId: S1, sharedToken: token(A, S2) })).toBe(false);
+  });
+
+  test("an unknown ended copy (page just opened) leaves the shared sign-in alone", () => {
+    expect(shouldClearSharedOnLocalEnd({ endedSessionId: null, sharedToken: token(A, S2) })).toBe(false);
+  });
+
+  test("the same sign-in ending here is wiped from the shared copy too", () => {
+    expect(shouldClearSharedOnLocalEnd({ endedSessionId: S1, sharedToken: token(A, S1) })).toBe(true);
   });
 });

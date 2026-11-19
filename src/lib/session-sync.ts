@@ -134,3 +134,17 @@ export function sharedSignInEnded(error: { name?: string; status?: number } | nu
   if (typeof status === "number" && (status === 0 || status === 408 || status === 429 || status >= 500)) return false;
   return true;
 }
+
+/**
+ * When this address's own copy ends, may the shared sign-in be wiped too?
+ * Only when we know which sign-in ended and the shared one is that same one.
+ * An old, expired copy left on an address ends while a brand-new sign-in is
+ * already shared: wiping it then bounced fresh sign-ins back to the sign-in page.
+ */
+export function shouldClearSharedOnLocalEnd(input: {
+  endedSessionId: string | null;
+  sharedToken: string | null;
+}): boolean {
+  if (!input.sharedToken || !input.endedSessionId) return false;
+  return tokenClaims(input.sharedToken).sessionId === input.endedSessionId;
+}

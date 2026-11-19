@@ -8,6 +8,7 @@ import {
   shouldTakeNewerShared,
   SIGNED_OUT_COOKIE,
   sharedSignInEnded,
+  shouldClearSharedOnLocalEnd,
   tokenClaims,
   tokenTimes,
 } from "@/lib/session-sync";
@@ -331,8 +332,9 @@ export function initCrossDomainSession() {
       lastLocalSessionId = null;
       if (droppingLocal) return;
       // Only forget the shared sign-in if it is the one that just ended here.
-      const shared = readSessionCookie();
-      if (!shared || !prev || tokenClaims(shared.access_token).sessionId === prev) clearSessionCookie();
+      if (shouldClearSharedOnLocalEnd({ endedSessionId: prev, sharedToken: readSessionCookie()?.access_token ?? null })) {
+        clearSessionCookie();
+      }
     }
   });
 
