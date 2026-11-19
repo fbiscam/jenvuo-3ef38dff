@@ -153,7 +153,7 @@ export default function SiteFooter({ className }: { className?: string }) {
               <p className="mt-4 text-[13px] text-muted-foreground">© {year} Jenvu. All rights reserved.</p>
             </div>
             {/* Faint Pakistan flag fills the gap between the copyright and the newsletter. */}
-            <PakistanFlagMark className="hidden w-[180px] text-foreground/[0.08] lg:block" />
+            <PakistanFlagMark className="hidden w-[220px] text-foreground/[0.08] lg:block" />
             <div className="space-y-5">
               <NewsletterSubscribe />
               <div className="flex flex-nowrap items-center gap-2">
