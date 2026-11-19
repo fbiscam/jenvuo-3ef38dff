@@ -3,6 +3,7 @@ import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, Bot, CandlestickChart
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import BotPerformanceCard from "@/components/dashboard/BotPerformanceCard";
+import { PlatformLogo } from "@/components/brand/ProductLogos";
 
 
 
@@ -35,9 +36,13 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
 
       <div className="mt-8 grid items-stretch gap-4 md:grid-cols-2">
         <div className="console-card flex flex-col p-6">
-          <p className="text-[16px] font-medium text-foreground">
-            {balance > 0 ? "Your API credit balance." : "Pick a plan to get more API credit."}
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <PlatformLogo framed className="h-8 w-8" />
+              <p className="text-[16px] font-medium text-foreground">API credit</p>
+            </div>
+            <span className="text-[12px] text-muted-foreground">{balance > 0 ? "Balance" : "Pick a plan for more"}</span>
+          </div>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
             <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
               {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}

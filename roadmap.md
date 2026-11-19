@@ -165,4 +165,4 @@
 - [x] News page redesign: weekly calendar, Gold reaction cards, latest results
 - [x] Overview: API keys under credit balance; JX Bot 30-day results card (green/red)
 - [x] Ask Jenvu open to signed-out visitors
-- [ ] News page Gold moves after releases are not being measured (all show "No data"), waiting on owner OK to fix
+- [x] News page Gold moves after releases are not being measured (all show "No data"), waiting on owner OK to fix

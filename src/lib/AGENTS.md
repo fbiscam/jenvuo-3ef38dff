@@ -40,3 +40,4 @@
 - Promo codes only add free API credit (`promoRedeemable`/`promoCodeForOrder` in `promo-rules.ts`, tested): `redeemFreeCode` refuses other code types and `createTopupOrder`/`quoteTopup` never pass a code: plans can never be discounted by a code.
 - Ask Jenvu answers signed-out visitors (owner's choice); `askJenvu` limits speed per account or `anon` + visitor IP bucket (tested in `ask-jenvu.functions.test.js`): no sign-in wall, but the AI can't be hammered from one address.
 - The news alert job (`/api/public/hooks/news-alerts`) posts only in-app bell notifications, no emails: owner switched news emails off.
+- News Impact 5m candles come from `fiveMin` in `news-impact.server.ts` (Binance, then OKX, then KuCoin for Gold) and releases with no Gold move are re-measured at most every 6 hours, keeping moves already stored: Binance refuses some server regions, which left every Gold move empty.

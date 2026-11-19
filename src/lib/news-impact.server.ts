@@ -19,6 +19,7 @@ const TV_URL = "https://economic-calendar.tradingview.com/events";
 const BACKFILL_MONTHS = 38; // 24 FOMC decisions need about 3 years
 const RECENT_SYNC_MS = 10 * 60_000;
 const BATCH = 10; // releases measured per call (keeps outbound requests small)
+const RETRY_MS = 6 * 3600_000; // retry a missing Gold move at most this often
 let lastRecentSync = 0;
 let hourCache: { at: number; gbpjpy: Candle[]; dxy: Candle[] } | null = null;
 
@@ -83,19 +84,37 @@ export async function syncCalendar(db: any): Promise<void> {
   }
 }
 
-async function binance5m(symbol: string, startMs: number): Promise<Candle[]> {
-  for (const host of ["data-api.binance.vision", "api.binance.com"]) {
-    try {
-      const res = await fetch(`https://${host}/api/v3/klines?symbol=${symbol}&interval=5m&startTime=${startMs}&limit=12`, {
-        headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" },
-        signal: AbortSignal.timeout(8_000),
-      });
-      if (!res.ok) continue;
-      const rows = (await res.json()) as unknown[][];
-      return rows.map((r) => ({ t: Number(r[0]), o: Number(r[1]), h: Number(r[2]), l: Number(r[3]), c: Number(r[4]) }));
-    } catch {
-      /* next host */
-    }
+type Row = unknown[];
+const num = (v: unknown) => Number(v);
+
+async function getJson(url: string): Promise<any | null> {
+  try {
+    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0", Accept: "application/json" }, signal: AbortSignal.timeout(7_000) });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** 5-minute candles for the hour after `startMs`. Binance first, then OKX and KuCoin:
+ *  Binance refuses some server regions, which left every Gold move empty. */
+export async function fiveMin(base: "PAXG" | "EUR", startMs: number): Promise<Candle[]> {
+  const endMs = startMs + 60 * 60_000;
+  for (const host of ["data-api.binance.vision", "api.binance.com", "api1.binance.com"]) {
+    const rows = await getJson(`https://${host}/api/v3/klines?symbol=${base}USDT&interval=5m&startTime=${startMs}&limit=12`);
+    if (Array.isArray(rows) && rows.length) return (rows as Row[]).map((r) => ({ t: num(r[0]), o: num(r[1]), h: num(r[2]), l: num(r[3]), c: num(r[4]) }));
+  }
+  if (base !== "PAXG") return [];
+  const okx = await getJson(`https://www.okx.com/api/v5/market/history-candles?instId=PAXG-USDT&bar=5m&after=${endMs}&before=${startMs - 1}&limit=20`);
+  if (Array.isArray(okx?.data) && okx.data.length) {
+    return (okx.data as Row[]).map((r) => ({ t: num(r[0]), o: num(r[1]), h: num(r[2]), l: num(r[3]), c: num(r[4]) }));
+  }
+  const s = Math.floor(startMs / 1000);
+  const ku = await getJson(`https://api.kucoin.com/api/v1/market/candles?type=5min&symbol=PAXG-USDT&startAt=${s}&endAt=${s + 3600}`);
+  if (Array.isArray(ku?.data) && ku.data.length) {
+    // KuCoin rows are [time(s), open, close, high, low, ...]
+    return (ku.data as Row[]).map((r) => ({ t: num(r[0]) * 1000, o: num(r[1]), c: num(r[2]), h: num(r[3]), l: num(r[4]) }));
   }
   return [];
 }
@@ -137,26 +156,29 @@ export async function measurePending(db: any): Promise<number> {
   const ready = new Date(Date.now() - 65 * 60_000).toISOString();
   const { data } = await db
     .from("news_releases")
-    .select("id,released_at")
+    .select("id,released_at,reactions")
     .neq("event_key", "other")
-    .is("computed_at", null)
+    // New releases, plus ones whose Gold move is still missing (retried at most every 6 hours).
+    .or(`computed_at.is.null,and(reactions->>gold.is.null,computed_at.lt.${new Date(Date.now() - RETRY_MS).toISOString()})`)
     .not("actual", "is", null)
     .lte("released_at", ready)
     .order("released_at", { ascending: false })
     .limit(200);
-  const list = (data ?? []) as { id: string; released_at: string }[];
+  const list = (data ?? []) as { id: string; released_at: string; reactions: Reactions | null }[];
   if (!list.length) return 0;
   const batch = list.slice(0, BATCH);
   const h = await hourly();
   await Promise.all(
     batch.map(async (r) => {
       const t = Date.parse(r.released_at);
-      const [g, e] = await Promise.all([binance5m("PAXGUSDT", t), binance5m("EURUSDT", t)]);
+      const [g, e] = await Promise.all([fiveMin("PAXG", t), fiveMin("EUR", t)]);
+      const old = r.reactions;
+      // Keep a move measured earlier when a feed is unavailable this time.
       const reactions: Reactions = {
-        gold: fiveMinReaction(g, t),
-        eurusd: fiveMinReaction(e, t),
-        gbpjpy: hourReaction(h.gbpjpy, t),
-        dxy: hourReaction(h.dxy, t),
+        gold: fiveMinReaction(g, t) ?? old?.gold ?? null,
+        eurusd: fiveMinReaction(e, t) ?? old?.eurusd ?? null,
+        gbpjpy: hourReaction(h.gbpjpy, t) ?? old?.gbpjpy ?? null,
+        dxy: hourReaction(h.dxy, t) ?? old?.dxy ?? null,
       };
       await db.from("news_releases").update({ reactions, computed_at: new Date().toISOString() }).eq("id", r.id);
     }),
