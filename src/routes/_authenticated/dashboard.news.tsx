@@ -98,7 +98,7 @@ function NewsImpactPage() {
       </p>
 
       {data?.feedError && (
-        <div className="console-card mt-4 px-4 py-3 text-[13px] text-muted-foreground">The news feed did not answer this time; showing the last saved results.</div>
+        <div className="console-card mt-4 px-4 py-3 text-[14px] text-muted-foreground">The news feed did not answer this time; showing the last saved results.</div>
       )}
 
       <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
@@ -120,7 +120,7 @@ function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook;
       className="rounded-2xl border p-5"
       style={color ? { borderColor: tint(color, 40), background: tint(color, 7) } : undefined}
     >
-      <div className="text-[13px] text-muted-foreground">{title}</div>
+      <div className="text-[14px] text-muted-foreground">{title}</div>
       <div className={`mt-3 flex items-center gap-3 ${toneOf(dir)}`}>
         <span
           className={`inline-flex shrink-0 items-center justify-center rounded-full ${big ? "h-16 w-16" : "h-14 w-14"}`}
@@ -133,7 +133,7 @@ function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook;
           {dir !== "none" && <div className="mt-1.5 text-[15px] font-medium tabular-nums">{confidence}% confidence</div>}
         </div>
       </div>
-      <div className="mt-4 text-[13px] text-muted-foreground tabular-nums">
+      <div className="mt-4 text-[14px] text-muted-foreground tabular-nums">
         {dir === "none"
           ? `Only ${n} past result${n === 1 ? "" : "s"} like this, not enough to read.`
           : `Avg Gold move ${usd(avgMove)} in 15 min · ${n} past releases`}
@@ -143,7 +143,7 @@ function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook;
 }
 
 function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; releases: UpcomingRelease[]; now: number; loading: boolean }) {
-  if (loading) return <section className="console-card mt-6 min-h-[260px] p-5 text-[13px] text-muted-foreground">Loading the next release…</section>;
+  if (loading) return <section className="console-card mt-6 min-h-[260px] p-5 text-[14px] text-muted-foreground">Loading the next release…</section>;
   if (!next) {
     return (
       <section className="console-card mt-6 flex items-center gap-3 p-5 text-[14px] text-muted-foreground">
@@ -177,12 +177,12 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
       )}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-[12px] uppercase tracking-wider text-muted-foreground"><Newspaper className="h-4 w-4" /> Next high-impact USD news</div>
+          <div className="flex items-center gap-2 text-[13px] uppercase tracking-wider text-muted-foreground"><Newspaper className="h-4 w-4" /> Next high-impact USD news</div>
           <div className="mt-2 text-[24px] font-medium sm:text-[28px]">{def.label}</div>
-          <div className="mt-1 text-[13px] text-muted-foreground">{fmtTime(next.released_at)}</div>
+          <div className="mt-1 text-[14px] text-muted-foreground">{fmtTime(next.released_at)}</div>
         </div>
         <div className="text-right">
-          <div className="text-[12px] text-muted-foreground">{released ? "Released" : "Starts in"}</div>
+          <div className="text-[13px] text-muted-foreground">{released ? "Released" : "Starts in"}</div>
           <div className="mt-1 font-mono text-[28px] tabular-nums sm:text-[34px]">{released ? fmtVal(next.actual, next.unit, next.scale) : countdown(t - now)}</div>
         </div>
       </div>
@@ -225,7 +225,7 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
           </>
         )}
       </div>
-      <p className="mt-3 text-[12px] text-muted-foreground">
+      <p className="mt-3 text-[13px] text-muted-foreground">
         Confidence = how often Gold went that way 15 minutes after the same kind of result in the last {RELEASES_PER_EVENT} releases. History, not a promise.
       </p>
     </section>
@@ -239,7 +239,7 @@ function SectionHead({ icon: Icon, title, sub }: { icon: typeof Newspaper; title
         <h2 className="flex items-center gap-2 text-[18px] font-medium tracking-tight sm:text-[20px]">
           <Icon className="h-[18px] w-[18px]" aria-hidden="true" /> {title}
         </h2>
-        <p className="mt-0.5 text-[13px] text-muted-foreground">{sub}</p>
+        <p className="mt-0.5 text-[14px] text-muted-foreground">{sub}</p>
       </div>
     </div>
   );
@@ -266,7 +266,7 @@ function WeekCalendar({ upcoming, now, loading, nextId }: { upcoming: UpcomingRe
         <div className="console-card divide-y divide-border overflow-hidden">
           {Array.from(groups, ([day, items]) => (
             <div key={day} className="grid gap-3 p-4 sm:grid-cols-[150px_1fr] sm:p-5">
-              <div className="text-[13px] font-medium text-muted-foreground">{day}</div>
+              <div className="text-[14px] font-medium text-muted-foreground">{day}</div>
               <ul className="space-y-2">
                 {items.map((u) => {
                   const def = eventDef(u.event_key);
@@ -278,15 +278,15 @@ function WeekCalendar({ upcoming, now, loading, nextId }: { upcoming: UpcomingRe
                       key={u.id}
                       className={`flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl px-3 py-2.5 ${isNext ? "bg-background ring-1 ring-foreground/15" : ""}`}
                     >
-                      <span className="w-[72px] shrink-0 whitespace-nowrap font-mono text-[13px] tabular-nums">{clock(u.released_at)}</span>
+                      <span className="w-[80px] shrink-0 whitespace-nowrap font-mono text-[14px] tabular-nums">{clock(u.released_at)}</span>
                       <span className="min-w-0 flex-1 text-[14px] font-medium">
                         {u.title}
-                        {def && <span className="ml-2 rounded-full bg-foreground px-2 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider text-background">{def.short}</span>}
+                        {def && <span className="ml-2 rounded-full bg-foreground px-2 py-0.5 align-middle text-[11px] font-semibold uppercase tracking-wider text-background">{def.short}</span>}
                       </span>
-                      <span className="text-[12px] tabular-nums text-muted-foreground">
+                      <span className="text-[13px] tabular-nums text-muted-foreground">
                         F {fmtVal(u.forecast, u.unit, u.scale)} · P {fmtVal(u.previous, u.unit, u.scale)}
                       </span>
-                      <span className="w-[96px] text-right font-mono text-[12px] tabular-nums">
+                      <span className="w-[104px] text-right font-mono text-[13px] tabular-nums">
                         {done ? <>A {fmtVal(u.actual, u.unit, u.scale)}</> : t <= now ? "Waiting" : countdown(t - now)}
                       </span>
                     </li>
@@ -316,12 +316,12 @@ function EventReactions({ releases, now, loading }: { releases: UpcomingRelease[
             <div key={e.key} className="console-card flex flex-col p-5">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">{e.short}</div>
+                  <div className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">{e.short}</div>
                   <div className="mt-0.5 text-[15px] font-medium">{e.label}</div>
                 </div>
                 {loading ? null : (
                   <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${toneOf(o.dir)}`}
+                    className={`rounded-full px-2.5 py-1 text-[12px] font-semibold ${toneOf(o.dir)}`}
                     style={o.dir === "up" || o.dir === "down" ? { background: tint(o.dir === "up" ? UP : DOWN, 14) } : undefined}
                   >
                     {o.dir === "up" ? "Leans UP" : o.dir === "down" ? "Leans DOWN" : o.dir === "mixed" ? "Mixed" : "No data"}
@@ -332,11 +332,11 @@ function EventReactions({ releases, now, loading }: { releases: UpcomingRelease[
                 <div className="bg-pl-up transition-[width] duration-700" style={{ width: loading ? 0 : `${st.upPct}%` }} />
                 <div className="ml-auto bg-pl-down transition-[width] duration-700" style={{ width: loading ? 0 : `${st.downPct}%` }} />
               </div>
-              <div className="mt-2 flex justify-between text-[12px] tabular-nums">
+              <div className="mt-2 flex justify-between text-[13px] tabular-nums">
                 <span className="pl-up font-medium">{st.upPct}% up</span>
                 <span className="pl-down font-medium">{st.downPct}% down</span>
               </div>
-              <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-3 text-[12px] tabular-nums">
+              <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-3 text-[13px] tabular-nums">
                 <div>
                   <dt className="text-muted-foreground">Avg move</dt>
                   <dd className="mt-0.5 text-[14px] font-medium">±${st.avgAbsT15.toFixed(2)}</dd>
@@ -373,7 +373,7 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
         <div className="console-card p-5 text-[14px] text-muted-foreground">No measured releases yet.</div>
       ) : (
         <div className="console-card overflow-hidden">
-          <div className="hidden grid-cols-[1.4fr_1fr_0.8fr_repeat(3,0.7fr)] gap-3 border-b border-border px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid">
+          <div className="hidden grid-cols-[1.4fr_1fr_0.8fr_repeat(3,0.7fr)] gap-3 border-b border-border px-5 py-3 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid">
             <span>Release</span><span>Actual / forecast</span><span>Result</span><span className="text-right">5 min</span><span className="text-right">15 min</span><span className="text-right">1 hour</span>
           </div>
           <ul className="divide-y divide-border">
@@ -384,14 +384,14 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
               const result = read == null ? "—" : read === 0 ? "In line" : read > 0 ? "Beat" : "Miss";
               const move = (v: number) => <span className={`font-medium ${v > 0 ? "pl-up" : v < 0 ? "pl-down" : ""}`}>{usd(v)}</span>;
               return (
-                <li key={r.id} className="grid grid-cols-2 gap-x-3 gap-y-1.5 px-5 py-3.5 text-[13px] tabular-nums sm:grid-cols-[1.4fr_1fr_0.8fr_repeat(3,0.7fr)] sm:items-center">
+                <li key={r.id} className="grid grid-cols-2 gap-x-3 gap-y-1.5 px-5 py-3.5 text-[14px] tabular-nums sm:grid-cols-[1.4fr_1fr_0.8fr_repeat(3,0.7fr)] sm:items-center">
                   <div className="col-span-2 sm:col-span-1">
                     <div className="font-medium">{def?.label ?? r.title}</div>
-                    <div className="text-[12px] text-muted-foreground">{new Date(r.released_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</div>
+                    <div className="text-[13px] text-muted-foreground">{new Date(r.released_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</div>
                   </div>
                   <div>{fmtVal(r.actual, r.unit, r.scale)} <span className="text-muted-foreground">/ {fmtVal(r.forecast, r.unit, r.scale)}</span></div>
                   <div>
-                    <span className="rounded-full bg-background px-2.5 py-0.5 text-[12px] font-medium">{result}</span>
+                    <span className="rounded-full bg-background px-2.5 py-0.5 text-[13px] font-medium">{result}</span>
                   </div>
                   <div className="sm:text-right"><span className="text-muted-foreground sm:hidden">5m </span>{move(g.t5)}</div>
                   <div className="sm:text-right"><span className="text-muted-foreground sm:hidden">15m </span>{move(g.t15)}</div>
@@ -402,7 +402,7 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
           </ul>
         </div>
       )}
-      <p className="mt-3 text-[12px] text-muted-foreground">Past Gold moves after each release. History, not a promise.</p>
+      <p className="mt-3 text-[13px] text-muted-foreground">Past Gold moves after each release. History, not a promise.</p>
     </section>
   );
 }

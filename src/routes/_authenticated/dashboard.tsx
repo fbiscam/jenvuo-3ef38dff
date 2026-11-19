@@ -90,7 +90,7 @@ import {
   ChevronRight,
   Info,
   Settings2,
-  LayoutDashboard,
+  House,
   ChartNoAxesCombined,
   KeyRound,
   Code2,
@@ -178,7 +178,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       {
         to: "/dashboard",
         label: "Overview",
-        icon: LayoutDashboard,
+        icon: House,
         exact: true,
         countKey: "saved",
       },
