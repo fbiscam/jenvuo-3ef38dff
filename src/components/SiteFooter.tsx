@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Globe } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import PakistanFlagMark from "@/components/PakistanFlagMark";
 
 
 function NewsletterSubscribe() {
@@ -151,6 +152,8 @@ export default function SiteFooter({ className }: { className?: string }) {
               <Link to="/" className="inline-flex items-center gap-2.5 text-[26px] font-medium leading-none tracking-tight text-foreground"><JenvuMark className="h-7 w-7 shrink-0" />Jenvu</Link>
               <p className="mt-4 text-[13px] text-muted-foreground">© {year} Jenvu. All rights reserved.</p>
             </div>
+            {/* Faint Pakistan flag fills the gap between the copyright and the newsletter. */}
+            <PakistanFlagMark className="hidden w-[180px] text-foreground/[0.08] lg:block" />
             <div className="space-y-5">
               <NewsletterSubscribe />
               <div className="flex flex-nowrap items-center gap-2">
