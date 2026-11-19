@@ -309,7 +309,7 @@ function AssistantTurn({ msg, last, onRetry, onAsk, onSales }: {
           <button type="button" onClick={onSales} className="mt-3 flex items-center gap-3 rounded-full bg-gc-blue-soft py-2 pl-5 pr-2 text-[16px] text-gc-blue-deep transition hover:brightness-95">
             <FileText className="h-5 w-5" />
             <span className="mr-6">Contact sales</span>
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gc-blue text-gc-on-blue">
+            <span className="ask-sales-arrow flex h-10 w-10 items-center justify-center rounded-full bg-gc-blue text-gc-on-blue">
               <Maximize2 className="h-4 w-4" />
             </span>
           </button>

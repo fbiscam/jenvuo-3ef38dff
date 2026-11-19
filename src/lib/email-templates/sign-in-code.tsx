@@ -15,7 +15,7 @@ const COPY: Record<SignInCodeKind, { subject: string; heading: string; intro: st
   second_step: {
     subject: 'Your Jenvu security code',
     heading: 'Confirm it is you',
-    intro: 'Your password was entered correctly. Enter this code to finish signing in.',
+    intro: 'Your password was entered correctly. Enter this code to sign in.',
     label: 'SECURITY CODE',
   },
   email_2fa_setup: {

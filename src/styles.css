@@ -1982,6 +1982,9 @@ html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcapt
 .dash-dark :is(.bg-blue-50,.bg-sky-50,.bg-indigo-50,.bg-zinc-50,.bg-\[\#F4F4F4\]) { background-color: rgba(255,255,255,0.1) !important; }
 .dash-dark :is(aside, nav, [role="dialog"], header) svg:not(.terminal-dark *),
 .dash-dark .text-muted-foreground svg { color: #ffffff !important; }
+/* Ask Jenvu "Contact sales" circle: the arrow keeps the circle's contrast colour (black on the white dark-theme circle). */
+.dash-dark [role="dialog"] .ask-sales-arrow svg,
+.dark [role="dialog"] .ask-sales-arrow svg { color: var(--gc-on-blue) !important; }
 
 /* ====== xAI console look: dashboard shell, pages and sidebar ====== */
 /* Light: white canvas, #F4F4F4 cards/pills. Black: #000 canvas, #141414 cards. */
