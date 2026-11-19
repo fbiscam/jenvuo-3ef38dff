@@ -36,7 +36,7 @@ export default function ServiceStatusPage() {
           <div className="status-services">{group.services.map(service => <div key={service.id} className="status-service"><span>{service.name}</span><Indicator state={data.checks.find(c => c.id === service.id)?.state ?? 'unknown'} /></div>)}</div>
         </section>;
       })}
-      <p className="status-method">Live checks refresh every minute. History contains hourly observations, not continuous uptime; grey bars have no verified data. Page access does not verify signed-in workflows, AI replies or broker execution. {data.historyAvailable ? '' : 'Recorded history is currently unavailable.'}</p>
+      {data.historyAvailable ? null : <p className="status-method">Recorded history is currently unavailable.</p>}
     </main>
     <SiteFooter />
   </div>;
