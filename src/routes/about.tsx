@@ -84,7 +84,7 @@ function AboutPage() {
       <section className="why-hero why-wrap">
         <div className="why-hero-copy">
           <h1>Everything you<br />need for your<br />trading workspace</h1>
-          <p className="mb-9 mt-7 max-w-[550px] text-[17px] leading-7 text-gc-ink-muted">Analysis and support across Terminal, JX Bot, News Trading and the Jenvu API, all in one place.</p>
+          <p className="mb-9 mt-7 max-w-[550px] text-[17px] leading-7 text-gc-ink-muted">Analysis and support across Terminal, JX Bot, News Trading and the Jenvu API, all in one place with different strategies.</p>
           <Actions />
         </div>
         <WhyWorkspaceScene />
