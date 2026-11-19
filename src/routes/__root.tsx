@@ -198,18 +198,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       ...(googleAnalyticsId
         ? [
             {
-              src: `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleAnalyticsId)}`,
-              async: true,
+              // Analytics loads after the page has finished loading so it never
+              // competes with the app's own files on slow phone connections.
+              children: `window.addEventListener('load',function(){var go=function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(googleAnalyticsId)}';document.head.appendChild(s)};if('requestIdleCallback' in window){requestIdleCallback(go,{timeout:3000})}else{setTimeout(go,1500)}},{once:true});`,
             },
             {
               children: `window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', ${JSON.stringify(googleAnalyticsId)});`,
             },
           ]
         : []),
-      {
-        children:
-          "(function(){var r=document.documentElement;var done=function(){r.classList.add('ms-icons-ready')};try{if(document.fonts&&document.fonts.load){document.fonts.load('20px \"Material Symbols Rounded\"','space_dashboard').then(done).catch(done)}else{done()}}catch(e){done()}setTimeout(done,2500)})();",
-      },
       {
         type: "application/ld+json",
         children: JSON.stringify({
@@ -263,10 +260,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,1,0&display=block",
-      },
-      {
-        rel: "stylesheet",
         href: appCss,
       },
     ],
@@ -279,8 +272,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    // suppressHydrationWarning: the Material Symbols script in head() adds
-    // the `ms-icons-ready` class to <html> before React hydrates.
+    // suppressHydrationWarning: the theme boot script adds `.dark` to <html>
+    // before React hydrates.
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: SITE_THEME_BOOT_SCRIPT }} />

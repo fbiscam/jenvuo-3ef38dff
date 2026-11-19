@@ -157,3 +157,6 @@
 - [x] Billing promo box: white background, no border
 - [x] Whole dashboard: input boxes without grey border / click shadow
 - [x] Dashboard pages open faster
+
+- [x] Dashboard loads slowly / sometimes not at all: find and fix
+- [x] Whole site responsive on phones (check main public + dashboard pages)

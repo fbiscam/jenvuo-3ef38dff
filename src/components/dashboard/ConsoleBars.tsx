@@ -24,10 +24,34 @@ function gapFor(count: number) {
 
 /** Date labels pinned inside the chart: first left-aligned, last right-aligned. */
 function DateAxis({ dates, compact }: { dates: string[]; compact?: boolean }) {
-  const ticks = tickIndexes(dates.length, compact ? 3 : 5);
-  const withYear = !compact && dates.length <= 7;
+  // Phones get 3 short labels; wider screens the full set (with year for a week).
   return (
-    <div className="relative mt-2 h-4 text-[11.5px] text-muted-foreground">
+    <>
+      <AxisRow dates={dates} maxTicks={3} withYear={false} className="sm:hidden" />
+      <AxisRow
+        dates={dates}
+        maxTicks={compact ? 3 : 5}
+        withYear={!compact && dates.length <= 7}
+        className="hidden sm:block"
+      />
+    </>
+  );
+}
+
+function AxisRow({
+  dates,
+  maxTicks,
+  withYear,
+  className,
+}: {
+  dates: string[];
+  maxTicks: number;
+  withYear: boolean;
+  className: string;
+}) {
+  const ticks = tickIndexes(dates.length, maxTicks);
+  return (
+    <div className={`relative mt-2 h-4 text-[11.5px] text-muted-foreground ${className}`}>
       {ticks.map((i, t) => {
         const first = t === 0;
         const last = t === ticks.length - 1 && ticks.length > 1;
