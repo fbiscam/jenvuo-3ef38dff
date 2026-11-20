@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Prepare v4.05 / Owner v26.18 source: no recovery additions; confirmed M15 invalidation on profitable and losing baskets; retained TP, lots, daily guards and schedule; 12 native/source regressions pass; deliver source package only, not a compiled customer replacement.
+- [ ] Compile v4.05 and run real-tick backtest plus demo forward test — requires owner to use MetaEditor/MT5; no fixed-dollar loss guarantee, legacy pre-session BE remains unchanged.
+- [x] Check reported utils.ts numeric/string error: current file is seven lines and returns string; existing numeric-input regression passes; no utility change needed.
+
 - [x] Apply exact #E8E7E5 to Contact Sales and shared secondary buttons, including Products; black primary actions unchanged. Desktop/390px colors and dark-theme contrast verified; utility regression passes, build OK, reported line 8 absent.
 
 - [x] Apply approved black primary buttons, defined grey secondary pills and darker headings/subtitles through shared color tokens; desktop/390px, light/dark and homepage/Platform/Pricing/Docs verified. Read Docs navigation works; utility numeric-input regression passes and build OK (reported line 8 absent).
