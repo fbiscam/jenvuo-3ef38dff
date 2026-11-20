@@ -2972,3 +2972,20 @@ html.dark body .console-pill.console-pill-white {
 .console-pill.console-pill-white *,
 .dash-dark .console-pill.console-pill-white * { color: #000000 !important; }
 .console-pill.console-pill-white:hover { background: #f2f2f2 !important; }
+
+/* Overview numbers: brief glow when a balance / profit value updates. */
+@keyframes value-flash-up {
+  0% { text-shadow: 0 0 0 transparent; }
+  30% { text-shadow: 0 0 18px color-mix(in oklab, var(--pl-up) 55%, transparent); }
+  100% { text-shadow: 0 0 0 transparent; }
+}
+@keyframes value-flash-down {
+  0% { text-shadow: 0 0 0 transparent; }
+  30% { text-shadow: 0 0 18px color-mix(in oklab, var(--pl-down) 55%, transparent); }
+  100% { text-shadow: 0 0 0 transparent; }
+}
+.value-flash-up { animation: value-flash-up 1.2s ease-out; }
+.value-flash-down { animation: value-flash-down 1.2s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .value-flash-up, .value-flash-down { animation: none; }
+}

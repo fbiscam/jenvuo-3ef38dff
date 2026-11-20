@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, Bot, CandlestickChart, type LucideIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
+import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 import BotPerformanceCard from "@/components/dashboard/BotPerformanceCard";
 import { PlatformLogo } from "@/components/brand/ProductLogos";
 
@@ -24,6 +25,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
   const name = String(profileName?.trim() || meta.full_name || meta.name || user?.email?.split("@")[0] || "trader").split(" ")[0];
   const balance = credits.balance || 0;
   const hasKeys = (keysCount ?? 0) > 0;
+  const shown = useAnimatedNumber(balance, !credits.isLoading);
 
   return (
     <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">
@@ -44,8 +46,11 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <span className="text-[14px] text-muted-foreground">{balance > 0 ? "Balance      " : "Pick a plan for more"}</span>
           </div>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
-            <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
-              {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}
+            <p
+              className={`text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground ${shown.flash ? `value-flash-${shown.flash}` : ""}`}
+              aria-label={credits.isLoading ? undefined : `$${balance.toFixed(2)}`}
+            >
+              {credits.isLoading ? "—" : `$${shown.value.toFixed(2)}`}
             </p>
             <Link to="/dashboard/api" className="console-pill console-pill-white">
               {hasKeys ? "Manage API keys" : "Create API key"}

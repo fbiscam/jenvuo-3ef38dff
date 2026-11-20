@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { JxBotLogo } from "@/components/brand/ProductLogos";
 import { getBotUsage } from "@/lib/mt5-licenses.functions";
 import { botPerformance, plTone } from "@/lib/bot-performance";
+import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 
 const money = (n: number) =>
   `${n > 0 ? "+" : n < 0 ? "−" : ""}$${Math.abs(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -15,6 +16,7 @@ export default function BotPerformanceCard() {
   const load = useServerFn(getBotUsage);
   const { data, isLoading } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), staleTime: 60_000 });
   const perf = useMemo(() => botPerformance(data?.rows ?? [], Date.now()), [data]);
+  const shown = useAnimatedNumber(perf.total, !isLoading);
 
   return (
     <div className="console-card flex flex-col p-6">
@@ -27,8 +29,11 @@ export default function BotPerformanceCard() {
       </div>
 
       <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
-        <p className={`text-[40px] font-medium leading-none tracking-tight tabular-nums ${isLoading ? "text-muted-foreground" : toneClass(perf.total)}`}>
-          {isLoading ? "—" : money(perf.total)}
+        <p
+          className={`text-[40px] font-medium leading-none tracking-tight tabular-nums transition-colors duration-500 ${isLoading ? "text-muted-foreground" : toneClass(perf.total)} ${shown.flash ? `value-flash-${shown.flash}` : ""}`}
+          aria-label={isLoading ? undefined : money(perf.total)}
+        >
+          {isLoading ? "—" : money(Math.round(shown.value * 100) / 100)}
         </p>
         <Link to={perf.hasData || isLoading ? "/dashboard/bot-usage" : "/dashboard/jx-bot"} className="console-pill console-pill-white">
           {perf.hasData || isLoading ? "Bot usage" : "Set up JX Bot"}
