@@ -53,7 +53,7 @@ export function SidebarMoreMenu({ onSignOut }: { onSignOut: () => void }) {
   }, [open]);
 
   const item =
-    "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-[14px] text-foreground transition-colors hover:bg-foreground/[0.06]";
+    "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-foreground transition-colors hover:bg-foreground/[0.06]";
   const close = () => setOpen(false);
 
   return (
@@ -72,12 +72,12 @@ export function SidebarMoreMenu({ onSignOut }: { onSignOut: () => void }) {
       {open && (
         <div
           role="menu"
-          className="absolute bottom-full left-0 z-50 mb-2 w-[244px] rounded-2xl border border-border bg-background p-1.5 text-foreground shadow-[0_12px_32px_-12px_rgba(0,0,0,0.25)]"
+          className="absolute bottom-full left-0 z-50 mb-2 w-[210px] rounded-xl border border-border bg-background p-1 text-foreground shadow-[0_12px_32px_-12px_rgba(0,0,0,0.25)]"
         >
-          <div className="flex items-center gap-3 px-3 py-2 text-[14px]" role="status" aria-live="polite">
-            <Activity className="h-4 w-4" strokeWidth={2} />
+          <div className="flex items-center gap-2.5 px-2.5 py-1.5 text-[13px]" role="status" aria-live="polite">
+            <Activity className="h-3.5 w-3.5" strokeWidth={2} />
             <span className="flex-1">API status</span>
-            <span className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 text-[12px] text-muted-foreground">
               <span
                 className={`h-2 w-2 rounded-full ${
                   status === "active" ? "bg-emerald-500" : status === "down" ? "bg-red-500" : "bg-muted-foreground/50"
@@ -87,19 +87,19 @@ export function SidebarMoreMenu({ onSignOut }: { onSignOut: () => void }) {
             </span>
           </div>
           <Link to="/dashboard/settings" role="menuitem" onClick={close} className={item}>
-            <Settings className="h-4 w-4" strokeWidth={2} /> Settings
+            <Settings className="h-3.5 w-3.5" strokeWidth={2} /> Settings
           </Link>
           <Link to="/docs" role="menuitem" onClick={close} className={item}>
-            <BookOpen className="h-4 w-4" strokeWidth={2} /> Documentation
+            <BookOpen className="h-3.5 w-3.5" strokeWidth={2} /> Documentation
           </Link>
           <Link to="/help" role="menuitem" onClick={close} className={item}>
-            <LifeBuoy className="h-4 w-4" strokeWidth={2} /> Support
+            <LifeBuoy className="h-3.5 w-3.5" strokeWidth={2} /> Support
           </Link>
           <Link to="/contact" role="menuitem" onClick={close} className={item}>
-            <Mail className="h-4 w-4" strokeWidth={2} /> Contact
+            <Mail className="h-3.5 w-3.5" strokeWidth={2} /> Contact
           </Link>
           <Link to="/terms" role="menuitem" onClick={close} className={item}>
-            <FileText className="h-4 w-4" strokeWidth={2} /> Terms and policies
+            <FileText className="h-3.5 w-3.5" strokeWidth={2} /> Terms and policies
           </Link>
           <button
             type="button"
@@ -110,7 +110,7 @@ export function SidebarMoreMenu({ onSignOut }: { onSignOut: () => void }) {
             }}
             className={item}
           >
-            <LogOut className="h-4 w-4" strokeWidth={2} /> Log out
+            <LogOut className="h-3.5 w-3.5" strokeWidth={2} /> Log out
           </button>
         </div>
       )}
