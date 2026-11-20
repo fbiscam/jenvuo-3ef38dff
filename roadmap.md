@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Replace customer download with approved JX_BOT_MT5-24.zip (v4.05, 143254 bytes); CRC integrity and signed-link readback match upload SHA256 86e5557ed8f8f8c6afc264f06cd5df77a6b97b46768df8c6a1e763aa43171eec. Manual and uploaded contents unchanged (guide still has obsolete source-only wording). Utility regression passes; reported line 8 absent. MT5 compile/behavior cannot be proved from EX5 strings; backtest/demo testing remains owner-blocked. Signed-in button check unavailable: requester has no matching app account; direct signed download verified.
 - [x] Add original three-page PDF to a versioned v4.05 owner source ZIP; inspected every page, flag obsolete Gold/key/plan/drawdown instructions in READ_FIRST_MANUAL_NOTICE.txt; source and preset unchanged, utility regression passes. Customer download not replaced; compilation/demo testing remains owner-blocked.
 - [x] Prepare v4.05 / Owner v26.18 source: no recovery additions; confirmed M15 invalidation on profitable and losing baskets; retained TP, lots, daily guards and schedule; 12 native/source regressions pass; deliver source package only, not a compiled customer replacement.
 - [ ] Compile v4.05 and run real-tick backtest plus demo forward test — requires owner to use MetaEditor/MT5; no fixed-dollar loss guarantee, legacy pre-session BE remains unchanged.
