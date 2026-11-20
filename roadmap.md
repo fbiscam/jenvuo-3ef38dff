@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Apply exact #E8E7E5 to Contact Sales and shared secondary buttons, including Products; black primary actions unchanged. Desktop/390px colors and dark-theme contrast verified; utility regression passes, build OK, reported line 8 absent.
+
 - [x] Apply approved black primary buttons, defined grey secondary pills and darker headings/subtitles through shared color tokens; desktop/390px, light/dark and homepage/Platform/Pricing/Docs verified. Read Docs navigation works; utility numeric-input regression passes and build OK (reported line 8 absent).
 
 - [x] Premium prices for everyone: Pro $69 / Elite $139 / Ultra $239, JX Bot in every paid plan (50-seat limit removed); API credit Free $20 / Pro $40 / Elite $70 / Ultra $90; Founding Pro/Elite credit $40 / $70; update every page/copy

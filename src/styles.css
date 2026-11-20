@@ -199,7 +199,7 @@
   --popover-foreground: #000000;
   --primary: #000000;
   --primary-foreground: #ffffff;
-  --secondary: #eceff1;
+  --secondary: #E8E7E5;
   --secondary-foreground: #000000;
   --muted: oklch(0.968 0.007 247.896);
   --muted-foreground: #222222;    /* Strong secondary text on light surfaces. */
@@ -2909,7 +2909,7 @@ html.dark body .why-page .why-platform-kucoin { color: var(--why-kucoin-mark) !i
 @media (prefers-reduced-motion: reduce) { .products-page *, .products-page *::after { animation: none !important; transition: none !important; } }
 
 /* White, text-only product motion. Controls inherit monochrome page tokens. */
-.products-page { --product-video-surface: oklch(1 0 0); --product-video-ink: oklch(.16 0 0); --secondary: var(--product-surface); --secondary-foreground: var(--foreground); }
+.products-page { --product-video-surface: oklch(1 0 0); --product-video-ink: oklch(.16 0 0); --secondary-foreground: var(--foreground); }
 .products-page .products-actions a[data-slot="button"], .products-copy a[data-slot="button"], .products-developer a[data-slot="button"] { box-shadow: none; }
 .product-motion { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: clip; border-radius: 8px; background: var(--product-video-surface); color: var(--product-video-ink); }
 .product-motion video { display: block; width: 100%; height: 100%; object-fit: contain; }
