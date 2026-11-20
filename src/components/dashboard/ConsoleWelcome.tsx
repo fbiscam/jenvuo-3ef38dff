@@ -41,7 +41,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
               <PlatformLogo framed className="h-8 w-8" />
               <p className="text-[16px] font-medium text-foreground">API credit</p>
             </div>
-            <span className="text-[12px] text-muted-foreground">{balance > 0 ? "Balance" : "Pick a plan for more"}</span>
+            <span className="text-[14px] text-muted-foreground">{balance > 0 ? "Balance" : "Pick a plan for more"}</span>
           </div>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
             <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
