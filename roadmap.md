@@ -166,4 +166,4 @@
 - [x] Overview: API keys under credit balance; JX Bot 30-day results card (green/red)
 - [x] Ask Jenvu open to signed-out visitors
 - [x] News page Gold moves after releases are not being measured (all show "No data"), waiting on owner OK to fix
-- [ ] JX Bot v4.03 (auto break-even +2.0/+0.5 pips, trailing step +3.5/+2.0 pips, confirmed M15 structure exit, PKT hours 04:00-11:15 + 12:30-17:00, NY off): source ready in Files (v26.16); waiting for the owner to compile in MetaEditor and send the .ex5 so the customer download can be replaced.
+- [x] JX Bot v4.03 (auto break-even +2.0/+0.5 pips, trailing step +3.5/+2.0 pips, confirmed M15 structure exit, PKT hours 04:00-11:15 + 12:30-17:00, NY off): owner-compiled package (JX_BOT_MT5-22) now the customer download; stored file matches the upload byte for byte.
