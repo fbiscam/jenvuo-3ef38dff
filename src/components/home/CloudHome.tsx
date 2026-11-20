@@ -229,7 +229,7 @@ const AUDIENCES: Array<{ key: string; label: string; cards: AudienceCard[] }> = 
     key: "traders",
     label: "Traders",
     cards: [
-      { tag: "NEW TRADERS", text: "Sign up free: $20 API credit every month and 2 hours a day of the Terminal's paid indicators", to: "/auth", img: tradeNeonStart },
+      { tag: "NEW TRADERS", text: "Sign up free: $35 API credit every month and 2 hours a day of the Terminal's paid indicators", to: "/auth", img: tradeNeonStart },
       { tag: "JX BOT", text: "Run JX Bot on MetaTrader 5 with a daily auto-stop at your plan's target", to: "/pricing", img: tradeNeonPractice },
       { tag: "LEARN", text: "Read daily Gold insights and guides on sweeps, zones and order blocks", to: "/insights", img: tradeNeonLearn },
     ],
@@ -379,7 +379,7 @@ export function CloudBuildWith() {
             <span className="whitespace-nowrap text-gc-blue-deep">designed for traders and AI</span>
           </h2>
           <p className="mt-4 max-w-[540px] text-[14px] leading-[1.55] text-gc-ink-muted sm:mt-5 sm:text-[16px] sm:leading-[1.6]">
-            Sign up free: $20 API credit every month and 2 hours a day of the Terminal's paid indicators. JX Bot comes with every paid plan.
+            Sign up free: $35 API credit every month and 2 hours a day of the Terminal's paid indicators. JX Bot comes with every paid plan.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-7">
             <SignUpCta className="inline-flex h-12 items-center justify-center rounded-full bg-gc-blue px-6 text-[15px] font-medium text-gc-on-blue transition hover:bg-gc-blue-hover" />
@@ -562,7 +562,7 @@ export function CloudUseCases() {
 
 /* ---------------- Pricing band ---------------- */
 const PLANS = [
-  { name: "Pro", price: "$69", note: "Terminal, AI desk and JX Bot on 2 IPs.", tone: "blue" as Tone },
+  { name: "Pro", price: "$69", note: "Terminal, AI desk and JX Bot on 1 IP.", tone: "blue" as Tone },
   { name: "Elite", price: "$139", note: "More AI usage and JX Bot on 3 IPs.", tone: "green" as Tone },
   { name: "Ultra", price: "$239", note: "The highest limits and JX Bot on 4 IPs.", tone: "red" as Tone },
 ];

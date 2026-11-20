@@ -428,6 +428,13 @@
       "when": 1794993469729,
       "tag": "0060_founding_credit_40_70",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1795151105674,
+      "tag": "0061_free_plan_credit_35",
+      "breakpoints": true
     }
   ]
 }

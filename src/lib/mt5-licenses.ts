@@ -1,6 +1,6 @@
 /** MT5 JX Bot plans: profit targets and license (MT5 account) limits per plan. */
 export const MT5_PLANS = {
-  pro: { name: "Pro", monthlyTarget: 600, licenses: 2 },
+  pro: { name: "Pro", monthlyTarget: 600, licenses: 1 },
   elite: { name: "Elite", monthlyTarget: 1500, licenses: 3 },
   ultra: { name: "Ultra", monthlyTarget: 3000, licenses: 4 },
 } as const;

@@ -151,11 +151,11 @@ const FAQS = [
   },
   {
     q: "Who can use JX Bot?",
-    a: "JX Bot comes with every paid plan (Pro $69, Elite $139, Ultra $239 a month), with no limit on how many people can join. Free accounts don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 2 IPs), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
+    a: "JX Bot comes with every paid plan (Pro $69, Elite $139, Ultra $239 a month), with no limit on how many people can join. Free accounts don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 1 IP), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
   },
   {
     q: "How many accounts can I run?",
-    a: "Each IP works with one MT5 account. Pro allows 2 IPs, Elite 3 and Ultra 4.",
+    a: "Each IP works with one MT5 account. Pro allows 1 IP, Elite 3 and Ultra 4.",
   },
   {
     q: "Does JX Bot guarantee profit?",

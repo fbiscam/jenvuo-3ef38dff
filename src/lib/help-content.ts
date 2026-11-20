@@ -78,10 +78,10 @@ export const collections: Collection[] = [
       {
         slug: "create-account",
         title: "Create your account",
-        summary: "Sign up in a minute and start on the Free plan with $20 API credit a month.",
+        summary: "Sign up in a minute and start on the Free plan with $35 API credit a month.",
         updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $20 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan. JX Bot is not part of Free: it comes with every paid plan." },
+          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan. JX Bot is not part of Free: it comes with every paid plan." },
 
           { type: "h2", content: "Sign up" },
           { type: "ol", items: [
@@ -354,7 +354,7 @@ export const collections: Collection[] = [
         body: [
           { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It comes with every paid plan (Pro $69, Elite $139, Ultra $239 a month), with no limit on how many people can join; Free doesn't include the bot. The plan decides how many IPs you get and the daily profit target. Daily profit targets are maximum safety caps — profit is not guaranteed. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
           { type: "h2", content: "Plans" },
-          { type: "ul", items: [`Every plan with the bot: ${DAILY_DRAWDOWN_PCT}% drawdown guard.`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 2 IPs.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 3 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 4 IPs.`, "The daily target is the plan percentage of the day's starting balance, per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
+          { type: "ul", items: [`Every plan with the bot: ${DAILY_DRAWDOWN_PCT}% drawdown guard.`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 1 IP.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 3 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 4 IPs.`, "The daily target is the plan percentage of the day's starting balance, per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See profit, balance, equity and trades for each account at Dashboard → Usage → Bot Usage."] },
           { type: "h2", content: "Trading hours and safety" },
           { type: "ul", items: ["New trades Monday to Thursday 01:00–14:00 and Friday until 13:00 (broker server time). No trading on Saturday and Sunday.", "The bot trades only the Asia and London sessions. No new trades during the London open (06:15–09:00 UTC), and the New York session is off (no new trades after 12:00 UTC). Open trades are still managed, and a trade already in profit at 06:15 UTC is protected at break-even.", `Daily stop (fixed, can't be changed): $5 profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance. Fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`, "Before each entry the bot checks the H1 trend, the spread (max 2 pips), a confirming candle and skips spike candles, so some days have fewer trades.", "After an update, download again, attach the bot again and load the Jenvu EURUSD 15M preset in Inputs."] },
           { type: "h2", content: "Setup" },
@@ -424,7 +424,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "Free" },
           { type: "ul", items: [
             "1,000,000 tokens per day.",
-            "$20 API credit per month.",
+            "$35 API credit per month.",
             "AI terminal chat with starter wallet access.",
             "Full signal engine — A+ / A institutional signals.",
             "Full ICT / SMC narration.",
@@ -483,7 +483,7 @@ export const collections: Collection[] = [
 
           { type: "h2", content: "How wallets refresh" },
           { type: "ul", items: [
-            "Free: $20 API credit each month.",
+            "Free: $35 API credit each month.",
             "Pro: $40 API credit added on each billing date.",
             "Elite: $70 API credit added on each billing date.",
             "Ultra: $90 API credit added on each billing date.",

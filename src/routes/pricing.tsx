@@ -42,7 +42,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Free, Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Jenvu pricing: a Free plan with $20 monthly API credit, then Pro $69, Elite $139 and Ultra $239, each with JX Bot included." },
+      { name: "description", content: "Jenvu pricing: a Free plan with $35 monthly API credit, then Pro $69, Elite $139 and Ultra $239, each with JX Bot included." },
       { property: "og:title", content: "Jenvu pricing" },
       { property: "og:description", content: "Free, Pro, Elite and Ultra plans for the Terminal and Top AI Models, with daily Terminal hours by plan." },
       { property: "og:type", content: "website" },

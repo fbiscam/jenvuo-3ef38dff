@@ -21,7 +21,7 @@ export type ProductUpdate = {
 export const PRODUCT_UPDATES: ProductUpdate[] = [
   {
     title: "Higher limits and two-step sign-in",
-    copy: "Daily tokens: Free 1M, Pro 4M, Elite 10M, Ultra 20M. API: 10/20/40/80 requests a minute. JX Bot: Pro 2, Elite 3, Ultra 4 IPs. Sign in with a one-time email code, and turn on email codes or an authenticator app.",
+    copy: "Daily tokens: Free 1M, Pro 4M, Elite 10M, Ultra 20M. API: 10/20/40/80 requests a minute. JX Bot: Pro 1, Elite 3, Ultra 4 IPs. Sign in with a one-time email code, and turn on email codes or an authenticator app.",
     at: "2026-11-16T07:30:00Z",
     tag: "Updated",
     icon: "shield",

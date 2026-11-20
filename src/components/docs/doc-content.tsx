@@ -47,7 +47,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "sign up register signup login sign in founding apply",
         body: (
           <>
-            <p>Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $20 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. Pro gives 3 API keys and 8 hours a day, Elite 5 keys and 16 hours, Ultra 7 keys and all day.</p>
+            <p>Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. Pro gives 3 API keys and 8 hours a day, Elite 5 keys and 16 hours, Ultra 7 keys and all day.</p>
             <ol>
               <li>Open <a href="https://auth.jenvu.com/sign-in?mode=signup">auth.jenvu.com/sign-in</a> and choose Create an account.</li>
               <li>Enter the 6-digit code we email you.</li>
@@ -63,7 +63,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The Free plan gives every account $20 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is not part of Free: it comes with every paid plan.</p>
+            <p>The Free plan gives every account $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is not part of Free: it comes with every paid plan.</p>
             <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($40 Pro, $70 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
           </>
         ),
@@ -289,7 +289,7 @@ export const DOC_GROUPS: DocGroup[] = [
           <>
             <p>
               JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
-              Pro 2 IPs, Elite 3, Ultra 4 (Free has no JX Bot). There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
+              Pro 1 IP, Elite 3, Ultra 4 (Free has no JX Bot). There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
             </p>
             <ul>
               <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
