@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Add original three-page PDF to a versioned v4.05 owner source ZIP; inspected every page, flag obsolete Gold/key/plan/drawdown instructions in READ_FIRST_MANUAL_NOTICE.txt; source and preset unchanged, utility regression passes. Customer download not replaced; compilation/demo testing remains owner-blocked.
 - [x] Prepare v4.05 / Owner v26.18 source: no recovery additions; confirmed M15 invalidation on profitable and losing baskets; retained TP, lots, daily guards and schedule; 12 native/source regressions pass; deliver source package only, not a compiled customer replacement.
 - [ ] Compile v4.05 and run real-tick backtest plus demo forward test — requires owner to use MetaEditor/MT5; no fixed-dollar loss guarantee, legacy pre-session BE remains unchanged.
 - [x] Check reported utils.ts numeric/string error: current file is seven lines and returns string; existing numeric-input regression passes; no utility change needed.
