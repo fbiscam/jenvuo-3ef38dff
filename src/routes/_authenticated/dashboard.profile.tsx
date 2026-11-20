@@ -291,7 +291,7 @@ function Profile() {
               disabled={nameLocked}
               placeholder="Your name"
               aria-label="Full name"
-              className="h-9 w-[200px] max-w-full rounded-lg border border-gc-line bg-gc-surface px-3 text-center text-[14px] text-gc-ink outline-none focus:border-gc-ink-muted disabled:cursor-not-allowed disabled:text-gc-ink-muted"
+              className="h-9 w-[200px] max-w-full rounded-lg border border-gc-line bg-gc-surface px-3 text-center text-[16px] text-gc-ink outline-none focus:border-gc-ink-muted disabled:cursor-not-allowed disabled:text-gc-ink-muted"
             />
             {!nameLocked && (
               <button type="button" onClick={saveProfile} disabled={saving} className={pill}>{saving ? "Saving…" : "Save"}</button>
