@@ -199,7 +199,7 @@
   --popover-foreground: #000000;
   --primary: #000000;
   --primary-foreground: #ffffff;
-  --secondary: #E8E7E5;
+  --secondary: #EDEDEB;
   --secondary-foreground: #000000;
   --muted: oklch(0.968 0.007 247.896);
   --muted-foreground: #222222;    /* Strong secondary text on light surfaces. */
