@@ -47,7 +47,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
               {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}
             </p>
-            <Link to="/dashboard/api" className="console-pill border-border bg-white text-black hover:bg-white/90">
+            <Link to="/dashboard/api" className="console-pill console-pill-white">
               {hasKeys ? "Manage API keys" : "Create API key"}
             </Link>
           </div>

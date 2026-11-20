@@ -30,7 +30,7 @@ export default function BotPerformanceCard() {
         <p className={`text-[40px] font-medium leading-none tracking-tight tabular-nums ${isLoading ? "text-muted-foreground" : toneClass(perf.total)}`}>
           {isLoading ? "—" : money(perf.total)}
         </p>
-        <Link to={perf.hasData || isLoading ? "/dashboard/bot-usage" : "/dashboard/jx-bot"} className="console-pill border-border bg-white text-black hover:bg-white/90">
+        <Link to={perf.hasData || isLoading ? "/dashboard/bot-usage" : "/dashboard/jx-bot"} className="console-pill console-pill-white">
           {perf.hasData || isLoading ? "Bot usage" : "Set up JX Bot"}
         </Link>
       </div>

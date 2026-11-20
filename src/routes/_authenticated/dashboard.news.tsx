@@ -272,14 +272,14 @@ function WeekCalendar({ upcoming, now, loading, nextId }: { upcoming: UpcomingRe
                       className={`flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl px-3 py-2.5 ${isNext ? "bg-background ring-1 ring-foreground/15" : ""}`}
                     >
                       <span className="w-[80px] shrink-0 whitespace-nowrap font-mono text-[14px] tabular-nums">{clock(u.released_at)}</span>
-                      <span className="min-w-0 flex-1 text-[14px] font-medium">
+                      <span className="min-w-[170px] flex-1 text-[14px] font-medium">
                         {u.title}
                         {def && <span className="ml-2 rounded-full bg-foreground px-2 py-0.5 align-middle text-[11px] font-semibold uppercase tracking-wider text-background">{def.short}</span>}
                       </span>
                       <span className="text-[13px] tabular-nums text-muted-foreground">
                         F {fmtVal(u.forecast, u.unit, u.scale)} · P {fmtVal(u.previous, u.unit, u.scale)}
                       </span>
-                      <span className="w-[104px] text-right font-mono text-[13px] tabular-nums">
+                      <span className="ml-auto w-[104px] text-right font-mono text-[13px] tabular-nums">
                         {done ? <>A {fmtVal(u.actual, u.unit, u.scale)}</> : t <= now ? "Waiting" : countdown(t - now)}
                       </span>
                     </li>
