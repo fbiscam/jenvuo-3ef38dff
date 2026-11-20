@@ -192,19 +192,19 @@
      Destructive shifted to orange-red (Okabe-Ito) so red/green confusion is reduced.
      Chart palette follows Okabe-Ito color-blind-safe set. */
   --background: oklch(1 0 0);
-  --foreground: #202124;           /* same dark ink as the Platform page */
+  --foreground: #000000;
   --card: oklch(1 0 0);
-  --card-foreground: #202124;
+  --card-foreground: #000000;
   --popover: oklch(1 0 0);
-  --popover-foreground: #202124;
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #eceff1;
+  --secondary-foreground: #000000;
   --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: #3c4043;    /* dark secondary text, ~10:1 on white */
+  --muted-foreground: #222222;    /* Strong secondary text on light surfaces. */
   --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --accent-foreground: #000000;
   --destructive: oklch(0.55 0.22 29);            /* orange-red, distinguishable from green */
   --destructive-foreground: oklch(0.99 0.003 247.858);
   --border: oklch(0.9 0.013 255.508);
@@ -228,13 +228,13 @@
   --brand-gemini: oklch(0.62 0.23 285);
   --brand-deepseek: oklch(0.59 0.22 271);
   --brand-claude: oklch(0.7 0.12 55);
-  --home-accent: #111111;
+  --home-accent: #000000;
   --home-accent-foreground: #ffffff;
   --home-accent-soft: #f1f1f1;
   --home-accent-canvas: #f4f4f4;
   /* Homepage (Google Cloud-style) palette */
   /* Monochrome: "blue" tokens render black so buttons/links match the homepage. */
-  --gc-blue: #111111;
+  --gc-blue: #000000;
   --gc-blue-hover: #333333;
   --gc-blue-soft: #f1f1f1;
   --gc-console-bar: #f4f4f4;
@@ -252,16 +252,16 @@
   --gc-amber: #b06000;
   --gc-green: #34a853;
   --gc-green-soft: #e6f4ea;
-  --gc-ink: #141414;
+  --gc-ink: #000000;
   --ink-strong: #000000;
-  --gc-ink-muted: #3c4043;
+  --gc-ink-muted: #222222;
   --gc-surface: #f9f8f6;
-  --gc-pill: var(--gc-surface);
+  --gc-pill: var(--secondary);
   --gc-line: #dadce0;
   --gc-on-blue: #ffffff;
   --gc-panel: #eef2f7;
   --gc-navy: #283593;
-  --gc-blue-deep: #111111;
+  --gc-blue-deep: #000000;
   --gc-sky: #dcefff;
   /* Dashboard console shell (Google Cloud console-style) */
   --gc-canvas: #f4f4f4;
@@ -277,7 +277,7 @@
   --gc-night-soft: #17233b;
   --gc-on-night: #eef3ff;
   --gc-on-night-muted: #9fb0cf;
-  --auth-action: oklch(0.72 0.14 255);
+  --auth-action: #000000;
   --auth-action-foreground: oklch(1 0 0);
 }
 
@@ -1094,8 +1094,8 @@ html[data-pwa="1"] .pwa-tabbar {
   --gc-notice: #e9eef6;
   --gc-nav-active: #dbedfc;
   --gc-sky: #dcefff;
-  --gc-blue: #111111;
-  --gc-blue-deep: #111111;
+  --gc-blue: #000000;
+  --gc-blue-deep: #000000;
   --gc-console-search: #e1e6ef;
   --foreground: #202124;
   --muted-foreground: #3c4043;
@@ -1942,9 +1942,9 @@ h1.font-medium, h2.font-medium { letter-spacing: -0.025em; }
    data-dash-theme on <html>; public pages use .dark on <html>. */
 .ask-jenvu-root {
   --ask-bg: #ffffff;
-  --gc-blue: #111111;
+  --gc-blue: #000000;
   --gc-blue-hover: #333333;
-  --gc-blue-deep: #111111;
+  --gc-blue-deep: #000000;
   --gc-on-blue: #ffffff;
   --gc-blue-soft: #f4f4f4;
   --gc-sky: #f4f4f4;
