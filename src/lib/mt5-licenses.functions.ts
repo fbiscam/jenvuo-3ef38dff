@@ -11,7 +11,7 @@ async function readPlan(userId: string) {
   const { data: sub } = await db.from("user_subscriptions").select("plan_id,status,is_trial,current_period_end,bot_included").eq("user_id", userId).maybeSingle();
   const { foundingBotFor } = await import("./mt5-ip-license.server");
   const founding = await foundingBotFor(db, userId);
-  // JX Bot runs for every active paid plan and active Founding months; Free accounts get no bot.
+  // JX Bot runs for every active paid plan and active Founding months; everyone else runs the Free tier.
   const paid = isPaidBotSub(sub ?? null);
   const viaFounding = !paid && founding.state === "active";
   const access = botAccessFor(sub ?? null, founding.state === "active");
@@ -56,7 +56,7 @@ export const createMt5License = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ ip: z.string().trim().refine((v) => !!normalizeIp(v), "Enter a valid IP address") }).parse(d))
   .handler(async ({ context, data }) => {
     const { db, allowed, limit, plan } = await readPlan(context.userId);
-    if (!allowed) return { ok: false as const, error: "JX Bot comes with every paid plan. Buy Pro, Elite or Ultra to use it." };
+    if (!allowed) return { ok: false as const, error: "JX Bot is not available on this account." };
     const { data: rows } = await db.from("mt5_licenses").select("id,mt5_account").eq("user_id", context.userId).is("revoked_at", null);
     const list = rows ?? [];
     const ip = normalizeIp(data.ip);
@@ -89,7 +89,7 @@ export const getBotDownloadUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { db, allowed } = await readPlan(context.userId);
-    if (!allowed) return { ok: false as const, error: "JX Bot comes with every paid plan. Buy Pro, Elite or Ultra to use it." };
+    if (!allowed) return { ok: false as const, error: "JX Bot is not available on this account." };
     const { data, error } = await db.storage.from("bot-files").createSignedUrl("JX-Bot-MT5.zip", 300, { download: true });
     return error || !data ? { ok: false as const, error: "Download unavailable." } : { ok: true as const, url: data.signedUrl as string };
   });

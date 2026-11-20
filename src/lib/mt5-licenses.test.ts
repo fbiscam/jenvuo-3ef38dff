@@ -49,12 +49,14 @@ describe("mt5 licenses", () => {
     expect(first.valid && first.bind).toBe(true);
     expect(evaluateIpLicense(IP, IP, "222", lic, paid("pro"))).toEqual({ valid: false, reason: "account_mismatch" });
   });
-  it("Free accounts, trials and expired plans get no bot", () => {
-    const no = { valid: false, reason: "no_plan" };
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, { plan_id: "free", status: "active", is_trial: false, current_period_end: null })).toEqual(no);
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, null)).toEqual(no);
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), is_trial: true })).toEqual(no);
-    expect(evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" })).toEqual(no);
+  it("Free accounts, trials and expired plans run the Free tier: $10/day, 1 IP", () => {
+    for (const sub of [{ plan_id: "free", status: "active", is_trial: false, current_period_end: null }, { ...paid("pro"), is_trial: true }, { ...paid("pro"), current_period_end: "2000-01-01T00:00:00Z" }]) {
+      const r = evaluateIpLicense(IP, IP, "12345678", lic, sub);
+      expect(r.valid && r.plan).toBe("free");
+      expect(r.valid && r.daily_target).toBe(10);
+    }
+    expect(licenseLimit("free")).toBe(1);
+    expect(evaluateIpLicense(IP, IP, "12345678", lic, null)).toEqual({ valid: false, reason: "no_plan" });
   });
   it("every paid plan runs its tier, even one once sold without the bot", () => {
     const r = evaluateIpLicense(IP, IP, "12345678", lic, { ...paid("elite"), bot_included: false });
@@ -164,9 +166,9 @@ it("IP-only license locks only its most recent account", () => {
 import { DAILY_TARGET_PCT, dailyStopFor } from "./mt5-licenses";
 describe("Free JX Bot daily stop", () => {
   it("stops once the day's profit reaches $5", () => {
-    expect(dailyStopFor("free", 1005, 5).stop).toBe(true);
-    expect(dailyStopFor("free", 1004, 4).stop).toBe(false);
-    expect(dailyStopFor("free", 1005, 5).target).toBe(5);
+    expect(dailyStopFor("free", 1010, 10).stop).toBe(true);
+    expect(dailyStopFor("free", 1009, 9).stop).toBe(false);
+    expect(dailyStopFor("free", 1010, 10).target).toBe(10);
   });
 });
 describe("fixed % daily target and drawdown", () => {

@@ -17,10 +17,10 @@ export function dailyTarget(plan: Mt5PlanId) {
 }
 
 /**
- * Legacy Free bot tier ($5/day, 1 IP). Free accounts no longer get JX Bot (paid plans and
- * Founding months only); kept so old reports and the stop rule still read.
+ * Free bot tier: every signed-in Free account runs JX Bot on 1 IP with a fixed $10 daily
+ * profit stop (paid plans use % targets).
  */
-export const FREE_BOT = { name: "Free", dailyTargetUsd: 5, licenses: 1 } as const;
+export const FREE_BOT = { name: "Free", dailyTargetUsd: 10, licenses: 1 } as const;
 export type BotPlanId = Mt5PlanId | "free";
 
 export function isBotPlan(id: string | null | undefined): id is BotPlanId {
@@ -55,13 +55,14 @@ export function licenseLimit(plan: string | null | undefined) {
 
 /**
  * Which JX Bot plan a user runs, or null when they have no bot: an active paid plan gives its
- * own tier, an active Founding month gives the Founding plan. Free accounts, trials and lapsed
- * plans get no bot.
+ * own tier, an active Founding month gives the Founding plan, every other account gets the
+ * Free tier.
  */
-export function botAccessFor(sub: Sub, foundingActive = false, now = Date.now()): Mt5PlanId | null {
+export function botAccessFor(sub: Sub, foundingActive = false, now = Date.now()): BotPlanId | null {
   if (sub && isPaidBotSub(sub, now)) return String(sub.plan_id).toLowerCase() as Mt5PlanId;
   if (foundingActive) return String(sub?.plan_id || "").toLowerCase() === "elite" ? "elite" : "pro";
-  return null;
+  // Every account (Free, trial or lapsed) falls back to the Free bot tier: 1 IP, $10/day.
+  return sub ? "free" : null;
 }
 
 /** Display plan for the bot pages: the bot tier, else "free" (shown as no bot access). */

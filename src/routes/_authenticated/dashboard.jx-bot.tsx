@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Bot, Check, Copy, Download, FileText, Plus, Trash2, Wrench, X } from "lucide-react";
 import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
 import { createMt5License, getBotDownloadUrl, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
-import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, MT5_PLANS, countIpLicenses, dailyTargetLabel, isBotPlan, parseBinding } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, DAILY_TARGET_PCT, FREE_BOT, MT5_PLANS, countIpLicenses, dailyTargetLabel, isBotPlan, parseBinding } from "@/lib/mt5-licenses";
 
 const MONO = "font-sans";
 
@@ -157,7 +157,7 @@ function JxBotPage() {
   const stats = access
     ? [
         { label: "Linked IPs", value: `${bound} / ${limit}` },
-        { label: "Daily target", value: !access.allowed || plan === "free" ? "—" : `${DAILY_TARGET_PCT[plan]}% of balance` },
+        { label: "Daily target", value: !access.allowed ? "—" : plan === "free" ? `$${FREE_BOT.dailyTargetUsd} profit` : `${DAILY_TARGET_PCT[plan]}% of balance` },
         { label: "Drawdown guard", value: access.allowed ? `${DAILY_DRAWDOWN_PCT}% daily` : "—" },
       ]
     : [];

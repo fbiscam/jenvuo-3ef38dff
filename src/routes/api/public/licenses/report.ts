@@ -70,7 +70,7 @@ export const Route = createFileRoute("/api/public/licenses/report")({
           );
 
           // Each license has its own daily target: only this account's profit today counts.
-          // Fixed by the server: Free $5, paid plans % of the day's starting balance; 4.7% drawdown from the day's peak closed balance (EA inputs can't change them).
+          // Fixed by the server: Free $10, paid plans % of the day's starting balance; 4.7% drawdown from the day's peak closed balance (EA inputs can't change them).
           const profit = num(body?.today_profit);
           const d = dailyStopFor(r.plan, num(body?.balance), profit);
           const target = d.start > 0 ? d.target : r.daily_target;
