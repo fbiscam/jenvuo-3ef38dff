@@ -47,10 +47,12 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
               {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}
             </p>
-            <Link to="/dashboard/pay" className="console-pill console-pill-solid">Upgrade plan</Link>
+            <Link to="/dashboard/api" className="console-pill border-border bg-white text-black hover:bg-white/90">
+              {hasKeys ? "Manage API keys" : "Create API key"}
+            </Link>
           </div>
 
-          <div className="mt-6 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+          <div className="mt-6 flex flex-col gap-4 border-t border-border pt-6 ">
             <div className="min-w-0">
               <p className="text-[16px] font-medium text-foreground">
                 {hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}
@@ -58,14 +60,6 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
               <p className="mt-2 text-[14px] text-muted-foreground">
                 Use a key to send requests to Jenvu models from your code.
               </p>
-            </div>
-            <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col sm:items-stretch">
-              <Link to="/dashboard/api" className="console-pill">
-                {hasKeys ? "Manage API keys" : "Create API key"}
-              </Link>
-              <Link to="/docs" className="console-pill">
-                Read the docs <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
             </div>
           </div>
         </div>

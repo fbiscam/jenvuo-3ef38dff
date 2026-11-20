@@ -92,10 +92,7 @@ function NewsImpactPage() {
           <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} /> Refresh
         </button>
       </div>
-      <p className="mt-1 text-[13px] text-muted-foreground lg:whitespace-nowrap lg:text-[18px]">
-        <span className="block lg:inline">The next US high-impact news and which way Gold went</span>{" "}
-        <span className="block lg:inline">after the same kind of result in the last {RELEASES_PER_EVENT} releases.</span>
-      </p>
+      <p className="mt-1 text-[14px] text-muted-foreground sm:text-[16px]">Next US news and how Gold moved after it.</p>
 
       {data?.feedError && (
         <div className="console-card mt-4 px-4 py-3 text-[14px] text-muted-foreground">The news feed did not answer this time; showing the last saved results.</div>
@@ -104,7 +101,6 @@ function NewsImpactPage() {
       <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
 
       <WeekCalendar upcoming={data?.upcoming ?? []} now={now} loading={!data} nextId={nextTracked?.id ?? null} />
-      <EventReactions releases={releases} now={now} loading={!data} />
       <RecentResults releases={releases} now={now} loading={!data} />
     </div>
   );
@@ -225,9 +221,6 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
           </>
         )}
       </div>
-      <p className="mt-3 text-[13px] text-muted-foreground">
-        Confidence = how often Gold went that way 15 minutes after the same kind of result in the last {RELEASES_PER_EVENT} releases. History, not a promise.
-      </p>
     </section>
   );
 }
@@ -257,7 +250,7 @@ function WeekCalendar({ upcoming, now, loading, nextId }: { upcoming: UpcomingRe
   }
   return (
     <section className="mt-10">
-      <SectionHead icon={CalendarDays} title="This week's calendar" sub="US high-impact releases in the next 8 days, in your local time." />
+      <SectionHead icon={CalendarDays} title="This week's calendar" sub="Next 8 days, local time." />
       {loading ? (
         <div className="console-card h-[180px] animate-pulse" />
       ) : groups.size === 0 ? (
@@ -302,63 +295,6 @@ function WeekCalendar({ upcoming, now, loading, nextId }: { upcoming: UpcomingRe
 }
 
 /** Section 3: how Gold moved 15 minutes after each tracked release type. */
-function EventReactions({ releases, now, loading }: { releases: UpcomingRelease[]; now: number; loading: boolean }) {
-  return (
-    <section className="mt-10">
-      <SectionHead icon={Activity} title="How Gold reacts" sub={`Gold 15 minutes after each release, last ${RELEASES_PER_EVENT} of each.`} />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {NEWS_EVENTS.map((e) => {
-          const history = lastReleases(releases, e.key, now);
-          const rows = history.map((r) => r.reactions?.gold).filter((x): x is FiveMinReaction => !!x);
-          const st = moveStats(rows, "t15");
-          const o = outlookFrom(st);
-          return (
-            <div key={e.key} className="console-card flex flex-col p-5">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">{e.short}</div>
-                  <div className="mt-0.5 text-[15px] font-medium">{e.label}</div>
-                </div>
-                {loading ? null : (
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[12px] font-semibold ${toneOf(o.dir)}`}
-                    style={o.dir === "up" || o.dir === "down" ? { background: tint(o.dir === "up" ? UP : DOWN, 14) } : undefined}
-                  >
-                    {o.dir === "up" ? "Leans UP" : o.dir === "down" ? "Leans DOWN" : o.dir === "mixed" ? "Mixed" : "No data"}
-                  </span>
-                )}
-              </div>
-              <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-background" aria-hidden="true">
-                <div className="bg-pl-up transition-[width] duration-700" style={{ width: loading ? 0 : `${st.upPct}%` }} />
-                <div className="ml-auto bg-pl-down transition-[width] duration-700" style={{ width: loading ? 0 : `${st.downPct}%` }} />
-              </div>
-              <div className="mt-2 flex justify-between text-[13px] tabular-nums">
-                <span className="pl-up font-medium">{st.upPct}% up</span>
-                <span className="pl-down font-medium">{st.downPct}% down</span>
-              </div>
-              <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-3 text-[13px] tabular-nums">
-                <div>
-                  <dt className="text-muted-foreground">Avg move</dt>
-                  <dd className="mt-0.5 text-[14px] font-medium">±${st.avgAbsT15.toFixed(2)}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Whipsaw</dt>
-                  <dd className="mt-0.5 text-[14px] font-medium">{st.whipsawPct}%</dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Releases</dt>
-                  <dd className="mt-0.5 text-[14px] font-medium">{st.n}</dd>
-                </div>
-              </dl>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-/** Section 4: the latest tracked results, beat or miss, and what Gold did. */
 function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]; now: number; loading: boolean }) {
   const recent = releases
     .filter((r) => r.actual != null && Date.parse(r.released_at) <= now && r.reactions?.gold)
@@ -366,7 +302,7 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
     .slice(0, 8);
   return (
     <section className="mt-10">
-      <SectionHead icon={History} title="Latest results" sub="The most recent tracked releases and how far Gold moved." />
+      <SectionHead icon={History} title="Latest results" sub="Recent releases and Gold moves." />
       {loading ? (
         <div className="console-card h-[220px] animate-pulse" />
       ) : recent.length === 0 ? (
@@ -402,7 +338,6 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
           </ul>
         </div>
       )}
-      <p className="mt-3 text-[13px] text-muted-foreground">Past Gold moves after each release. History, not a promise.</p>
     </section>
   );
 }
