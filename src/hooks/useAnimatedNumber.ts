@@ -3,22 +3,31 @@ import { useEffect, useRef, useState } from "react";
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
 /**
- * Smoothly rolls a number to its new value: counts up from 0 on first show,
- * then from the old value to the new one whenever it changes.
+ * Last value each number finished on, kept for this browser tab only.
+ * Coming back to a page inside the dashboard starts from it (no replay);
+ * a full page load or refresh clears it, so the count-up plays again.
+ */
+const lastShown = new Map<string, number>();
+
+/**
+ * Smoothly rolls a number to its new value: counts up from 0 the first time it is shown
+ * in this tab, then from the old value to the new one only when the value changes.
  * `flash` is "up"/"down" for a moment after a later update (not the first count-up).
  * Users with reduced motion get the final value straight away.
  */
-export function useAnimatedNumber(target: number, ready: boolean, duration = 900) {
-  const [value, setValue] = useState(0);
+export function useAnimatedNumber(target: number, ready: boolean, key: string, duration = 900) {
+  const remembered = lastShown.get(key);
+  const [value, setValue] = useState(remembered ?? 0);
   const [flash, setFlash] = useState<"up" | "down" | null>(null);
-  const current = useRef(0);
-  const started = useRef(false);
+  const current = useRef(remembered ?? 0);
+  const started = useRef(remembered !== undefined);
 
   useEffect(() => {
     if (!ready || !Number.isFinite(target)) return;
     const from = current.current;
     const first = !started.current;
     started.current = true;
+    lastShown.set(key, target);
     if (from === target) {
       setValue(target);
       return;
@@ -48,8 +57,10 @@ export function useAnimatedNumber(target: number, ready: boolean, duration = 900
     return () => {
       cancelAnimationFrame(raf);
       clearTimeout(flashTimer);
+      // Leaving mid-roll: the next visit settles on the final value instead of replaying.
+      current.current = target;
     };
-  }, [target, ready, duration]);
+  }, [target, ready, key, duration]);
 
   return { value, flash };
 }

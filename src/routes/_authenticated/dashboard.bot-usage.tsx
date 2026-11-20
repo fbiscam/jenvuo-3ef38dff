@@ -288,7 +288,7 @@ function BotUsagePage() {
         </section>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
           <section className="console-card flex min-h-[200px] flex-col p-4">
-            <div className="text-[13px] text-muted-foreground">Trades</div>
+            <div className="text-[13px] text-muted-foreground">Trades opened · last {rangeDays} days</div>
             <div className="mt-1 text-[20px] font-medium tabular-nums text-foreground">{view.rangeTrades.toLocaleString()}</div>
             <StackedBars
               className="mt-3 flex-1"

@@ -25,7 +25,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
   const name = String(profileName?.trim() || meta.full_name || meta.name || user?.email?.split("@")[0] || "trader").split(" ")[0];
   const balance = credits.balance || 0;
   const hasKeys = (keysCount ?? 0) > 0;
-  const shown = useAnimatedNumber(balance, !credits.isLoading);
+  const shown = useAnimatedNumber(balance, !credits.isLoading, "overview-api-credit");
 
   return (
     <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">

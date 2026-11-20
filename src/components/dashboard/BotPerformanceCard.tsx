@@ -16,7 +16,7 @@ export default function BotPerformanceCard() {
   const load = useServerFn(getBotUsage);
   const { data, isLoading } = useQuery({ queryKey: ["bot-usage"], queryFn: () => load(), staleTime: 60_000 });
   const perf = useMemo(() => botPerformance(data?.rows ?? [], Date.now()), [data]);
-  const shown = useAnimatedNumber(perf.total, !isLoading);
+  const shown = useAnimatedNumber(perf.total, !isLoading, "overview-bot-30d");
 
   return (
     <div className="console-card flex flex-col p-6">
