@@ -165,10 +165,19 @@ it("IP-only license locks only its most recent account", () => {
 
 import { DAILY_TARGET_PCT, dailyStopFor } from "./mt5-licenses";
 describe("Free JX Bot daily stop", () => {
-  it("stops once the day's profit reaches $5", () => {
+  it("stops once the day's profit reaches $10, regardless of account size", () => {
     expect(dailyStopFor("free", 1010, 10).stop).toBe(true);
     expect(dailyStopFor("free", 1009, 9).stop).toBe(false);
     expect(dailyStopFor("free", 1010, 10).target).toBe(10);
+    expect(dailyStopFor("free", 10009.99, 9.99).stop).toBe(false);
+    expect(dailyStopFor("free", 10010, 10).reason).toBe("target");
+    expect(dailyStopFor("free", 110, 10).target).toBe(10);
+  });
+  it("allows exactly one registered IP on Free", () => {
+    const licenses = [{ mt5_account: IP, revoked_at: null }];
+    expect(licenseLimit("free")).toBe(1);
+    expect(countIpLicenses(licenses) < licenseLimit("free")).toBe(false);
+    expect(countIpLicenses([]) < licenseLimit("free")).toBe(true);
   });
 });
 describe("fixed % daily target and drawdown", () => {

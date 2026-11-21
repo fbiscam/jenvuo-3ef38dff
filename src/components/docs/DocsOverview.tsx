@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Check, ChevronRight, Copy, DollarSign, Eye, Code2, MessageSquare, Waves } from "lucide-react";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { MODEL_CATALOG, PRICE_PER_MILLION, formatContext } from "@/lib/model-catalog";
+import { FREE_BOT, dailyTargetLabel } from "@/lib/mt5-licenses";
 
 export const API_BASE = "https://jenvu.com/api/public/v1";
 const DEFAULT_MODEL = "deepseek-v3.2";
@@ -337,7 +338,7 @@ export function DocsOverview() {
           This guide walks you through the basics of the Jenvu API, from getting an account to making your first request.
         </p>
         <Step n={1} title="Get a Jenvu account">
-          <Link to="/auth" search={{ mode: "signup" } as never} className="underline underline-offset-4">Sign up</Link> to start on the Free plan ($35 API credit every month). JX Bot comes with every paid plan, or with the <Link to="/founding" className="underline underline-offset-4">Founding Program</Link>.
+          <Link to="/auth" search={{ mode: "signup" } as never} className="underline underline-offset-4">Sign up</Link> to start on the Free plan ($35 API credit every month), including JX Bot on {FREE_BOT.licenses} IP with a {dailyTargetLabel("free")} daily profit stop and live Bot Usage updates. Profit is not guaranteed. Paid plans and the <Link to="/founding" className="underline underline-offset-4">Founding Program</Link> have their own targets.
         </Step>
         <Step n={2} title="Generate an API key">
           Create a key on the <Link to="/dashboard/api" className="underline underline-offset-4">API keys page</Link>, then export it as an environment variable.

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
+import { DAILY_DRAWDOWN_PCT, FREE_BOT, dailyTargetLabel } from "@/lib/mt5-licenses";
 
 export type DocSection = { id: string; title: string; keywords?: string; body: ReactNode };
 export type DocGroup = { title: string; sections: DocSection[] };
@@ -53,7 +53,7 @@ export const DOC_GROUPS: DocGroup[] = [
               <li>Enter the 6-digit code we email you.</li>
               <li>You land on API keys: create your first key and start building.</li>
             </ol>
-            <p>Want JX Bot? Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>. Once approved, verify your ID on the Documents page within 2 days.</p>
+            <p>JX Bot is included on Free with {FREE_BOT.licenses} IP and a {dailyTargetLabel("free")} daily profit stop. Open Dashboard → JX Bot to get started; profit is not guaranteed.</p>
           </>
         ),
       },
@@ -63,7 +63,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The Free plan gives every account $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is not part of Free: it comes with every paid plan.</p>
+            <p>The Free plan gives every account $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is included on Free with {FREE_BOT.licenses} IP, a {dailyTargetLabel("free")} daily profit stop and live Bot Usage updates.</p>
             <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($40 Pro, $70 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
           </>
         ),
@@ -288,15 +288,16 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <p>
-              JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every paid plan:
-              Pro 1 IP, Elite 3, Ultra 4 (Free has no JX Bot). There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
+              JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every plan:
+              Free {FREE_BOT.licenses} IP, Pro 1 IP, Elite 3, Ultra 4. There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
             </p>
             <ul>
               <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
               <li>Type the same IP into the bot's MyIP input; the bot checks with jenvu.com that it runs from that IP before it trades.</li>
-              <li>It pauses for the day at your plan's daily target: 2% (Pro), 4% (Elite) or 6% (Ultra) of the day's starting balance, or at the {DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).</li>
+              <li>It pauses for the day at {dailyTargetLabel("free")} profit (Free), or 2% (Pro), 4% (Elite) or 6% (Ultra) of the day's starting balance, or at the {DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).</li>
+              <li>Bot Usage shows live profit, balance, equity, trades and ON / OFF logs; connected bots report about once a minute.</li>
             </ul>
-            <Note>Targets are stop limits, not promised profit. Credit does not unlock JX Bot; it is only for approved Founding members whose ID is verified (first month free, then a Founding plan).</Note>
+            <Note>Targets are stop limits, not promised profit. Every account gets JX Bot; your plan sets its IP limit and daily target. API credit does not change those limits.</Note>
           </>
         ),
       },
@@ -382,6 +383,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <ul>
+              <li><strong>Free</strong> — $0 per month, JX Bot included on {FREE_BOT.licenses} IP with a {dailyTargetLabel("free")} daily target.</li>
               <li><strong>Pro</strong> — $69 per month, JX Bot included.</li>
               <li><strong>Elite</strong> — $139 per month, JX Bot included.</li>
               <li><strong>Ultra</strong> — $239 per month, JX Bot included.</li>

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Update Free pricing card, comparison and FAQ/docs for JX Bot (1 IP, $10 daily target, live updates); pricing card/table/FAQ browser check and 34 bot/utility tests pass. Existing limits unchanged; reported utils error absent. MT5 trading test remains owner-pending.
+
 - [x] Recheck uploaded JX_MT5_BOT.zip: 143759 bytes, CRC passes, EX5 v4.06 marker and PDF present, SHA256 340667c7e30c8ce1605a64079910c33d992f849dabadde6e2db798a24cecc1e0. All 23 native/source bot checks and the utility regression pass; latest build OK. Binary markers do not prove compiled logic or MT5 behavior; uploaded README/notice still incorrectly describe it as source-only.
 - [x] Replace customer download with owner-approved JX_MT5_BOT-2.zip (v4.06, 143759 bytes, SHA256 340667c7…); stored copy matches upload (MD5 eTag), bucket stays private. Previous v4.05 kept at bot-files/archive/JX-Bot-MT5_v4.05.zip for rollback. Owner chose to release before MT5 testing.
 - [x] Prepare approved v4.06 / Owner v26.19 source: one consolidated order with old total exposure, fixed confirmed pre-entry pivot exit (50% body / 0.2 ATR, no EMA exit delay), symmetric profit/loss, all BE and step trailing off; original entries/TP/session/daily protections unchanged. 23 native/source tests and utility regression pass; inspected source ZIP with original unchanged PDF. Customer binary unchanged pending owner compilation; no fixed $20 loss or commission-saving guarantee.
