@@ -168,10 +168,10 @@ function Hero() {
   return (
     <section className="mx-auto max-w-6xl px-5 pb-20 pt-20 text-center sm:pt-28">
       <h1 className="mx-auto max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
-        Jenvu API & Chat
+        Build leading AI products on Jenvu’s platform
       </h1>
-      <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink-muted">
-        One API key for leading AI models. Use Chat for TradingView scripts, trading bot code, coding help, images, HD graphics and documents — not complete Android apps or automated workflows.
+      <p className="mx-auto mt-6 max-w-[22rem] text-[16px] leading-relaxed text-gc-ink-muted sm:max-w-xl sm:text-[17px]">
+        One API key for top AI models. Chat for trading scripts, code and images.
       </p>
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
         <ContactSales />
