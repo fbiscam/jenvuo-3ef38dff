@@ -93,7 +93,7 @@ function Hero() {
       <p className="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-muted-foreground md:text-[20px]">
         <span className="md:hidden">
           <span className="block">EUR/USD bot for MetaTrader 5.</span>
-          <span className="block">M15 swing rules with trade protection.</span>
+          <span className="block">M15 swing rules and protection.</span>
           <span className="block">No need to watch charts all day.</span>
         </span>
         <span className="hidden md:inline">
