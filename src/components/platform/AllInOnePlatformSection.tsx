@@ -87,7 +87,7 @@ export function AllInOnePlatformSection() {
           </div>
           <h3 className="mt-5 text-xl font-medium">API access</h3>
           <p className="mt-2 text-[16px] leading-relaxed">
-            Call leading AI models from your own code with one OpenAI-compatible API key. Jenvu does not build or host complete apps or automated workflows.
+            Call top AI models from your own code with one OpenAI-compatible key.
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export function AllInOnePlatformSection() {
           </div>
           <h3 className="mt-5 text-xl font-medium">Chat & creative work</h3>
           <p className="mt-2 text-[16px] leading-relaxed">
-            Create TradingView scripts, trading bot source code, images, HD graphics and documents. Review code and share chart images for analysis.
+            Create TradingView scripts, bot code, images, HD graphics and documents.
           </p>
         </div>
 
@@ -125,7 +125,7 @@ export function AllInOnePlatformSection() {
           </div>
           <h3 className="mt-5 text-xl font-medium">Connect your tools</h3>
           <p className="mt-2 text-[16px] leading-relaxed">
-            Connect an external AI assistant to your Jenvu account through MCP for access to your own account data.
+            Connect an outside AI assistant to your own Jenvu account through MCP.
           </p>
         </div>
       </div>
