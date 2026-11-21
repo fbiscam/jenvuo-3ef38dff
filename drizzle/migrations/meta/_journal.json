@@ -435,6 +435,13 @@
       "when": 1795151105674,
       "tag": "0061_free_plan_credit_35",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1795238263732,
+      "tag": "0062_revoke_mail_lookup_client_access",
+      "breakpoints": true
     }
   ]
 }

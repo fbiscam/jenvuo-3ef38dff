@@ -274,7 +274,9 @@ export const searchMailDirectory = createServerFn({ method: "POST" })
   .inputValidator((data: { q: string }) => ({ q: String(data?.q ?? "").slice(0, 60) }))
   .handler(async ({ context, data }) => {
     if (!data.q.trim()) return [];
-    const { data: rows, error } = await context.supabase.rpc("mail_directory_search", { _q: data.q });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Signed-in caller verified by middleware; function is server-only (no client EXECUTE).
+    const { data: rows, error } = await (supabaseAdmin as any).rpc("mail_directory_search", { _q: data.q });
     if (error) throw new Error(error.message);
     return (rows ?? []) as { address: string; full_name: string | null }[];
   });
@@ -288,7 +290,9 @@ export const getMailBadges = createServerFn({ method: "POST" })
   }))
   .handler(async ({ context, data }) => {
     if (!data.addresses.length) return {} as Record<string, MailBadgeTier>;
-    const { data: rows, error } = await context.supabase.rpc("mail_get_badges", { _addresses: data.addresses });
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Signed-in caller verified by middleware; function is server-only (no client EXECUTE).
+    const { data: rows, error } = await (supabaseAdmin as any).rpc("mail_get_badges", { _addresses: data.addresses });
     if (error) throw new Error(error.message);
     const map: Record<string, MailBadgeTier> = {};
     for (const r of (rows ?? []) as { address: string; tier: MailBadgeTier }[]) {
