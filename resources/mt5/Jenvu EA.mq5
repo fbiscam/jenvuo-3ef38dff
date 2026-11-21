@@ -6,7 +6,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Jenvu"
 #property link      "https://jenvu.com"
-#property version   "4.05"
+#property version   "4.06"
 #property description "Jenvu EA - single-cluster entries, confirmed M15 invalidation and daily drawdown guard."
 #include <Trade\Trade.mqh>
 
@@ -21,7 +21,7 @@ input string MyIP            = "";     // License: your PC/RDP IP (same as added
 const double DailyDrawdownPct = 4.7;   // Daily drawdown % (of the day's peak closed balance: start + closed profit)
 double DailyTargetPct = 0.0;  // LOCKED: set from plan by jenvu.com (Pro 2%, Elite 4%, Ultra 6%)
 const bool   UsePlanDailyTarget = true; // LOCKED: stop for the day when plan daily target is reached (server-enforced)
-int    ClusterSize     = 3;    // Trades opened together per signal (ClevrFX style)
+const int ClusterSize  = 1;    // One consolidated order per signal; no recovery
 string LicenseUrl      = "https://jenvu.com/api/public/licenses/validate"; // License server URL
 string ReportUrl       = "https://jenvu.com/api/public/licenses/report";   // Bot usage report URL
 
@@ -110,7 +110,7 @@ string fridayEndTime   = "13:00";   // Friday: no new trades after this (server)
 bool   blockKillzones  = true;      // Block new entries at London/NY open (UTC)
 string londonBlockUTC  = "6:15-7:30";   // No new trades 06:15-07:30 UTC (11:15 AM-12:30 PM PKT, London pre-open trap)
 string nyBlockUTC      = "12:00-23:00"; // No new trades 12:00-23:00 UTC (5:00 PM-4:00 AM PKT, New York session OFF, Asia starts 4:00 AM PKT)
-bool   UsePreSessionBE  = true;          // London pre-session: lock a green basket at break-even from 06:15 UTC
+bool   UsePreSessionBE  = false;         // v4.06: legacy break-even also OFF
 double PreSessionBEPips = 1.0;           // Break-even buffer kept above the basket average (pips, covers spread)
 string preSessionBEUTC = "6:15-9:00";   // Pre-session break-even window (UTC), same as before v4.02
 //string AUTO_BE       = "===== AUTO BREAK-EVEN (all day) =====";
@@ -121,8 +121,8 @@ bool   UseTrailStep    = false;         // v4.04: OFF together with auto break-e
 double TrailStepTrigPips = 3.5;         // Step 2 arms when price is this many pips beyond the basket average
 double TrailStepLockPips = 2.0;         // Then close the basket if price comes back to average + this many pips
 //string STRUCT_EXIT   = "===== M15 STRUCTURE EXIT =====";
-const bool UseStructureExit = true;     // v4.05: same confirmed exit in profit OR loss, all existing positions
-int    StructLookback   = 5;            // v4.04 stronger: swing = lowest low / highest high of the 5 closed M15 candles before the break candle (nearer swing = earlier cut)
+const bool UseStructureExit = true;     // Same confirmed exit in profit OR loss
+int    StructLookback   = 50;           // Search up to 50 pre-entry M15 pivot candidates, newest first
 double StructMinBodyPct = 50.0;         // Break candle needs a real body (% of its range): wicks and sweeps never count
 double StructDispATR    = 0.2;          // v4.04 stronger: break candle must CLOSE at least this many M15 ATR(14) beyond the swing (was 0.5)
 bool   StructH1Confirm  = false;        // v4.04 stronger: no H1 wait - the M15 break alone cuts the losing basket
@@ -803,40 +803,67 @@ bool CanStartBasket(int count, bool pendingExit, bool sameBar)
   }
 
 bool ConfirmedStructureBreak(bool isBuy, double o, double c, double h, double l,
-                             double swing, double atr, double baseline,
+                             double swing, double atr,
                              double minBodyPct, double dispATR)
   {
    double range = h - l;
-   if(range <= 0 || atr <= 0 || swing <= 0 || baseline <= 0) return false;
+   if(range <= 0 || atr <= 0 || swing <= 0) return false;
    if(o < l || o > h || c < l || c > h) return false;
    double body = c > o ? c - o : o - c;
    if(body / range * 100.0 < minBodyPct) return false;
-   if(isBuy) return c < o && c < baseline && swing - c >= dispATR * atr;
-   return c > o && c > baseline && c - swing >= dispATR * atr;
+   if(isBuy) return c < o && c < swing && swing - c >= dispATR * atr;
+   return c > o && c > swing && c - swing >= dispATR * atr;
+  }
+
+// A confirmed pivot has TWO completed candles on each side before entry.
+bool ConfirmedSwingPivot(bool isBuy, double pivot, double newer1, double newer2,
+                        double older1, double older2)
+  {
+   if(pivot <= 0 || newer1 <= 0 || newer2 <= 0 || older1 <= 0 || older2 <= 0) return false;
+   if(isBuy) return pivot < newer1 && pivot < newer2 && pivot < older1 && pivot < older2;
+   return pivot > newer1 && pivot > newer2 && pivot > older1 && pivot > older2;
+  }
+
+// Anchor to the most recent CONFIRMED pre-entry pivot, not a rolling swing.
+// Entry-bar and post-entry candles never define or move this level.
+double PreEntrySwing(bool isBuy, datetime entryTime)
+  {
+   int entryShift = iBarShift(_Symbol, PERIOD_M15, entryTime, false);
+   if(entryShift < 0) return 0;
+   int first = entryShift + 3; // two newer candles fully closed before entry
+   int total = Bars(_Symbol, PERIOD_M15);
+   int end = MathMin(first + MathMax(1, StructLookback), total - 2);
+   for(int p = first; p < end; p++)
+     {
+      double pivot = isBuy ? iLow(_Symbol, PERIOD_M15, p) : iHigh(_Symbol, PERIOD_M15, p);
+      double n1 = isBuy ? iLow(_Symbol, PERIOD_M15, p - 1) : iHigh(_Symbol, PERIOD_M15, p - 1);
+      double n2 = isBuy ? iLow(_Symbol, PERIOD_M15, p - 2) : iHigh(_Symbol, PERIOD_M15, p - 2);
+      double o1 = isBuy ? iLow(_Symbol, PERIOD_M15, p + 1) : iHigh(_Symbol, PERIOD_M15, p + 1);
+      double o2 = isBuy ? iLow(_Symbol, PERIOD_M15, p + 2) : iHigh(_Symbol, PERIOD_M15, p + 2);
+      if(ConfirmedSwingPivot(isBuy, pivot, n1, n2, o1, o2)) return pivot;
+     }
+   return 0; // missing history / no confirmed pivot: never invent a level
   }
 
 // Last CLOSED M15 candle only, including the entry candle once it closes.
-// Swing uses 5 preceding CLOSED candles, excluding the break candle.
-// Opposite body >=50%, close >=0.2 ATR beyond swing AND beyond M15 EMA50.
+// Opposite body >=50%, close >=0.2 ATR beyond the fixed pre-entry pivot.
+// EMA50 remains an ENTRY filter only; it never delays this exit.
 // No profit threshold: identical confirmation for green and red baskets.
 bool StructureBrokenAgainst(bool isBuy, datetime entryTime)
   {
    if(entryTime == 0) return false;
-   int n = MathMax(3, StructLookback);
-   if(Bars(_Symbol, PERIOD_M15) < n + 2) return false;
    datetime t1 = iTime(_Symbol, PERIOD_M15, 1);
    long ps = PeriodSeconds(PERIOD_M15);
    if(t1 == 0 || ps <= 0) return false;
    datetime entryBar = (datetime)((long)entryTime - ((long)entryTime % ps));
    if(t1 < entryBar) return false;
-   int idx = isBuy ? iLowest(_Symbol, PERIOD_M15, MODE_LOW, n, 2) : iHighest(_Symbol, PERIOD_M15, MODE_HIGH, n, 2);
-   if(idx < 0) return false;
-   double swing = isBuy ? iLow(_Symbol, PERIOD_M15, idx) : iHigh(_Symbol, PERIOD_M15, idx);
-   double a[1], baseline[1];
-   if(CopyBuffer(hM15ATR, 0, 1, 1, a) != 1 || CopyBuffer(hM15Slow, 0, 1, 1, baseline) != 1) return false;
+   double swing = PreEntrySwing(isBuy, entryTime);
+   if(swing <= 0) return false;
+   double a[1];
+   if(CopyBuffer(hM15ATR, 0, 1, 1, a) != 1) return false;
    return ConfirmedStructureBreak(isBuy, iOpen(_Symbol, PERIOD_M15, 1), iClose(_Symbol, PERIOD_M15, 1),
                                   iHigh(_Symbol, PERIOD_M15, 1), iLow(_Symbol, PERIOD_M15, 1),
-                                  swing, a[0], baseline[0], StructMinBodyPct, StructDispATR);
+                                  swing, a[0], StructMinBodyPct, StructDispATR);
   }
 
 //--- basket management ------------------------------------------------
@@ -961,8 +988,10 @@ void ManageSide(ENUM_POSITION_TYPE type, int sig, bool canOpen)
      }
    if(maxPairs > 0 && ActiveSymbols() >= maxPairs) return;
    if(!((isBuy && sig == 1) || (!isBuy && sig == -1))) return;
-   double lot = BaseLot();
-   // ClevrFX style: open a cluster of equal trades, no broker SL/TP (exits are handled by the EA)
+   // Preserve the former THREE BaseLot orders' total exposure in ONE order.
+   // Broker per-order maximum may cap it; never split into extra orders.
+   double lot = NormLot(3.0 * BaseLot());
+   // No broker SL/TP: existing EA exits and daily guard remain unchanged.
    int n = MathMax(1, ClusterSize);
    if(tradeLimit > 0) n = MathMin(n, tradeLimit - b.count);
    bool ok = false;

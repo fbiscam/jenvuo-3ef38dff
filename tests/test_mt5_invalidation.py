@@ -37,6 +37,7 @@ class BotRules(unittest.TestCase):
             "#include <cstdlib>\n"
             + function(cls.source, "CanStartBasket") + "\n"
             + function(cls.source, "ConfirmedStructureBreak") + "\n"
+            + function(cls.source, "ConfirmedSwingPivot") + "\n"
             + """
 int main(int argc, char** argv) {
   if(argc != 2) return 2;
@@ -53,33 +54,33 @@ int main(int argc, char** argv) {
         && !CanStartBasket(0, false, true); break;
     case 3: // Confirmed bearish break exits buys.
       ok = ConfirmedStructureBreak(true, 1.102, 1.099, 1.102, 1.098,
-                                    1.100, 0.002, 1.101, 50, 0.2); break;
+                                    1.100, 0.002, 50, 0.2); break;
     case 4: // Confirmed bullish break exits sells.
       ok = ConfirmedStructureBreak(false, 1.098, 1.101, 1.102, 1.098,
-                                    1.100, 0.002, 1.099, 50, 0.2); break;
+                                    1.100, 0.002, 50, 0.2); break;
     case 5: // Wick below swing, but close inside structure: hold.
       ok = !ConfirmedStructureBreak(true, 1.102, 1.101, 1.103, 1.098,
-                                     1.100, 0.002, 1.102, 50, 0.2); break;
+                                     1.100, 0.002, 50, 0.2); break;
     case 6: // Body less than 50%: hold despite a close beyond swing.
       ok = !ConfirmedStructureBreak(true, 1.100, 1.099, 1.102, 1.098,
-                                     1.100, 0.002, 1.101, 50, 0.2); break;
+                                     1.100, 0.002, 50, 0.2); break;
     case 7: // Less than 0.2 ATR displacement: hold.
       ok = !ConfirmedStructureBreak(true, 1.101, 1.0998, 1.101, 1.0998,
-                                     1.100, 0.002, 1.102, 50, 0.2); break;
-    case 8: // Structure break but close remains on valid side of EMA50: hold.
-      ok = !ConfirmedStructureBreak(true, 1.102, 1.099, 1.102, 1.098,
-                                     1.100, 0.002, 1.098, 50, 0.2); break;
+                                     1.100, 0.002, 50, 0.2); break;
+    case 8: // Confirmed swing break exits without waiting for EMA50.
+      ok = ConfirmedStructureBreak(true, 1.102, 1.099, 1.102, 1.098,
+                                     1.100, 0.002, 50, 0.2); break;
     case 9: // Missing ATR / zero-range data cannot trigger exit.
       ok = !ConfirmedStructureBreak(true, 1.102, 1.099, 1.102, 1.098,
-                                     1.100, 0, 1.101, 50, 0.2)
+                                     1.100, 0, 50, 0.2)
         && !ConfirmedStructureBreak(true, 1.1, 1.1, 1.1, 1.1,
-                                    1.100, 0.002, 1.101, 50, 0.2); break;
+                                    1.100, 0.002, 50, 0.2); break;
     case 10: // Profitable and losing entry prices share the same exit predicate.
       for(double entry : {1.098, 1.104}) {
         double profit = 1.099 - entry;
         (void)profit; // P&L must never gate confirmation.
         if(!ConfirmedStructureBreak(true, 1.102, 1.099, 1.102, 1.098,
-                                     1.100, 0.002, 1.101, 50, 0.2)) return 1;
+                                     1.100, 0.002, 50, 0.2)) return 1;
       }
       ok = true; break;
   }
@@ -105,7 +106,7 @@ int main(int argc, char** argv) {
     def test_wick_is_not_invalidation(self): self.run_case(5)
     def test_body_must_be_at_least_fifty_percent(self): self.run_case(6)
     def test_displacement_must_be_point_two_atr(self): self.run_case(7)
-    def test_baseline_confirmation_filters_pullback(self): self.run_case(8)
+    def test_no_ema_exit_delay(self): self.run_case(8)
     def test_missing_data_does_not_force_exit(self): self.run_case(9)
     def test_confirmation_applies_in_profit_and_loss(self): self.run_case(10)
 
@@ -118,11 +119,30 @@ int main(int argc, char** argv) {
         self.assertNotIn("ReversalAgainst(", manage)
         self.assertNotIn("TrendAgainst(", manage)
 
+    def test_pre_entry_pivot_is_not_a_rolling_extreme(self):
+        anchor = self.source.split("double PreEntrySwing(", 1)[1].split("bool StructureBrokenAgainst(", 1)[0]
+        self.assertIn("iBarShift(_Symbol, PERIOD_M15, entryTime, false)", anchor)
+        self.assertIn("int first = entryShift + 3", anchor)
+        self.assertIn("ConfirmedSwingPivot(isBuy, pivot, n1, n2, o1, o2)", anchor)
+        self.assertNotIn("iLowest", anchor)
+        self.assertNotIn("iHighest", anchor)
+
+    def test_total_exposure_consolidated_not_tripled(self):
+        manage = self.source.split("void ManageSide(", 1)[1].split("bool LossCutHit(", 1)[0]
+        self.assertIn("double lot = NormLot(3.0 * BaseLot());", manage)
+        self.assertIn("const int ClusterSize  = 1", self.source)
+
+    def test_exit_has_no_profit_or_ema_gate(self):
+        rule = self.source.split("bool StructureBrokenAgainst(", 1)[1].split("void ManageSide(", 1)[0]
+        self.assertNotIn("hM15Slow", rule)
+        self.assertNotIn("profit", rule)
+        self.assertIn("PreEntrySwing(isBuy, entryTime)", rule)
+
     def test_approved_existing_settings_unchanged(self):
-        for setting in ["ClusterSize     = 3", "takeprofit      = 7.0",
+        for setting in ["ClusterSize  = 1", "takeprofit      = 7.0",
                         "lotSize         = 0.05", "DailyDrawdownPct = 4.7",
                         'londonBlockUTC  = "6:15-7:30"', 'nyBlockUTC      = "12:00-23:00"',
-                        "UseAutoBE       = false", "UseTrailStep    = false"]:
+                        "UseAutoBE       = false", "UseTrailStep    = false", "UsePreSessionBE  = false"]:
             with self.subTest(setting=setting):
                 self.assertIn(setting, self.source)
 

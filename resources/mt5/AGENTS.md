@@ -1,0 +1,4 @@
+- Keep the EA source package separate from compiled customer downloads; only an owner-compiled and tested archive may replace the customer binary.
+- Consolidate the former cluster's total lot exposure into one order, bounded by broker limits; changing order count does not guarantee lower per-lot commission.
+- Anchor structure exits to fully confirmed pre-entry pivots and use identical closed-candle confirmation in profit and loss; post-entry extrema must not move the anchor.
+- Execute native tests against the actual MQL predicates and pivot lookup; these checks do not substitute for MetaEditor compilation or MT5 backtests.
