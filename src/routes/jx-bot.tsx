@@ -91,8 +91,15 @@ function Hero() {
         Meet <JxFace className="jx-float h-[0.9em] w-[0.9em]" /> JX Bot
       </h1>
       <p className="mx-auto mt-6 max-w-[620px] text-[17px] leading-relaxed text-muted-foreground md:text-[20px]">
-        An EUR/USD trading bot for MetaTrader 5. It reads EUR/USD only on M15, follows clear swing rules and puts a stop loss
-        on every trade, so you don't have to watch the chart all day.
+        <span className="md:hidden">
+          <span className="block">EUR/USD bot for MetaTrader 5.</span>
+          <span className="block">M15 swing rules with trade protection.</span>
+          <span className="block">No need to watch charts all day.</span>
+        </span>
+        <span className="hidden md:inline">
+          An EUR/USD trading bot for MetaTrader 5. It reads EUR/USD only on M15, follows clear swing rules and puts a stop loss
+          on every trade, so you don't have to watch the chart all day.
+        </span>
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <GetBot />
