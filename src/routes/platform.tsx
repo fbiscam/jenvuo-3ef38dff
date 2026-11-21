@@ -97,7 +97,7 @@ function Ticks({ items }: { items: string[] }) {
       {items.map((t) => (
         <li key={t} className="flex gap-2">
           <Check className="mt-0.5 h-4 w-4 shrink-0" />
-          <span>{t}</span>
+          <span className="whitespace-nowrap">{t}</span>
         </li>
       ))}
     </ul>
@@ -493,27 +493,27 @@ const ENTERPRISE = [
   {
     t: "Security and data privacy",
     items: [
-      "Secret API keys you can revoke any time",
-      "All traffic encrypted in transit (HTTPS/TLS)",
-      "Two-factor authentication for your account",
-      "New-login alerts on your account",
-      "Errors never expose your configuration",
+      "Revocable secret API keys",
+      "Encrypted traffic (HTTPS/TLS)",
+      "Two-factor authentication",
+      "New-login alerts",
+      "Errors hide your setup",
     ],
   },
   {
     t: "Administrative controls",
     items: [
-      "Create, name, rotate and delete keys",
-      "See tokens, requests and spend per key",
-      "Pay-as-you-go credit with no minimums",
+      "Create, rotate and delete keys",
+      "Usage and spend per key",
+      "Pay as you go, no minimums",
     ],
   },
   {
     t: "Access to Jenvu expertise",
     items: [
       "Help center and inbox support",
-      "Talk to sales about higher volumes",
-      "Ask Jenvu assistant for quick answers",
+      "Sales help for high volumes",
+      "Quick answers from Ask Jenvu",
     ],
   },
 ];
