@@ -14,12 +14,12 @@ export function JxFace({ className = "", eyes = "bg-background" }: { className?:
   );
 }
 
-function Card({ title, text, children }: { title: string; text: string; children: React.ReactNode }) {
+function Card({ title, text, mobileText, children }: { title: string; text: string; mobileText?: React.ReactNode; children: React.ReactNode }) {
   return (
     <article className="jx-feature-card">
       <div className="jx-feature-copy">
         <h3>{title}</h3>
-        <p>{text}</p>
+        <p>{mobileText ? <><span className="md:hidden">{mobileText}</span><span className="hidden md:inline">{text}</span></> : text}</p>
       </div>
       <div className="jx-feature-visual">{children}</div>
     </article>
@@ -84,7 +84,7 @@ function StopCard() {
 
 function HoursCard() {
   return (
-    <Card title="Trades at safe hours" text="New entries stay in the Asia and London sessions. The London open is blocked, New York entries are off, and existing trades continues.">
+    <Card title="Trades at safe hours" text="New entries stay in the Asia and London sessions. The London open is blocked, New York entries are off, and existing trades continues." mobileText={<><span className="block">Asia and London entries only.</span><span className="block">London open &amp; NY entries off.</span><span className="block">Existing trades stay managed.</span></>}>
       <div className="jx-preview-window jx-schedule-window"><WindowBar title="Session schedule · UTC" /><div className="jx-preview-heading"><span><Clock3 size={14} /> Trading windows</span><span className="jx-status-pill">Session guard</span></div>
         <div className="jx-session-row"><span className="jx-session-icon"><Clock3 size={15} /></span><div><strong>Asia</strong><p>Entry window</p></div><span className="jx-session-tag">Allowed</span></div>
         <div className="jx-session-row"><span className="jx-session-icon"><Clock3 size={15} /></span><div><strong>London</strong><p>Open block · 06:15–09:00</p></div><span className="jx-session-tag">Filtered</span></div>

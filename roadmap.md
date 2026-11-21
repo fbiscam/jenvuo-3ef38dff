@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Fit safe-hours paragraph to three lines at 320px and 393px; desktop unchanged. Utility numeric-input test passes and latest build is OK; reported line 8 does not exist in current seven-line utils file.
+
 - [x] Clarify Platform/shared homepage API/Chat copy (not a full-app/workflow builder); Current plan green with white text verified signed-in on pricing card/table; JX Bot content zoom 0.95 on phones and 1 on desktop; Pricing/JX Bot FAQs start closed and toggle correctly, Help/About already closed; industry disclosure starts closed. Utility regression passes, latest build OK, no browser runtime errors. Trading/account rules unchanged; MT5 owner testing remains pending.
 
 - [x] Update Free pricing card, comparison and FAQ/docs for JX Bot (1 IP, $10 daily target, live updates); pricing card/table/FAQ browser check and 34 bot/utility tests pass. Existing limits unchanged; reported utils error absent. MT5 trading test remains owner-pending.
