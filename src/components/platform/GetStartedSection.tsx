@@ -14,7 +14,7 @@ function StartBuilding() {
   const { user } = useAuthUser();
   return (
     <Link to={user ? "/dashboard/models" : "/auth"} search={user ? undefined : ({ mode: "signup" } as never)} className={pillDark}>
-      {user ? "Start Building" : "Sign up"}
+      {user ? "Explore models" : "Sign up"}
     </Link>
   );
 }
@@ -53,13 +53,13 @@ export function GetStartedSection() {
           <h2 className="text-[28px] font-medium tracking-tight text-gc-ink sm:text-[32px]"><RevealWords>Choose how to get started</RevealWords></h2>
           <div className="mx-auto mt-12 grid w-full max-w-7xl gap-5 text-left md:grid-cols-2">
             <Card
-              title="Build on your own"
-              sub="Launch your AI-powered product with:"
+              title="Use API keys & Chat"
+              sub="AI access for trading code, images and everyday work."
               items={[
                 "Access leading models through one API",
                 "Simple pay-as-you-go pricing",
                 "Works with the OpenAI SDK",
-                "Build with our API docs and examples",
+                "Chat for scripts, bot code, images and documents",
               ]}
               action={<StartBuilding />}
             />
@@ -67,7 +67,7 @@ export function GetStartedSection() {
               title="Get extra support"
               sub="Hands-on help and custom needs for your team."
               items={[
-                "Talk to our team about your product",
+                "Talk to our team about your API needs",
                 "Get hands-on setup guidance",
                 "Discuss volume and custom needs",
                 "Billing support for teams",

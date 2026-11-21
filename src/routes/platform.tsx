@@ -33,16 +33,16 @@ import avatarUser from "@/assets/platform/avatar-user.jpg";
 export const Route = createFileRoute("/platform")({
   head: () => ({
     meta: [
-      { title: "Jenvu API Platform — Build AI products on Jenvu" },
+      { title: "Jenvu API Platform — AI Keys, Chat & Trading Code" },
       {
         name: "description",
         content:
-          "Build AI products on Jenvu's platform: leading models behind one OpenAI-compatible API key, pay as you go from $3 per million tokens.",
+          "Access AI models with a Jenvu API key or use Chat for trading scripts, bot code, images, graphics and documents. Not a full-app or workflow builder.",
       },
-      { property: "og:title", content: "Jenvu API Platform — Build AI products on Jenvu" },
+      { property: "og:title", content: "Jenvu API Platform — AI Keys, Chat & Trading Code" },
       {
         property: "og:description",
-        content: "Leading AI models behind one OpenAI-compatible endpoint. Pay as you go from $3 per million tokens.",
+        content: "AI API keys and Chat for trading scripts, bot code, images, graphics and documents — not a full-app or workflow builder.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -80,13 +80,13 @@ function StartBuilding({ className = pillLight }: { className?: string }) {
   if (signedIn) {
     return (
       <Link to="/dashboard/models" className={className}>
-        Start building <ArrowUpRight className="h-3.5 w-3.5" />
+        Explore models <ArrowUpRight className="h-3.5 w-3.5" />
       </Link>
     );
   }
   return (
     <Link to="/auth" search={{ mode: "signup" } as never} className={className}>
-      Start building <ArrowUpRight className="h-3.5 w-3.5" />
+      Explore models <ArrowUpRight className="h-3.5 w-3.5" />
     </Link>
   );
 }
@@ -121,7 +121,7 @@ function StartMenu() {
   return (
     <div ref={ref} className="relative">
       <button type="button" onClick={() => setOpen((o) => !o)} className={pillLight} aria-expanded={open}>
-        Start building <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+        Get API access <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
         <div className="absolute left-1/2 z-20 mt-2 w-56 -translate-x-1/2 overflow-hidden rounded-2xl border border-gc-line bg-background p-1.5 text-left shadow-xl">
@@ -168,8 +168,11 @@ function Hero() {
   return (
     <section className="mx-auto max-w-6xl px-5 pb-20 pt-20 text-center sm:pt-28">
       <h1 className="mx-auto max-w-3xl text-[2.6rem] font-medium leading-[1.08] tracking-tight sm:text-6xl">
-        Build leading AI products on Jenvu’s platform
+        Jenvu API & Chat
       </h1>
+      <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-gc-ink-muted">
+        One API key for leading AI models. Use Chat for TradingView scripts, trading bot code, coding help, images, HD graphics and documents — not complete Android apps or automated workflows.
+      </p>
       <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
         <ContactSales />
         <StartMenu />
@@ -191,7 +194,7 @@ function Hero() {
 
 const MODELS = [
   { id: "claude-opus-5", name: "Claude Opus 5", a: "Deep reasoning and documents", b: "Code review and refactoring", img: starsNebula },
-  { id: "gpt-5.5", name: "GPT-5.5", a: "Fast, all-round chat", b: "Agents and automation", img: starsPlain },
+  { id: "gpt-5.5", name: "GPT-5.5", a: "Fast, all-round chat", b: "Trading scripts and coding help", img: starsPlain },
   { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", a: "Text and image understanding", b: "Charts and screenshots", img: starsPlain },
   { id: "deepseek-v4-flash-0731", name: "DeepSeek V4", a: "Quick everyday tasks", b: "High-volume workloads", img: starsPlain },
 ];
@@ -253,7 +256,7 @@ const GUIDES = [
 function StartSection() {
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 text-center">
-      <h2 className="text-3xl font-medium tracking-tight">Start building with frontier models</h2>
+      <h2 className="text-3xl font-medium tracking-tight">Access frontier models with your API key</h2>
       <div className="mt-8 flex justify-center">
         <StartBuilding />
       </div>
@@ -438,7 +441,7 @@ function ExperiencesSection() {
   return (
     <section className="bg-gc-surface py-16 text-center sm:py-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-5">
-        <h2 className="text-3xl font-medium tracking-tight sm:text-[2.6rem]">Bring AI experiences to life</h2>
+        <h2 className="text-3xl font-medium tracking-tight sm:text-[2.6rem]">Chat, code and understand images</h2>
         <div className="mt-6 inline-flex rounded-full bg-background p-1 ring-1 ring-gc-line">
           {(["chat", "vision"] as const).map((k) => (
             <button
@@ -452,13 +455,13 @@ function ExperiencesSection() {
           ))}
         </div>
         <p className="mx-auto mt-6 max-w-lg text-sm">
-          Build{" "}
+          Use{" "}
           <Link to="/docs" className="underline underline-offset-2">
-            {tab === "chat" ? "chat experiences" : "vision experiences"}
+            {tab === "chat" ? "AI Chat" : "image understanding"}
           </Link>{" "}
           {tab === "chat"
-            ? "that listen and respond naturally, with streaming replies."
-            : "that read charts, screenshots and documents from a single image."}
+            ? "for trading scripts, bot code, documents and everyday questions, with streaming replies."
+            : "to read charts, screenshots and document images."}
         </p>
 
         <div className="relative mx-auto mt-10 h-[380px] max-w-[760px] overflow-hidden bg-background sm:h-[420px]">

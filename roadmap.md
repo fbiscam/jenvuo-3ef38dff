@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Clarify Platform/shared homepage API/Chat copy (not a full-app/workflow builder); Current plan green with white text verified signed-in on pricing card/table; JX Bot content zoom 0.95 on phones and 1 on desktop; Pricing/JX Bot FAQs start closed and toggle correctly, Help/About already closed; industry disclosure starts closed. Utility regression passes, latest build OK, no browser runtime errors. Trading/account rules unchanged; MT5 owner testing remains pending.
+
 - [x] Update Free pricing card, comparison and FAQ/docs for JX Bot (1 IP, $10 daily target, live updates); pricing card/table/FAQ browser check and 34 bot/utility tests pass. Existing limits unchanged; reported utils error absent. MT5 trading test remains owner-pending.
 
 - [x] Recheck uploaded JX_MT5_BOT.zip: 143759 bytes, CRC passes, EX5 v4.06 marker and PDF present, SHA256 340667c7e30c8ce1605a64079910c33d992f849dabadde6e2db798a24cecc1e0. All 23 native/source bot checks and the utility regression pass; latest build OK. Binary markers do not prove compiled logic or MT5 behavior; uploaded README/notice still incorrectly describe it as source-only.

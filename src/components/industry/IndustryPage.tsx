@@ -342,7 +342,7 @@ function TopicsTabs({ c }: { c: IndustryContent }) {
 }
 
 function WhyList({ c }: { c: IndustryContent }) {
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState(-1);
   return (
     <Wrap id="why">
       <div className="grid items-start gap-10 text-left md:grid-cols-2">

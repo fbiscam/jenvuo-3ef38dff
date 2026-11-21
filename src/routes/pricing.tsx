@@ -199,7 +199,7 @@ const CUSTOM: ReadonlyArray<[string, string]> = [
   ["Custom rate limits", "Tailored throughput for your workload."],
   ["Dedicated support", "Named account team and onboarding."],
   ["Team seats & roles", "Give your desk its own access."],
-  ["Custom API models", "Pick the models your workflow needs."],
+  ["Custom API models", "Pick the models your coding and analysis tasks need."],
   ["Volume pricing", "Discounts at scale."],
 ];
 
@@ -249,7 +249,7 @@ function PricingPage() {
   const money = (n: number) => `$${n.toLocaleString("en-US")}`;
   const priceFor = (k: PlanKey) => (annual ? annualPrice(k) : planPrice(k));
   const suffix = billing === "annual" ? "/ year" : "/ month";
-  const [open, setOpen] = React.useState<number | null>(0);
+  const [open, setOpen] = React.useState<number | null>(null);
 
   const plans: Array<{ key: CardKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
     { key: "free", name: "Free", description: "Try the Terminal, API & JX Bot", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: FREE_BOT.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
@@ -275,7 +275,7 @@ function PricingPage() {
       return <Link to="/auth" search={{ mode: "signup" } as never} className={small ? smallStyle(false) : bigStyle(false)}>Sign up free</Link>;
     }
     const onFree = (currentPlan === "free" || currentPlan === null) && !trial.active;
-    return <div className={`${btnBase} ${quiet}`}>{onFree ? "Current plan" : "Included"}</div>;
+    return <div className={`${btnBase} ${onFree ? "bg-gc-success text-gc-on-success" : quiet}`}>{onFree ? "Current plan" : "Included"}</div>;
   };
 
   const planCta = (key: PlanKey, small = false) => {
@@ -288,7 +288,7 @@ function PricingPage() {
     // Pro during a running free trial shows the trial as the user's status.
     const quiet = small ? "bg-gc-pill text-gc-ink-muted" : "border border-gc-line bg-background text-gc-ink-muted";
     if (trialPro) return <div className={`${btnBase} ${quiet}`}>{small ? "On trial" : "You Got Free Trial"}</div>;
-    if (isCurrent) return <div className={`${btnBase} ${quiet}`}>Current plan</div>;
+    if (isCurrent) return <div className={`${btnBase} bg-gc-success text-gc-on-success`}>Current plan</div>;
     if (disabled) return <button type="button" disabled className={`${btnBase} cursor-not-allowed ${quiet}`}>Locked in trial</button>;
     if (!signedOut && !buyGate.canBuy) {
       return (

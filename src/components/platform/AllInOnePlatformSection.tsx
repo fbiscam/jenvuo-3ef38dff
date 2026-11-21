@@ -13,13 +13,13 @@ function StartBuilding({ className = pillLight }: { className?: string }) {
   if (user) {
     return (
       <Link to="/dashboard/models" className={className}>
-        Start building <ArrowUpRight className="h-3.5 w-3.5" />
+        Explore models <ArrowUpRight className="h-3.5 w-3.5" />
       </Link>
     );
   }
   return (
     <Link to="/auth" search={{ mode: "signup" } as never} className={className}>
-      Start building <ArrowUpRight className="h-3.5 w-3.5" />
+      Explore models <ArrowUpRight className="h-3.5 w-3.5" />
     </Link>
   );
 }
@@ -53,8 +53,8 @@ function Tile({ children }: { children: React.ReactNode }) {
 export function AllInOnePlatformSection() {
   return (
     <section className="mx-auto max-w-6xl px-5 py-20 text-center">
-      <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">The all-in-one platform for builders</h2>
-      <p className="mt-5 text-[18px] text-gc-ink sm:text-[19px]">Build apps and assistants that use your context and tools to get work done.</p>
+      <h2 className="text-4xl font-medium tracking-tight sm:text-5xl">AI keys, trading code and creative tools</h2>
+      <p className="mt-5 text-[18px] text-gc-ink sm:text-[19px]">Use your API key in your own software, or ask Chat for trading scripts, bot code, images, HD graphics and documents.</p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link to="/docs" hash="ai-assistants" className={pillLight}>
           Learn more <ArrowUpRight className="h-3.5 w-3.5" />
@@ -85,9 +85,9 @@ export function AllInOnePlatformSection() {
               </pre>
             </div>
           </div>
-          <h3 className="mt-5 text-xl font-medium">Build</h3>
+          <h3 className="mt-5 text-xl font-medium">API access</h3>
           <p className="mt-2 text-[16px] leading-relaxed">
-            Create chat apps and workflows with the compatible Completions API you already know.
+            Call leading AI models from your own code with one OpenAI-compatible API key. Jenvu does not build or host complete apps or automated workflows.
           </p>
         </div>
 
@@ -105,9 +105,9 @@ export function AllInOnePlatformSection() {
               <Tile><ImageIcon className="h-6 w-6" /></Tile>
             </div>
           </div>
-          <h3 className="mt-5 text-xl font-medium">Ground</h3>
+          <h3 className="mt-5 text-xl font-medium">Chat & creative work</h3>
           <p className="mt-2 text-[16px] leading-relaxed">
-            Give models the right context: send text, documents and chart images with your prompt.
+            Create TradingView scripts, trading bot source code, images, HD graphics and documents. Review code and share chart images for analysis.
           </p>
         </div>
 
@@ -123,9 +123,9 @@ export function AllInOnePlatformSection() {
               <Tile><Plug className="h-7 w-7" /></Tile>
             </div>
           </div>
-          <h3 className="mt-5 text-xl font-medium">Act</h3>
+          <h3 className="mt-5 text-xl font-medium">Connect your tools</h3>
           <p className="mt-2 text-[16px] leading-relaxed">
-            Connect assistants to your Jenvu account through our MCP server so it can working.
+            Connect an external AI assistant to your Jenvu account through MCP for access to your own account data.
           </p>
         </div>
       </div>

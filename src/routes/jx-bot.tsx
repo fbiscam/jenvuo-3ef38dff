@@ -184,7 +184,7 @@ const FAQS = [
 ];
 
 function Faqs() {
-  const [open, setOpen] = React.useState(0);
+  const [open, setOpen] = React.useState(-1);
   return (
     <section className="px-5 py-20">
       <div className="mx-auto grid max-w-[880px] gap-8 md:grid-cols-2">
@@ -244,7 +244,7 @@ function JxBotLanding() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
-      <main>
+      <main className="jx-mobile-content">
         <Hero />
         <Banner />
         <JxBotFeatures />

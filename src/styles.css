@@ -156,6 +156,7 @@
   --color-gc-canvas: var(--gc-canvas);
   --color-gc-section: var(--gc-section);
   --color-gc-success: var(--gc-success);
+  --color-gc-on-success: var(--gc-on-success);
   --color-pl-up: var(--pl-up);
   --color-pl-down: var(--pl-down);
   --color-gc-nav-active: var(--gc-nav-active);
@@ -2224,6 +2225,10 @@ html.dark .jx-features { --jx-success-soft: oklch(.23 .035 160); --jx-lilac: okl
 }
 
 /* Settings pages (General, Personal, Security, Billing, Payments, Documents): page area only, sidebar untouched. */
+@media (max-width: 767px) {
+  .jx-mobile-content { zoom: 0.95; }
+}
+
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard main.dash-page.settings-page { zoom: 0.742 !important; }
 }
