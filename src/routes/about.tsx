@@ -98,7 +98,7 @@ function AboutPage() {
         <div className="mt-10 grid gap-6 md:grid-cols-2">{products.map((p, i) => <article key={p.title} className="why-product">
           <div className="mb-5">{(() => { const mark = workspaceMarks[i]; if (!mark) return null; const Mark = mark[1]; return <Mark className="size-6" /> })()}</div>
           <h3 className="text-[18px] font-medium">{p.title}</h3><p className="mt-2 max-w-[490px] text-[16px] leading-6 text-gc-ink-muted">{p.text}</p>
-          <Button asChild variant="link" className="mt-4 h-auto justify-start p-0 text-sm font-normal text-gc-ink-muted"><a href={p.href}>{p.link}<ArrowRight /></a></Button>
+          <Button asChild variant="outline" className="mt-4 h-auto rounded-full border-gc-line bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted hover:text-foreground"><a href={p.href}>{p.link}<ArrowRight /></a></Button>
           <div className="why-product-demo"><WhyProductPreview type={p.type} /></div>
         </article>)}</div>
       </section>
