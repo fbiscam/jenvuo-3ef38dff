@@ -1356,9 +1356,6 @@ function AuthPage() {
                     <span>Sign up with email</span>
                   </button>
                 </div>
-                <p className="text-center text-[13px] leading-snug text-muted-foreground">
-                  Every new account starts on Free with $35 API credit a month.
-                </p>
                 {errorBox}
               </div>
             )
