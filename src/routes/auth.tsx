@@ -1,3 +1,4 @@
+import haseebWordmark from "@/assets/haseeb-grey.png.asset.json";
 import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import { clearStoredAuthSessions, goAfterSignIn as goAfterSignInRaw, restoreSharedSession } from "@/lib/cross-domain-session";
@@ -1531,7 +1532,10 @@ function AuthPage() {
           <a href="/models" className="hover:text-foreground">Models</a>
           <a href="https://status.jenvu.com" className="hover:text-foreground">Status</a>
         </nav>
-        <JenvuMark className="h-5 w-5 text-foreground" />
+        <a href="/founding" className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-1.5 hover:text-foreground">
+          <span>Founding seats by</span>
+          <img src={haseebWordmark.url} alt="HASEEB" className="h-3 w-auto object-contain" />
+        </a>
       </footer>
     </div>
   );
