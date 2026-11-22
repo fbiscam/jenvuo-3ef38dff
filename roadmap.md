@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Add enabled Google/Lovable buttons on both auth screens, increase page size 10%, default all completed registrations to Overview, and verify utility regression and auth navigation.
+- [x] Add enabled Google/Lovable buttons to both auth screens with official marks, increase form size 10% at existing breakpoints, and remove API-key redirects from completed sign-ups. Verified 320/393/1280px layouts, email-form transitions, fresh authenticated session event reaching Overview with $35 credit, 9 regressions and build OK. Actual Google/Lovable provider-account authentication and new-email OTP completion remain unverified; no credentials/inbox supplied.
 
 - [x] Sweep daily article entry points, admin controls, research, text/cover providers, database publishing, blog reads and indexing; stop strict-cover fallback, pause failed editorial checks, retain indexing errors and reject no-op controls. Legacy image batch now respects the shared pause and has its own single-flight lock. 16 tests pass; article detail title/canonical/render verified. Existing published articles and sent emails untouched. Live generation/admin execution still blocked by quota/console access; deployment required.
 

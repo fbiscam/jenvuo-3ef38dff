@@ -1,1 +1,2 @@
 - `__root.tsx` injects analytics/ads only after window `load` and loads no unused icon webfont: they delayed the dashboard's first paint on slow phones.
+- Auth uses `authDestination` for safe default Overview routing and the managed OAuth helper for Google/Lovable; both new and returning accounts share the existing MFA/session handoff so provider sign-ups cannot force an API-page redirect.
