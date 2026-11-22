@@ -153,7 +153,7 @@ function Guides() {
 
 const FAQS = [
   {
-    q: "How is JX Bot different from a signal service?",
+    q: "How is JX Bot different?",
     a: "It places trades itself inside your MetaTrader 5, using fixed swing rules on closed M15 candles, with a stop loss and take profit on every order.",
   },
   {
@@ -161,23 +161,23 @@ const FAQS = [
     a: "JX Bot comes with every paid plan (Pro $69, Elite $139, Ultra $239 a month), with no limit on how many people can join. Free accounts don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 1 IP), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
   },
   {
-    q: "How many accounts can I run?",
+    q: "How many accounts can I use?",
     a: "Each IP works with one MT5 account. Pro allows 1 IP, Elite 3 and Ultra 4.",
   },
   {
-    q: "Does JX Bot guarantee profit?",
+    q: "Is profit guaranteed?",
     a: "No. Trading carries risk and losses happen. Targets are limits the bot stops at, not promised results. Start with a small lot size.",
   },
   {
-    q: "Can I use it on a prop firm like The5ers?",
+    q: "Can I use it with The5ers?",
     a: "The5ers support told us JX Bot looks consistent with their EA rules: a visible hard stop loss on every trade, no martingale, grid, tick scalping or arbitrage, and EUR/USD M15 isn't restricted. Rules differ by firm and can change, so check yours first.",
   },
   {
-    q: "What if my VPS or RDP changes and I get a new IP?",
+    q: "What if my VPS IP changes?",
     a: "Delete the old IP in Dashboard → JX Bot, add the new one and type it into MyIP. The5ers said a new VPS IP isn't a rule break by itself on your own account; never use a VPS or VPN to hide your location.",
   },
   {
-    q: "Can I check my trades on my phone?",
+    q: "Can I check trades on mobile?",
     a: "Yes. You can stay logged in on the MT5 phone app while the bot runs on your VPS. Use the investor (read-only) password and don't place manual trades on that account.",
   },
   {
@@ -196,7 +196,7 @@ function Faqs() {
     <section className="px-5 py-20">
       <div className="mx-auto grid max-w-[880px] gap-8 md:grid-cols-2">
         <h2 className="text-[34px] font-medium tracking-tight text-foreground">FAQs</h2>
-        <div>
+        <div className="min-w-0">
           {FAQS.map((f, i) => {
             const isOpen = open === i;
             return (
@@ -205,9 +205,9 @@ function Faqs() {
                   type="button"
                   onClick={() => setOpen(isOpen ? -1 : i)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-4 py-5 text-left text-[16px] text-foreground"
+                  className="flex w-full items-center justify-between gap-3 py-5 text-left text-[15px] text-foreground sm:text-[16px]"
                 >
-                  {f.q}
+                  <span className="whitespace-nowrap">{f.q}</span>
                   <X className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${isOpen ? "" : "rotate-45"}`} />
                 </button>
                 <div className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr] pb-6" : "grid-rows-[0fr]"}`}>
