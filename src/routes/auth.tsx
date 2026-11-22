@@ -1189,8 +1189,8 @@ function AuthPage() {
     : mode === "forgot"
       ? forgotStep === "code" ? "Check your email" : forgotStep === "reset" ? "Set a new password" : "Reset your password"
       : mode === "signup"
-        ? otpStep ? "Verify your email" : signupStep === "details" ? "Complete your sign up" : signupStep === "form" ? "Sign up with your email" : "Create your account"
-        : signinStep === "choose" ? "Log into your account" : signinStep === "code" ? "Check your email" : "Log in with your email";
+        ? otpStep ? "Verify your email" : signupStep === "details" ? "Complete your sign up" : signupStep === "form" ? "Sign up with your email" : "Create your API account"
+        : signinStep === "choose" ? "Build with Jenvu API" : signinStep === "code" ? "Check your email" : "Log in with your email";
 
   if (completing && !mfaChallenge && !errorMsg) {
     return (
@@ -1221,6 +1221,13 @@ function AuthPage() {
       <main className="flex w-full justify-center px-6 pb-16 pt-10 sm:pt-[72px]">
         <div className="auth-zoom-desktop w-full max-w-[386px]">
           <h1 className="text-center text-[28px] font-normal tracking-[-0.02em] text-foreground sm:text-[30px]">{title}</h1>
+          {!mfaChallenge && ((mode === "signin" && signinStep === "choose") || (mode === "signup" && !otpStep && signupStep === "choose")) && (
+            <p className="mt-3 text-center text-[15px] leading-relaxed text-muted-foreground">
+              {mode === "signup"
+                ? "Get started with the API and developer tools."
+                : "One unified API for trading scripts, code, chat and images. Create an API key and start building today."}
+            </p>
+          )}
 
           {emailChangedBanner && (
             <div role="status" className="mt-5 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
@@ -1517,6 +1524,15 @@ function AuthPage() {
           {!mfaChallenge && mode === "signin" && signinStep === "choose" && <div className="mt-8">{terms}</div>}
         </div>
       </main>
+      <footer className="flex flex-col items-center gap-4 px-6 pb-10 text-[13px] text-muted-foreground">
+        <nav aria-label="Helpful links" className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <a href="/docs" className="hover:text-foreground">Documentation</a>
+          <a href="/pricing" className="hover:text-foreground">Pricing</a>
+          <a href="/models" className="hover:text-foreground">Models</a>
+          <a href="https://status.jenvu.com" className="hover:text-foreground">Status</a>
+        </nav>
+        <JenvuMark className="h-5 w-5 text-foreground" />
+      </footer>
     </div>
   );
 }
