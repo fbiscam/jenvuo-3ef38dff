@@ -13,12 +13,20 @@ describe("mt5 licenses", () => {
     expect(dailyTarget("elite")).toBe(75);
     expect(dailyTarget("ultra")).toBe(150);
   });
-  it("license limits per plan: Free 1, Pro 1, Elite 3, Ultra 4 IPs", () => {
-    expect(licenseLimit("pro")).toBe(1);
+  it("license limits per plan: Free 1, Pro 2, Elite 3, Ultra 4 IPs", () => {
+    expect(licenseLimit("pro")).toBe(2);
     expect(licenseLimit("elite")).toBe(3);
     expect(licenseLimit("ultra")).toBe(4);
     expect(licenseLimit("free")).toBe(1);
     expect(licenseLimit("none")).toBe(0);
+  });
+  it("Pro allows a second active IP but blocks a third", () => {
+    const first = [{ mt5_account: IP, revoked_at: null }];
+    expect(countIpLicenses(first)).toBe(1);
+    expect(countIpLicenses(first) < licenseLimit("pro")).toBe(true);
+    const second = [...first, { mt5_account: "198.51.100.7#87654321", revoked_at: null }];
+    expect(countIpLicenses(second)).toBe(2);
+    expect(countIpLicenses(second) < licenseLimit("pro")).toBe(false);
   });
   it("a Pro legacy account-only license leaves its IP slot available", () => {
     const legacy = [{ mt5_account: "12345678", revoked_at: null }];
