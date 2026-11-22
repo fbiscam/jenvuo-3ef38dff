@@ -2135,8 +2135,11 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
   }
 }
 
-/* Auth forms: 10% larger, with a bounded layout that still fits narrow phones. */
+/* Auth forms: existing sizing, reduced by 5% on phones only. */
 .auth-zoom-desktop { zoom: 1.1; }
+@media (max-width: 767px) {
+  .auth-zoom-desktop { zoom: 1.045; }
+}
 @media (min-width: 1024px) {
   .auth-zoom-desktop { zoom: 1.1253; }
 }

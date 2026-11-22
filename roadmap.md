@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Reduce sign-in/sign-up size 5% below 768px (1.1 → 1.045); verified both screens at 320/393/768/1280px without overflow, tablet/desktop unchanged. Utility numeric-input regression passes; current utils.ts has no line 8; build OK. Existing external blockers below unchanged.
+
 - [x] Auth flow sweep: read auth choose/email/signup/session-return/MFA/recovery paths, header and purchase entry links, protected-route return paths, cross-domain handoff, domain rewrites, reset-password/email-change returns, auth-email rendering, extension key link and legacy extension redirect, signup server functions and Free initialization/renewal migrations. No remaining forced API destination for default auth; intentional API-key links and explicit protected-page returns preserved. 23 utility/auth/domain tests pass. Provider account login, delivered OTP/MFA and custom-domain browser handoff remain unverified; live database definitions not queried. Existing settled records, permissions/settings and example data unchanged.
 
 - [x] Add enabled Google/Lovable buttons to both auth screens with official marks, increase form size 10% at existing breakpoints, and remove API-key redirects from completed sign-ups. Verified 320/393/1280px layouts, email-form transitions, fresh authenticated session event reaching Overview with $35 credit, 9 regressions and build OK. Actual Google/Lovable provider-account authentication and new-email OTP completion remain unverified; no credentials/inbox supplied.
