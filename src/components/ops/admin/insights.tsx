@@ -98,6 +98,7 @@ export function AdminInsightsPage() {
     try {
       const result = await controlDaily({data:{action}});
       if ('error' in result && result.error) toast.error(String(result.error));
+      else if ('skipped' in result && result.skipped) toast.info(String(result.skipped));
       else toast.success(action === 'run' ? 'Daily article run finished' : 'Daily publishing updated');
       await refresh();
     } catch (error) { toast.error(error instanceof Error ? error.message : 'Daily publishing failed'); }

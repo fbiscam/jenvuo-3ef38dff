@@ -427,6 +427,10 @@ async function callBackupChat(
       } catch {
         continue;
       }
+      if (opts.backgroundJob && (evt.type === 'response.refusal.delta' || evt.type === 'response.refusal.done')) {
+        await reader.cancel();
+        throw new AiGatewayError('The article request was refused.',422,true);
+      }
       if (evt.type === "response.output_text.delta" && typeof evt.delta === "string") text += evt.delta;
       else if (evt.type === "response.completed" || evt.type === "response.incomplete") {
         if (evt.type === "response.incomplete") incomplete = true;
@@ -443,7 +447,7 @@ async function callBackupChat(
   }
   const content = text.trim();
   if (!content) throw new AiGatewayError("Backup AI returned an empty response.", 0, true);
-  if (incomplete && opts.rejectTruncated) {
+  if (incomplete && (opts.rejectTruncated || opts.backgroundJob)) {
     throw new AiGatewayError("The answer was cut off before it finished.", 0, true);
   }
   const promptChars = opts.messages.reduce((n, m) => n + JSON.stringify(m.content).length, 0);
@@ -463,13 +467,13 @@ async function callBackupChat(
 export async function callChatCompletion(
   opts: CallChatOptions,
 ): Promise<{ content: string; model: string; usage: UsageInfo }> {
-  const primary = opts.raceModels ? callChatRace : callChatChain;
+  const primary = opts.raceModels && !opts.backgroundJob ? callChatRace : callChatChain;
   const hasImagesInput = opts.messages.some((m) => Array.isArray(m.content) && m.content.some((p) => p.type === "image_url"));
   // OmniRoute answers every text AI job first.
   if (OMNIROUTE_FIRST && !opts.exactModels && !hasImagesInput && process.env.CUSTOM_AI_API_KEY) {
     const models = [...OMNIROUTE_BEST_CHAIN];
     try {
-      return opts.raceModels
+      return opts.raceModels && !opts.backgroundJob
         ? await callChatRace({ ...opts, models })
         : await callChatChain({ ...opts, models, retriesPerModel: 1, attemptTimeoutMs: opts.attemptTimeoutMs ?? 60000 });
     } catch (omniErr) {
@@ -482,7 +486,7 @@ export async function callChatCompletion(
     const hasImages = opts.messages.some((m) => Array.isArray(m.content) && m.content.some((p) => p.type === "image_url"));
     const models = [...(hasImages ? AWS_VISION_CHAIN : AWS_BEST_CHAIN)];
     try {
-      return opts.raceModels
+      return opts.raceModels && !opts.backgroundJob
         ? await callChatRace({ ...opts, models })
         : await callChatChain({ ...opts, models, retriesPerModel: 1, attemptTimeoutMs: opts.attemptTimeoutMs ?? 60000 });
     } catch (awsErr) {
@@ -504,6 +508,7 @@ export async function callChatCompletion(
   try {
     return await primary(opts);
   } catch (primaryErr) {
+    if (opts.backgroundJob && primaryErr instanceof AiGatewayError && primaryErr.terminal) throw primaryErr;
     // Keep user chat on CodeCraft: try every other configured CodeCraft model
     // one by one before the user's own fallback API. Lovable AI is not used.
     const tried = new Set(opts.models);
@@ -632,6 +637,7 @@ async function callChatChain(
         const validation = opts.validateContent?.(content, model) ?? true;
         if (validation !== true) {
           lastErr = new AiGatewayError(validation, 422, true);
+          if (opts.backgroundJob) throw lastErr;
           break;
         }
 

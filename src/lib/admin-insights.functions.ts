@@ -205,9 +205,10 @@ export const controlDailyArticle = createServerFn({method:'POST'})
     await assertAdmin(context.supabase,context.userId);
     const {supabaseAdmin} = await import('@/integrations/supabase/client.server');
     if (data.action !== 'run') {
-      const {error} = await supabaseAdmin.from('insight_generation_jobs').update({status:data.action === 'pause'?'paused':'idle',pause_reason:data.action === 'pause'?'owner-paused':null})
-        .eq('job_key','daily-insight').or('locked_until.is.null,locked_until.lt.'+new Date().toISOString());
+      const {data: updated,error} = await supabaseAdmin.from('insight_generation_jobs').update({status:data.action === 'pause'?'paused':'idle',pause_reason:data.action === 'pause'?'owner-paused':null})
+        .eq('job_key','daily-insight').or('locked_until.is.null,locked_until.lt.'+new Date().toISOString()).select('id');
       if (error) throw error;
+      if (!updated?.length) throw new Error('An article is still running; publishing controls were not changed.');
       return {ok:true};
     }
     const {runDailyArticle} = await import('@/lib/daily-article.server');

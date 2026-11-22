@@ -14,7 +14,8 @@ export const Route = createFileRoute("/api/public/hooks/generate-insight")({
     const { isAuthorizedCronRequest, cronUnauthorized } = await import('@/lib/cron-guard.server');
     if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
     const { runDailyArticle } = await import('@/lib/daily-article.server');
-    const result = await runDailyArticle({ google: submitToGoogle, indexnow: submitToIndexNow });
+    const { keepAlive } = await import('@/lib/keep-alive.server');
+    const result = await keepAlive(runDailyArticle({ google: submitToGoogle, indexnow: submitToIndexNow }));
     return Response.json(result, {status: 'status' in result && result.status && result.status >= 400 ? result.status : 200});
   } } },
 });

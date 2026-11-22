@@ -27,7 +27,7 @@ export async function submitToGoogle(_url?: string) {
       `${GSC_GATEWAY}/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/sitemaps/${encodeURIComponent(SITEMAP_URL)}`,
       { method: "PUT", headers },
     );
-    return { ok: res.ok, status: res.status, sitemap: SITEMAP_URL, property: siteUrl };
+    return { ok: res.ok, status: res.status, sitemap: SITEMAP_URL, property: siteUrl, ...(!res.ok ? {error:(await res.text()).slice(0,500)} : {}) };
   } catch (e) {
     return { ok: false, error: String(e) };
   }
@@ -46,7 +46,7 @@ export async function submitToIndexNow(urls: string[]) {
         urlList: urls,
       }),
     });
-    return { ok: res.ok, status: res.status };
+    return { ok: res.ok, status: res.status, ...(!res.ok ? {error:(await res.text()).slice(0,500)} : {}) };
   } catch (e) {
     return { ok: false, error: String(e) };
   }

@@ -56,7 +56,7 @@ export async function runDailyArticle(indexers: Indexers) {
     const markdown = parts.join('\n\n').trim().replace(/^```(?:markdown|md)?\s*/i,'').replace(/```\s*$/,'');
     const errors = articleQuality(markdown,keyword,research.sources.map(source=>source.url));
     if (errors.length) {
-      await save({status:'failed',last_error:`Editorial checks: ${errors.join(' ')}`},true);
+      await save({status:'paused',pause_reason:'editorial-checks',last_error:`Editorial checks: ${errors.join(' ')}`},true);
       return {published:false,error:errors.join(' ')};
     }
     const title = /^# (.+)$/m.exec(markdown)?.[1]?.trim() ?? keyword;
@@ -81,12 +81,12 @@ export async function runDailyArticle(indexers: Indexers) {
     const status = {google,indexnow};
     // Submission is not proof of indexing. Store only the submission result.
     await db.from('insights').update({index_status:status}).eq('id',id);
-    await db.from('insight_generation_jobs').update({last_index_status:status,last_error:null,pause_reason:null}).eq('job_key',JOB).eq('last_insight_id',id);
+    await db.from('insight_generation_jobs').update({last_index_status:status,last_error:google && typeof google === 'object' && !Array.isArray(google) && google['ok'] === false ? 'Article published; Google sitemap submission needs attention.' : null,pause_reason:null}).eq('job_key',JOB).eq('last_insight_id',id);
     return {ok:true,published:true,slug,url,google,indexnow};
   } catch (error) {
     const status = error instanceof ArticleProviderError || error instanceof AiGatewayError ? error.status : typeof error === 'object' && error !== null && 'status' in error ? Number(error.status) : 0;
     const terminal = typeof error === 'object' && error !== null && 'terminal' in error && error.terminal === true;
-    const paused = [401,402,403,404].includes(status) || terminal;
+    const paused = (status >= 400 && status < 500 && status !== 429) || terminal;
     const message = error instanceof Error ? error.message : String(error);
     await save({status:paused?'paused':'failed',pause_reason:paused?`provider-${status}`:null,last_error:message,consecutive_rate_limits:status===429?1:0},true);
     return {published:false,paused,status,error:message};

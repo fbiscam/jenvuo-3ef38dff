@@ -108,7 +108,7 @@ async function generateWithUnoRouter(
         for (const byte of bytes) binary += String.fromCharCode(byte);
         return { b64: btoa(binary), model: `unorouter:${model}`, mime };
       }
-      if (strict && !image) throw new InsightImageGenerationError('The cover provider returned no image or refused the request.',422);
+      if (strict) throw new InsightImageGenerationError('The cover provider returned no image or refused the request.',422);
     } catch (error) {
       if (strict && error instanceof InsightImageGenerationError) throw error;
       console.warn("[insight-image] UnoRouter threw", model, String(error));
@@ -284,7 +284,6 @@ export async function generateInsightCover(opts: {
   slug: string;
   strict?: boolean;
 }): Promise<string | null> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug),opts.strict);
 
   let bytes: Uint8Array;
@@ -293,6 +292,7 @@ export async function generateInsightCover(opts: {
     mime = generated.mime || "image/png";
     bytes = base64ToBytes(generated.b64);
   } else {
+    if (opts.strict) throw new InsightImageGenerationError('Article cover unavailable; automatic publishing stopped.',502);
     // Every external provider is unavailable — fall back to a locally drawn
     // cover so the article still publishes on schedule.
     console.warn("[insight-image] all providers unavailable, using local cover");
@@ -307,6 +307,7 @@ export async function generateInsightCover(opts: {
     : "png";
   const path = `${opts.slug}-${Date.now()}.${ext}`;
 
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { error } = await supabaseAdmin.storage
     .from(INSIGHT_IMAGE_BUCKET)
     .upload(path, bytes, { contentType: mime, upsert: true });
