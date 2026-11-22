@@ -10,3 +10,11 @@ export function oauthReturnPath(value: unknown): string {
     return "/";
   }
 }
+
+/** Default completed authentication to Overview, preserving safe explicit destinations. */
+export function authDestination(value?: string): string {
+  const safe = oauthReturnPath(value);
+  if (safe === "/") return "/dashboard";
+  if (safe.startsWith("/.lovable/oauth/consent")) return safe;
+  return safe.split(/[?#]/)[0] || "/dashboard";
+}

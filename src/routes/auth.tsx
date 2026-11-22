@@ -2,11 +2,12 @@ import JenvuMark from "@/components/JenvuMark";
 import * as React from "react";
 import { clearStoredAuthSessions, goAfterSignIn as goAfterSignInRaw, restoreSharedSession } from "@/lib/cross-domain-session";
 import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
-import { oauthReturnPath } from "@/lib/oauth-return-path";
+import { authDestination } from "@/lib/oauth-return-path";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Mail, Loader2, Eye, EyeOff, ChevronDown } from "lucide-react";
 import { lovable } from "@/integrations/lovable/index";
+import { LovableMark } from "@lovable.dev/cloud-auth-js/react";
 import { isFreshSocialSignup } from "@/lib/social-signup";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,18 +49,7 @@ async function waitForMfaElevation(): Promise<boolean> {
 type AuthSearch = { redirect?: string; emailChanged?: "1"; newEmail?: string; mfa?: "1"; mode?: "signup" };
 
 export function sanitizeRedirect(r?: string): string {
-  if (!r || typeof r !== "string") return "/dashboard";
-  if (!r.startsWith("/") || r.startsWith("//")) return "/dashboard";
-  // OAuth consent needs its authorization_id query preserved.
-  if (r.startsWith("/.lovable/oauth/consent")) {
-    const safe = oauthReturnPath(r);
-    return safe === "/" ? "/dashboard" : safe;
-  }
-  // Strip query/hash — TanStack's navigate({ to }) expects a route path only.
-  // Lovable preview appends cache-buster params (__lovable_sha, __lovable_load_id)
-  // that break route matching and cause sign-in to silently stall on /auth.
-  const path = r.split("?")[0].split("#")[0];
-  return path || "/dashboard";
+  return authDestination(r);
 }
 
 export const Route = createFileRoute("/auth")({
@@ -133,7 +123,7 @@ export const Route = createFileRoute("/auth")({
 
 const MONO = "font-sans";
 
-type SocialProvider = "google" | "apple";
+type SocialProvider = "google" | "lovable";
 
 function isNewSocialUser(user: { app_metadata?: Record<string, unknown>; created_at?: string }) {
   return isFreshSocialSignup({
@@ -175,7 +165,7 @@ function AuthPage() {
   const [mode, setMode] = React.useState<"signin" | "signup" | "forgot">(
     search.mode === "signup" ? "signup" : "signin",
   );
-  // A brand-new account goes straight to API keys to create its first key.
+  // Both sign-in and sign-up default to Overview.
   const signedUpRef = React.useRef(false);
   const [signinStep, setSigninStep] = React.useState<"choose" | "email" | "password" | "code">("choose");
   const [signupStep, setSignupStep] = React.useState<"choose" | "form" | "details">("choose");
@@ -426,7 +416,7 @@ function AuthPage() {
         if (!(await socialGate(data.user))) { setCompleting(null); return; }
         if (await openMfaChallengeIfNeeded()) { setCompleting(null); return; }
         await applyPendingReferral();
-        const dest = signedUpRef.current ? "/dashboard/api" : redirectTo;
+        const dest = redirectTo;
         void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true }));
         return;
       }
@@ -461,7 +451,7 @@ function AuthPage() {
                   const res = await verifyTrustedDeviceFn({ data: { token: savedToken } });
                   if (res?.valid) {
                     await applyPendingReferral();
-                    { const dest = signedUpRef.current ? "/dashboard/api" : redirectTo; void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true })); }
+                    { const dest = redirectTo; void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true })); }
                     return;
                   }
                   // Stale/expired — clear it so we don't retry every login.
@@ -484,7 +474,7 @@ function AuthPage() {
             }
           }
           await applyPendingReferral();
-          { const dest = signedUpRef.current ? "/dashboard/api" : redirectTo; void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true })); }
+          { const dest = redirectTo; void goAfterSignIn(dest, () => navigate({ to: dest as "/dashboard", replace: true })); }
         })();
       }
     });
@@ -1096,44 +1086,39 @@ function AuthPage() {
     </p>
   );
 
-  const socialButton = (provider: SocialProvider, verb: string, variant: "google-dark" | "google-light" | "light") => {
+  const socialButton = (provider: SocialProvider) => {
     const busy = socialBusy === provider;
-    const name = provider === "google" ? "Google" : "Apple";
-    const cls =
-      variant === "google-dark"
-        ? `${pill} border border-[#8E918F] bg-[#131314] text-[#E3E3E3] hover:opacity-90`
-        : variant === "google-light"
-          ? `${pill} border border-[#747775] bg-[#FFFFFF] text-[#1F1F1F] hover:bg-[#F8F8F8]`
-          : pillLight;
+    const name = provider === "google" ? "Google" : "Lovable";
+    const cls = `${pill} ${provider === "google" ? "auth-google-button" : pillLight}`;
     return (
-      <button type="button" onClick={() => void socialSignIn(provider)} disabled={!!socialBusy || loading} className={cls}>
+      <Button variant="outline" type="button" onClick={() => void socialSignIn(provider)} disabled={!!socialBusy || loading} className={cls}>
         {busy ? (
           <Loader2 className="h-[18px] w-[18px] animate-spin" aria-hidden="true" />
         ) : provider === "google" ? (
           <GoogleLogo />
         ) : (
-          <AppleLogo />
+          <LovableMark className="h-[18px] w-[18px] shrink-0" />
         )}
-        <span>{verb} with {name}</span>
-      </button>
+        <span>Continue with {name}</span>
+      </Button>
     );
   };
 
   const otpBoxes = (ref: React.RefObject<HTMLInputElement | null>, errId: string) => (
     <div className="flex flex-col items-center">
-      <div className={`relative ${otpShake ? "animate-otp-shake" : ""}`}>
-        <div className="flex items-center gap-3" aria-hidden="true">
+      <div className={`relative w-full max-w-[300px] ${otpShake ? "animate-otp-shake" : ""}`}>
+        <div className="flex w-full items-center gap-2" aria-hidden="true">
           {[0, 1].map((g) => (
             <React.Fragment key={g}>
-              {g === 1 && <span className="h-px w-4 bg-border" />}
-              <div className={`flex overflow-hidden rounded-xl border ${otpError ? "border-red-400" : "border-border"} bg-muted/40`}>
+              {g === 1 && <span className="h-px w-4 shrink-0 bg-border" />}
+              <div className={`flex min-w-0 flex-1 overflow-hidden rounded-xl border ${otpError ? "border-red-400" : "border-border"} bg-muted/40`}>
                 {[0, 1, 2].map((j) => {
                   const i = g * 3 + j;
                   const active = otpCode.length === i;
                   return (
                     <span
                       key={i}
-                      className={`flex h-[46px] w-[42px] items-center justify-center text-[20px] font-medium ${j > 0 ? "border-l border-border" : ""} ${otpError ? "text-red-600" : "text-foreground"} ${active ? "bg-background" : ""}`}
+                      className={`flex h-[46px] min-w-0 flex-1 items-center justify-center text-[20px] font-medium ${j > 0 ? "border-l border-border" : ""} ${otpError ? "text-red-600" : "text-foreground"} ${active ? "bg-background" : ""}`}
                     >
                       {otpCode[i] ?? ""}
                     </span>
@@ -1363,7 +1348,8 @@ function AuthPage() {
               <div className="mt-7 space-y-7">
                 {terms}
                 <div className="space-y-3">
-                  {socialButton("google", "Sign up", "google-light")}
+                  {socialButton("google")}
+                  {socialButton("lovable")}
                   <div className="mx-auto h-px w-[76%] bg-border" />
                   <button type="button" onClick={() => { setSignupStep("form"); setErrorMsg(null); }} disabled={!!socialBusy} className={pillLight}>
                     <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -1428,7 +1414,8 @@ function AuthPage() {
             )
           ) : signinStep === "choose" ? (
             <div className="mt-8 space-y-3">
-              {socialButton("google", "Login", "google-light")}
+              {socialButton("google")}
+              {socialButton("lovable")}
               <button type="button" onClick={() => { setSigninStep("email"); setErrorMsg(null); }} disabled={!!socialBusy} className={pillLight}>
                 <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
                 <span>Login with email</span>

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Add enabled Google/Lovable buttons on both auth screens, increase page size 10%, default all completed registrations to Overview, and verify utility regression and auth navigation.
+
 - [x] Sweep daily article entry points, admin controls, research, text/cover providers, database publishing, blog reads and indexing; stop strict-cover fallback, pause failed editorial checks, retain indexing errors and reject no-op controls. Legacy image batch now respects the shared pause and has its own single-flight lock. 16 tests pass; article detail title/canonical/render verified. Existing published articles and sent emails untouched. Live generation/admin execution still blocked by quota/console access; deployment required.
 
 - [x] Add Semrush-backed daily article pipeline: one per UTC day, researched sources, editorial checks, persistent lock/pause and checkpoints, transactional publication, blog sitemap submissions and admin controls; 14 focused tests pass. Existing model selection preserved; no fabricated backlinks or ranking guarantees.

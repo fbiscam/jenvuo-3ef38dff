@@ -2135,9 +2135,30 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
   }
 }
 
-/* Sign-in / sign-up page on laptop/desktop: the old 1.1 scale made 7% smaller (1.1 x 0.93). */
+/* Auth forms: 10% larger, with a bounded layout that still fits narrow phones. */
+.auth-zoom-desktop { zoom: 1.1; }
 @media (min-width: 1024px) {
-  .auth-zoom-desktop { zoom: 1.023; }
+  .auth-zoom-desktop { zoom: 1.1253; }
+}
+
+/* Provider branding tokens stay local to authentication. */
+.auth-google-button {
+  --auth-provider-bg: #ffffff;
+  --auth-provider-border: #747775;
+  --auth-provider-fg: #1f1f1f;
+  background: var(--auth-provider-bg);
+  border: 1px solid var(--auth-provider-border);
+  color: var(--auth-provider-fg);
+}
+.dark .auth-google-button {
+  --auth-provider-bg: #131314;
+  --auth-provider-border: #8e918f;
+  --auth-provider-fg: #e3e3e3;
+}
+.auth-google-button:hover {
+  background: var(--auth-provider-bg);
+  color: var(--auth-provider-fg);
+  opacity: 0.9;
 }
 
 /* Homepage showcase: animated Chat/Build/Bot/Voice tiles. */
