@@ -122,8 +122,23 @@ function FoundingPage() {
 
       <main className="w-full px-5 pb-24 pt-20 sm:pt-28">
         <FormHero eyebrow="Founding" title="Founding Trader Program">
-          An invite-only program for 50 traders a month. Approved traders get 1 month of Pro or Elite. Upload your ID within 2 days: your 30-day Founding month, the Terminal and JX Bot start on the day it is verified, and we then add your plan's API credit ($40 Pro, $70 Elite). After those 30 days the plan, credit and bot access end, and we tell you whether the bot reached $200 profit so you can take your payout and choose a paid plan.
+          An invite-only program for 50 traders a month.
         </FormHero>
+
+        <div className="mx-auto mt-8 grid max-w-[880px] gap-3 text-left sm:grid-cols-2">
+          <div className="rounded-xl bg-gc-surface px-5 py-4">
+            <p className="text-[12px] text-gc-ink-muted">What you get</p>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-foreground">
+              Approved traders get 1 month of Pro or Elite, with the Terminal, JX Bot and API credit ($40 Pro, $70 Elite).
+            </p>
+          </div>
+          <div className="rounded-xl bg-gc-surface px-5 py-4">
+            <p className="text-[12px] text-gc-ink-muted">How it works</p>
+            <p className="mt-1.5 text-[15px] leading-relaxed text-foreground">
+              Verify your ID within 2 days to start. After 30 days, we report if the bot reached $200 profit for payout.
+            </p>
+          </div>
+        </div>
 
         <FormCallout
           action={
