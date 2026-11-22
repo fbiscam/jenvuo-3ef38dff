@@ -8,11 +8,13 @@
 export const INSIGHT_IMAGE_BUCKET = "insight-images";
 
 export class InsightImageGenerationError extends Error {
+  readonly terminal: boolean;
   constructor(
     message: string,
     readonly status: number,
   ) {
     super(message);
+    this.terminal = status !== 429 && status < 500;
   }
 }
 
@@ -75,6 +77,7 @@ function coverPrompt(title: string, category: string, slug = ""): string {
 
 async function generateWithUnoRouter(
   prompt: string,
+  strict = false,
 ): Promise<{ b64: string; model: string; mime?: string } | null> {
   const key = process.env.UNOROUTER_API_KEY;
   if (!key) return null;
@@ -87,7 +90,9 @@ async function generateWithUnoRouter(
         body: JSON.stringify({ model, prompt, size: "1280x720", n: 1 }),
       });
       if (!res.ok) {
-        console.warn("[insight-image] UnoRouter failed", model, res.status, (await res.text()).slice(0, 200));
+        const reason = (await res.text()).slice(0,200);
+        console.warn("[insight-image] UnoRouter failed", model, res.status, reason);
+        if (strict && res.status !== 429 && res.status < 500) throw new InsightImageGenerationError(`Cover provider [${res.status}]: ${reason}`,res.status);
         continue;
       }
 
@@ -103,7 +108,9 @@ async function generateWithUnoRouter(
         for (const byte of bytes) binary += String.fromCharCode(byte);
         return { b64: btoa(binary), model: `unorouter:${model}`, mime };
       }
+      if (strict && !image) throw new InsightImageGenerationError('The cover provider returned no image or refused the request.',422);
     } catch (error) {
+      if (strict && error instanceof InsightImageGenerationError) throw error;
       console.warn("[insight-image] UnoRouter threw", model, String(error));
     }
   }
@@ -116,7 +123,7 @@ const GOOGLE_IMAGE_MODELS = [
   "gemini-2.5-flash-image",
 ] as const;
 
-async function generateWithGoogle(prompt: string): Promise<{ b64: string; model: string } | null> {
+async function generateWithGoogle(prompt: string, strict = false): Promise<{ b64: string; model: string } | null> {
   const key = process.env.GOOGLE_AI_API_KEY;
   if (!key) return null;
 
@@ -135,7 +142,9 @@ async function generateWithGoogle(prompt: string): Promise<{ b64: string; model:
       );
 
       if (!res.ok) {
-        console.warn("[insight-image] google failed", model, res.status, (await res.text()).slice(0, 200));
+        const reason = (await res.text()).slice(0,200);
+        console.warn("[insight-image] google failed", model, res.status, reason);
+        if (strict && res.status !== 429 && res.status < 500) throw new InsightImageGenerationError(`Cover provider [${res.status}]: ${reason}`,res.status);
         continue;
       }
 
@@ -146,7 +155,9 @@ async function generateWithGoogle(prompt: string): Promise<{ b64: string; model:
         return { b64: inline, model: `google:${model}` };
       }
       console.warn("[insight-image] google returned no image", model);
+      if (strict) throw new InsightImageGenerationError('The cover provider returned no image or refused the request.',422);
     } catch (e) {
+      if (strict && e instanceof InsightImageGenerationError) throw e;
       console.warn("[insight-image] google threw", model, String(e));
     }
   }
@@ -156,6 +167,7 @@ async function generateWithGoogle(prompt: string): Promise<{ b64: string; model:
 // Free, keyless image provider (no Lovable credits are consumed).
 async function generateWithPollinations(
   prompt: string,
+  strict = false,
 ): Promise<{ b64: string; model: string; mime: string } | null> {
   const models = ["flux", "turbo"];
   for (const model of models) {
@@ -166,6 +178,7 @@ async function generateWithPollinations(
       const res = await fetch(url);
       if (!res.ok) {
         console.warn("[insight-image] pollinations failed", model, res.status);
+        if (strict && res.status !== 429 && res.status < 500) throw new InsightImageGenerationError(`Cover provider [${res.status}] rejected the request.`,res.status);
         continue;
       }
       const mime = res.headers.get("content-type") || "image/jpeg";
@@ -173,9 +186,10 @@ async function generateWithPollinations(
       const buf = new Uint8Array(await res.arrayBuffer());
       if (buf.byteLength < 5000) continue;
       let bin = "";
-      for (let i = 0; i < buf.length; i++) bin += String.fromCharCode(buf[i]!);
+      for (const byte of buf) bin += String.fromCharCode(byte);
       return { b64: btoa(bin), model: `pollinations:${model}`, mime };
     } catch (e) {
+      if (strict && e instanceof InsightImageGenerationError) throw e;
       console.warn("[insight-image] pollinations threw", model, String(e));
     }
   }
@@ -184,14 +198,15 @@ async function generateWithPollinations(
 
 async function generateBase64(
   prompt: string,
+  strict = false,
 ): Promise<{ b64: string; model: string; mime?: string } | null> {
-  const viaUnoRouter = await generateWithUnoRouter(prompt);
+  const viaUnoRouter = await generateWithUnoRouter(prompt,strict);
   if (viaUnoRouter) return viaUnoRouter;
 
-  const viaGoogle = await generateWithGoogle(prompt);
+  const viaGoogle = await generateWithGoogle(prompt,strict);
   if (viaGoogle) return viaGoogle;
 
-  const viaFree = await generateWithPollinations(prompt);
+  const viaFree = await generateWithPollinations(prompt,strict);
   if (viaFree) return viaFree;
   return null;
 }
@@ -267,9 +282,10 @@ export async function generateInsightCover(opts: {
   title: string;
   category: string;
   slug: string;
+  strict?: boolean;
 }): Promise<string | null> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug));
+  const generated = await generateBase64(coverPrompt(opts.title, opts.category, opts.slug),opts.strict);
 
   let bytes: Uint8Array;
   let mime: string;

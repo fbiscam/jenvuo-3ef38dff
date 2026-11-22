@@ -1554,6 +1554,7 @@ export type Database = {
       }
       insight_generation_jobs: {
         Row: {
+          article_parts: Json
           consecutive_rate_limits: number
           created_at: string
           id: string
@@ -1567,10 +1568,14 @@ export type Database = {
           last_topic_id: string | null
           locked_until: string | null
           pause_reason: string | null
+          research: Json | null
+          run_day: string | null
+          selected_site_url: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          article_parts?: Json
           consecutive_rate_limits?: number
           created_at?: string
           id?: string
@@ -1584,10 +1589,14 @@ export type Database = {
           last_topic_id?: string | null
           locked_until?: string | null
           pause_reason?: string | null
+          research?: Json | null
+          run_day?: string | null
+          selected_site_url?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          article_parts?: Json
           consecutive_rate_limits?: number
           created_at?: string
           id?: string
@@ -1601,6 +1610,9 @@ export type Database = {
           last_topic_id?: string | null
           locked_until?: string | null
           pause_reason?: string | null
+          research?: Json | null
+          run_day?: string | null
+          selected_site_url?: string | null
           status?: string
           updated_at?: string
         }
@@ -1653,6 +1665,7 @@ export type Database = {
       }
       insights: {
         Row: {
+          auto_publish_day: string | null
           category: string
           content: string
           created_at: string
@@ -1669,6 +1682,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          auto_publish_day?: string | null
           category: string
           content: string
           created_at?: string
@@ -1685,6 +1699,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          auto_publish_day?: string | null
           category?: string
           content?: string
           created_at?: string
@@ -3941,6 +3956,7 @@ export type Database = {
       acquire_insight_generation_job: {
         Args: { _job_key: string; _lease_seconds?: number }
         Returns: {
+          article_parts: Json
           consecutive_rate_limits: number
           created_at: string
           id: string
@@ -3954,6 +3970,9 @@ export type Database = {
           last_topic_id: string | null
           locked_until: string | null
           pause_reason: string | null
+          research: Json | null
+          run_day: string | null
+          selected_site_url: string | null
           status: string
           updated_at: string
         }
@@ -4179,6 +4198,10 @@ export type Database = {
       process_free_monthly_credit: { Args: never; Returns: number }
       process_paid_plan_expiry: { Args: never; Returns: number }
       public_home_stats: { Args: never; Returns: Json }
+      publish_daily_insight: {
+        Args: { _article: Json; _day: string; _lease: string }
+        Returns: string
+      }
       release_founding_credit: { Args: { _user_id: string }; Returns: boolean }
       renew_founding_plan: {
         Args: { _plan_id: string; _user_id: string }

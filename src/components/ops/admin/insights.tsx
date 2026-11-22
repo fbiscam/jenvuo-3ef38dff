@@ -4,12 +4,15 @@ import { toast } from "sonner";
 import { Sparkles, Image as ImageIcon, Send, Loader2, RefreshCw } from "lucide-react";
 import { isAdmin } from "@/lib/admin-messages.functions";
 import { OpsPage, OpsState } from "@/components/ops/OpsPage";
+import { Button } from '@/components/ui/button';
 import {
   draftInsight,
   assistInsightWriting,
   generateInsightImage,
   listInsightsAdmin,
   publishInsight,
+  dailyArticleStatus,
+  controlDailyArticle,
   type InsightRow,
 } from "@/lib/admin-insights.functions";
 
@@ -31,6 +34,9 @@ export function AdminInsightsPage() {
   const makeImage = useServerFn(generateInsightImage);
   const listAll = useServerFn(listInsightsAdmin);
   const publish = useServerFn(publishInsight);
+  const getDailyStatus = useServerFn(dailyArticleStatus);
+  const controlDaily = useServerFn(controlDailyArticle);
+  const [daily, setDaily] = useState<Awaited<ReturnType<typeof dailyArticleStatus>> | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [allowed, setAllowed] = useState(false);
@@ -48,7 +54,9 @@ export function AdminInsightsPage() {
 
   const refresh = async () => {
     try {
-      setRows(await listAll());
+      const [articles, status] = await Promise.all([listAll(),getDailyStatus()]);
+      setRows(articles);
+      setDaily(status);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to load");
     }
@@ -83,6 +91,17 @@ export function AdminInsightsPage() {
     } finally {
       setBusy(null);
     }
+  };
+
+  const changeDaily = async (action: 'pause'|'resume'|'run') => {
+    setBusy('daily');
+    try {
+      const result = await controlDaily({data:{action}});
+      if ('error' in result && result.error) toast.error(String(result.error));
+      else toast.success(action === 'run' ? 'Daily article run finished' : 'Daily publishing updated');
+      await refresh();
+    } catch (error) { toast.error(error instanceof Error ? error.message : 'Daily publishing failed'); }
+    finally { setBusy(null); }
   };
 
   const onAssist = async (action: (typeof ASSIST_ACTIONS)[number][0]) => {
@@ -166,6 +185,22 @@ export function AdminInsightsPage() {
       icon={<Sparkles />}
     >
       <div className="space-y-6 px-4 py-5 sm:px-6">
+
+        <section className="space-y-3 border-b border-border pb-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold">Daily articles</h2>
+            <span className="text-xs text-muted-foreground">09:00 UTC · 1 article/day · US keyword research</span>
+          </div>
+          <p className="text-sm">Status: {daily?.status ?? 'Unknown'}{daily?.last_model ? ` · ${daily.last_model}` : ''}</p>
+          {daily?.last_completed_at && <p className="text-xs text-muted-foreground">Last published: {new Date(daily.last_completed_at).toUTCString()}</p>}
+          {daily?.last_error && <p role="alert" className="text-sm text-destructive">{daily.last_error}</p>}
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" disabled={busy !== null || daily?.status === 'running' || daily?.status === 'paused'} onClick={() => changeDaily('run')}><Sparkles />Run today</Button>
+            <Button size="sm" variant="outline" disabled={busy !== null || daily?.status === 'running'} onClick={() => changeDaily(daily?.status === 'paused' ? 'resume' : 'pause')}>{daily?.status === 'paused' ? 'Resume' : 'Pause'}</Button>
+            <Button size="sm" variant="ghost" aria-label="Refresh publishing status" onClick={refresh}><RefreshCw /></Button>
+          </div>
+          {daily?.research && <details><summary className="cursor-pointer text-xs font-medium">Keyword research and outreach candidates</summary><pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap text-xs text-muted-foreground">{JSON.stringify(daily.research,null,2)}</pre></details>}
+        </section>
 
       <section className="space-y-4 rounded-xl border border-border p-5">
         <div className="grid gap-3 sm:grid-cols-[1fr_220px]">

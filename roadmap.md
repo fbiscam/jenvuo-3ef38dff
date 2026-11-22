@@ -1,5 +1,9 @@
 # Roadmap
 
+- [x] Add Semrush-backed daily article pipeline: one per UTC day, researched sources, editorial checks, persistent lock/pause and checkpoints, transactional publication, blog sitemap submissions and admin controls; 14 focused tests pass. Existing model selection preserved; no fabricated backlinks or ranking guarantees.
+- [ ] Complete live daily article publication — blocked by Semrush ERROR 134 (API quota exhausted); publishing state and new schedule are paused. Source deployment also required before activating the new 09:00 UTC schedule; old twice-daily/repeated-submission jobs disabled. Genuine outreach/backlinks require external publisher participation, not automatic creation.
+- [x] Verify reported utils numeric/string error: current helper has seven lines; numeric-input regression passes, no utility edit needed.
+
 - [x] Match the safe-hours description to the other feature cards using a natural 21-word paragraph; verified at 320/393/1280px without overflow. Utility numeric-input regression passes; current utils.ts has no line 8; build OK.
 
 - [x] Restore Pro JX Bot to 2 IPs without changing Free/Elite/Ultra; 35 bot/utility tests pass, pricing row and FAQ show 2 IPs, build OK. Existing server creation limit reads the corrected constant; signed-in second-IP creation was not exercised.

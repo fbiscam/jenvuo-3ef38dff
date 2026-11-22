@@ -186,6 +186,36 @@ export const listInsightsAdmin = createServerFn({ method: "GET" })
     return (data ?? []) as InsightRow[];
   });
 
+export const dailyArticleStatus = createServerFn({ method: 'GET' })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({context}) => {
+    await assertAdmin(context.supabase, context.userId);
+    const {supabaseAdmin} = await import('@/integrations/supabase/client.server');
+    const {data, error} = await supabaseAdmin.from('insight_generation_jobs')
+      .select('status,pause_reason,last_error,last_completed_at,last_model,research,last_index_status,selected_site_url')
+      .eq('job_key','daily-insight').single();
+    if (error) throw error;
+    return data;
+  });
+
+export const controlDailyArticle = createServerFn({method:'POST'})
+  .inputValidator((input: unknown) => z.object({action:z.enum(['pause','resume','run'])}).parse(input))
+  .middleware([requireSupabaseAuth])
+  .handler(async ({data,context}) => {
+    await assertAdmin(context.supabase,context.userId);
+    const {supabaseAdmin} = await import('@/integrations/supabase/client.server');
+    if (data.action !== 'run') {
+      const {error} = await supabaseAdmin.from('insight_generation_jobs').update({status:data.action === 'pause'?'paused':'idle',pause_reason:data.action === 'pause'?'owner-paused':null})
+        .eq('job_key','daily-insight').or('locked_until.is.null,locked_until.lt.'+new Date().toISOString());
+      if (error) throw error;
+      return {ok:true};
+    }
+    const {runDailyArticle} = await import('@/lib/daily-article.server');
+    const {submitToGoogle,submitToIndexNow} = await import('@/lib/article-indexing.server');
+    const result = await runDailyArticle({google:submitToGoogle,indexnow:submitToIndexNow});
+    return {ok: 'ok' in result && result.ok === true, error: 'error' in result ? result.error ?? null : null, skipped: 'skipped' in result ? result.skipped ?? null : null};
+  });
+
 export const publishInsight = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z

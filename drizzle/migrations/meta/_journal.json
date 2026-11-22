@@ -442,6 +442,13 @@
       "when": 1795238263732,
       "tag": "0062_revoke_mail_lookup_client_access",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1795325966057,
+      "tag": "0063_daily_article_pipeline",
+      "breakpoints": true
     }
   ]
 }

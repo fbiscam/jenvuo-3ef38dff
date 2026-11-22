@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { submitToGoogle, submitToIndexNow } from "./generate-insight";
 
 const BASE_URL = "https://blogs.jenvu.com";
 
 async function handle(request: Request) {
   const { isAuthorizedCronRequest, cronUnauthorized } = await import("@/lib/cron-guard.server");
   if (!(await isAuthorizedCronRequest(request))) return cronUnauthorized();
+  const {submitToGoogle,submitToIndexNow} = await import('@/lib/article-indexing.server');
 
   const url = new URL(request.url);
   const force = url.searchParams.get("force") === "1";
@@ -30,10 +30,9 @@ async function handle(request: Request) {
 
   // One sitemap resubmission covers every article (the sitemap lists them all).
   const google = await submitToGoogle();
-  const now = new Date().toISOString();
   await supabaseAdmin
     .from("insights")
-    .update({ indexed_at: now, index_status: { google, indexnow } })
+    .update({ index_status: { google, indexnow } })
     .in("id", items.map((r) => r.id));
 
   return Response.json({ ok: true, count: items.length, indexnow, google });

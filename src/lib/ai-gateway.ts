@@ -60,6 +60,8 @@ export type CallChatOptions = {
   // Use exactly the listed models (no Lovable-first). The public developer
   // API sets this so a customer's chosen model maps to one upstream model.
   exactModels?: boolean;
+  // Automated article jobs stop the entire chain on terminal denial/refusal.
+  backgroundJob?: boolean;
 };
 
 export class AiGatewayError extends Error {
@@ -217,6 +219,9 @@ async function singleAttemptInner(
 
   const json: any = await res.json();
   const content = json?.choices?.[0]?.message?.content;
+  if (opts.backgroundJob && (json?.choices?.[0]?.message?.refusal || json?.choices?.[0]?.finish_reason === 'content_filter')) {
+    throw new AiGatewayError('The provider refused this article request.', 422, true);
+  }
   if (typeof content !== "string" || !content.trim()) {
     throw new AiGatewayError(jenvuServiceError(502), 502, false);
   }
@@ -468,6 +473,7 @@ export async function callChatCompletion(
         ? await callChatRace({ ...opts, models })
         : await callChatChain({ ...opts, models, retriesPerModel: 1, attemptTimeoutMs: opts.attemptTimeoutMs ?? 60000 });
     } catch (omniErr) {
+      if (opts.backgroundJob && omniErr instanceof AiGatewayError && omniErr.terminal) throw omniErr;
       console.warn(`[ai] ${opts.stage ?? "chat"}: OmniRoute models failed, trying next provider`, (omniErr as Error)?.message);
     }
   }
@@ -480,6 +486,7 @@ export async function callChatCompletion(
         ? await callChatRace({ ...opts, models })
         : await callChatChain({ ...opts, models, retriesPerModel: 1, attemptTimeoutMs: opts.attemptTimeoutMs ?? 60000 });
     } catch (awsErr) {
+      if (opts.backgroundJob && awsErr instanceof AiGatewayError && awsErr.terminal) throw awsErr;
       console.warn(`[ai] ${opts.stage ?? "chat"}: AWS models failed, trying Lovable AI`, (awsErr as Error)?.message);
     }
   }
@@ -489,6 +496,7 @@ export async function callChatCompletion(
     try {
       return await callBackupChat(opts);
     } catch (lovErr) {
+      if (opts.backgroundJob) throw lovErr;
       console.warn(`[ai] ${opts.stage ?? "chat"}: Lovable AI failed, trying CodeCraft`, (lovErr as Error)?.message);
     }
   }
@@ -638,6 +646,7 @@ async function callChatChain(
         // A route-scoped model failure may still fall through to the second
         // verified OmniRoute model later in the chain.
         if (lastErr.terminal) {
+          if (opts.backgroundJob) throw lastErr;
           const isAuthOrBilling =
             lastErr.status === 401 || lastErr.status === 402 || lastErr.status === 403;
           if (isAuthOrBilling && isLastModel) throw lastErr;

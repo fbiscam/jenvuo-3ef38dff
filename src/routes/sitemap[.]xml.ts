@@ -68,26 +68,29 @@ export const Route = createFileRoute("/sitemap.xml")({
         // Append every published insight
         try {
           const supa = createClient(
-            process.env.SUPABASE_URL!,
-            process.env.SUPABASE_PUBLISHABLE_KEY!,
-            { auth: { persistSession: false, autoRefreshToken: false } },
+            process.env['SUPABASE_URL']!,
+            process.env['SUPABASE_PUBLISHABLE_KEY']!,
+            { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: (input, init) => {
+              const key = process.env['SUPABASE_PUBLISHABLE_KEY']!;
+              const headers = new Headers(init?.headers);
+              if (key.startsWith('sb_') && headers.get('Authorization') === `Bearer ${key}`) headers.delete('Authorization');
+              headers.set('apikey',key);
+              return fetch(input,{...init,headers});
+            } } },
           );
-          const { data: posts } = await supa
-            .from("insights")
-            .select("slug, published_at")
-            .order("published_at", { ascending: false })
-            .limit(1000);
-          for (const p of posts ?? []) {
-            entries.push({
-              path: `/${p.slug}`,
-              origin: BLOG_URL,
-              changefreq: "weekly",
-              priority: "0.7",
-              lastmod: new Date(p.published_at).toISOString().slice(0, 10),
-            });
+          for (let offset=0; ; offset+=1000) {
+            const {data: posts,error} = await supa.from('insights').select('slug,published_at')
+              .lte('published_at',new Date().toISOString()).order('published_at',{ascending:false}).order('id').range(offset,offset+999);
+            if (error) throw error;
+            for (const p of posts ?? []) {
+              entries.push({ path:`/${p.slug}`,origin:BLOG_URL,changefreq:'weekly',priority:'0.7',
+                lastmod:new Date(p.published_at).toISOString().slice(0,10) });
+            }
+            if (!posts || posts.length<1000) break;
           }
-        } catch {
-          // ignore — sitemap still serves with static routes
+        } catch (error) {
+          console.error('[sitemap] Could not list published articles',error);
+          return new Response('Sitemap temporarily unavailable',{status:503});
         }
 
         const origin = sitemapOriginForHost(requestHost(request));
