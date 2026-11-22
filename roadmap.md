@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Match the safe-hours description to the other feature cards using a natural 21-word paragraph; verified at 320/393/1280px without overflow. Utility numeric-input regression passes; current utils.ts has no line 8; build OK.
+
 - [x] Restore Pro JX Bot to 2 IPs without changing Free/Elite/Ultra; 35 bot/utility tests pass, pricing row and FAQ show 2 IPs, build OK. Existing server creation limit reads the corrected constant; signed-in second-IP creation was not exercised.
 
 - [x] Fit safe-hours paragraph to three lines at 320px and 393px; desktop unchanged. Utility numeric-input test passes and latest build is OK; reported line 8 does not exist in current seven-line utils file.
