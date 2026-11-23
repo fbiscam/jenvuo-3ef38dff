@@ -21,11 +21,11 @@ function StartBuilding() {
 
 function Ticks({ items }: { items: string[] }) {
   return (
-    <ul className="mt-6 space-y-3 border-t border-gc-line pt-6 text-[14px] leading-snug text-gc-ink">
+    <ul className="mt-6 space-y-3 border-t border-gc-line pt-6 text-[12px] leading-snug text-gc-ink min-[360px]:text-[13px] sm:text-[14px]">
       {items.map((t) => (
-        <li key={t} className="flex items-start gap-3">
+        <li key={t} className="flex items-center gap-2 sm:gap-3">
           <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gc-ink-muted" />
-          <span>{t}</span>
+          <span className="whitespace-nowrap sm:whitespace-normal">{t}</span>
         </li>
       ))}
     </ul>
@@ -34,9 +34,9 @@ function Ticks({ items }: { items: string[] }) {
 
 function Card({ title, sub, items, action }: { title: string; sub: string; items: string[]; action: React.ReactNode }) {
   return (
-    <div className="flex flex-col rounded-2xl bg-gc-surface p-7 sm:p-9">
+    <div className="flex min-w-0 flex-col rounded-2xl bg-gc-surface p-5 sm:p-9">
       <h3 className="text-[22px] font-medium tracking-tight text-gc-ink">{title}</h3>
-      <p className="mt-3 text-[15px] font-normal text-foreground">{sub}</p>
+      <p className="mt-3 whitespace-nowrap text-[12px] font-normal text-foreground min-[360px]:text-[13px] sm:whitespace-normal sm:text-[15px]">{sub}</p>
       <div className="flex-1">
         <Ticks items={items} />
       </div>
@@ -54,20 +54,20 @@ export function GetStartedSection() {
           <div className="mx-auto mt-12 grid w-full max-w-7xl gap-5 text-left md:grid-cols-2">
             <Card
               title="Use API keys & Chat"
-              sub="AI access for trading code, images and everyday work."
+              sub="AI for code, images & everyday work."
               items={[
-                "Access leading models through one API",
+                "Leading models through one API",
                 "Simple pay-as-you-go pricing",
                 "Works with the OpenAI SDK",
-                "Chat for scripts, bot code, images and documents",
+                "Scripts, bot code, images & docs",
               ]}
               action={<StartBuilding />}
             />
             <Card
               title="Get extra support"
-              sub="Hands-on help and custom needs for your team."
+              sub="Setup help & custom team needs."
               items={[
-                "Talk to our team about your API needs",
+                "Talk to our team about your API",
                 "Get hands-on setup guidance",
                 "Discuss volume and custom needs",
                 "Billing support for teams",
