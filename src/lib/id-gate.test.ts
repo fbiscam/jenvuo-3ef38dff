@@ -43,3 +43,12 @@ describe("Buying before and after ID check", () => {
     expect(isTrialPlanLocked("pro", null)).toBe(false);
   });
 });
+
+import { isApprovedFoundingMember as _approved } from "./id-gate";
+describe("verify-identity notice audience", () => {
+  it("shows only for approved Founding members", () => {
+    expect(_approved("approved")).toBe(true);
+    expect(_approved("pending")).toBe(false);
+    expect(_approved(null)).toBe(false);
+  });
+});

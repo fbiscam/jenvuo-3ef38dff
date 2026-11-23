@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { isApprovedFoundingMember } from "@/lib/id-gate";
 import { getMyDocumentStatus, type DocumentStatusRow } from "@/lib/founding.functions";
 
 /**
@@ -27,6 +28,7 @@ export function useVerification() {
   return {
     loading: isLoading,
     status,
+    approved: isApprovedFoundingMember((data as any)?.status),
     verified: status === "verified",
     submitted: status === "received" || status === "pending",
     rejected: status === "rejected",

@@ -18,6 +18,11 @@ export const ID_OPEN_PATHS = [
 /** Application statuses that make someone an approved Founding member (the only ones the ID lock applies to). */
 export const ID_LOCK_APPLICATION_STATUSES = ["approved", "active", "graduated", "verified"];
 
+/** Whether the account is an approved Founding member (only they are asked to verify their ID). */
+export function isApprovedFoundingMember(applicationStatus: string | null | undefined): boolean {
+  return ID_LOCK_APPLICATION_STATUSES.includes(String(applicationStatus || "").toLowerCase());
+}
+
 /**
  * Whether this account's actions are blocked until its ID is verified.
  * Only approved members are locked; pending, rejected or waitlisted applicants are not.

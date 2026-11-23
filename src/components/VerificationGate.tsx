@@ -7,8 +7,9 @@ const FONT = '"Google Sans Flex", "Google Sans", "Google Sans Text", Inter, syst
 
 /** Slim persistent banner shown on the pages an unverified user can still open. */
 export function VerificationBanner({ isAdmin = false }: { isAdmin?: boolean }) {
-  const { loading, verified, submitted, rejected, needsInfo, status } = useVerification();
-  if (isAdmin || loading || verified || !status) return null;
+  const { loading, approved, verified, submitted, rejected, needsInfo, status } = useVerification();
+  // Only approved Founding members must verify their ID; everyone else never sees this.
+  if (isAdmin || loading || !approved || verified || !status) return null;
 
   const tone = rejected ? "error" : submitted || needsInfo ? "warn" : "info";
   const title = rejected ? "Documents rejected" : needsInfo ? "One more document needed" : submitted ? "Documents under review" : "Verify your identity";
