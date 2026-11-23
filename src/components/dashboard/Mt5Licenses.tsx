@@ -5,10 +5,12 @@ import { toast } from "sonner";
 import { Check, Copy, KeyRound, Lock, Trash2 } from "lucide-react";
 import { createMt5License, getMt5Access, revokeMt5License, type Mt5LicenseRow } from "@/lib/mt5-licenses.functions";
 import { MT5_PLANS, countIpLicenses, dailyTarget, isMt5Plan, parseBinding } from "@/lib/mt5-licenses";
+import { useCredits } from "@/hooks/useCredits";
 
 export type Mt5Access = { plan: string; allowed: boolean; limit: number; expiresAt: string | null; dailyTarget?: number; monthlyTarget?: number; licenses: Mt5LicenseRow[] };
 
 export function useMt5Access() {
+  const credits = useCredits();
   const load = useServerFn(getMt5Access);
   const [access, setAccess] = useState<Mt5Access | null>(null);
   const refresh = async () => {
@@ -20,7 +22,7 @@ export function useMt5Access() {
   };
   useEffect(() => {
     void refresh(); // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [credits.plan?.id, credits.state?.nextBillingDate]);
   return { access, refresh };
 }
 

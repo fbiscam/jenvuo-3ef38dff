@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { readSessionUser } from "@/lib/session-user";
 import { GIFT_REASONS, countUnseenGifts, giftTitle } from "@/lib/gifts";
 import { shortTitle } from "@/lib/notice-text";
+import { useCredits } from "@/hooks/useCredits";
 
 type GiftRow = { id: string; delta: number; reason: string; created_at: string };
 
@@ -19,6 +20,7 @@ function timeAgo(iso: string): string {
 
 /** Top-bar Gifts box: every credit gift sent to this account, with a dot for new ones. */
 export default function GiftBox() {
+  const credits = useCredits();
   const [open, setOpen] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
   const [items, setItems] = useState<GiftRow[]>([]);
@@ -50,6 +52,10 @@ export default function GiftBox() {
     window.addEventListener("focus", onFocus);
     return () => { window.clearInterval(t); window.removeEventListener("focus", onFocus); };
   }, [load]);
+
+  useEffect(() => {
+    if (credits.state) void load();
+  }, [credits.state?.recent, load]);
 
   useEffect(() => {
     if (!open) return;

@@ -217,6 +217,7 @@ function PayPage() {
       if (res.status === "approved") {
         toast.success("Payment verified — credits added to your wallet.");
         setOrder({ ...order, status: "approved", tx_hash: hash.trim() });
+        void credits.refresh();
       } else {
         toast.message("Sent for review", { description: res.detail ?? "Our team will confirm shortly." });
         setOrder({ ...order, status: "needs_review", tx_hash: hash.trim() });

@@ -49,6 +49,17 @@ describe('promo activation updates and confirmation trigger', () => {
     assert.equal(state?.nextBillingDate, pro.nextBillingDate);
     client.clear();
   });
+  it('updates independent plan-label observers along with the wallet observer', async () => {
+    const client = new QueryClient();
+    const key = ['credit-state', 'recipient'];
+    client.setQueryData(key, { ...pro, plan: { ...pro.plan, id: 'free' } });
+    const label = new QueryObserver(client, { queryKey: key, enabled: false, select: (state: CreditState) => state.plan.id });
+    let currentPlan: string | undefined;
+    const unsubscribe = label.subscribe(result => { currentPlan = result.data; });
+    await applyPromoSnapshot(client, 'recipient', pro);
+    assert.equal(currentPlan, 'pro');
+    unsubscribe(); client.clear();
+  });
   for (const kind of ['plan', 'credit']) {
     it(`triggers one confirmation only after a successful ${kind} redemption`, async () => {
       let sent = 0;

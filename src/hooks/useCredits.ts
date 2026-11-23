@@ -47,6 +47,19 @@ export function useCredits() {
     }
   }, [snapshotKey, query.data, query.isPlaceholderData]);
 
+  // Another open tab can redeem a gift while this tab's cached query is still fresh.
+  // Re-read from the server instead of trusting browser-written account data.
+  useEffect(() => {
+    if (!snapshotKey || !user?.id) return;
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === snapshotKey) {
+        void queryClient.invalidateQueries({ queryKey: ["credit-state", user.id] });
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [snapshotKey, user?.id, queryClient]);
+
   // Realtime: refresh whenever wallet, ledger, or subscription changes for this user
   useEffect(() => {
     if (!user?.id) return;

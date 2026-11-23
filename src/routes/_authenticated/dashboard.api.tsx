@@ -19,6 +19,7 @@ import {
 } from "@/lib/extension-keys.functions";
 import { getPlanCapabilities } from "@/lib/plan-entitlements";
 import { readPageCache, writePageCache } from "@/lib/page-cache";
+import { useCredits } from "@/hooks/useCredits";
 
 const MONO = "font-sans";
 
@@ -31,6 +32,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/api")({
         content:
           "Create and manage API keys for Jenvu multi-market ICT/SMC browser extension analysis.",
       },
+      { property: "og:title", content: "API Keys — Jenvu" },
+      { property: "og:description", content: "Manage your Jenvu API keys, plan limits and available AI credit." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -38,6 +43,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/api")({
 });
 
 function ExtensionPage() {
+  const credits = useCredits();
   const load = useServerFn(listExtensionKeys);
   const create = useServerFn(createExtensionKey);
   const revoke = useServerFn(revokeExtensionKey);
@@ -102,6 +108,12 @@ function ExtensionPage() {
     };
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
+
+  useEffect(() => {
+    if (!credits.plan) return;
+    void refresh();
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [credits.plan?.id, credits.balance]);
 
   const onCreate = async () => {
     setCreating(true);
