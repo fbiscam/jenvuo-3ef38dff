@@ -211,7 +211,7 @@ function Billing() {
                 {redeemingPromo ? "Applying…" : "Apply"}
               </button>
             </div>
-            <p className="mt-2 text-[13px] text-gc-ink-muted">   Promo codes add API credit only. They can't be used to buy a plan.</p>
+            <p className="mt-2 text-[13px] text-gc-ink-muted">Redeem promo codes for Pro, Elite or Ultra plans, or API credits. Plan codes activate immediately—no payment needed.</p>
             </div>
           )}
 

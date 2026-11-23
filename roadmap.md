@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Fix plan/API-credit promo redemption without the purchase gate, correct Billing/help text, remove the two unsubmitted payment orders for the requested account, and verify regressions.
+
 - [x] Verify one-use/email-locked promos and instant activation; use 30-day gift months and unpaid expiry for every paid account including paid Founding members. Rolled-back database tests passed for email lock, activation, reuse rejection, 30/360-day terms, refill preserving renewals and Founding expiry/renewal. Existing hourly jobs run expiry (up to one hour delay); no new schedule. No missing paid end dates or active calendar-month gifts. Failed activation can no longer mark payment approved.
 - [x] Reduce Ops Console shell, sign-in, standalone and embedded tools by 25%; desktop/393px sizing verified, theme switch, Payments tabs and Lock exercised. Payments and Support open with console access; all other customer tools correctly require an additional signed-in account.
 - [ ] Finish authenticated Ops tool/action audit (Founding, documents, emails, promos and other account-protected tools) — blocked by separate admin-account sign-in; requester has no matching app account and cannot mint the admin session. No customer approvals, gifts or emails sent during audit.

@@ -59,7 +59,7 @@ export const createTopupOrder = createServerFn({ method: "POST" })
     // Every paid plan comes with JX Bot (no seat limit).
     const withBot = isPaidPlanId(data.planId);
     const amountUsd = isPaidPlanId(data.planId) ? planPrice(data.planId) : data.amountUsd;
-    // Promo codes only add API credit (Billing page); orders never take one.
+    // Promo codes redeem separately on Billing; paid orders never take one.
     const { promoCodeForOrder } = await import("@/lib/promo-rules");
     const quote = await evaluatePromo({ userId, amountUsd, code: promoCodeForOrder(data.code) });
     if (quote.error) return { ok: false as const, error: quote.error };
@@ -195,27 +195,28 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ code: z.string().trim().min(2).max(40) }).parse(d))
   .handler(async ({ data, context }) => {
     const { userId } = context;
-    const blocked = await purchaseBlock(context.supabase, userId);
-    if (blocked) return { ok: false as const, error: blocked };
+    const { redeemPromoCode } = await import("@/lib/promo-rules");
     // Plan promo codes (JNV-<PLAN>-<N>M-…) start a plan instead of adding credit;
     // the database checks the code is active, unused and sent to this email.
-    const { looksLikeGiftCode, normalizeGiftCode } = await import("@/lib/plan-gift");
-    if (looksLikeGiftCode(data.code)) {
+    return redeemPromoCode(data.code, {
+    gift: async (code) => {
       const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
-      const { data: res, error } = await (admin as any).rpc("redeem_plan_gift", { _user_id: userId, _code: normalizeGiftCode(data.code) });
+      const { data: res, error } = await (admin as any).rpc("redeem_plan_gift", { _user_id: userId, _code: code });
       if (error) return { ok: false as const, error: "Could not apply this code. Please try again." };
       const r = (res ?? {}) as { ok?: boolean; error?: string; plan?: string; months?: number; ends_at?: string };
       if (!r.ok) return { ok: false as const, error: r.error ?? "Invalid promo code." };
       return { ok: true as const, credited: 0, balance: null, plan: String(r.plan), months: Number(r.months), endsAt: String(r.ends_at) };
-    }
+    },
+    credit: async (code) => {
     const { evaluatePromo, creditWallet, bumpPromoUsage } = await import("@/lib/payments/core.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const quote = await evaluatePromo({ userId, amountUsd: 0, code: data.code });
+    const quote = await evaluatePromo({ userId, amountUsd: 0, code });
     if (quote.error) return { ok: false as const, error: quote.error };
     const { promoRedeemable, PROMO_ONLY_CREDIT_MESSAGE } = await import("@/lib/promo-rules");
     if (!promoRedeemable(quote.promoType)) return { ok: false as const, error: PROMO_ONLY_CREDIT_MESSAGE };
 
+    if (!quote.promoCode) return { ok: false as const, error: "Invalid promo code." };
     const balance = await creditWallet({
       userId,
       amount: quote.creditUsd,
@@ -223,10 +224,12 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
       metadata: { promo_code: quote.promoCode },
     });
     await supabaseAdmin.from("promo_redemptions").insert({
-      code: quote.promoCode!,
+      code: quote.promoCode,
       user_id: userId,
       bonus_usd: quote.creditUsd,
     });
-    await bumpPromoUsage(quote.promoCode!);
+    await bumpPromoUsage(quote.promoCode);
     return { ok: true as const, credited: quote.creditUsd, balance };
+    },
+    });
   });
