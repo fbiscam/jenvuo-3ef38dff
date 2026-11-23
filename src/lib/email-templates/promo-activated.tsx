@@ -31,7 +31,7 @@ const PromoActivatedEmail = ({ recipient, kind = 'credit', planName = 'Pro', cre
           <Section style={{ backgroundColor: COLORS.codeBg, borderRadius: '8px', padding: '20px', margin: '24px 0' }}>
             {kind === 'plan' && <><Text style={s.text}><strong>Active plan: {planName}</strong></Text><Text style={s.text}>Plan active until<br /><strong>{dateLabel(planEndsAt)}</strong></Text></>}
             <Text style={s.text}>{kind === 'plan' ? 'Monthly API credit' : 'API credit added'}: <strong>${creditAmount.toFixed(2)}</strong></Text>
-            <Text style={s.text}>Use this credit before<br /><strong>{dateLabel(creditExpiresAt)}</strong></Text>
+            <Text style={s.text}>{kind === 'plan' ? 'Your current API credit starts expiring on' : 'Use this credit before'}<br /><strong>{dateLabel(creditExpiresAt)}</strong></Text>
           </Section>
           <EmailNotice>{kind === 'plan' ? 'Use your gifted features before the plan end date. Without an approved renewal, your account returns to Free. Each monthly credit grant has its own expiry date; unused credit expires and does not roll over.' : 'Use your gifted API credit before the expiry date above. Any unused gift credit expires automatically. Redeeming this credit does not change or renew your plan.'}</EmailNotice>
           <Section style={s.actionWrap}><Button href="https://dash.jenvu.com/billing" style={s.button}>View your account</Button></Section>

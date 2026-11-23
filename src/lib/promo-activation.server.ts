@@ -14,9 +14,9 @@ export async function sendPromoActivation(userId: string, rawCode: string) {
     if (error || !gift?.plan_ends_at || !gift.redeemed_at) throw new Error('Redeemed plan gift unavailable')
     const [{ data: plan }, { data: lot }] = await Promise.all([
       supabaseAdmin.from('plans').select('wallet_usd').eq('id', gift.plan_id).single(),
-      supabaseAdmin.from('credit_lots').select('expires_at').eq('user_id', userId).eq('reason', 'plan_change')
-        .gte('granted_at', new Date(Date.parse(gift.redeemed_at) - 1000).toISOString())
-        .order('granted_at', { ascending: true }).limit(1).maybeSingle(),
+      supabaseAdmin.from('credit_lots').select('expires_at').eq('user_id', userId)
+        .gt('amount_remaining', 0).gt('expires_at', new Date().toISOString())
+        .order('expires_at', { ascending: true }).limit(1).maybeSingle(),
     ])
     if (!plan || !lot?.expires_at) throw new Error('Gift credit expiry unavailable')
     return sendTemplateEmail('promo-activated', account.user.email, {
