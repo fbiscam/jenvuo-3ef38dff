@@ -2001,6 +2001,7 @@ html.dark body :is(h1,h2,h3,h4,h5,h6,p,span,li,a,label,small,dt,dd,td,th,figcapt
 .jenvu-zoom-dashboard {
   --console-card: #f4f4f4;
   --console-line: #e5e5e5;
+  --console-section-radius: 0px;
 }
 .jenvu-zoom-dashboard.dash-dark {
   --console-card: #141414;
@@ -2057,10 +2058,18 @@ html body .jenvu-zoom-dashboard main .border,
 html body .jenvu-zoom-dashboard main .border-zinc-100,
 html body .jenvu-zoom-dashboard main .border-zinc-200 { border-color: var(--console-line) !important; }
 html body .jenvu-zoom-dashboard main .divide-y > * + * { border-color: var(--console-line) !important; }
-html body .jenvu-zoom-dashboard main .rounded-xl,
-html body .jenvu-zoom-dashboard main .rounded-2xl,
-html body .jenvu-zoom-dashboard main .rounded-lg,
-html body .jenvu-zoom-dashboard main .console-card { border-radius: 16px !important; }
+/* AWS-style section corners; controls, avatars and badges keep their shapes. */
+html body .jenvu-zoom-dashboard main :is(
+  .console-card, .dash-tile, .dash-hero-card, .dash-glass,
+  [data-slot="card"],
+  section[class*="rounded-"], article[class*="rounded-"],
+  div[class*="rounded-"]:is(.border, .bg-white, .bg-card, .bg-gc-surface, .bg-gc-panel, .bg-gc-canvas, .bg-zinc-50, .bg-muted),
+  a[class*="rounded-"].border
+):not(.rounded-full):not([role="button"]):not([role="checkbox"]):not([role="radio"]) {
+  border-radius: var(--console-section-radius) !important;
+  border: 1px solid var(--console-line) !important;
+  box-shadow: none !important;
+}
 
 /* Buttons: pills (cards that are whole buttons keep their shape) */
 html body .jenvu-zoom-dashboard main button:not([class*="p-4"]):not([class*="p-5"]):not([class*="p-6"]):not([role="checkbox"]):not([role="radio"]),
