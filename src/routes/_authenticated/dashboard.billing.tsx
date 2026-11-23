@@ -118,6 +118,12 @@ function Billing() {
       }
       setPromoCode("");
       await credits.refresh();
+      if ("plan" in result && result.plan) {
+        const name = result.plan.charAt(0).toUpperCase() + result.plan.slice(1);
+        const until = new Date(result.endsAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+        toast.success(`${name} plan active for ${result.months === 1 ? "1 month" : `${result.months} months`}, until ${until}.`);
+        return;
+      }
       toast.success(`$${Number(result.credited).toFixed(2)} promotional credit added.`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not apply this promotion.");

@@ -463,6 +463,20 @@
       "when": 1795411677740,
       "tag": "0065_status_email_and_second_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1795412341734,
+      "tag": "0066_plan_gift_codes",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1795412590853,
+      "tag": "0067_plan_gift_redeem_server_only",
+      "breakpoints": true
     }
   ]
 }

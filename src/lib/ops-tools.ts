@@ -12,6 +12,7 @@ export const OPS_TOOL_SLUGS = [
   "founding",
   "insights",
   "messages",
+  "promos",
   "scan-audit",
   "subscribers",
   "tuning",

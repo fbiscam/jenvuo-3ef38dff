@@ -68,6 +68,7 @@ import { Route as OpsX9k27m4nHubRouteImport } from './routes/ops-x9k2-7m4n.hub'
 import { Route as OpsX9k27m4nInsightsRouteImport } from './routes/ops-x9k2-7m4n.insights'
 import { Route as OpsX9k27m4nMessagesRouteImport } from './routes/ops-x9k2-7m4n.messages'
 import { Route as OpsX9k27m4nPaymentsRouteImport } from './routes/ops-x9k2-7m4n.payments'
+import { Route as OpsX9k27m4nPromosRouteImport } from './routes/ops-x9k2-7m4n.promos'
 import { Route as OpsX9k27m4nScanAuditRouteImport } from './routes/ops-x9k2-7m4n.scan-audit'
 import { Route as OpsX9k27m4nSubscribersRouteImport } from './routes/ops-x9k2-7m4n.subscribers'
 import { Route as OpsX9k27m4nTuningRouteImport } from './routes/ops-x9k2-7m4n.tuning'
@@ -431,6 +432,11 @@ const OpsX9k27m4nMessagesRoute = OpsX9k27m4nMessagesRouteImport.update({
 const OpsX9k27m4nPaymentsRoute = OpsX9k27m4nPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => OpsX9k27m4nRoute,
+} as any)
+const OpsX9k27m4nPromosRoute = OpsX9k27m4nPromosRouteImport.update({
+  id: '/promos',
+  path: '/promos',
   getParentRoute: () => OpsX9k27m4nRoute,
 } as any)
 const OpsX9k27m4nScanAuditRoute = OpsX9k27m4nScanAuditRouteImport.update({
@@ -883,6 +889,7 @@ export interface FileRoutesByFullPath {
   '/ops-x9k2-7m4n/insights': typeof OpsX9k27m4nInsightsRoute
   '/ops-x9k2-7m4n/messages': typeof OpsX9k27m4nMessagesRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/ops-x9k2-7m4n/promos': typeof OpsX9k27m4nPromosRoute
   '/ops-x9k2-7m4n/scan-audit': typeof OpsX9k27m4nScanAuditRoute
   '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
   '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
@@ -1007,6 +1014,7 @@ export interface FileRoutesByTo {
   '/ops-x9k2-7m4n/insights': typeof OpsX9k27m4nInsightsRoute
   '/ops-x9k2-7m4n/messages': typeof OpsX9k27m4nMessagesRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/ops-x9k2-7m4n/promos': typeof OpsX9k27m4nPromosRoute
   '/ops-x9k2-7m4n/scan-audit': typeof OpsX9k27m4nScanAuditRoute
   '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
   '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
@@ -1137,6 +1145,7 @@ export interface FileRoutesById {
   '/ops-x9k2-7m4n/insights': typeof OpsX9k27m4nInsightsRoute
   '/ops-x9k2-7m4n/messages': typeof OpsX9k27m4nMessagesRoute
   '/ops-x9k2-7m4n/payments': typeof OpsX9k27m4nPaymentsRoute
+  '/ops-x9k2-7m4n/promos': typeof OpsX9k27m4nPromosRoute
   '/ops-x9k2-7m4n/scan-audit': typeof OpsX9k27m4nScanAuditRoute
   '/ops-x9k2-7m4n/subscribers': typeof OpsX9k27m4nSubscribersRoute
   '/ops-x9k2-7m4n/tuning': typeof OpsX9k27m4nTuningRoute
@@ -1267,6 +1276,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/insights'
     | '/ops-x9k2-7m4n/messages'
     | '/ops-x9k2-7m4n/payments'
+    | '/ops-x9k2-7m4n/promos'
     | '/ops-x9k2-7m4n/scan-audit'
     | '/ops-x9k2-7m4n/subscribers'
     | '/ops-x9k2-7m4n/tuning'
@@ -1391,6 +1401,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/insights'
     | '/ops-x9k2-7m4n/messages'
     | '/ops-x9k2-7m4n/payments'
+    | '/ops-x9k2-7m4n/promos'
     | '/ops-x9k2-7m4n/scan-audit'
     | '/ops-x9k2-7m4n/subscribers'
     | '/ops-x9k2-7m4n/tuning'
@@ -1520,6 +1531,7 @@ export interface FileRouteTypes {
     | '/ops-x9k2-7m4n/insights'
     | '/ops-x9k2-7m4n/messages'
     | '/ops-x9k2-7m4n/payments'
+    | '/ops-x9k2-7m4n/promos'
     | '/ops-x9k2-7m4n/scan-audit'
     | '/ops-x9k2-7m4n/subscribers'
     | '/ops-x9k2-7m4n/tuning'
@@ -2077,6 +2089,13 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/ops-x9k2-7m4n/payments'
       preLoaderRoute: typeof OpsX9k27m4nPaymentsRouteImport
+      parentRoute: typeof OpsX9k27m4nRoute
+    }
+    '/ops-x9k2-7m4n/promos': {
+      id: '/ops-x9k2-7m4n/promos'
+      path: '/promos'
+      fullPath: '/ops-x9k2-7m4n/promos'
+      preLoaderRoute: typeof OpsX9k27m4nPromosRouteImport
       parentRoute: typeof OpsX9k27m4nRoute
     }
     '/ops-x9k2-7m4n/scan-audit': {
@@ -2712,6 +2731,7 @@ interface OpsX9k27m4nRouteChildren {
   OpsX9k27m4nInsightsRoute: typeof OpsX9k27m4nInsightsRoute
   OpsX9k27m4nMessagesRoute: typeof OpsX9k27m4nMessagesRoute
   OpsX9k27m4nPaymentsRoute: typeof OpsX9k27m4nPaymentsRoute
+  OpsX9k27m4nPromosRoute: typeof OpsX9k27m4nPromosRoute
   OpsX9k27m4nScanAuditRoute: typeof OpsX9k27m4nScanAuditRoute
   OpsX9k27m4nSubscribersRoute: typeof OpsX9k27m4nSubscribersRoute
   OpsX9k27m4nTuningRoute: typeof OpsX9k27m4nTuningRoute
@@ -2730,6 +2750,7 @@ const OpsX9k27m4nRouteChildren: OpsX9k27m4nRouteChildren = {
   OpsX9k27m4nInsightsRoute: OpsX9k27m4nInsightsRoute,
   OpsX9k27m4nMessagesRoute: OpsX9k27m4nMessagesRoute,
   OpsX9k27m4nPaymentsRoute: OpsX9k27m4nPaymentsRoute,
+  OpsX9k27m4nPromosRoute: OpsX9k27m4nPromosRoute,
   OpsX9k27m4nScanAuditRoute: OpsX9k27m4nScanAuditRoute,
   OpsX9k27m4nSubscribersRoute: OpsX9k27m4nSubscribersRoute,
   OpsX9k27m4nTuningRoute: OpsX9k27m4nTuningRoute,

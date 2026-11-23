@@ -197,6 +197,17 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
     const { userId } = context;
     const blocked = await purchaseBlock(context.supabase, userId);
     if (blocked) return { ok: false as const, error: blocked };
+    // Plan promo codes (JNV-<PLAN>-<N>M-…) start a plan instead of adding credit;
+    // the database checks the code is active, unused and sent to this email.
+    const { looksLikeGiftCode, normalizeGiftCode } = await import("@/lib/plan-gift");
+    if (looksLikeGiftCode(data.code)) {
+      const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
+      const { data: res, error } = await (admin as any).rpc("redeem_plan_gift", { _user_id: userId, _code: normalizeGiftCode(data.code) });
+      if (error) return { ok: false as const, error: "Could not apply this code. Please try again." };
+      const r = (res ?? {}) as { ok?: boolean; error?: string; plan?: string; months?: number; ends_at?: string };
+      if (!r.ok) return { ok: false as const, error: r.error ?? "Invalid promo code." };
+      return { ok: true as const, credited: 0, balance: null, plan: String(r.plan), months: Number(r.months), endsAt: String(r.ends_at) };
+    }
     const { evaluatePromo, creditWallet, bumpPromoUsage } = await import("@/lib/payments/core.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 

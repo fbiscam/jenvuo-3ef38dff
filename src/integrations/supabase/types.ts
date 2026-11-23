@@ -2482,6 +2482,57 @@ export type Database = {
           },
         ]
       }
+      plan_gift_codes: {
+        Row: {
+          code: string
+          created_at: string
+          email_sent_at: string | null
+          expires_at: string | null
+          months: number
+          months_credited: number
+          next_credit_at: string | null
+          note: string | null
+          plan_ends_at: string | null
+          plan_id: string
+          recipient_email: string
+          redeemed_at: string | null
+          redeemed_by: string | null
+          status: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          email_sent_at?: string | null
+          expires_at?: string | null
+          months: number
+          months_credited?: number
+          next_credit_at?: string | null
+          note?: string | null
+          plan_ends_at?: string | null
+          plan_id: string
+          recipient_email: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          status?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          email_sent_at?: string | null
+          expires_at?: string | null
+          months?: number
+          months_credited?: number
+          next_credit_at?: string | null
+          note?: string | null
+          plan_ends_at?: string | null
+          plan_id?: string
+          recipient_email?: string
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       plans: {
         Row: {
           annual_discount_pct: number | null
@@ -4198,10 +4249,15 @@ export type Database = {
       process_founding_renewals: { Args: never; Returns: number }
       process_free_monthly_credit: { Args: never; Returns: number }
       process_paid_plan_expiry: { Args: never; Returns: number }
+      process_plan_gift_credit: { Args: never; Returns: number }
       public_home_stats: { Args: never; Returns: Json }
       publish_daily_insight: {
         Args: { _article: Json; _day: string; _lease: string }
         Returns: string
+      }
+      redeem_plan_gift: {
+        Args: { _code: string; _user_id: string }
+        Returns: Json
       }
       release_founding_credit: { Args: { _user_id: string }; Returns: boolean }
       renew_founding_plan: {

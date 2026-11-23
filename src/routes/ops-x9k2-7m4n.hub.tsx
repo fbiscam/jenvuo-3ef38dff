@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Crown,
   FileText,
+  Gift,
   Inbox,
   Lock,
   Mail,
@@ -58,6 +59,7 @@ const TILES: Tile[] = [
   { key: "tuning", title: "Weight Tuning", desc: "Grid search & walk-forward configs", to: "/ops-x9k2-7m4n/tuning", icon: <SlidersHorizontal />, group: "Signals" },
   { key: "tvmm", title: "TV Mismatch Checker", desc: "Signal chart price drift audit", to: "/ops-x9k2-7m4n/tv-mismatch", icon: <Activity />, group: "Signals" },
   
+  { key: "promos", title: "Promo Codes", desc: "Email Pro, Elite or Ultra codes for 1–12 months", to: "/ops-x9k2-7m4n/promos", icon: <Gift />, group: "Money" },
   { key: "payments", countKey: "payments", title: "Payments & Promos", desc: "Crypto top-ups, approvals & promo codes", to: "/ops-x9k2-7m4n/payments", icon: <Wallet />, group: "Money" },
 
 
