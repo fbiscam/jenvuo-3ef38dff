@@ -484,6 +484,20 @@
       "when": 1795413239494,
       "tag": "0068_plan_gift_months_1_to_12",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1795416703347,
+      "tag": "0069_plan_terms_all_accounts_30_days",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1795416827063,
+      "tag": "0070_unified_hourly_plan_expiry",
+      "breakpoints": true
     }
   ]
 }

@@ -5,7 +5,12 @@ import { AdminSubscribersPage } from "@/components/ops/admin/subscribers";
 export const Route = createFileRoute("/ops-x9k2-7m4n/subscribers")({
   head: () => ({
     meta: [
-      { title: "Ops Console · Newsletter Subscribers" },
+      { title: "Jenvu Ops Console · Newsletter Subscribers" },
+      { name: "description", content: "Jenvu Ops Console \u00b7 Newsletter Subscribers: restricted operations and account management." },
+      { property: "og:title", content: "Jenvu Ops Console \u00b7 Newsletter Subscribers" },
+      { property: "og:description", content: "Jenvu Ops Console \u00b7 Newsletter Subscribers: restricted operations and account management." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),

@@ -2693,17 +2693,18 @@ html body .docs-code .tok-type, html body .docs-code .tok-var { color: #ffa657 !
 }
 
 /* ====== Ops Console size ======
-   Shell (sidebar + Overview, .ops-shell-zoom) = dashboard scale.
-   Standalone tool pages (.ops-zoom) = dashboard scale.
+   Shell (sidebar + Overview, .ops-shell-zoom) = 75% of previous scale.
+   Standalone tool pages (.ops-zoom) = 75% of previous scale.
    Tool pages inside the console frame get the hub's zoom (--ops-inner-zoom,
    see src/lib/ops-zoom.ts): a bit larger than the dashboard. */
-@media (min-width: 1024px) { .ops-zoom, .ops-shell-zoom { zoom: 0.909; min-height: calc(100vh / 0.909); } }
-@media (min-width: 1200px) { .ops-zoom, .ops-shell-zoom { zoom: 1.005; min-height: calc(100vh / 1.005); } }
-@media (min-width: 1360px) { .ops-zoom, .ops-shell-zoom { zoom: 1.099; min-height: calc(100vh / 1.099); } }
-@media (min-width: 1500px) { .ops-zoom, .ops-shell-zoom { zoom: 1.195; min-height: calc(100vh / 1.195); } }
-@media (min-width: 1600px) { .ops-zoom, .ops-shell-zoom { zoom: 1.316; min-height: calc(100vh / 1.316); } }
-@media (min-width: 1680px) { .ops-zoom, .ops-shell-zoom { zoom: 1.388; min-height: calc(100vh / 1.388); } }
-@media (min-width: 1920px) { .ops-zoom, .ops-shell-zoom { zoom: 1.482; min-height: calc(100vh / 1.482); } }
+.ops-zoom, .ops-shell-zoom { --ops-base-zoom: 1; --ops-scale: 0.75; zoom: calc(var(--ops-base-zoom) * var(--ops-scale)); min-height: calc(100vh / (var(--ops-base-zoom) * var(--ops-scale))); }
+@media (min-width: 1024px) { .ops-zoom, .ops-shell-zoom { --ops-base-zoom: 0.909; } }
+@media (min-width: 1200px) { .ops-zoom, .ops-shell-zoom { --ops-base-zoom: 1.005; } }
+@media (min-width: 1360px) { .ops-zoom, .ops-shell-zoom { --ops-base-zoom: 1.099; } }
+@media (min-width: 1500px) { .ops-zoom, .ops-shell-zoom { --ops-base-zoom: 1.195; } }
+@media (min-width: 1600px) { .ops-zoom, .ops-shell-zoom { --ops-base-zoom: 1.316; } }
+@media (min-width: 1680px) { .ops-zoom, .ops-shell-zoom { --ops-base-zoom: 1.388; } }
+@media (min-width: 1920px) { .ops-zoom, .ops-shell-zoom { --ops-base-zoom: 1.482; } }
 html[data-ops-z] .jenvu-zoom-dashboard.ops-embed,
 html[data-ops-z] .ops-zoom {
   zoom: var(--ops-inner-zoom, 1) !important;

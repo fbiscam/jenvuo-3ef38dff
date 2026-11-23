@@ -7,7 +7,7 @@ import { renewalState, type RenewalRow, type RenewalState } from "@/lib/renewal"
 
 const name = (id: string) => id.charAt(0).toUpperCase() + id.slice(1);
 
-/** Dashboard strip: founding renewal due (3-day notice) or plan moved to Free. */
+/** Dashboard strip: plan expiry or plan moved to Free. */
 export default function RenewalNotice() {
   const [state, setState] = useState<RenewalState>(null);
 

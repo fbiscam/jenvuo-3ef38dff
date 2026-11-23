@@ -1,7 +1,7 @@
 /**
  * Ops Console sizing.
  *
- * The console shell (sidebar + Overview) uses the dashboard's own scale.
+ * The console shell (sidebar + Overview) uses 75% of the dashboard's scale.
  * Tools open inside an iframe that is narrower than the screen, so their
  * width-based zoom would come out smaller than the dashboard. The hub passes
  * the zoom for the whole screen (`z` URL param, plus postMessage on resize)
@@ -21,6 +21,11 @@ const DASH_STEPS: [number, number][] = [
 
 /** Embedded console pages are this much larger than the dashboard. */
 export const OPS_INNER_BOOST = 1.12;
+export const OPS_SCALE = 0.75;
+
+export function opsShellZoomFor(screenWidth: number): number {
+  return dashboardZoomFor(screenWidth) * OPS_SCALE;
+}
 
 export function dashboardZoomFor(screenWidth: number): number {
   for (const [min, z] of DASH_STEPS) if (screenWidth >= min) return z;
@@ -29,14 +34,14 @@ export function dashboardZoomFor(screenWidth: number): number {
 
 /** Zoom for a tool page shown inside the console, from the full screen width. */
 export function opsInnerZoomFor(screenWidth: number): number {
-  if (screenWidth < 1024) return 1;
-  return Math.round(dashboardZoomFor(screenWidth) * OPS_INNER_BOOST * 1000) / 1000;
+  if (screenWidth < 1024) return OPS_SCALE;
+  return (Math.round(dashboardZoomFor(screenWidth) * OPS_INNER_BOOST * 1000) / 1000) * OPS_SCALE;
 }
 
 /** Accepts only a sane zoom value from the URL/message. */
 export function parseOpsZoom(raw: unknown): number | null {
   const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw) : NaN;
-  if (!Number.isFinite(n) || n < 0.75 || n > 2) return null;
+  if (!Number.isFinite(n) || n < 0.5 || n > 2) return null;
   return n;
 }
 
@@ -46,4 +51,4 @@ export const OPS_ZOOM_MESSAGE = "jenvu-ops-zoom";
  * Runs before paint in every page: inside a console iframe (`embed=1&z=`),
  * apply the hub's zoom and follow later updates from the hub.
  */
-export const OPS_EMBED_ZOOM_BOOT_SCRIPT = `(function(){try{var q=new URLSearchParams(location.search);if(q.get("embed")!=="1")return;var d=document.documentElement;function s(v){var n=Number(v);if(!isFinite(n)||n<0.75||n>2)return;d.style.setProperty("--ops-inner-zoom",String(n));d.setAttribute("data-ops-z","1");}s(q.get("z"));window.addEventListener("message",function(e){if(window.parent===window||e.source!==window.parent)return;if(e.origin!==location.origin&&!/^https:\\/\\/([a-z0-9-]+\\.)*jenvu\\.com$/.test(e.origin))return;var m=e.data;if(m&&m.type==="${OPS_ZOOM_MESSAGE}")s(m.z);});}catch(e){}})();`;
+export const OPS_EMBED_ZOOM_BOOT_SCRIPT = `(function(){try{var q=new URLSearchParams(location.search);if(q.get("embed")!=="1")return;var d=document.documentElement;function s(v){var n=Number(v);if(!isFinite(n)||n<0.5||n>2)return;d.style.setProperty("--ops-inner-zoom",String(n));d.setAttribute("data-ops-z","1");}s(q.get("z"));window.addEventListener("message",function(e){if(window.parent===window||e.source!==window.parent)return;if(e.origin!==location.origin&&!/^https:\\/\\/([a-z0-9-]+\\.)*jenvu\\.com$/.test(e.origin))return;var m=e.data;if(m&&m.type==="${OPS_ZOOM_MESSAGE}")s(m.z);});}catch(e){}})();`;

@@ -196,8 +196,7 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
     earned = tiers.filter((p: any) => paidUsd + 0.01 >= Number(p.price_usd)).pop() as any;
   }
 
-  // Founding members renew on the 1st of each month: a plan payment (including
-  // paying back a plan that lapsed to Free) runs the plan until the next 1st.
+  // Paid Founding members use the same 30-day periods as other accounts.
   {
     const { data: founding } = await (supabaseAdmin as any).rpc("is_founding_member", { _user_id: userId });
     if (founding) {
@@ -233,10 +232,12 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
   // Paying again for the plan you already have extends it by one period.
   if (sub?.plan_id === earned.id && !(sub as any).is_trial) {
     if (targetPlanId !== earned.id) return null;
-    await supabaseAdmin
+    const end = paidPeriodEnd({ samePlan: true, currentEnd: (sub as any).current_period_end });
+    const { error } = await supabaseAdmin
       .from("user_subscriptions")
-      .update({ status: "active", current_period_end: paidPeriodEnd({ samePlan: true, currentEnd: (sub as any).current_period_end }), updated_at: new Date().toISOString() } as any)
+      .update({ status: "active", current_period_end: end, renewal_due_at: end, renewal_notice_at: null, lapsed_plan_id: null, lapsed_at: null, updated_at: new Date().toISOString() } as any)
       .eq("user_id", userId);
+    if (error) throw new Error("Could not activate the paid plan. Please retry approval.");
     return earned.id as string;
   }
   // Downgrades are allowed only when explicitly targeted via targetPlanId.
@@ -259,9 +260,11 @@ export async function applyPlanForPayment(userId: string, paidUsd: number, targe
     updated_at: new Date().toISOString(),
   };
   if (sub) {
-    await supabaseAdmin.from("user_subscriptions").update(payload).eq("user_id", userId);
+    const { error } = await supabaseAdmin.from("user_subscriptions").update(payload).eq("user_id", userId);
+    if (error) throw new Error("Could not activate the paid plan. Please retry approval.");
   } else {
-    await supabaseAdmin.from("user_subscriptions").insert(payload);
+    const { error } = await supabaseAdmin.from("user_subscriptions").insert(payload);
+    if (error) throw new Error("Could not activate the paid plan. Please retry approval.");
   }
   return earned.id as string;
 }
@@ -317,6 +320,7 @@ export async function approveOrder(orderId: string, by: string) {
       if (withBot) await ensureMt5License(order.user_id);
     } catch (e) {
       console.error("plan upgrade on approval failed", (e as Error)?.message);
+      throw new Error("The plan could not be activated; the payment has not been marked approved. Please retry.");
     }
     const after = await balanceOf();
     const creditPlan = applied ?? (covers ? order.target_plan_id : null);

@@ -6,7 +6,12 @@ export const Route = createFileRoute("/ops-x9k2-7m4n/emails")({
   validateSearch: (s) => emailsSearch.parse(s),
   head: () => ({
     meta: [
-      { title: "Ops Console · Email box" },
+      { title: "Jenvu Ops Console · Email box" },
+      { name: "description", content: "Jenvu Ops Console \u00b7 Email box: restricted operations and account management." },
+      { property: "og:title", content: "Jenvu Ops Console \u00b7 Email box" },
+      { property: "og:description", content: "Jenvu Ops Console \u00b7 Email box: restricted operations and account management." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),

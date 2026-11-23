@@ -1,5 +1,10 @@
 # Roadmap
 
+- [x] Verify one-use/email-locked promos and instant activation; use 30-day gift months and unpaid expiry for every paid account including paid Founding members. Rolled-back database tests passed for email lock, activation, reuse rejection, 30/360-day terms, refill preserving renewals and Founding expiry/renewal. Existing hourly jobs run expiry (up to one hour delay); no new schedule. No missing paid end dates or active calendar-month gifts. Failed activation can no longer mark payment approved.
+- [x] Reduce Ops Console shell, sign-in, standalone and embedded tools by 25%; desktop/393px sizing verified, theme switch, Payments tabs and Lock exercised. Payments and Support open with console access; all other customer tools correctly require an additional signed-in account.
+- [ ] Finish authenticated Ops tool/action audit (Founding, documents, emails, promos and other account-protected tools) — blocked by separate admin-account sign-in; requester has no matching app account and cannot mint the admin session. No customer approvals, gifts or emails sent during audit.
+- [x] Recheck utility error: current helper has seven lines and returns string; 30 focused regressions passed and latest build OK. No utility edit needed.
+
 - [x] Redesign active promo, billing, Founding, auth, security and one-to-one support email families with shared account-style layout and hosted illustrations. Verified 35 renders at desktop/393/320px (105 checks, no overflow or missing images), 27 regressions pass, utility has seven lines and returns text. Existing sends/status rules unchanged; cancelled/renewal designs are prepared but no new send triggers added. Discontinued news/signal/article mail not re-enabled. Inbox-client delivery not tested; publish required. Existing external blockers below unchanged.
 
 - [x] Reduce sign-in/sign-up size 5% below 768px (1.1 → 1.045); verified both screens at 320/393/768/1280px without overflow, tablet/desktop unchanged. Utility numeric-input regression passes; current utils.ts has no line 8; build OK. Existing external blockers below unchanged.

@@ -7,7 +7,12 @@ import { opsStatus, opsUnlock } from "@/lib/ops-gate.functions";
 export const Route = createFileRoute("/ops-x9k2-7m4n/")({
   head: () => ({
     meta: [
-      { title: "Ops Console" },
+      { title: "Jenvu Ops Console" },
+      { name: "description", content: "Jenvu Ops Console: restricted operations and account management." },
+      { property: "og:title", content: "Jenvu Ops Console" },
+      { property: "og:description", content: "Jenvu Ops Console: restricted operations and account management." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -59,7 +64,7 @@ function OpsLogin() {
 
   return (
     <div className={`min-h-dvh w-full bg-muted/40 text-gc-ink ${SANS} antialiased`}>
-      <main className="mx-auto flex min-h-dvh max-w-md items-center justify-center px-5 py-16 sm:px-6">
+      <main className="ops-shell-zoom mx-auto flex min-h-dvh max-w-md items-center justify-center px-5 py-16 sm:px-6">
         <form onSubmit={onSubmit} className="w-full rounded-2xl border border-border bg-background p-7 shadow-sm sm:p-10">
           <div className="flex items-center gap-2.5">
             <JenvuMark className="h-7 w-7 text-foreground" />

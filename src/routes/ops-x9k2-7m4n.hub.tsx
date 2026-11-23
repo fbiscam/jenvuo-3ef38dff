@@ -29,7 +29,12 @@ import { applyHtmlTheme, readSiteTheme, saveSiteTheme } from "@/lib/site-theme";
 export const Route = createFileRoute("/ops-x9k2-7m4n/hub")({
   head: () => ({
     meta: [
-      { title: "Ops Console · Hub" },
+      { title: "Jenvu Ops Console · Hub" },
+      { name: "description", content: "Jenvu Ops Console \u00b7 Hub: restricted operations and account management." },
+      { property: "og:title", content: "Jenvu Ops Console \u00b7 Hub" },
+      { property: "og:description", content: "Jenvu Ops Console \u00b7 Hub: restricted operations and account management." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
