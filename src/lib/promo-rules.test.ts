@@ -1,9 +1,15 @@
 import { describe, it } from "node:test";
 import { expect } from "./chart/test-expect";
-import { promoCodeForOrder, promoRedeemable, redeemPromoCode } from "./promo-rules";
+import { assertCreditPromoType, promoCodeForOrder, promoRedeemable, redeemPromoCode } from "./promo-rules";
 import assert from "node:assert/strict";
 
 describe("promo redemption is separate from payment orders", () => {
+  it("admin credit codes must redeem without payment", () => {
+    assert.doesNotThrow(() => assertCreditPromoType("free"));
+    for (const type of ["flat", "percent", "discount"]) {
+      assert.throws(() => assertCreditPromoType(type));
+    }
+  });
   it("an emailed Pro gift activates directly without a credit top-up or payment", async () => {
     const result = await redeemPromoCode(" jnv-pro-1m-abcd-2345 ", {
       gift: async (code) => {

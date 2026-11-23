@@ -4255,6 +4255,10 @@ export type Database = {
         Args: { _article: Json; _day: string; _lease: string }
         Returns: string
       }
+      redeem_api_credit_promo: {
+        Args: { _code: string; _user_id: string }
+        Returns: Json
+      }
       redeem_plan_gift: {
         Args: { _code: string; _user_id: string }
         Returns: Json

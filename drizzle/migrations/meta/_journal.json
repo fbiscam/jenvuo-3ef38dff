@@ -498,6 +498,13 @@
       "when": 1795416827063,
       "tag": "0070_unified_hourly_plan_expiry",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1795418287543,
+      "tag": "0071_promo_redemption_atomic_and_30_day_credit",
+      "breakpoints": true
     }
   ]
 }

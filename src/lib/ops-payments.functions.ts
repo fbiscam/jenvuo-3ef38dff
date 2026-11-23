@@ -1,5 +1,6 @@
 // Ops-console-only server functions for crypto payments & promo codes.
 import { createServerFn } from "@tanstack/react-start";
+import { assertCreditPromoType } from "./promo-rules";
 async function db() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   return supabaseAdmin as any;
@@ -121,9 +122,10 @@ export const opsSavePromo = createServerFn({ method: "POST" })
     if (!/^[A-Z0-9_-]{2,24}$/.test(code)) throw new Error("Code must be 2-24 letters, digits, - or _.");
     const value = Number(i?.value);
     if (!Number.isFinite(value) || value <= 0) throw new Error("Enter a valid value.");
+    assertCreditPromoType(i?.type ?? "free");
     return {
       code,
-      type: i?.type ?? "flat",
+      type: "free",
       value,
       minTopup: Number(i?.minTopup ?? 0) || 0,
       maxBonus: i?.maxBonus == null || i.maxBonus === ("" as never) ? null : Number(i.maxBonus),

@@ -20,6 +20,11 @@ export function promoRedeemable(type: PromoType): boolean {
   return type === "free";
 }
 
+/** New credit promos must work without a purchase; legacy types remain stored unchanged. */
+export function assertCreditPromoType(type: PromoType): void {
+  if (!promoRedeemable(type)) throw new Error("Create a free API-credit code here, or use Promo Codes for an emailed plan gift.");
+}
+
 /** Plan orders never carry a promo code, whatever the browser sends. */
 export function promoCodeForOrder(_code: string | null | undefined): null {
   return null;

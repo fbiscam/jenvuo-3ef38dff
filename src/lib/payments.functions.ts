@@ -208,28 +208,12 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
       return { ok: true as const, credited: 0, balance: null, plan: String(r.plan), months: Number(r.months), endsAt: String(r.ends_at) };
     },
     credit: async (code) => {
-    const { evaluatePromo, creditWallet, bumpPromoUsage } = await import("@/lib/payments/core.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const quote = await evaluatePromo({ userId, amountUsd: 0, code });
-    if (quote.error) return { ok: false as const, error: quote.error };
-    const { promoRedeemable, PROMO_ONLY_CREDIT_MESSAGE } = await import("@/lib/promo-rules");
-    if (!promoRedeemable(quote.promoType)) return { ok: false as const, error: PROMO_ONLY_CREDIT_MESSAGE };
-
-    if (!quote.promoCode) return { ok: false as const, error: "Invalid promo code." };
-    const balance = await creditWallet({
-      userId,
-      amount: quote.creditUsd,
-      reason: "promo_bonus",
-      metadata: { promo_code: quote.promoCode },
-    });
-    await supabaseAdmin.from("promo_redemptions").insert({
-      code: quote.promoCode,
-      user_id: userId,
-      bonus_usd: quote.creditUsd,
-    });
-    await bumpPromoUsage(quote.promoCode);
-    return { ok: true as const, credited: quote.creditUsd, balance };
+    const { data: result, error } = await supabaseAdmin.rpc("redeem_api_credit_promo", { _user_id: userId, _code: code });
+    if (error) return { ok: false as const, error: "Could not apply this code. Please try again." };
+    const r = (result ?? {}) as { ok?: boolean; error?: string; credited?: number; balance?: number };
+    if (!r.ok) return { ok: false as const, error: r.error ?? "Invalid promo code." };
+    return { ok: true as const, credited: Number(r.credited), balance: r.balance ?? null };
     },
     });
   });

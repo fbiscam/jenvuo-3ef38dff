@@ -54,7 +54,7 @@ const FILTERS = [
 
 const emptyPromo = {
   code: "",
-  type: "flat" as "percent" | "flat" | "discount" | "free",
+  type: "free" as "free",
   value: "5",
   minTopup: "0",
   maxBonus: "",
@@ -357,10 +357,7 @@ function OpsPayments() {
               <div className="text-[13px] font-medium text-gc-ink">Create / update code</div>
               <div className="mt-3 grid gap-2 sm:grid-cols-4">
                 <input className={input} placeholder="CODE" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })} />
-                <select className={input} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as any })}>
-                  <option value="percent">Percent bonus (%)</option>
-                  <option value="flat">Flat bonus ($)</option>
-                  <option value="discount">Discount (% off)</option>
+                <select className={input} value={form.type} aria-label="Promo type" disabled>
                   <option value="free">Free credit ($)</option>
                 </select>
                 <input className={input} placeholder="Value" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })} />
