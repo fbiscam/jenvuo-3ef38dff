@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { matchActualAiModels, type AiCostLogRow, type MatchedAiModels } from "@/lib/credits-model-match";
 
 // LEGACY constant kept for import compatibility. All charges are now
 // USD-based and deducted per-AI-call inside logAiCost().

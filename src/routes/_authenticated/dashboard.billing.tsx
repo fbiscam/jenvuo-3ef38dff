@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 import { useTrial } from "@/hooks/useTrial";
@@ -59,7 +60,6 @@ function Billing() {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancellingPlan, setCancellingPlan] = useState(false);
   const [promoCode, setPromoCode] = useState("");
-  const [redeemingPromo, setRedeemingPromo] = useState(false);
   const [prefs, setPrefs] = useState(() => {
     try { return JSON.parse(localStorage.getItem("jenvu-billing-prefs") ?? "{}"); } catch { return {}; }
   });
@@ -106,18 +106,16 @@ function Billing() {
     }
   };
 
-  const handleRedeemPromotion = async () => {
-    const code = promoCode.trim();
-    if (!code || redeemingPromo) return;
-    setRedeemingPromo(true);
-    try {
-      const result = await redeemPromotion({ data: { code } });
+  const promoMutation = useMutation({
+    mutationFn: (code: string) => redeemPromotion({ data: { code } }),
+    onSuccess: async (result) => {
       if (!result.ok) {
         toast.error(result.error);
         return;
       }
       setPromoCode("");
-      await credits.refresh();
+      if (result.creditState) await credits.applySnapshot(result.creditState);
+      else await credits.refresh();
       if ("plan" in result && result.plan) {
         const name = result.plan.charAt(0).toUpperCase() + result.plan.slice(1);
         const until = new Date(result.endsAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
@@ -125,11 +123,15 @@ function Billing() {
         return;
       }
       toast.success(`$${Number(result.credited).toFixed(2)} promotional credit added.`);
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error(error instanceof Error ? error.message : "Could not apply this promotion.");
-    } finally {
-      setRedeemingPromo(false);
-    }
+    },
+  });
+  const redeemingPromo = promoMutation.isPending;
+  const handleRedeemPromotion = () => {
+    const code = promoCode.trim();
+    if (code && !redeemingPromo) promoMutation.mutate(code);
   };
 
   // A cancelled account legitimately has no current plan. Only wait for the

@@ -198,7 +198,7 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
     const { redeemPromoCode } = await import("@/lib/promo-rules");
     // Plan promo codes (JNV-<PLAN>-<N>M-…) start a plan instead of adding credit;
     // the database checks the code is active, unused and sent to this email.
-    return redeemPromoCode(data.code, {
+    const result = await redeemPromoCode(data.code, {
     gift: async (code) => {
       const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
       const { data: res, error } = await (admin as any).rpc("redeem_plan_gift", { _user_id: userId, _code: code });
@@ -215,5 +215,17 @@ export const redeemFreeCode = createServerFn({ method: "POST" })
     if (!r.ok) return { ok: false as const, error: r.error ?? "Invalid promo code." };
     return { ok: true as const, credited: Number(r.credited), balance: r.balance ?? null };
     },
+    });
+    const { completePromoActivation } = await import("@/lib/promo-activation");
+    const { readCreditState } = await import("@/lib/credits-state.server");
+    const { keepAlive } = await import("@/lib/keep-alive.server");
+    return completePromoActivation(result, {
+      snapshot: () => readCreditState(context.supabase, userId),
+      notify: () => {
+        keepAlive(import("@/lib/promo-activation.server")
+          .then(({ sendPromoActivation }) => sendPromoActivation(userId, data.code))
+          .catch(() => { console.error("[promo-activation] Confirmation email failed; redemption remains active."); }));
+      },
+      onError: () => { console.error("[promo-activation] Snapshot unavailable; redemption remains active."); },
     });
   });

@@ -6,6 +6,7 @@ import { template as newsEventTemplate } from './news-event'
 import { template as newDeviceTemplate } from './new-device'
 import { template as adminMessageTemplate } from './admin-message'
 import { template as planGiftTemplate } from './plan-gift'
+import { template as promoActivatedTemplate } from './promo-activated'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -27,4 +28,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'new-device': newDeviceTemplate,
   'admin-message': adminMessageTemplate,
   'plan-gift': planGiftTemplate,
+  'promo-activated': promoActivatedTemplate,
 }

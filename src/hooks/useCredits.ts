@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { getCreditState, spendCredits, CREDIT_COSTS, type CreditAction } from "@/lib/credits.functions";
 import { useAuthUser } from "./useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
+import { applyPromoSnapshot } from "@/lib/promo-activation";
+import type { CreditState } from "@/lib/credits.functions";
 
 const CREDIT_SNAPSHOT_PREFIX = "jenvu:page-cache:credit-state:";
 
@@ -132,5 +134,9 @@ export function useCredits() {
     spend,
     costs: CREDIT_COSTS,
     refresh: () => queryClient.invalidateQueries({ queryKey: ["credit-state", user?.id] }),
+    applySnapshot: async (state: CreditState) => {
+      if (!user?.id) return;
+      await applyPromoSnapshot(queryClient, user.id, state);
+    },
   };
 }
