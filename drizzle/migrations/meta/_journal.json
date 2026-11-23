@@ -456,6 +456,13 @@
       "when": 1795411239244,
       "tag": "0064_status_new_services",
       "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1795411677740,
+      "tag": "0065_status_email_and_second_checks",
+      "breakpoints": true
     }
   ]
 }

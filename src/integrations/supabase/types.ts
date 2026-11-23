@@ -4040,6 +4040,7 @@ export type Database = {
         }[]
       }
       current_profile_plan: { Args: { _user_id: string }; Returns: string }
+      email_delivery_state: { Args: never; Returns: string }
       ensure_free_account: { Args: { _user_id: string }; Returns: boolean }
       error_fingerprint: {
         Args: { _message: string; _stack: string }
