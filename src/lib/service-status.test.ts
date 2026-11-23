@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregateState, goldQuoteState, statusDays } from './service-status';
+import { aggregateState, goldQuoteState, keyAuthState, statusDays } from './service-status';
 describe('truthful service availability', () => {
   it('never marks missing history operational', () => {
     const days = statusDays([], ['api'], '2026-11-16T11:00:00Z');
@@ -21,5 +21,10 @@ describe('truthful service availability', () => {
     assert.equal(goldQuoteState(4000, '2026-11-16T10:59:00Z', now), 'operational');
     assert.equal(goldQuoteState(4000, '2026-11-16T10:00:00Z', now), 'degraded');
     assert.equal(goldQuoteState(4000, undefined, now), 'unknown');
+  });
+  it('API key check passes only when a keyless call is rejected with the auth error', () => {
+    assert.equal(keyAuthState(401, { error: { type: 'invalid_request_error' } }), 'operational');
+    assert.equal(keyAuthState(200, { choices: [] }), 'degraded');
+    assert.equal(keyAuthState(502, null), 'unavailable');
   });
 });

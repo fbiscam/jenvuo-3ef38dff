@@ -1,5 +1,5 @@
 export type ServiceState = 'operational' | 'degraded' | 'unavailable' | 'unknown';
-export type ServiceId = 'website' | 'dashboard' | 'auth' | 'docs' | 'api' | 'licensing' | 'gold';
+export type ServiceId = 'website' | 'dashboard' | 'auth' | 'docs' | 'api' | 'licensing' | 'gold' | 'keys' | 'terminal' | 'chat' | 'payments';
 export type StatusSample = { service: string; checked_at: string; state: ServiceState };
 export type ServiceCheck = { id: ServiceId; state: ServiceState };
 export const STATUS_GROUPS: { name: string; services: { id: ServiceId; name: string }[] }[] = [
@@ -7,7 +7,16 @@ export const STATUS_GROUPS: { name: string; services: { id: ServiceId; name: str
   { name: 'Developer API', services: [{ id: 'api', name: 'Model catalog' }, { id: 'docs', name: 'Documentation' }] },
   { name: 'Terminal & Market Data', services: [{ id: 'gold', name: 'Gold quote feed' }] },
   { name: 'JX Bot', services: [{ id: 'licensing', name: 'MT5 license validator' }] },
+  { name: 'API Keys', services: [{ id: 'keys', name: 'API key authentication' }] },
+  { name: 'Workspace', services: [{ id: 'terminal', name: 'Web Terminal' }, { id: 'chat', name: 'AI Chat & script studio' }] },
+  { name: 'Billing & Payments', services: [{ id: 'payments', name: 'Billing & checkout' }] },
 ];
+/** The keyless completions request must be rejected with the public auth error, proving key checks run. */
+export function keyAuthState(status: number, body: unknown): ServiceState {
+  const error = (body as { error?: { type?: unknown } } | null)?.error;
+  if (status === 401 && error?.type === 'invalid_request_error') return 'operational';
+  return status >= 500 ? 'unavailable' : 'degraded';
+}
 export const STATE_LABEL: Record<ServiceState, string> = { operational: 'Operational', degraded: 'Degraded', unavailable: 'Unavailable', unknown: 'Not verified' };
 export function aggregateState(states: ServiceState[]): ServiceState {
   if (states.includes('unavailable')) return 'unavailable';

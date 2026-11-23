@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { goldQuoteState, type ServiceCheck, type ServiceId, type StatusSample } from './service-status';
+import { goldQuoteState, keyAuthState, type ServiceCheck, type ServiceId, type StatusSample } from './service-status';
 
 const PROBES: { id: ServiceId; url: string }[] = [
   { id: 'website', url: 'https://jenvu.com/' },
@@ -9,12 +9,21 @@ const PROBES: { id: ServiceId; url: string }[] = [
   { id: 'api', url: 'https://jenvu.com/api/public/v1/models' },
   { id: 'licensing', url: 'https://jenvu.com/api/public/licenses/validate' },
   { id: 'gold', url: 'https://api.gold-api.com/price/XAU' },
+  { id: 'keys', url: 'https://jenvu.com/api/public/v1/chat/completions' },
+  { id: 'terminal', url: 'https://dash.jenvu.com/terminal' },
+  { id: 'chat', url: 'https://dash.jenvu.com/chat' },
+  { id: 'payments', url: 'https://dash.jenvu.com/billing' },
 ];
 let cache: { expires: number; value: Awaited<ReturnType<typeof collectStatus>> } | undefined;
 let pending: Promise<Awaited<ReturnType<typeof collectStatus>>> | undefined;
 
 async function probe({ id, url }: typeof PROBES[number]): Promise<ServiceCheck> {
   try {
+    if (id === 'keys') {
+      // Keyless request: rejected before any account lookup, usage or model call.
+      const response = await fetch(url, { method: 'POST', body: '{}', signal: AbortSignal.timeout(8000), headers: { 'Content-Type': 'application/json' } });
+      return { id, state: keyAuthState(response.status, await response.json().catch(() => null)) };
+    }
     const response = await fetch(url, { signal: AbortSignal.timeout(8000), headers: { Accept: id === 'gold' || id === 'api' || id === 'licensing' ? 'application/json' : 'text/html' },
       ...(id === 'licensing' ? { method: 'POST', body: '{', headers: { 'Content-Type': 'application/json' } } : {}) });
     if (!response.ok) return { id, state: 'unavailable' };
