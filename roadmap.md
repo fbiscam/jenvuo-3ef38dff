@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Fix plan/API-credit promo redemption without the purchase gate, correct Billing/help text, remove the two unsubmitted payment orders for the requested account, and verify regressions.
+- [x] Fix plan/API-credit promo redemption without the purchase gate; correct Billing/help text; remove only the requested account's two unpaid/unsubmitted orders (69.48/69.96 USDT), read back zero remaining. 12 focused regressions pass, build OK. Temporary signed-in Billing test confirmed direct Pro activation, duplicate rejection, $1 credit redemption, $41 balance and paid plan persisted on reload; no invoice created. Customer's one-month Pro gift remains active and unused; live code requires publishing. Test promos removed.
 
 - [x] Verify one-use/email-locked promos and instant activation; use 30-day gift months and unpaid expiry for every paid account including paid Founding members. Rolled-back database tests passed for email lock, activation, reuse rejection, 30/360-day terms, refill preserving renewals and Founding expiry/renewal. Existing hourly jobs run expiry (up to one hour delay); no new schedule. No missing paid end dates or active calendar-month gifts. Failed activation can no longer mark payment approved.
 - [x] Reduce Ops Console shell, sign-in, standalone and embedded tools by 25%; desktop/393px sizing verified, theme switch, Payments tabs and Lock exercised. Payments and Support open with console access; all other customer tools correctly require an additional signed-in account.
