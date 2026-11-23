@@ -9,7 +9,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface ReauthenticationEmailProps {
   token: string
@@ -24,6 +24,7 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
         <LogoHeader />
         <Section style={s.card}>
         <Heading style={s.h1}>Confirm reauthentication</Heading>
+          <EmailIllustration kind="security" />
         <Text style={s.text}>Use the code below to confirm your identity:</Text>
         <Section style={s.codeBox}>
           <Text style={s.codeLabel}>VERIFICATION CODE</Text>
@@ -33,7 +34,7 @@ export const ReauthenticationEmail = ({ token }: ReauthenticationEmailProps) => 
         <Text style={s.footer}>
           This code will expire shortly. If you didn't request this, you can
           safely ignore this email.
-        </Text><Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+        </Text><EmailFooter />
         </Section>
       </Container>
     </Body>

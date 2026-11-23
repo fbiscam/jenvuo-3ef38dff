@@ -1,3 +1,4 @@
+import { legacyEmailLayout } from '@/lib/email-templates/legacy-layout';
 import { foundingCreditFor, FOUNDING_PLAN_DAYS, foundingPlanFor } from "@/lib/founding-offer";
 import { FOUNDING_SEATS_PER_MONTH, nextSeatOpening, seatsFullMessage } from "@/lib/founding-seats";
 import { createServerFn } from "@tanstack/react-start";
@@ -104,27 +105,12 @@ function renderApplicantEmail(kind: ApplicantEmailKind, name: string, plan: stri
   // Site theme: white page, black ink, warm-gray surfaces, black primary pill and gray secondary pill.
   const btn = (c: { label: string; href: string }, primary: boolean) =>
     `<a href="${c.href}" style="display:inline-block;background:${primary ? "#09090b" : "#f2f1ef"};color:${primary ? "#ffffff" : "#09090b"};text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:500;font-size:14px;font-family:${FONT}">${escapeHtml(c.label)}</a>`;
-  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) => `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@400;500;700&display=swap" rel="stylesheet"></head><body style="margin:0;background:#ffffff;font-family:${FONT};color:#18181b;padding:32px 12px">
-    <div style="max-width:560px;margin:0 auto">
-      <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 28px">
-        <tr>
-          <td style="vertical-align:middle"><img src="${APP_URL}/favicon.png" width="28" height="28" alt="Jenvu" style="display:block;border-radius:7px" /></td>
-          <td style="vertical-align:middle;padding-left:10px;font-family:${FONT};font-size:20px;font-weight:400;color:#09090b;line-height:1">Jenvu</td>
-        </tr>
-      </table>
-      <div style="display:inline-block;background:#f2f1ef;color:#52525b;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:500">${escapeHtml(tag)}</div>
-      <h1 style="font-family:${FONT};font-size:28px;line-height:1.2;font-weight:400;letter-spacing:-0.01em;margin:14px 0 0;color:#09090b">${escapeHtml(title)}</h1>
-      <div style="padding:18px 0 4px;font-size:15px;line-height:1.65;color:#3f3f46">${body}</div>
-      ${cta ? `<div style="padding:18px 0 8px">${btn(cta, true)}${cta2 ? `&nbsp;&nbsp;${btn(cta2, false)}` : ""}</div>` : ""}
-      <div style="margin-top:32px;border-top:1px dashed #d4d4d8;padding-top:18px;font-size:12px;line-height:1.6;color:#a1a1aa">
-        Jenvu · AI trading tools for Gold, Bitcoin and EUR/USD · <a href="${APP_URL}" style="color:#71717a;text-decoration:underline">jenvu.com</a> · <a href="https://support.jenvu.com" style="color:#71717a;text-decoration:underline">Help</a><br/>
-        Trading involves risk. Jenvu tools do not guarantee profits.
-      </div>
-    </div></body></html>`;
+  const wrap = (title: string, tag: string, body: string, cta?: { label: string; href: string }, cta2?: { label: string; href: string }) =>
+    legacyEmailLayout(title, tag, body, cta ? `${btn(cta, true)}${cta2 ? `<div style="margin-top:12px">${btn(cta2, false)}</div>` : ""}` : "");
 
   // Shared list for the Founding emails: what an approved member gets.
   const box = (rows: string[]) =>
-    `<div style="background:#f7f6f4;border-radius:16px;padding:16px 20px;margin:4px 0 14px">${rows
+    `<div style="background:#f5f7f8;border-radius:8px;padding:16px 20px;margin:4px 0 14px">${rows
       .map((r) => `<div style="padding:6px 0;font-size:14px;color:#18181b">&#8226;&nbsp;&nbsp;${r}</div>`)
       .join("")}</div>`;
   const perks = () =>
@@ -484,11 +470,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
           w: escapeHtml(data.why_joining).replace(/\n/g, "<br/>"),
           m: escapeHtml(data.myfxbook_url || "—"),
         };
-        const html = `<!doctype html><html><body style="font-family:'Google Sans Flex','Google Sans','Google Sans Normal',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#fff;color:#111;padding:24px">
-          <div style="max-width:600px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;padding:24px">
-            <div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">New founding application</div>
-            <h1 style="font-size:20px;margin:8px 0 16px">${safe.n}</h1>
-            <table style="width:100%;font-size:14px;border-collapse:collapse;margin-bottom:16px">
+        const html = legacyEmailLayout("New Founding application", data.full_name, `            <table style="width:100%;font-size:14px;border-collapse:collapse;margin-bottom:16px">
               <tr><td style="color:#6b7280;padding:4px 0;width:140px">Email</td><td>${safe.e}</td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">WhatsApp</td><td><a href="https://wa.me/${safe.wa.replace(/[^0-9]/g, "")}">${safe.wa}</a></td></tr>
               <tr><td style="color:#6b7280;padding:4px 0">Requested plan</td><td><strong>${escapeHtml(data.requested_plan.toUpperCase())}</strong></td></tr>
@@ -499,8 +481,7 @@ export const submitFoundingApplication = createServerFn({ method: "POST" })
               <tr><td style="color:#6b7280;padding:4px 0">MyFxBook</td><td>${safe.m}</td></tr>
             </table>
             <div style="font-size:14px;line-height:1.6;white-space:pre-wrap;border-top:1px solid #e5e7eb;padding-top:16px">${safe.w}</div>
-            <p style="font-size:12px;color:#6b7280;margin-top:24px">Review in the Founding admin panel.</p>
-          </div></body></html>`;
+`);
         const text = `New founding application\n\n${data.full_name} <${data.email}>\nWhatsApp: ${data.whatsapp_number}\nRequested plan: ${data.requested_plan.toUpperCase()}\nCountry: ${data.country || "—"}\nBroker: ${data.broker || "—"}\nExperience: ${data.experience_years ?? "—"} yrs\nMonthly volume: $${data.monthly_volume_usd ?? "—"}\nMyFxBook: ${data.myfxbook_url || "—"}\n\n${data.why_joining}`;
         const messageId = crypto.randomUUID();
         const { sendManagedEmailLogged } = await import("@/lib/email/managed.server");

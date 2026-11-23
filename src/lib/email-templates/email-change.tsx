@@ -11,7 +11,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface EmailChangeEmailProps {
   siteName: string
@@ -39,6 +39,8 @@ export const EmailChangeEmail = ({
         <LogoHeader />
         <Section style={s.card}>
         <Heading style={s.h1}>Confirm your email change</Heading>
+          <AccountPill recipient={oldEmail} />
+          <EmailIllustration kind="security" />
         <Text style={s.text}>
           You requested to change your email address for {siteName} from{' '}
           <Link href={`mailto:${oldEmail}`} style={linkStyle}>
@@ -59,7 +61,7 @@ export const EmailChangeEmail = ({
         <Text style={s.footer}>
           If you didn't request this change, please secure your account
           immediately.
-        </Text><Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+        </Text><EmailFooter />
         </Section>
       </Container>
     </Body>

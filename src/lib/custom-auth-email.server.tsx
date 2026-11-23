@@ -49,7 +49,7 @@ export async function sendCustomAuthEmail({ to, type, code, resetLink }: CustomA
     ) : type === 'existing_account' ? (
       <ExistingAccountEmail />
     ) : type !== 'recovery' ? (
-      <SignInCodeEmail kind={type} token={code ?? ''} />
+      <SignInCodeEmail kind={type} token={code ?? ''} recipient={to} />
     ) : (
       <RecoveryEmail
         siteName={SITE_NAME}

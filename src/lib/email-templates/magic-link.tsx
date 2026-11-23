@@ -10,7 +10,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface MagicLinkEmailProps {
   siteName: string
@@ -29,6 +29,7 @@ export const MagicLinkEmail = ({
         <LogoHeader />
         <Section style={s.card}>
         <Heading style={s.h1}>Your login link</Heading>
+          <EmailIllustration kind="security" />
         <Text style={s.text}>
           Click the button below to log in to {siteName}. This link will expire
           shortly.
@@ -38,7 +39,7 @@ export const MagicLinkEmail = ({
         </Button></Section>
         <Text style={s.footer}>
           If you didn't request this link, you can safely ignore this email.
-        </Text><Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+        </Text><EmailFooter />
         </Section>
       </Container>
     </Body>

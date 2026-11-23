@@ -11,7 +11,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface SignupEmailProps {
   siteName: string
@@ -38,6 +38,8 @@ export const SignupEmail = ({
         <LogoHeader />
         <Section style={s.card}>
         <Heading style={s.h1}>Confirm your email</Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="security" />
         <Text style={s.text}>
           Thanks for signing up for{' '}
           <Link href={siteUrl} style={linkStyle}>
@@ -61,7 +63,7 @@ export const SignupEmail = ({
         <Text style={s.footer}>
           If you didn't create an account, you can safely ignore this email.
         </Text>
-        <Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+        <EmailFooter />
         </Section>
       </Container>
     </Body>

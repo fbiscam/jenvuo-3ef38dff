@@ -9,7 +9,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS, MONO } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s, COLORS, MONO } from './_shared'
 import type { TemplateEntry } from './registry'
 
 interface Props {
@@ -49,6 +49,8 @@ const PlanUpgradeEmail = ({
           <Heading as="h1" style={s.h1}>
             You're on {toPlan}.
           </Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="billing" />
           <Text style={s.text}>
             Nice move <span style={mono}>{recipient}</span> — your desk has
             upgraded from <strong style={{ color: COLORS.ink }}>{fromPlan}</strong>{' '}
@@ -77,7 +79,7 @@ const PlanUpgradeEmail = ({
             Questions about your plan or invoice? Reply to this email.
           </Text>
 
-          <Text style={s.legal}>JENVU · Subscription updates</Text>
+          <EmailFooter />
         </Section>
       </Container>
     </Body>
@@ -87,7 +89,7 @@ const PlanUpgradeEmail = ({
 const mono = { color: COLORS.ink, fontFamily: MONO, fontSize: '13px' }
 const box = {
   border: `1px solid ${COLORS.border}`,
-  borderRadius: '12px',
+  borderRadius: '8px',
   padding: '18px 20px',
   margin: '4px 0 22px',
   backgroundColor: '#fafafa',
@@ -95,7 +97,7 @@ const box = {
 const boxLabel = {
   fontFamily: MONO,
   fontSize: '10px',
-  letterSpacing: '0.24em',
+  letterSpacing: '0',
   color: COLORS.soft,
   textTransform: 'uppercase' as const,
   margin: '0 0 6px',
@@ -110,7 +112,7 @@ const boxValue = {
 const boxSub = {
   fontFamily: MONO,
   fontSize: '11px',
-  letterSpacing: '0.06em',
+  letterSpacing: '0',
   color: COLORS.muted,
   margin: 0,
 }
@@ -118,7 +120,7 @@ const stepsHeading = {
   fontFamily: MONO,
   fontSize: '10px',
   fontWeight: 700 as const,
-  letterSpacing: '0.2em',
+  letterSpacing: '0',
   color: COLORS.muted,
   textTransform: 'uppercase' as const,
   margin: '4px 0 10px',

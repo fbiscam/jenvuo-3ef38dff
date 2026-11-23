@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { Body, Container, Heading, Html, Preview, Section, Text } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 export type SignInCodeKind = 'login' | 'second_step' | 'email_2fa_setup'
 
@@ -28,7 +28,7 @@ const COPY: Record<SignInCodeKind, { subject: string; heading: string; intro: st
 
 export const signInCodeSubject = (kind: SignInCodeKind) => COPY[kind].subject
 
-export const SignInCodeEmail = ({ kind, token }: { kind: SignInCodeKind; token: string }) => {
+export const SignInCodeEmail = ({ kind, token, recipient }: { kind: SignInCodeKind; token: string; recipient?: string }) => {
   const c = COPY[kind]
   return (
     <Html lang="en" dir="ltr">
@@ -39,6 +39,8 @@ export const SignInCodeEmail = ({ kind, token }: { kind: SignInCodeKind; token: 
           <LogoHeader />
           <Section style={s.card}>
             <Heading style={s.h1}>{c.heading}</Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="security" />
             <Text style={s.text}>{c.intro}</Text>
             <Section style={s.codeBox}>
               <Text style={s.codeLabel}>{c.label}</Text>
@@ -48,7 +50,7 @@ export const SignInCodeEmail = ({ kind, token }: { kind: SignInCodeKind; token: 
             <Text style={s.footer}>
               If you didn't ask for this code, someone may know your email or password. Change your password from the Security page.
             </Text>
-            <Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+            <EmailFooter />
           </Section>
         </Container>
       </Body>

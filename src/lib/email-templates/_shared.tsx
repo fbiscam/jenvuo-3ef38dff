@@ -1,5 +1,7 @@
 import * as React from 'react'
-import { Head, Img, Section, Text } from '@react-email/components'
+import { Head, Img, Link, Section, Text } from '@react-email/components'
+
+import { EMAIL_ART, type EmailArtKind } from './_visuals'
 
 export const SITE_URL = 'https://jenvu.com'
 /** Borderless J mark (no outer rounded box), used in every email masthead. */
@@ -27,8 +29,12 @@ export const COLORS = {
   border: '#dadce0',
   hairline: '#dadce0',
   accent: '#111111',
-  link: '#1a0dab',
-  codeBg: '#f1f3f4',
+  link: '#202124',
+  codeBg: '#f5f7f8',
+  notice: '#e8f2ee',
+  warning: '#fceeee',
+  success: '#188038',
+  danger: '#b3261e',
 }
 
 /** Load Google Sans inside <Head>. Falls back to system sans-serif when web fonts are blocked. */
@@ -82,7 +88,7 @@ export const LogoHeader = (_props: { tagline?: string } = {}) => (
 )
 
 const logoWrap = {
-  padding: '32px 28px 0',
+  padding: '32px 24px 0',
   backgroundColor: '#ffffff',
   textAlign: 'center' as const,
 }
@@ -92,7 +98,7 @@ const logoWord = {
   fontFamily: '"Google Sans Flex","Google Sans","Google Sans Normal",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif',
   fontSize: '22px',
   fontWeight: 400 as const,
-  letterSpacing: '-0.005em',
+  letterSpacing: '0',
   color: COLORS.ink,
   lineHeight: '1',
 }
@@ -102,35 +108,35 @@ export const shellStyles = {
   main: {
     backgroundColor: COLORS.bg,
     fontFamily: INTER,
-    padding: '40px 12px',
+    padding: '24px 10px',
     margin: 0,
   },
   container: {
     maxWidth: '560px',
     margin: '0 auto',
     backgroundColor: COLORS.card,
-    borderRadius: '10px',
+    borderRadius: '8px',
     border: `1px solid ${COLORS.border}`,
     overflow: 'hidden' as const,
   },
-  card: { padding: '20px 40px 32px' },
+  card: { padding: '24px 24px 28px', overflowWrap: 'anywhere' as const },
   eyebrow: {
     fontFamily: INTER,
     fontSize: '12px',
     fontWeight: 500 as const,
-    letterSpacing: '0.02em',
+    letterSpacing: '0',
     color: COLORS.muted,
     margin: '0 0 8px',
   },
   h1: {
     fontFamily: INTER,
-    fontSize: '24px',
+    fontSize: '26px',
     fontWeight: 400 as const,
     color: COLORS.ink,
     letterSpacing: '0',
-    margin: '0 0 24px',
-    padding: '0 0 20px',
-    borderBottom: `1px solid ${COLORS.hairline}`,
+    margin: '0 0 18px',
+    padding: '0',
+    borderBottom: 'none',
     textAlign: 'center' as const,
     lineHeight: '1.33',
   },
@@ -149,14 +155,14 @@ export const shellStyles = {
   },
   button: {
     display: 'inline-block',
-    backgroundColor: '#111111',
-    color: '#ffffff',
-    border: '1px solid #111111',
+    backgroundColor: COLORS.accent,
+    color: COLORS.card,
+    border: `1px solid ${COLORS.accent}`,
     fontFamily: INTER,
     fontSize: '14px',
     fontWeight: 500 as const,
-    borderRadius: '4px',
-    padding: '10px 24px',
+    borderRadius: '999px',
+    padding: '13px 26px',
     textDecoration: 'none',
     margin: '4px 0 0',
 
@@ -196,7 +202,7 @@ export const shellStyles = {
   },
   codeBox: {
     backgroundColor: COLORS.codeBg,
-    borderRadius: '10px',
+    borderRadius: '8px',
     padding: '22px 20px',
     margin: '18px 0 22px',
     textAlign: 'center' as const,
@@ -206,7 +212,7 @@ export const shellStyles = {
     fontFamily: INTER,
     fontSize: '12px',
     fontWeight: 500 as const,
-    letterSpacing: '0.02em',
+    letterSpacing: '0',
     color: COLORS.muted,
     margin: '0 0 10px',
   },
@@ -215,7 +221,7 @@ export const shellStyles = {
     fontSize: '32px',
     fontWeight: 500 as const,
     color: COLORS.ink,
-    letterSpacing: '0.18em',
+    letterSpacing: '0',
     margin: '0 0 10px',
     padding: '0 0 0 6px',
   },
@@ -234,4 +240,36 @@ export const EmailHead = () => (
   <Head>
     <EmailFonts />
   </Head>
+)
+
+/** Recipient is optional: never show an invented address in an actual email. */
+export const AccountPill = ({ recipient }: { recipient?: string }) => recipient ? (
+  <Section style={{ textAlign: 'center', margin: '0 0 22px' }}>
+    <Text style={{ display: 'inline-block', border: `1px solid ${COLORS.border}`, borderRadius: '999px', padding: '7px 12px', margin: 0, color: COLORS.body, fontSize: '13px', lineHeight: '1.5', overflowWrap: 'anywhere', maxWidth: '100%', boxSizing: 'border-box' }}>
+      <span aria-hidden="true">◎ &nbsp;</span>{recipient}
+    </Text>
+  </Section>
+) : null
+
+export const EmailIllustration = ({ kind = 'security' }: { kind?: EmailArtKind }) => (
+  <Section style={{ borderTop: `1px solid ${COLORS.hairline}`, padding: '24px 0', textAlign: 'center' }}>
+    <Img src={EMAIL_ART[kind]} width="160" alt={kind === 'gift' ? 'Gift and promo ticket' : kind === 'billing' ? 'Payment receipt' : 'Account and security'} style={{ display: 'block', width: '160px', maxWidth: '100%', height: 'auto', margin: '0 auto' }} />
+  </Section>
+)
+
+export const EmailNotice = ({ children, tone = 'info' }: { children: React.ReactNode; tone?: 'info' | 'warning' }) => (
+  <Section style={{ padding: '16px 18px', backgroundColor: tone === 'warning' ? COLORS.warning : COLORS.notice, borderRadius: '8px', margin: '0 0 22px' }}>
+    <Text style={{ ...shellStyles.text, fontSize: '14px', margin: 0 }}>{children}</Text>
+  </Section>
+)
+
+export const EmailFooter = () => (
+  <Section style={{ borderTop: `1px solid ${COLORS.hairline}`, paddingTop: '18px', marginTop: '24px', textAlign: 'center' }}>
+    <Text style={shellStyles.footer}>This email concerns your Jenvu account or a request you made.</Text>
+    <Text style={{ ...shellStyles.footer, margin: 0 }}>
+      <Link href="https://support.jenvu.com" style={shellStyles.footerLink}>Help</Link>
+      {' · '}<Link href="https://jenvu.com/privacy" style={shellStyles.footerLink}>Privacy</Link>
+      {' · '}Jenvu
+    </Text>
+  </Section>
 )

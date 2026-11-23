@@ -1,6 +1,9 @@
 // Server-only: transactional emails for crypto top-up payments.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { networkMeta } from "./shared";
+import { render } from "@react-email/render";
+import { createElement } from "react";
+import { PaymentEmail } from "../email-templates/payment";
 
 const FROM = "Jenvu Billing <billing@notify.jenvu.com>";
 
@@ -28,18 +31,6 @@ async function resolveEmail(order: OrderLike): Promise<string | null> {
   }
 }
 
-function shell(title: string, lines: string[], accent: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#f6f7f9;padding:28px 12px;font-family:'Google Sans',Roboto,Helvetica,Arial,sans-serif;color:#18181b">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-  <table role="presentation" width="100%" style="max-width:520px;background:#fff;border-radius:18px;padding:28px" cellpadding="0" cellspacing="0">
-    <tr><td style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#71717a">Jenvu · Billing</td></tr>
-    <tr><td style="padding-top:10px;font-size:22px;font-weight:600;color:${accent}">${title}</td></tr>
-    ${lines.map((l) => `<tr><td style="padding-top:12px;font-size:14px;line-height:1.6;color:#3f3f46">${l}</td></tr>`).join("")}
-    <tr><td style="padding-top:22px"><a href="https://jenvu.com/dashboard/billing" style="display:inline-block;background:#ffffff;color:#111827;text-decoration:none;padding:12px 20px;border-radius:10px;border:1px solid #e5e7eb;box-shadow:0 1px 2px rgba(17,24,39,.08);font-size:14px;font-weight:600">Open billing</a></td></tr>
-    <tr><td style="padding-top:22px;font-size:12px;color:#a1a1aa">Need help? Reply to this email or contact support@jenvu.com</td></tr>
-  </table></td></tr></table></body></html>`;
-}
-
 export async function sendPaymentEmail(args: {
   kind: "submitted" | "approved" | "rejected";
   order: OrderLike;
@@ -53,34 +44,16 @@ export async function sendPaymentEmail(args: {
   const bonus = Number(args.order.bonus_usd ?? 0);
   const ref = args.order.id.slice(0, 8).toUpperCase();
 
-  let subject = "";
-  let html = "";
-
-  if (args.kind === "submitted") {
-    subject = `We received your $${pay} payment — verifying`;
-    html = shell("Payment received, verifying", [
-      `Thanks — we've received your transaction and it's being verified on <b>${net.chain}</b>.`,
-      `Reference: <b>#${ref}</b><br/>Amount sent: <b>$${pay} USDT</b><br/>Credit on approval: <b>$${credit}</b>${bonus > 0 ? ` (includes $${bonus.toFixed(2)} bonus)` : ""}`,
-      args.order.tx_hash ? `Transaction: <code style="font-size:12px">${args.order.tx_hash}</code>` : "",
-      `Most payments confirm automatically within a few minutes. If it needs a manual check, our team reviews it shortly.`,
-    ].filter(Boolean), "#18181b");
-  } else if (args.kind === "approved") {
-    subject = `$${credit} added to your Jenvu wallet`;
-    html = shell("Payment approved", [
-      `Your top-up is confirmed and <b>$${credit}</b> has been added to your scan wallet.`,
-      `Reference: <b>#${ref}</b><br/>Paid: <b>$${pay} USDT</b> on ${net.chain}${args.order.promo_code ? `<br/>Promo: <b>${args.order.promo_code}</b>` : ""}${bonus > 0 ? `<br/>Bonus: <b>$${bonus.toFixed(2)}</b>` : ""}`,
-      `You can start scanning right away.`,
-    ], "#047857");
-  } else {
-    subject = `Your $${pay} payment could not be approved`;
-    html = shell("Payment rejected", [
-      `We couldn't approve your top-up (reference <b>#${ref}</b>).`,
-      `Reason: <b>${args.order.reject_reason ?? "Verification failed"}</b>`,
-      `No credit was added. If you believe this is a mistake, reply with your transaction ID and we'll re-check it.`,
-    ], "#b91c1c");
-  }
-
-  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const subject = args.kind === "submitted" ? `We received your $${pay} payment — verifying` : args.kind === "approved" ? `$${credit} added to your Jenvu wallet` : `Your $${pay} payment could not be approved`;
+  const element = createElement(PaymentEmail, {
+    kind: args.kind, recipient: to, amount: pay, credit, reference: ref, network: net.chain,
+    ...(args.order.tx_hash ? { transaction: args.order.tx_hash } : {}),
+    ...(args.kind === "rejected" ? { reason: args.order.reject_reason ?? "Verification failed" } : {}),
+    ...(bonus > 0 ? { bonus: bonus.toFixed(2) } : {}),
+    ...(args.order.promo_code ? { promo: args.order.promo_code } : {}),
+  });
+  const html = await render(element);
+  const text = await render(element, { plainText: true });
   const { sendManagedEmailLogged } = await import("@/lib/email/managed.server");
   const ok = await sendManagedEmailLogged(supabaseAdmin, {
     to,

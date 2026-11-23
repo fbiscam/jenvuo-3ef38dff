@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { Body, Button, Container, Heading, Html, Preview, Section, Text } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS, INTER } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s, COLORS, INTER } from './_shared'
 import type { TemplateEntry } from './registry'
 
 interface Props {
+  recipient?: string
   planName?: string
   months?: number
   code?: string
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const PlanGiftEmail = ({
+  recipient,
   planName = 'Pro',
   months = 1,
   code = 'JNV-PRO-1M-XXXX-XXXX',
@@ -34,6 +36,8 @@ const PlanGiftEmail = ({
             <Heading as="h1" style={s.h1}>
               You've received Jenvu {planName}
             </Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="gift" />
             <Text style={{ ...s.text, textAlign: 'center' as const }}>
               Here is your promo code for <strong>{duration}</strong> of the{' '}
               <strong>{planName}</strong> plan. Apply it from Billing to start right away.
@@ -98,7 +102,7 @@ const PlanGiftEmail = ({
               This code works only for this email address and can be used once. Keep it private.
               Didn't expect this? You can ignore this email.
             </Text>
-            <Text style={s.legal}>Jenvu · Promo codes</Text>
+            <EmailFooter />
           </Section>
         </Container>
       </Body>
@@ -108,7 +112,7 @@ const PlanGiftEmail = ({
 
 const codeCard = {
   backgroundColor: COLORS.codeBg,
-  borderRadius: '12px',
+  borderRadius: '8px',
   padding: '24px 16px 22px',
   margin: '20px 0 24px',
   textAlign: 'center' as const,
@@ -116,10 +120,10 @@ const codeCard = {
 const codeLabel = { fontFamily: INTER, fontSize: '12px', fontWeight: 500 as const, color: COLORS.muted, margin: '0 0 10px', textAlign: 'center' as const }
 const codeValue = {
   fontFamily: INTER,
-  fontSize: '19px',
+  fontSize: '16px',
   fontWeight: 500 as const,
   color: COLORS.ink,
-  letterSpacing: '0.04em',
+  letterSpacing: '0',
   margin: '0 0 14px',
   textAlign: 'center' as const,
   whiteSpace: 'nowrap' as const,
@@ -129,17 +133,17 @@ const chip = {
   fontSize: '12px',
   fontWeight: 500 as const,
   color: COLORS.ink,
-  backgroundColor: '#ffffff',
+  backgroundColor: COLORS.card,
   border: `1px solid ${COLORS.border}`,
   borderRadius: '999px',
   padding: '4px 12px',
   whiteSpace: 'nowrap' as const,
 }
 const codeHint = { fontFamily: INTER, fontSize: '12px', color: COLORS.soft, margin: '12px 0 0', textAlign: 'center' as const }
-const perkBox = { border: `1px solid ${COLORS.border}`, borderRadius: '12px', padding: '18px 20px 12px', margin: '0 0 8px' }
-const stepsBox = { border: `1px solid ${COLORS.border}`, borderRadius: '12px', padding: '18px 20px 12px', margin: '0' }
+const perkBox = { border: `1px solid ${COLORS.border}`, borderRadius: '8px', padding: '18px 20px 12px', margin: '0 0 8px' }
+const stepsBox = { border: `1px solid ${COLORS.border}`, borderRadius: '8px', padding: '18px 20px 12px', margin: '0' }
 const sectionLabel = { fontFamily: INTER, fontSize: '13px', fontWeight: 500 as const, color: COLORS.ink, margin: '0 0 10px' }
-const tickCell = { width: '22px', verticalAlign: 'top' as const, fontFamily: INTER, fontSize: '14px', color: '#188038', padding: '0 0 8px', lineHeight: '1.5' }
+const tickCell = { width: '22px', verticalAlign: 'top' as const, fontFamily: INTER, fontSize: '14px', color: COLORS.success, padding: '0 0 8px', lineHeight: '1.5' }
 const perkText = { verticalAlign: 'top' as const, fontFamily: INTER, fontSize: '14px', color: COLORS.body, padding: '0 0 8px', lineHeight: '1.5' }
 const stepNum = {
   width: '22px',

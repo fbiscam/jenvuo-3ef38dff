@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { Body, Container, Html, Preview, Section, Text } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s, COLORS } from './_shared'
 import type { TemplateEntry } from './registry'
 
 interface Props {
+  recipient?: string
   subject?: string
   body?: string
   boxLabel?: string
@@ -12,6 +13,7 @@ interface Props {
 
 /** One-to-one message written by the Jenvu team from the admin Email box. */
 const AdminMessageEmail = ({
+  recipient,
   subject = 'Message from Jenvu',
   body = '',
   boxLabel = 'Jenvu Support',
@@ -28,6 +30,8 @@ const AdminMessageEmail = ({
           <Section style={s.card}>
             <Text style={s.eyebrow}>{boxLabel}</Text>
             <Text style={{ ...s.text, fontSize: '18px', color: COLORS.ink, margin: '0 0 20px' }}>{subject}</Text>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="security" />
             {paragraphs.length === 0 ? (
               <Text style={s.text}>Hello from the Jenvu team.</Text>
             ) : (
@@ -40,7 +44,7 @@ const AdminMessageEmail = ({
             <Text style={{ ...s.footer, marginTop: '24px' }}>
               Just reply to this email — your answer goes to {replyAddress}.
             </Text>
-            <Text style={s.legal}>Jenvu · {boxLabel}</Text>
+            <EmailFooter />
           </Section>
         </Container>
       </Body>

@@ -11,7 +11,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface InviteEmailProps {
   siteName: string
@@ -32,6 +32,7 @@ export const InviteEmail = ({
         <LogoHeader />
         <Section style={s.card}>
         <Heading style={s.h1}>You've been invited</Heading>
+          <EmailIllustration kind="security" />
         <Text style={s.text}>
           You've been invited to join{' '}
           <Link href={siteUrl} style={linkStyle}>
@@ -46,7 +47,7 @@ export const InviteEmail = ({
         <Text style={s.footer}>
           If you weren't expecting this invitation, you can safely ignore this
           email.
-        </Text><Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+        </Text><EmailFooter />
         </Section>
       </Container>
     </Body>

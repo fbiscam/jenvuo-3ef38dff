@@ -9,7 +9,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s, COLORS } from './_shared'
 import type { TemplateEntry } from './registry'
 import { FREE_PLAN_CREDIT_USD, TERMINAL_DAILY_HOURS } from '../free-plan'
 
@@ -59,6 +59,8 @@ const WelcomeEmail = ({
             <Heading style={s.h1}>
               {first ? `Welcome, ${first}` : 'Welcome to Jenvu'}
             </Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="security" />
             <Text style={s.text}>
               You&apos;re in. Jenvu brings live charts, AI analysis and 60+ AI
               models together for Gold (XAU/USD), Bitcoin (BTC/USD) and EUR/USD.
@@ -97,6 +99,7 @@ const WelcomeEmail = ({
             <Text style={fineprint}>
               Trading involves risk; Jenvu gives analysis, not guaranteed results. Questions? Reply to this email or visit support.jenvu.com.
             </Text>
+          <EmailFooter />
           </Section>
         </Container>
       </Body>

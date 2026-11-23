@@ -9,7 +9,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS, MONO } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s, COLORS, MONO } from './_shared'
 import type { TemplateEntry } from './registry'
 
 interface Props {
@@ -42,6 +42,8 @@ const LowCreditEmail = ({
           <Heading as="h1" style={s.h1}>
             Your credits are running low.
           </Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="billing" />
           <Text style={s.text}>
             Heads up <span style={mono}>{recipient}</span> — your{' '}
             <strong style={{ color: COLORS.ink }}>{plan}</strong> plan has
@@ -76,7 +78,7 @@ const LowCreditEmail = ({
             Manage alert frequency from your Jenvu dashboard.
           </Text>
 
-          <Text style={s.legal}>JENVU · Billing notifications</Text>
+          <EmailFooter />
         </Section>
       </Container>
     </Body>
@@ -87,7 +89,7 @@ const mono = { color: COLORS.ink, fontFamily: MONO, fontSize: '13px' }
 const meterBox = {
   backgroundColor: '#ffffff',
   border: `1px solid ${COLORS.border}`,
-  borderRadius: '12px',
+  borderRadius: '8px',
   padding: '22px 20px',
   margin: '4px 0 22px',
   textAlign: 'center' as const,
@@ -95,7 +97,7 @@ const meterBox = {
 const meterLabel = {
   fontFamily: MONO,
   fontSize: '10px',
-  letterSpacing: '0.28em',
+  letterSpacing: '0',
   color: COLORS.ink,
   textTransform: 'uppercase' as const,
   margin: '0 0 8px',
@@ -105,13 +107,13 @@ const meterValue = {
   fontSize: '38px',
   fontWeight: 700 as const,
   color: COLORS.ink,
-  letterSpacing: '0.06em',
+  letterSpacing: '0',
   margin: '0 0 6px',
 }
 const meterHint = {
   fontFamily: MONO,
   fontSize: '10px',
-  letterSpacing: '0.15em',
+  letterSpacing: '0',
   color: COLORS.ink,
   textTransform: 'uppercase' as const,
   margin: 0,

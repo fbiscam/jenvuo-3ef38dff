@@ -9,7 +9,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s, COLORS, MONO } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s, COLORS, MONO } from './_shared'
 import type { TemplateEntry } from './registry'
 
 interface Props {
@@ -33,7 +33,7 @@ const NewDeviceEmail = ({
   location = 'Unknown location',
   ip = '0.0.0.0',
   signedInAt = new Date().toUTCString(),
-  secureAccountUrl = `${SITE}/dashboard/profile`,
+  secureAccountUrl = 'https://dash.jenvu.com/security',
 }: Props) => (
   <Html lang="en" dir="ltr">
     <EmailHead />
@@ -42,10 +42,12 @@ const NewDeviceEmail = ({
       <Container style={s.container}>
         <LogoHeader tagline="JENVU · SECURITY ALERT" />
         <Section style={s.card}>
-          <Text style={{ ...s.eyebrow, color: '#b91c1c' }}>SECURITY // NEW_DEVICE</Text>
+
           <Heading as="h1" style={s.h1}>
-            New sign-in detected.
+            Security alert
           </Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="security" />
           <Text style={s.text}>
             A new device just signed in to your Jenvu desk (
             <span style={mono}>{recipient}</span>). If this was you, no action
@@ -61,15 +63,15 @@ const NewDeviceEmail = ({
             <Row label="SIGNED IN" value={signedInAt} last />
           </Section>
 
-          <Link href={secureAccountUrl} style={s.button}>
-            Secure My Account →
-          </Link>
+          <Section style={s.actionWrap}><Link href={secureAccountUrl} style={s.button}>
+            Review account activity
+          </Link></Section>
 
           <Text style={{ ...s.footer, marginTop: '24px' }}>
             Was this you? Ignore this email — we alert on every new device or location.
           </Text>
 
-          <Text style={s.legal}>JENVU · Security notifications</Text>
+          <EmailFooter />
         </Section>
       </Container>
     </Body>
@@ -92,8 +94,8 @@ const Row = ({ label, value, last }: { label: string; value: string; last?: bool
             borderBottom: last ? 'none' : `1px solid ${COLORS.hairline}`,
             width: '35%',
             fontFamily: MONO,
-            fontSize: '10.5px',
-            letterSpacing: '0.18em',
+            fontSize: '12px',
+            letterSpacing: '0',
             color: COLORS.soft,
             textTransform: 'uppercase' as const,
           }}
@@ -105,7 +107,7 @@ const Row = ({ label, value, last }: { label: string; value: string; last?: bool
             padding: '8px 0',
             borderBottom: last ? 'none' : `1px solid ${COLORS.hairline}`,
             fontFamily: MONO,
-            fontSize: '12.5px',
+            fontSize: '13px',
             color: COLORS.ink,
             textAlign: 'right' as const,
           }}
@@ -120,7 +122,7 @@ const Row = ({ label, value, last }: { label: string; value: string; last?: bool
 const mono = { color: COLORS.ink, fontFamily: MONO, fontSize: '13px' }
 const infoBox = {
   border: `1px solid ${COLORS.border}`,
-  borderRadius: '12px',
+  borderRadius: '8px',
   padding: '4px 16px',
   margin: '4px 0 20px',
   backgroundColor: '#fafafa',

@@ -10,7 +10,7 @@ import {
   Section,
   Text,
 } from '@react-email/components'
-import { EmailHead, LogoHeader, shellStyles as s } from './_shared'
+import { AccountPill, EmailIllustration, EmailFooter, EmailHead, LogoHeader, shellStyles as s } from './_shared'
 
 interface RecoveryEmailProps {
   siteName: string
@@ -23,6 +23,7 @@ interface RecoveryEmailProps {
 export const RecoveryEmail = ({
   siteName,
   confirmationUrl,
+  recipient,
   token,
   showLink = true,
 }: RecoveryEmailProps) => (
@@ -34,6 +35,8 @@ export const RecoveryEmail = ({
         <LogoHeader />
         <Section style={s.card}>
         <Heading style={s.h1}>Reset your password</Heading>
+          <AccountPill recipient={recipient} />
+          <EmailIllustration kind="security" />
         <Text style={s.text}>
           We received a request to reset your password for {siteName}.{' '}
           {showLink
@@ -57,7 +60,7 @@ export const RecoveryEmail = ({
         <Text style={s.footer}>
           If you didn't request a password reset, you can safely ignore this
           email. Your password will not be changed.
-        </Text><Text style={s.legal}>© Jenvu · AI Gold Trading</Text>
+        </Text><EmailFooter />
         </Section>
       </Container>
     </Body>
