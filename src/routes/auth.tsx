@@ -1219,7 +1219,7 @@ function AuthPage() {
         </div>
       </header>
 
-      <main className="flex w-full justify-center px-6 pb-16 pt-10 sm:pt-[72px] lg:pt-12">
+      <main className="flex w-full justify-center px-6 pb-16 pt-10 sm:pt-[72px] lg:pt-6">
         <div className="auth-zoom-desktop w-full max-w-[386px]">
           <h1 className="text-center text-[28px] font-normal tracking-[-0.02em] text-foreground sm:text-[30px]">{title}</h1>
           {!mfaChallenge && ((mode === "signin" && signinStep === "choose") || (mode === "signup" && !otpStep && signupStep === "choose")) && (
