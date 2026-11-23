@@ -1,0 +1,2 @@
+ALTER TABLE public.plan_gift_codes DROP CONSTRAINT IF EXISTS plan_gift_codes_months_check;
+ALTER TABLE public.plan_gift_codes ADD CONSTRAINT plan_gift_codes_months_check CHECK (months BETWEEN 1 AND 12);

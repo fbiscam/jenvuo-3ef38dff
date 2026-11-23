@@ -477,6 +477,13 @@
       "when": 1795412590853,
       "tag": "0067_plan_gift_redeem_server_only",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1795413239494,
+      "tag": "0068_plan_gift_months_1_to_12",
+      "breakpoints": true
     }
   ]
 }

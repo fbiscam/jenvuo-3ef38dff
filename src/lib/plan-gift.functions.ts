@@ -71,7 +71,7 @@ export const opsListPlanGifts = createServerFn({ method: "POST" })
 
 const createInput = z.object({
   plan: z.enum(GIFT_PLANS as [string, ...string[]]),
-  months: z.number().int().refine((m) => (GIFT_MONTHS as readonly number[]).includes(m), "Pick 1, 2, 5 or 12 months."),
+  months: z.number().int().refine((m) => (GIFT_MONTHS as readonly number[]).includes(m), "Pick 1 to 12 months."),
   email: z.string().trim().toLowerCase().email("Enter a valid email.").max(254),
   note: z.string().trim().max(240).optional(),
   validDays: z.number().int().min(1).max(365).default(30),

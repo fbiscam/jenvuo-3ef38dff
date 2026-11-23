@@ -25,7 +25,12 @@ function Segmented<T extends string | number>({
   render: (v: T) => string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="grid gap-2" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}>
+    <div
+      role="radiogroup"
+      aria-label={label}
+      className="grid gap-2"
+      style={{ gridTemplateColumns: `repeat(${Math.min(options.length, 6)}, minmax(0, 1fr))` }}
+    >
       {options.map((o) => {
         const active = o === value;
         return (
@@ -160,7 +165,7 @@ export function AdminPromosPage() {
   return (
     <OpsPage
       title="Promo codes"
-      description="Give one email Pro, Elite or Ultra for 1, 2, 5 or 12 months"
+      description="Give one email Pro, Elite or Ultra for any 1 to 12 months"
       icon={<Gift />}
       actions={
         <button type="button" onClick={() => void load()} className={ops.btn}>
@@ -192,7 +197,7 @@ export function AdminPromosPage() {
               </div>
               <div className="space-y-2">
                 <div className="text-[13px] font-medium text-foreground">Duration</div>
-                <Segmented label="Duration" value={months} options={GIFT_MONTHS} onChange={setMonths} render={(m) => monthsLabel(m)} />
+                <Segmented label="Duration" value={months} options={GIFT_MONTHS} onChange={setMonths} render={(m) => `${m} mo`} />
               </div>
               <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_160px]">
                 <label className="block space-y-2">

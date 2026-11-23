@@ -6,7 +6,7 @@
 export type GiftPlanId = "pro" | "elite" | "ultra";
 
 export const GIFT_PLANS: GiftPlanId[] = ["pro", "elite", "ultra"];
-export const GIFT_MONTHS = [1, 2, 5, 12] as const;
+export const GIFT_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 export type GiftMonths = (typeof GIFT_MONTHS)[number];
 
 export const GIFT_PLAN_PERKS: Record<GiftPlanId, { name: string; perks: string[] }> = {
@@ -54,7 +54,7 @@ export function normalizeGiftCode(code: string): string {
 
 /** Plan gift codes look like JNV-<PLAN>-<N>M-XXXX-XXXX. */
 export function looksLikeGiftCode(code: string): boolean {
-  return /^JNV-(PRO|ELITE|ULTRA)-(1|2|5|12)M-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(normalizeGiftCode(code));
+  return /^JNV-(PRO|ELITE|ULTRA)-([1-9]|1[0-2])M-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(normalizeGiftCode(code));
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;

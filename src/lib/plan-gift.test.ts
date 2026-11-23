@@ -5,10 +5,13 @@ import { GIFT_MONTHS, GIFT_PLANS, isGiftMonths, isGiftPlan, looksLikeGiftCode, m
 const rnd = (n: number) => Uint8Array.from({ length: n }, (_, i) => i * 7);
 
 describe("plan gift codes", () => {
-  it("offers exactly 1, 2, 5 and 12 months", () => {
-    expect([...GIFT_MONTHS]).toEqual([1, 2, 5, 12]);
-    expect(isGiftMonths(3)).toBe(false);
+  it("offers any month from 1 to 12", () => {
+    expect([...GIFT_MONTHS]).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(isGiftMonths(3)).toBe(true);
     expect(isGiftMonths(12)).toBe(true);
+    expect(isGiftMonths(0)).toBe(false);
+    expect(isGiftMonths(13)).toBe(false);
+    expect(looksLikeGiftCode(makeGiftCode("pro", 7, rnd))).toBe(true);
   });
   it("offers only Pro, Elite and Ultra", () => {
     expect(GIFT_PLANS).toEqual(["pro", "elite", "ultra"]);
