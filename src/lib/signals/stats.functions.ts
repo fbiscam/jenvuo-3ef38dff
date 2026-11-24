@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type SignalPerformance = {
   windowDays: number;
@@ -12,12 +13,14 @@ export type SignalPerformance = {
 };
 
 /**
- * Public, aggregate-only signal performance (rolling window). No user data,
- * no per-ticket rows — safe to show on the signal page.
+ * Admin-only aggregate signal performance (rolling window): internal strategy results.
  */
 export const getSignalPerformance = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: { days?: number } | undefined) => ({ days: Number(d?.days ?? 30) }))
-  .handler(async ({ data }): Promise<SignalPerformance> => {
+  .handler(async ({ data, context }): Promise<SignalPerformance> => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Not allowed");
     const days = Math.max(7, Math.min(90, Number.isFinite(data.days) ? data.days : 30));
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { computeCalibration } = await import("@/lib/signals/calibration.server");

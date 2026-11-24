@@ -1,9 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type BotProfitStat = { profit: number; accounts: number; day: string | null };
 
-/** Public aggregate only: total JX Bot profit of the latest reported day across all accounts. */
-export const getBotDailyProfit = createServerFn({ method: "GET" }).handler(async (): Promise<BotProfitStat> => {
+/** Admins only: total JX Bot profit of the latest reported day across all accounts. */
+export const getBotDailyProfit = createServerFn({ method: "GET" }).middleware([requireSupabaseAuth]).handler(async ({ context }): Promise<BotProfitStat> => {
+  const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+  if (!isAdmin) throw new Error("Not allowed");
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: latest } = await supabaseAdmin
