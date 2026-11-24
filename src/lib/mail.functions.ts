@@ -114,15 +114,14 @@ export const listMail = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     const rows = (states ?? []) as any[];
+    // Names/photos are shown only for the viewer and for people who wrote to the viewer.
+    // Writing to an address must never reveal who owns it.
+    const received = rows.filter((r) => r.mail_messages?.recipient_id === context.userId);
     const userIds = Array.from(
-      new Set(
-        rows.flatMap((r) => [r.mail_messages?.sender_id, r.mail_messages?.recipient_id]).filter(Boolean),
-      ),
+      new Set([context.userId, ...received.map((r) => r.mail_messages?.sender_id)].filter(Boolean)),
     );
     const addresses = Array.from(
-      new Set(
-        rows.flatMap((r) => [r.mail_messages?.sender_address, r.mail_messages?.recipient_address]).filter(Boolean),
-      ),
+      new Set(received.map((r) => r.mail_messages?.sender_address).filter(Boolean)),
     );
     let profileMap = new Map<string, { full_name: string | null; avatar_url: string | null }>();
     const avatarUrlMap = new Map<string, string>();

@@ -6,6 +6,8 @@ export const getTerminalAccess = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { checkTerminalAccess } = await import("@/lib/terminal-access.server");
-    const email = (context.claims as { email?: string } | undefined)?.email ?? null;
+    const { verifiedEmailFor } = await import("@/lib/verified-email");
+    const { data } = await (context.supabase as any).auth.getUser();
+    const email = verifiedEmailFor(data?.user, context.userId);
     return checkTerminalAccess(context.supabase as any, context.userId, email);
   });

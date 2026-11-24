@@ -7,7 +7,8 @@ async function readAccess(context: { supabase: unknown; userId: string; claims?:
   // Only a confirmed mailbox may match a Founding application by email.
   const { data: authUser } = await client.auth.getUser();
   const u = authUser?.user;
-  const email = u?.email && u.email_confirmed_at && u.id === context.userId ? (u.email as string) : null;
+  const { verifiedEmailFor } = await import("@/lib/verified-email");
+  const email = verifiedEmailFor(u, context.userId);
   const { checkPlanAccess } = await import("@/lib/terminal-access.server");
   await client.rpc("expire_my_pro_trial");
   const [terminal, { data: sub }] = await Promise.all([

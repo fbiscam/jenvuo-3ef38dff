@@ -1126,7 +1126,6 @@ async function linkApplicationToUser(admin: any, applicationId: string, userId: 
 // Returns the founding_applications row for the current user: linked by user_id,
 // else matched by the signed-in email and linked on the spot (creates none).
 async function getMyApplication(context: any, fields = "id, email, full_name, requested_plan, document_status, documents_rejected_at, user_id") {
-  const email = (context.claims as any)?.email as string | undefined;
   const admin = await getServiceClient();
   const { data: linked } = await admin
     .from("founding_applications" as any)
@@ -1136,11 +1135,15 @@ async function getMyApplication(context: any, fields = "id, email, full_name, re
     .limit(1)
     .maybeSingle();
   if (linked) return linked as any;
+  // Only a proven, confirmed mailbox may claim an unlinked application, matched exactly.
+  const { verifiedEmailFor, exactLike } = await import("@/lib/verified-email");
+  const { data: authUser } = await context.supabase.auth.getUser();
+  const email = verifiedEmailFor(authUser?.user, context.userId);
   if (!email) return null;
   const { data: legacy } = await admin
     .from("founding_applications" as any)
     .select(fields)
-    .ilike("email", email)
+    .ilike("email", exactLike(email))
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
