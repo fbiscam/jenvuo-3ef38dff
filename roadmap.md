@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Match Support and Why Jenvu FAQs to JX Bot using one shared disclosure layout; all 23 questions fit one line at 320/393/768/1280px with identical row widths, heights and font sizes. Opening/closing answers and Support expand/collapse-all verified with no runtime errors; utility numeric-input regression passes and reported line 8 is absent. Answers and account/trading rules unchanged; published-site verification pending.
+
 - [x] Fit shared homepage/Platform get-started card descriptions and tick rows on one mobile line with shorter copy and compact phone spacing; verified 320/393px and desktop. Utility numeric-input test passes; reported line 8 is absent in the current seven-line helper; build OK.
 - [x] Follow-up sweep: reread both shared-section callers (homepage and Platform), both card descriptions, eight tick rows, action links, separate Platform enterprise list, page sizing and the sole class-name helper. No duplicate get-started section/helper or remaining violation within the requested sections; unrelated feature lists and all account/server records unchanged.
 

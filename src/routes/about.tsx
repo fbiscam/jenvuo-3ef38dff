@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { ArrowRight, Bot, CandlestickChart, Code2, Layers, MessageSquare, Newspaper, Plus, ShieldCheck, Users } from 'lucide-react'
+import { ArrowRight, Bot, CandlestickChart, Code2, Layers, MessageSquare, Newspaper, ShieldCheck, Users } from 'lucide-react'
 import SiteHeader from '@/components/SiteHeader'
 import SiteFooter from '@/components/SiteFooter'
 import { Button } from '@/components/ui/button'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import PublicFaqs from '@/components/PublicFaqs'
 import { useAuthUser } from '@/hooks/useAuthUser'
 import { PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from '@/lib/free-plan'
 import { WhyProductPreview, WhyWorkspaceScene } from '@/components/WhyWorkspaceScene'
@@ -48,14 +48,14 @@ const benefits = [
   { icon: Newspaper, title: 'News Trading, always free', text: 'Follow the next US high-impact release, with countdowns and beat-or-miss context every plan.' },
 ]
 const faqs = [
-  ['What is included in one workspace?', 'Terminal, JX Bot, News Trading and Platform share your Jenvu account. Use chart analysis, follow US economic releases, manage your bot and build with model APIs without separate product accounts. Each product keeps its own plan allowances.'],
+  ['What’s in the workspace?', 'Terminal, JX Bot, News Trading and Platform share your Jenvu account. Use chart analysis, follow US economic releases, manage your bot and build with model APIs without separate product accounts. Each product keeps its own plan allowances.'],
   ['Can I start on the Free plan?', 'Yes. New accounts start on Free with one API key and free News Trading. JX Bot comes with every paid plan. There is no new free trial.'],
-  ['How many Terminal indicator hours do I get?', `Free includes ${TERMINAL_DAILY_HOURS.free} hours per UTC day, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite}, and Ultra ${TERMINAL_DAILY_HOURS.ultra}. When the allowance runs out, paid indicators lock until the next UTC day. The Terminal remains accessible.`],
-  ['What does the JX Bot daily target mean?', 'Pro 2%, Elite 4% and Ultra 6% per account. These are maximum safety caps, not guaranteed returns. JX Bot trades EUR/USD M15.'],
-  ['How many IPs and API keys are included?', `JX Bot IPs: Pro 1, Elite 3, Ultra 4 (Free has no JX Bot). API keys: Free ${PLAN_API_KEYS.free}, Pro ${PLAN_API_KEYS.pro}, Elite ${PLAN_API_KEYS.elite}, Ultra ${PLAN_API_KEYS.ultra}. One IP is bound to one MT5 account.`],
-  ['How does the Founding Program work?', 'Apply for Pro or Elite. If approved, complete ID verification to start a one-time 30-day plan grant with that plan’s API credit. After the month ends, continue on Free or purchase a plan.'],
-  ['Can I create more than one account?', 'Yes. Multiple accounts are allowed, including on the same device or network. Each email address can be linked to only one account at a time.'],
-  ['What happens when my API credit runs out?', 'API usage stops when there is insufficient credit. Plans are available from Payments; separate credit top-ups are not offered.'],
+  ['How many Terminal hours?', `Free includes ${TERMINAL_DAILY_HOURS.free} hours per UTC day, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite}, and Ultra ${TERMINAL_DAILY_HOURS.ultra}. When the allowance runs out, paid indicators lock until the next UTC day. The Terminal remains accessible.`],
+  ['What is the bot daily target?', 'Pro 2%, Elite 4% and Ultra 6% per account. These are maximum safety caps, not guaranteed returns. JX Bot trades EUR/USD M15.'],
+  ['How many IPs and API keys?', `JX Bot IPs: Pro 1, Elite 3, Ultra 4 (Free has no JX Bot). API keys: Free ${PLAN_API_KEYS.free}, Pro ${PLAN_API_KEYS.pro}, Elite ${PLAN_API_KEYS.elite}, Ultra ${PLAN_API_KEYS.ultra}. One IP is bound to one MT5 account.`],
+  ['How does Founding work?', 'Apply for Pro or Elite. If approved, complete ID verification to start a one-time 30-day plan grant with that plan’s API credit. After the month ends, continue on Free or purchase a plan.'],
+  ['Can I have multiple accounts?', 'Yes. Multiple accounts are allowed, including on the same device or network. Each email address can be linked to only one account at a time.'],
+  ['What if API credit runs out?', 'API usage stops when there is insufficient credit. Plans are available from Payments; separate credit top-ups are not offered.'],
 ]
 const samples = [
   { name: 'Arjun', role: 'CFD trader', image: portrait1, quote: 'Trading CFDs with FORAX has been smooth for me. The platform is easy to navigate, execution is quick, and the account setup was straightforward. I still do my own research before every trade, but having a reliable broker makes a real difference.' },
@@ -110,10 +110,9 @@ function AboutPage() {
         <h2 className="why-heading">Community voices</h2>
         <div className="why-review-columns mt-9">{samples.map((q,i) => <article key={q.name} className="why-review"><p className="text-[15px] leading-[26px]">“{q.quote}”</p><div className="mt-6 flex items-center gap-2 text-xs"><img src={q.image} width={28} height={28} loading="lazy" className="why-review-avatar" alt={`${q.name}, illustrative profile`} /><div>{q.name}<span className="block text-[10px] text-gc-ink-muted">{q.role}</span></div><ReviewPlatformMark platform={reviewPlatforms[i] ?? 'tradingview'} /></div></article>)}</div>
       </section>
-      <section className="why-wrap why-section py-28 sm:py-40">
-        <h2 className="why-heading mb-10 text-[38px] sm:text-[46px]">FAQ</h2>
-        <Accordion type="single" collapsible>{faqs.map(([q,a],i) => <AccordionItem key={q} value={`faq-${i}`} className="border-gc-line"><AccordionTrigger className="group py-7 text-[16px] sm:text-[17px] font-normal hover:no-underline [&>svg]:hidden"><span className="pr-5">{q}</span><span className="ml-auto shrink-0"><Plus className="size-5 text-gc-ink-muted transition-transform group-data-[state=open]:rotate-45" /></span></AccordionTrigger><AccordionContent className="max-w-[960px] pb-7 text-[16px] leading-7 text-gc-ink-muted">{a}</AccordionContent></AccordionItem>)}</Accordion>
-      </section>
+      <div className="jx-mobile-content">
+        <PublicFaqs faqs={faqs.map(([q, a]) => ({ q: q ?? '', a: a ?? '' }))} />
+      </div>
       <section className="why-wrap py-20 text-center sm:py-28"><h2 className="why-heading">Get started</h2><p className="mx-auto mb-7 mt-5 max-w-[520px] text-[16px] leading-6">Start Free with Jenvu, or choose the plan that fits your trading desk.</p><div className="flex justify-center"><Actions /></div></section>
     </main>
     <SiteFooter />

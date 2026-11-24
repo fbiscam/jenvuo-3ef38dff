@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import * as React from "react";
-import { ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import PublicFaqs from "@/components/PublicFaqs";
 import BotCodingPreview from "@/components/jxbot/BotCodingPreview";
 import { JxFace, JxBotFeatures } from "@/components/jxbot/JxBotFeatures";
 import { useAuthUser } from "@/hooks/useAuthUser";
@@ -191,35 +192,7 @@ const FAQS = [
 ];
 
 function Faqs() {
-  const [open, setOpen] = React.useState(-1);
-  return (
-    <section className="px-5 py-20">
-      <div className="mx-auto grid max-w-[880px] gap-8 md:grid-cols-2">
-        <h2 className="text-[34px] font-medium tracking-tight text-foreground">FAQs</h2>
-        <div className="min-w-0">
-          {FAQS.map((f, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={f.q} className="border-b border-gc-line">
-                <button
-                  type="button"
-                  onClick={() => setOpen(isOpen ? -1 : i)}
-                  aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-3 py-5 text-left text-[15px] text-foreground sm:text-[16px]"
-                >
-                  <span className="whitespace-nowrap">{f.q}</span>
-                  <X className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${isOpen ? "" : "rotate-45"}`} />
-                </button>
-                <div className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr] pb-6" : "grid-rows-[0fr]"}`}>
-                  <p className="overflow-hidden text-[15px] leading-relaxed text-muted-foreground">{f.a}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
+  return <PublicFaqs faqs={FAQS} />;
 }
 
 /* ---------- 6. Closing with outlined face ---------- */

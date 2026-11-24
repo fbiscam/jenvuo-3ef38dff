@@ -1,8 +1,9 @@
 import * as React from "react";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate, useLocation } from "@tanstack/react-router";
-import { Search, ArrowRight, ChevronDown, ChevronsUpDown, Send } from "lucide-react";
+import { Search, ArrowRight, ChevronDown, Send } from "lucide-react";
 import SiteFooter from "@/components/SiteFooter";
+import PublicFaqs from "@/components/PublicFaqs";
 
 import { collections, allArticles } from "@/lib/help-content";
 import { FREE_BOT, dailyTargetLabel, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
@@ -60,15 +61,13 @@ function HelpCenterPage() {
   const toggle = (s: string) => setPicked((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
 
   const faqs = [
-    { q: "How do I cancel my Jenvu subscription?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
+    { q: "How do I cancel my plan?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
     { q: "How do I get a Jenvu account?", a: "Sign up at jenvu.com with Google or your email. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators." },
     { q: "Who can use the Terminal?", a: "Every signed-in account can open the Terminal. Its paid indicators (Fresh sweep, price action, Zone + FVG) run a set time each UTC day: Free 2 hours, Pro 8, Elite 16 and Ultra all day, then lock until 00:00 UTC. Credit never unlocks the Terminal." },
     { q: "How do I get JX Bot?", a: `JX Bot comes with every plan. Free includes ${FREE_BOT.licenses} IP and a fixed ${dailyTargetLabel("free")} daily profit stop; Pro 1 IP, Elite 3 IPs, Ultra 4 IPs. Open Dashboard → JX Bot to download it, add the IP of the PC or RDP that runs MT5 and follow the install steps. Bot Usage shows live updates. ${TARGET_DISCLAIMER}` },
     { q: "How many API keys do I get?", a: "Free 1, Pro 3, Elite 5 and Ultra 7. Create and revoke them on Dashboard → API Keys." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
   ];
-  const [open, setOpen] = React.useState<number[]>([]);
-  const allOpen = open.length === faqs.length;
 
   return (
     <div className={`public-cloudflare min-h-dvh bg-background text-gc-ink ${SANS} antialiased`}>
@@ -183,29 +182,10 @@ function HelpCenterPage() {
           </div>
         </section>
 
-        {/* FAQ */}
-        <section className="pb-20">
-          <h2 className="text-[28px] tracking-tight">Frequently asked support questions</h2>
-          <div className="mt-6 flex justify-end">
-            <button type="button" onClick={() => setOpen(allOpen ? [] : faqs.map((_, i) => i))} className="flex items-center gap-2 text-[16px] text-gc-blue-deep">
-              {allOpen ? "Collapse all" : "Expand all"} <ChevronsUpDown className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="mt-4 border-t-2 border-gc-line">
-            {faqs.map((f, i) => {
-              const isOpen = open.includes(i);
-              return (
-                <div key={f.q} className="border-b-2 border-gc-line">
-                  <button type="button" onClick={() => setOpen((o) => (isOpen ? o.filter((x) => x !== i) : [...o, i]))} className="flex w-full items-center justify-between py-7 text-left text-[19px] text-gc-blue-deep">
-                    {f.q}
-                    <ChevronDown className={`h-6 w-6 shrink-0 transition ${isOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  {isOpen && <p className="border-t-2 border-gc-line py-8 text-[16px] leading-relaxed text-gc-ink-muted">{f.a}</p>}
-                </div>
-              );
-            })}
-          </div>
-        </section>
+      </div>
+
+      <div className="jx-mobile-content">
+        <PublicFaqs title="Support FAQs" faqs={faqs} expandAll />
       </div>
 
       <SiteFooter />
