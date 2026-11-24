@@ -1,9 +1,20 @@
-JX BOT v4.06 / OWNER v26.19 — SOURCE PACKAGE
+JX BOT v4.07 / OWNER v26.20 — SOURCE PACKAGE
 ==========================================
 This contains MQL5 source, not a compiled EX5. Customer downloads are not
 replaced by this package. Compile and test it in MetaEditor/MT5 first.
 
 APPROVED CHANGES
+v4.07 (new)
+- Layer 1 Trap Shield: no SELL when price is inside or within 1 M15 ATR
+  above an active bullish FVG or demand zone; no BUY inside or within
+  1 ATR below an active bearish FVG or supply zone. Scans the last 20
+  closed M15 candles; a zone dies once a candle closes through it.
+  FVG and zones are checked separately. The shield only removes entries.
+- Layer 2 Local invalidation: anchor = high (sell) / low (buy) of the 5
+  closed M15 candles before entry. Exit when a closed M15 candle has a
+  >=50% body and closes >=0.1 ATR beyond it. Wicks never count. No fixed
+  pip stop. The old swing exit still runs; whichever confirms first.
+v4.06
 - Each signal opens ONE consolidated order (ClusterSize = 1).
 - Total exposure stays equivalent to the old three BaseLot orders:
   BaseLot still uses 0.05 lot per $1,000; one order uses 3 x BaseLot,
