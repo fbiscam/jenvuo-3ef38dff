@@ -761,7 +761,9 @@ export const updateFoundingApplication = createServerFn({ method: "POST" })
 export const notifyFoundingPasswordSet = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ ok: true; sent: boolean }> => {
-    const email = (context.claims as any)?.email as string | undefined;
+    const { verifiedEmailFor, exactLike } = await import("@/lib/verified-email");
+    const { data: authUser } = await (context.supabase as any).auth.getUser();
+    const email = verifiedEmailFor(authUser?.user, context.userId);
     if (!email) return { ok: true, sent: false };
     const url = process.env.SUPABASE_URL;
     const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -772,7 +774,7 @@ export const notifyFoundingPasswordSet = createServerFn({ method: "POST" })
     const { data: app } = await admin
       .from("founding_applications" as any)
       .select("id, full_name, email, requested_plan, status")
-      .ilike("email", email)
+      .ilike("email", exactLike(email))
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
