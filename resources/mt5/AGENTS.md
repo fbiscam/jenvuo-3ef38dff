@@ -2,3 +2,4 @@
 - Consolidate the former cluster's total lot exposure into one order, bounded by broker limits; changing order count does not guarantee lower per-lot commission.
 - Anchor structure exits to fully confirmed pre-entry pivots and use identical closed-candle confirmation in profit and loss; post-entry extrema must not move the anchor.
 - Execute native tests against the actual MQL predicates and pivot lookup; these checks do not substitute for MetaEditor compilation or MT5 backtests.
+- Trap Shield and local invalidation only filter entries / add an earlier closed-candle exit; they must never create entries or change signal, lot, TP, session or drawdown logic.

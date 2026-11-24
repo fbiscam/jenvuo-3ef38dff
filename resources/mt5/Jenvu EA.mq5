@@ -6,7 +6,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Jenvu"
 #property link      "https://jenvu.com"
-#property version   "4.06"
+#property version   "4.07"
 #property description "Jenvu EA - single-cluster entries, confirmed M15 invalidation and daily drawdown guard."
 #include <Trade\Trade.mqh>
 
@@ -126,6 +126,16 @@ int    StructLookback   = 50;           // Search up to 50 pre-entry M15 pivot c
 double StructMinBodyPct = 50.0;         // Break candle needs a real body (% of its range): wicks and sweeps never count
 double StructDispATR    = 0.2;          // v4.04 stronger: break candle must CLOSE at least this many M15 ATR(14) beyond the swing (was 0.5)
 bool   StructH1Confirm  = false;        // v4.04 stronger: no H1 wait - the M15 break alone cuts the losing basket
+// v4.07 Layer 1: Trap Shield - never SELL into active bullish FVG / demand, never BUY into active bearish FVG / supply
+bool   UseTrapShield    = true;
+int    ShieldLookback   = 20;           // Closed M15 candles scanned for FVGs and zones
+double ShieldNearATR    = 1.0;          // Block when price is inside the zone or within this many M15 ATR of it
+double ShieldMinGapATR  = 0.1;          // Ignore tiny FVGs smaller than this many ATR
+double ZoneImpulseATR   = 1.0;          // Demand/supply needs an impulse candle body of at least this many ATR
+// v4.07 Layer 2: local verified invalidation - anchor = extreme of the 5 closed M15 candles before entry
+bool   UseLocalInvalidation = true;
+int    LocalAnchorBars  = 5;
+double LocalDispATR     = 0.1;          // Break candle must CLOSE this many ATR beyond the local anchor (wicks never count)
 bool   UseSessionProfitLock = true;      // Close green baskets 15 min before London (06:00) and NY (12:00) open
 string londonLockUTC   = "5:45-6:15";  // Pre-London profit lock window (UTC)
 string nyLockUTC       = "11:45-12:15"; // Pre-NY profit lock window (UTC)
@@ -715,11 +725,66 @@ bool EntryQualityOk(int dir)
    return true;
   }
 
+// Pure: is a trade in direction dir walking into an opposing zone [zLow, zHigh]?
+// SELL is blocked by a bullish FVG / demand at or just below price; BUY by a bearish FVG / supply at or just above.
+bool ZoneBlocksEntry(int dir, double price, double zLow, double zHigh, double atr, double nearATR)
+  {
+   if(atr <= 0 || zHigh <= zLow || price <= 0) return false;
+   if(dir < 0) return price >= zLow && price - zHigh <= nearATR * atr;
+   if(dir > 0) return price <= zHigh && zLow - price <= nearATR * atr;
+   return false;
+  }
+
+// Zone stays active until a closed candle newer than shift `newest` closes through its far edge.
+bool ZoneStillActive(bool bullish, double zLow, double zHigh, int newest)
+  {
+   for(int j = newest - 1; j >= 1; j--)
+     {
+      double c = iClose(_Symbol, PERIOD_M15, j);
+      if(bullish && c < zLow) return false;
+      if(!bullish && c > zHigh) return false;
+     }
+   return true;
+  }
+
+bool TrapShieldBlocks(int dir)
+  {
+   if(!UseTrapShield || dir == 0) return false;
+   double a[1];
+   if(CopyBuffer(hM15ATR, 0, 1, 1, a) != 1 || a[0] <= 0) return false;
+   double atr = a[0];
+   double price = dir < 0 ? SymbolInfoDouble(_Symbol, SYMBOL_BID) : SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+   bool bull = dir < 0;   // sells look for bullish zones, buys for bearish zones
+   int total = Bars(_Symbol, PERIOD_M15);
+   for(int i = 1; i <= ShieldLookback && i + 2 < total; i++)
+     {
+      double hi0 = iHigh(_Symbol, PERIOD_M15, i), lo0 = iLow(_Symbol, PERIOD_M15, i);
+      double hi2 = iHigh(_Symbol, PERIOD_M15, i + 2), lo2 = iLow(_Symbol, PERIOD_M15, i + 2);
+      // FVG (3 candles: i+2 oldest, i newest)
+      double zl = 0, zh = 0;
+      if(bull && lo0 > hi2 && lo0 - hi2 >= ShieldMinGapATR * atr) { zl = hi2; zh = lo0; }
+      if(!bull && hi0 < lo2 && lo2 - hi0 >= ShieldMinGapATR * atr) { zl = hi0; zh = lo2; }
+      if(zh > zl && ZoneStillActive(bull, zl, zh, i) && ZoneBlocksEntry(dir, price, zl, zh, atr, ShieldNearATR))
+        { Print("Jenvu shield: ", dir < 0 ? "SELL blocked by bullish FVG " : "BUY blocked by bearish FVG ", DoubleToString(zl, _Digits), "-", DoubleToString(zh, _Digits)); return true; }
+      // Demand / supply: opposite base candle (i+1) followed by an impulse candle (i) that closes beyond it
+      double o0 = iOpen(_Symbol, PERIOD_M15, i), c0 = iClose(_Symbol, PERIOD_M15, i);
+      double o1 = iOpen(_Symbol, PERIOD_M15, i + 1), c1 = iClose(_Symbol, PERIOD_M15, i + 1);
+      double h1 = iHigh(_Symbol, PERIOD_M15, i + 1), l1 = iLow(_Symbol, PERIOD_M15, i + 1);
+      bool impulse = MathAbs(c0 - o0) >= ZoneImpulseATR * atr;
+      bool zone = bull ? (c1 < o1 && c0 > o0 && c0 > h1 && impulse) : (c1 > o1 && c0 < o0 && c0 < l1 && impulse);
+      if(zone && ZoneStillActive(bull, l1, h1, i) && ZoneBlocksEntry(dir, price, l1, h1, atr, ShieldNearATR))
+        { Print("Jenvu shield: ", dir < 0 ? "SELL blocked by demand zone " : "BUY blocked by supply zone ", DoubleToString(l1, _Digits), "-", DoubleToString(h1, _Digits)); return true; }
+     }
+   return false;
+  }
+
 int Signal()
   {
    int d = RawSignal();
    if(!TrendAllows(d)) return 0;
-   return EntryQualityOk(d) ? d : 0;
+   if(!EntryQualityOk(d)) return 0;
+   if(TrapShieldBlocks(d)) return 0;   // v4.07 Layer 1: only removes trap entries, never creates new ones
+   return d;
   }
 
 int RawSignal()
@@ -866,6 +931,40 @@ bool StructureBrokenAgainst(bool isBuy, datetime entryTime)
                                   swing, a[0], StructMinBodyPct, StructDispATR);
   }
 
+// v4.07 Layer 2: local anchor = extreme of the LocalAnchorBars closed M15 candles just before entry.
+double LocalAnchor(bool isBuy, datetime entryTime)
+  {
+   int entryShift = iBarShift(_Symbol, PERIOD_M15, entryTime, false);
+   if(entryShift < 0 || LocalAnchorBars < 1) return 0;
+   if(entryShift + LocalAnchorBars >= Bars(_Symbol, PERIOD_M15)) return 0;
+   double v = 0;
+   for(int k = entryShift + 1; k <= entryShift + LocalAnchorBars; k++)
+     {
+      double x = isBuy ? iLow(_Symbol, PERIOD_M15, k) : iHigh(_Symbol, PERIOD_M15, k);
+      if(x <= 0) return 0;
+      if(v == 0 || (isBuy ? x < v : x > v)) v = x;
+     }
+   return v;
+  }
+
+// Same closed-candle rules (>=50% body, close beyond level) - only the level is closer than the old swing.
+bool LocalInvalidation(bool isBuy, datetime entryTime)
+  {
+   if(!UseLocalInvalidation || entryTime == 0) return false;
+   datetime t1 = iTime(_Symbol, PERIOD_M15, 1);
+   long ps = PeriodSeconds(PERIOD_M15);
+   if(t1 == 0 || ps <= 0) return false;
+   datetime entryBar = (datetime)((long)entryTime - ((long)entryTime % ps));
+   if(t1 < entryBar) return false;
+   double anchor = LocalAnchor(isBuy, entryTime);
+   if(anchor <= 0) return false;
+   double a[1];
+   if(CopyBuffer(hM15ATR, 0, 1, 1, a) != 1) return false;
+   return ConfirmedStructureBreak(isBuy, iOpen(_Symbol, PERIOD_M15, 1), iClose(_Symbol, PERIOD_M15, 1),
+                                  iHigh(_Symbol, PERIOD_M15, 1), iLow(_Symbol, PERIOD_M15, 1),
+                                  anchor, a[0], StructMinBodyPct, LocalDispATR);
+  }
+
 //--- basket management ------------------------------------------------
 void ManageSide(ENUM_POSITION_TYPE type, int sig, bool canOpen)
   {
@@ -958,7 +1057,7 @@ void ManageSide(ENUM_POSITION_TYPE type, int sig, bool canOpen)
          if(tsArmed && move <= tsLock) { CloseSide(type); Print("Jenvu: trailing step lock close at ", DoubleToString(b.profit, 2)); return; }
         }
       // Same strict reversal confirmation regardless of current basket profit.
-      if(UseStructureExit && StructureBrokenAgainst(isBuy, FirstOpenTime(type)))
+      if(UseStructureExit && (StructureBrokenAgainst(isBuy, FirstOpenTime(type)) || LocalInvalidation(isBuy, FirstOpenTime(type))))
         {
          if(isBuy) { g_exitBuy = true; g_lastBuyBar = iTime(_Symbol, PERIOD_CURRENT, 0); }
          else { g_exitSell = true; g_lastSellBar = iTime(_Symbol, PERIOD_CURRENT, 0); }

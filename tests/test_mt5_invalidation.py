@@ -38,12 +38,23 @@ class BotRules(unittest.TestCase):
             + function(cls.source, "CanStartBasket") + "\n"
             + function(cls.source, "ConfirmedStructureBreak") + "\n"
             + function(cls.source, "ConfirmedSwingPivot") + "\n"
+            + function(cls.source, "ZoneBlocksEntry") + "\n"
             + """
 int main(int argc, char** argv) {
   if(argc != 2) return 2;
   int test = std::atoi(argv[1]);
   bool ok = false;
   switch(test) {
+    case 101: // SELL just above an active bullish FVG / demand is blocked.
+      ok = ZoneBlocksEntry(-1, 1.0912, 1.0901, 1.0908, 0.0010, 1.0)
+        && ZoneBlocksEntry(-1, 1.0905, 1.0901, 1.0908, 0.0010, 1.0); break;
+    case 102: // BUY just below an active bearish FVG / supply is blocked.
+      ok = ZoneBlocksEntry(1, 1.0990, 1.0995, 1.1000, 0.0010, 1.0); break;
+    case 103: // Far away or wrong-side zones never block (normal trades unchanged).
+      ok = !ZoneBlocksEntry(-1, 1.0940, 1.0901, 1.0908, 0.0010, 1.0)
+        && !ZoneBlocksEntry(-1, 1.0890, 1.0901, 1.0908, 0.0010, 1.0)
+        && !ZoneBlocksEntry(1, 1.0912, 1.0901, 1.0908, 0.0010, 1.0)
+        && !ZoneBlocksEntry(-1, 1.0912, 1.0901, 1.0908, 0, 1.0); break;
     case 1: // Only the initial cluster; even one remaining position blocks adds.
       ok = CanStartBasket(0, false, false)
         && !CanStartBasket(1, false, false)
@@ -99,6 +110,9 @@ int main(int argc, char** argv) {
     def run_case(self, case):
         subprocess.run([str(self.binary), str(case)], check=True)
 
+    def test_shield_blocks_sell_into_bullish_zone(self): self.run_case(101)
+    def test_shield_blocks_buy_into_bearish_zone(self): self.run_case(102)
+    def test_shield_ignores_far_zones(self): self.run_case(103)
     def test_no_level_two_or_partial_refill(self): self.run_case(1)
     def test_no_reentry_during_pending_exit_or_same_bar(self): self.run_case(2)
     def test_buy_invalidation(self): self.run_case(3)
@@ -112,7 +126,7 @@ int main(int argc, char** argv) {
 
     def test_runtime_uses_unconditional_confirmation_and_no_recovery(self):
         manage = self.source.split("void ManageSide(", 1)[1].split("bool LossCutHit(", 1)[0]
-        self.assertIn("if(UseStructureExit && StructureBrokenAgainst(isBuy, FirstOpenTime(type)))", manage)
+        self.assertIn("if(UseStructureExit && (StructureBrokenAgainst(isBuy, FirstOpenTime(type)) || LocalInvalidation(isBuy, FirstOpenTime(type))))", manage)
         self.assertIn("if(!CanStartBasket(b.count", manage)
         self.assertNotIn("GridDistance(", manage)
         self.assertNotIn("NextLot(", manage)
