@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Follow-up consistency sweep: read all 76 production class-helper callers (shared controls, Chat, Models, Settings, Terminal/demo, Course/Profile/Security/Terminal/app routes) plus helper/test; all import the sole string-returning cn. No extension/electron/job/SQL caller or second definition found. Utility test passes; reported line-8 error absent. Read EA universal BUY/SELL TP and guard paths, optional preset/README and authenticated customer-download function; 41 bot tests pass. No further behavior change needed. Customer binary/button and MT5 execution remain unverified; settled records/settings/permissions unchanged.
+
 - [x] Prepare v4.08 owner source package: 5-pip TP for every basket, 0.2 ATR FVG-only entry buffer, opposing-FVG touch >=3.5 pips arms virtual +2-pip floor with restart persistence/close retries. Supply/demand distance and twelve original strategy/risk functions unchanged. 41 native bot tests and utility regression pass; build OK. ZIP entries inspected; two-page PDF visually checked without clipping/overlap. Current utility has seven lines, reported error absent. Customer binary unchanged.
 - [ ] Compile/backtest/demo-test v4.08 and supply customer EX5 — blocked by owner MetaEditor/MT5 execution; source ZIP and PDF delivered, no trading performance or fill-price guarantee.
 
