@@ -1,9 +1,22 @@
-JX BOT v4.07 / OWNER v26.20 — SOURCE PACKAGE
+JX BOT v4.08 — OWNER SOURCE PACKAGE
 ==========================================
 This contains MQL5 source, not a compiled EX5. Customer downloads are not
 replaced by this package. Compile and test it in MetaEditor/MT5 first.
 
 APPROVED CHANGES
+v4.08 (new)
+- 5-pip EA-managed basket TP for ALL trades, BUY and SELL alike.
+- FVG entry buffer reduced to 0.2 M15 ATR. Supply/demand buffer remains
+  1.0 ATR; its existing logic is unchanged.
+- FVG-only profit guard: an executable quote touching/crossing an ACTIVE
+  opposing FVG arms the guard only at >=3.5 pips profit. An armed trade
+  requests a close if profit returns to <=2 pips. Breaking through the
+  FVG can still reach 5-pip TP. Supply/demand alone never arms this guard.
+- Arming persists per position across restarts; triggered closes retry.
+  It is a virtual profit floor, NOT a broker stop or guaranteed +2 fill.
+  Before arming, ordinary pullbacks do not trigger this new exit.
+  Existing independent exits still apply. No opposite-direction entry
+  or new FVG entry strategy is added.
 v4.07 (new)
 - Layer 1 Trap Shield: no SELL when price is inside or within 1 M15 ATR
   above an active bullish FVG or demand zone; no BUY inside or within
@@ -41,7 +54,7 @@ v4.06
 
 UNCHANGED
 - Original MA signals and every existing entry filter unchanged.
-- EUR/USD M15; 7-pip basket TP; BaseLot rate unchanged; magic 9244.
+- EUR/USD M15; BaseLot rate unchanged; magic 9244. TP is now 5 pips.
 - All-day Auto Break-Even, legacy Pre-Session Break-Even and Trailing Step
   are OFF. No new hard stop-loss or fixed-dollar loss cutoff is added.
 - 4.7% peak-closed-balance daily drawdown guard; plan targets Pro 2%,
@@ -58,12 +71,17 @@ COMPILE / INSTALL
 2. Require zero compile errors. Copy the resulting EX5 to MQL5/Experts.
 3. Add https://jenvu.com to MT5 Options > Expert Advisors > WebRequest URLs.
 4. Register your PC/RDP IP on the JX Bot page, then enter it in MyIP.
-5. Attach to EURUSD M15, load the included preset, enable Algo Trading.
+5. Attach to EURUSD M15, enable Algo Trading. The preset is optional:
+   it contains only MyIP, lotSize and magic; protection defaults are built
+   into this source. Enter MyIP after loading if you choose the preset.
 6. Remove old bot instances before attaching this build. Prefer replacing
    the old version only when its open baskets have been closed safely.
 
 VALIDATION BEFORE LIVE USE
 Run Strategy Tester (Ctrl+R), EURUSD M15, Every tick based on real ticks.
+Verify both sides reach 5-pip TP, distant FVGs no longer block at 1 ATR,
+FVG touches below 3.5 pips do not arm, and armed pullbacks request close
+at 2 pips. Test restart persistence, rejected closes and price gaps.
 Test both buy/sell reversals, profit/loss baskets, small pullbacks, spread
 spikes and attempted recovery after an adverse 20–25-pip move. Confirm
 there are no recovery additions, and check the Experts/Journal close logs.

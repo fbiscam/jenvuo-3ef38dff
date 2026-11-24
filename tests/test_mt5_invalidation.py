@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
         self.assertIn("PreEntrySwing(isBuy, entryTime)", rule)
 
     def test_approved_existing_settings_unchanged(self):
-        for setting in ["ClusterSize  = 1", "takeprofit      = 7.0",
+        for setting in ["ClusterSize  = 1", "takeprofit      = 5.0",
                         "lotSize         = 0.05", "DailyDrawdownPct = 4.7",
                         'londonBlockUTC  = "6:15-7:30"', 'nyBlockUTC      = "12:00-23:00"',
                         "UseAutoBE       = false", "UseTrailStep    = false", "UsePreSessionBE  = false"]:

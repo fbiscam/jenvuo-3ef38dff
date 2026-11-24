@@ -6,7 +6,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Jenvu"
 #property link      "https://jenvu.com"
-#property version   "4.07"
+#property version   "4.08"
 #property description "Jenvu EA - single-cluster entries, confirmed M15 invalidation and daily drawdown guard."
 #include <Trade\Trade.mqh>
 
@@ -33,7 +33,7 @@ ENUM_JV_STRAT strattype = (ENUM_JV_STRAT)1; // Strategy (0 RSI, 1 MA, 2 RSI+MA, 
 //string ORDER           = "======= ORDER SETTINGS ======";
 input double lotSize         = 0.05;     // Auto lot per 1000 balance (0.05 per $1,000)
 bool   WaitFreshCandleOnAttach = true; // No entry on the candle the bot was attached
-double takeprofit      = 7.0;       // Basket take profit (points from average price)
+double takeprofit      = 5.0;       // Every basket: EA-managed take profit in EURUSD pips from average price
 double lotMul          = 1.2;       // Grid lot multiplier
 double lotMax          = 0.0;       // Max lot per trade (0 = no limit)
 int    mulSkip         = 3;         // Trades before multiplier starts
@@ -114,7 +114,7 @@ bool   UsePreSessionBE  = false;         // v4.06: legacy break-even also OFF
 double PreSessionBEPips = 1.0;           // Break-even buffer kept above the basket average (pips, covers spread)
 string preSessionBEUTC = "6:15-9:00";   // Pre-session break-even window (UTC), same as before v4.02
 //string AUTO_BE       = "===== AUTO BREAK-EVEN (all day) =====";
-bool   UseAutoBE       = false;         // v4.04: OFF (owner choice) - small wicks were closing baskets at ~$0.50; basket now runs to its 7-pip TP
+bool   UseAutoBE       = false;         // All-day break-even stays OFF; basket TP is 5 pips
 double AutoBETrigPips  = 2.0;           // Arm when price is this many pips beyond the basket average (spread already paid)
 double AutoBELockPips  = 0.5;           // Then close the basket if price comes back to average + this many pips
 bool   UseTrailStep    = false;         // v4.04: OFF together with auto break-even
@@ -130,8 +130,12 @@ bool   StructH1Confirm  = false;        // v4.04 stronger: no H1 wait - the M15 
 bool   UseTrapShield    = true;
 int    ShieldLookback   = 20;           // Closed M15 candles scanned for FVGs and zones
 double ShieldNearATR    = 1.0;          // Block when price is inside the zone or within this many M15 ATR of it
+double FvgNearATR       = 0.2;          // v4.08: tighter FVG-only buffer; supply/demand keeps ShieldNearATR
 double ShieldMinGapATR  = 0.1;          // Ignore tiny FVGs smaller than this many ATR
 double ZoneImpulseATR   = 1.0;          // Demand/supply needs an impulse candle body of at least this many ATR
+bool   UseFvgProfitGuard = true;        // Only an opposing active FVG touch can arm this exit
+double FvgGuardTrigPips  = 3.5;         // Minimum executable-quote profit at FVG touch
+double FvgGuardLockPips  = 2.0;         // Virtual floor after arming; not a guaranteed fill price
 // v4.07 Layer 2: local verified invalidation - anchor = extreme of the 5 closed M15 candles before entry
 bool   UseLocalInvalidation = true;
 int    LocalAnchorBars  = 5;
@@ -287,6 +291,8 @@ bool     g_beBuy = false, g_beSell = false;   // pre-session break-even lock arm
 bool     g_aeBuy = false, g_aeSell = false;   // all-day auto break-even armed per side
 bool     g_tsBuy = false, g_tsSell = false;   // trailing step lock (+3.5 -> +2.0 pips) armed per side
 bool g_exitBuy = false, g_exitSell = false; // latch invalidation until every owned position is closed
+struct FvgGuardState { string key; double previousQuote; bool armed; bool pending; };
+FvgGuardState g_fvgBuy, g_fvgSell;
 int      hM15ATR = INVALID_HANDLE;            // M15 ATR(14) for the structure exit
 string   g_status = "";
 const string PFX = "JENVU_";
@@ -764,7 +770,7 @@ bool TrapShieldBlocks(int dir)
       double zl = 0, zh = 0;
       if(bull && lo0 > hi2 && lo0 - hi2 >= ShieldMinGapATR * atr) { zl = hi2; zh = lo0; }
       if(!bull && hi0 < lo2 && lo2 - hi0 >= ShieldMinGapATR * atr) { zl = hi0; zh = lo2; }
-      if(zh > zl && ZoneStillActive(bull, zl, zh, i) && ZoneBlocksEntry(dir, price, zl, zh, atr, ShieldNearATR))
+      if(zh > zl && ZoneStillActive(bull, zl, zh, i) && ZoneBlocksEntry(dir, price, zl, zh, atr, FvgNearATR))
         { Print("Jenvu shield: ", dir < 0 ? "SELL blocked by bullish FVG " : "BUY blocked by bearish FVG ", DoubleToString(zl, _Digits), "-", DoubleToString(zh, _Digits)); return true; }
       // Demand / supply: opposite base candle (i+1) followed by an impulse candle (i) that closes beyond it
       double o0 = iOpen(_Symbol, PERIOD_M15, i), c0 = iClose(_Symbol, PERIOD_M15, i);
@@ -776,6 +782,85 @@ bool TrapShieldBlocks(int dir)
         { Print("Jenvu shield: ", dir < 0 ? "SELL blocked by demand zone " : "BUY blocked by supply zone ", DoubleToString(l1, _Digits), "-", DoubleToString(h1, _Digits)); return true; }
      }
    return false;
+  }
+
+// Executable quote touches/crosses the approach edge, or is inside the FVG.
+// Zones already behind the trade do not arm it; a gap across the edge does.
+bool OpposingFvgTouched(bool isBuy, double previous, double quote, double zl, double zh)
+  {
+   if(previous <= 0 || quote <= 0 || zl <= 0 || zh <= zl) return false;
+   if(quote >= zl && quote <= zh) return true;
+   return isBuy ? (previous <= zl && quote >= zl) : (previous >= zh && quote <= zh);
+  }
+
+bool FvgGuardCanArm(bool touched, double movePips, double triggerPips, double lockPips)
+  {
+   return touched && lockPips > 0 && triggerPips > lockPips && movePips >= triggerPips;
+  }
+
+bool FvgGuardMustClose(bool armed, bool pending, double movePips, double lockPips)
+  {
+   return pending || (armed && movePips <= lockPips);
+  }
+
+bool ActiveOpposingFvgTouch(bool isBuy, double previous, double quote)
+  {
+   double a[1];
+   if(CopyBuffer(hM15ATR, 0, 1, 1, a) != 1 || a[0] <= 0) return false;
+   int total = Bars(_Symbol, PERIOD_M15);
+   for(int i = 1; i <= ShieldLookback && i + 2 < total; i++)
+     {
+      double zl = isBuy ? iHigh(_Symbol, PERIOD_M15, i) : iHigh(_Symbol, PERIOD_M15, i + 2);
+      double zh = isBuy ? iLow(_Symbol, PERIOD_M15, i + 2) : iLow(_Symbol, PERIOD_M15, i);
+      if(zh <= zl || zh - zl < ShieldMinGapATR * a[0]) continue;
+      if(ZoneStillActive(!isBuy, zl, zh, i) && OpposingFvgTouched(isBuy, previous, quote, zl, zh)) return true;
+     }
+   return false;
+  }
+
+void ResetFvgGuard(FvgGuardState &state)
+  {
+   if(state.key != "") GlobalVariableDel(state.key);
+   state.key = ""; state.previousQuote = 0; state.armed = false; state.pending = false;
+  }
+
+// Stable POSITION_IDENTIFIER survives broker ticket changes; scope prevents cross-account sharing.
+string FvgGuardKey(ENUM_POSITION_TYPE type)
+  {
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+     {
+      if(PositionGetTicket(i) == 0) continue;
+      if(PositionGetInteger(POSITION_MAGIC) != magic || PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if((ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE) != type) continue;
+      return "JVF_" + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN)) + "_" + _Symbol + "_" +
+             IntegerToString(magic) + "_" + IntegerToString(PositionGetInteger(POSITION_IDENTIFIER));
+     }
+   return "";
+  }
+
+bool UpdateFvgGuard(FvgGuardState &state, ENUM_POSITION_TYPE type, double avg, double move)
+  {
+   string key = FvgGuardKey(type);
+   if(key == "") { ResetFvgGuard(state); return false; }
+   if(state.key != key)
+     {
+      ResetFvgGuard(state); state.key = key; state.previousQuote = avg;
+      double saved = GlobalVariableCheck(key) ? GlobalVariableGet(key) : 0;
+      state.armed = saved >= 1; state.pending = saved >= 2;
+     }
+   bool isBuy = type == POSITION_TYPE_BUY;
+   double quote = SymbolInfoDouble(_Symbol, isBuy ? SYMBOL_BID : SYMBOL_ASK);
+   double pips = move / PU();
+   if(!state.armed && UseFvgProfitGuard && FvgGuardCanArm(
+      ActiveOpposingFvgTouch(isBuy, state.previousQuote, quote), pips, FvgGuardTrigPips, FvgGuardLockPips))
+     {
+      state.armed = true; GlobalVariableSet(key, 1);
+      Print("Jenvu: opposing FVG profit guard armed (", isBuy ? "buy" : "sell", ", +", DoubleToString(pips, 1), " pips)");
+     }
+   state.previousQuote = quote;
+   if(!FvgGuardMustClose(state.armed, state.pending, pips, FvgGuardLockPips)) return false;
+   state.pending = true; GlobalVariableSet(key, 2);
+   return true;
   }
 
 int Signal()
@@ -971,6 +1056,7 @@ void ManageSide(ENUM_POSITION_TYPE type, int sig, bool canOpen)
    Basket b; GetBasket(type, b);
    bool isBuy = (type == POSITION_TYPE_BUY);
    double ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK), bid = SymbolInfoDouble(_Symbol, SYMBOL_BID);
+   if(b.count == 0) { if(isBuy) ResetFvgGuard(g_fvgBuy); else ResetFvgGuard(g_fvgSell); }
 
    // Retry a confirmed invalidation on EVERY tick until all owned positions close.
    bool pendingExit = isBuy ? g_exitBuy : g_exitSell;
@@ -986,6 +1072,15 @@ void ManageSide(ENUM_POSITION_TYPE type, int sig, bool canOpen)
       double avg = b.wsum / b.lots;
       double move = isBuy ? (bid - avg) : (avg - ask);
       if(move >= takeprofit * PU()) { CloseSide(type); Print("Jenvu: basket TP hit"); return; }
+
+      bool fvgClose = isBuy ? UpdateFvgGuard(g_fvgBuy, type, avg, move) : UpdateFvgGuard(g_fvgSell, type, avg, move);
+      if(fvgClose)
+        {
+         if(isBuy) { g_exitBuy = true; g_lastBuyBar = iTime(_Symbol, PERIOD_CURRENT, 0); }
+         else { g_exitSell = true; g_lastSellBar = iTime(_Symbol, PERIOD_CURRENT, 0); }
+         Print("Jenvu: FVG virtual profit floor triggered; requesting close at +", DoubleToString(move / PU(), 1), " pips");
+         CloseSide(type); return;
+        }
 
       // profit protection: lock gains, exit on reversal / trend flip
       double peak = isBuy ? g_peakBuy : g_peakSell;

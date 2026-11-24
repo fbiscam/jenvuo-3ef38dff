@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Prepare v4.08 owner source package: 5-pip TP for every basket, 0.2 ATR FVG-only entry buffer, opposing-FVG touch >=3.5 pips arms virtual +2-pip floor with restart persistence/close retries. Supply/demand distance and twelve original strategy/risk functions unchanged. 41 native bot tests and utility regression pass; build OK. ZIP entries inspected; two-page PDF visually checked without clipping/overlap. Current utility has seven lines, reported error absent. Customer binary unchanged.
+- [ ] Compile/backtest/demo-test v4.08 and supply customer EX5 — blocked by owner MetaEditor/MT5 execution; source ZIP and PDF delivered, no trading performance or fill-price guarantee.
+
 - [x] Match Support and Why Jenvu FAQs to JX Bot using one shared disclosure layout; all 23 questions fit one line at 320/393/768/1280px with identical row widths, heights and font sizes. Opening/closing answers and Support expand/collapse-all verified with no runtime errors; utility numeric-input regression passes and reported line 8 is absent. Answers and account/trading rules unchanged; published-site verification pending.
 
 - [x] Fit shared homepage/Platform get-started card descriptions and tick rows on one mobile line with shorter copy and compact phone spacing; verified 320/393px and desktop. Utility numeric-input test passes; reported line 8 is absent in the current seven-line helper; build OK.
