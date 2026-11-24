@@ -512,6 +512,13 @@
       "when": 1795500390686,
       "tag": "0072_security_posts_counts_log_error",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1795500959181,
+      "tag": "0073_status_samples_all_services",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,2 @@
+ALTER TABLE public.service_status_samples DROP CONSTRAINT IF EXISTS service_status_samples_service_check;
+ALTER TABLE public.service_status_samples ADD CONSTRAINT service_status_samples_service_check CHECK (service = ANY (ARRAY['website','dashboard','auth','docs','api','licensing','gold','keys','terminal','chat','payments','candles','reports','keys_console','payment_page','email_delivery','email_dns']));
