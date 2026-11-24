@@ -519,6 +519,13 @@
       "when": 1795500959181,
       "tag": "0073_status_samples_all_services",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1795501687898,
+      "tag": "0074_news_releases_server_only",
+      "breakpoints": true
     }
   ]
 }

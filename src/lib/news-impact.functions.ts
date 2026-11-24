@@ -20,7 +20,7 @@ export const getNewsImpact = createServerFn({ method: "POST" })
       feedError = true;
     }
     const since = new Date(Date.now() - 40 * 31 * 86400000).toISOString();
-    const { data: releases } = await context.supabase
+    const { data: releases } = await (await import("@/integrations/supabase/client.server")).supabaseAdmin
       .from("news_releases")
       .select("id,event_key,title,released_at,actual,forecast,previous,unit,scale,reactions")
       .neq("event_key", "other")
@@ -28,7 +28,7 @@ export const getNewsImpact = createServerFn({ method: "POST" })
       .order("released_at", { ascending: false })
       .limit(1000);
     const nowIso = new Date(Date.now() - 2 * 3600_000).toISOString();
-    const { data: upcoming } = await context.supabase
+    const { data: upcoming } = await (await import("@/integrations/supabase/client.server")).supabaseAdmin
       .from("news_releases")
       .select("id,event_key,title,released_at,actual,forecast,previous,unit,scale")
       .gte("released_at", nowIso)
