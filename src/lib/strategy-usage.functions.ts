@@ -3,8 +3,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { evaluateStrategyAccess, type StrategyAccess } from "@/lib/strategy-access";
 
 async function readAccess(context: { supabase: unknown; userId: string; claims?: unknown }, add: boolean): Promise<StrategyAccess> {
-  const email = (context.claims as { email?: string } | undefined)?.email ?? null;
   const client = context.supabase as any;
+  // Only a confirmed mailbox may match a Founding application by email.
+  const { data: authUser } = await client.auth.getUser();
+  const u = authUser?.user;
+  const email = u?.email && u.email_confirmed_at && u.id === context.userId ? (u.email as string) : null;
   const { checkPlanAccess } = await import("@/lib/terminal-access.server");
   await client.rpc("expire_my_pro_trial");
   const [terminal, { data: sub }] = await Promise.all([

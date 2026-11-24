@@ -505,6 +505,13 @@
       "when": 1795418287543,
       "tag": "0071_promo_redemption_atomic_and_30_day_credit",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1795500390686,
+      "tag": "0072_security_posts_counts_log_error",
+      "breakpoints": true
     }
   ]
 }
