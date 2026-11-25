@@ -79,3 +79,17 @@ describe("yearly pricing", () => {
     expect(annualPrice("ultra")).toBe(2237);
   });
 });
+
+import { currentPlanBasis } from "./plan-pricing";
+describe("current plan basis", () => {
+  it("a paid plan is billed monthly, so only the monthly column marks it current", () => {
+    expect(currentPlanBasis("pro")).toBe("monthly");
+    expect(currentPlanBasis("elite")).toBe("monthly");
+    expect(currentPlanBasis("ultra")).toBe("monthly");
+  });
+  it("Free costs nothing on either basis, so both columns may mark it current", () => {
+    expect(currentPlanBasis("free")).toBe("both");
+    expect(currentPlanBasis(null)).toBe("both");
+    expect(currentPlanBasis(undefined)).toBe("both");
+  });
+});

@@ -12,7 +12,7 @@ import { useTrial } from "@/hooks/useTrial";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
-import { ANNUAL_DISCOUNT_PCT, DEFAULT_BILLING_CYCLE, PLAN_API_CREDIT, TERMINAL_API_PRICE, annualFullPrice, annualPrice, isPaidPlanId, planPrice } from "@/lib/plan-pricing";
+import { ANNUAL_DISCOUNT_PCT, DEFAULT_BILLING_CYCLE, PLAN_API_CREDIT, TERMINAL_API_PRICE, annualFullPrice, annualPrice, currentPlanBasis, isPaidPlanId, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
@@ -222,7 +222,7 @@ function GroupMark({ icon }: { icon: GroupIcon }) {
   return null;
 }
 
-type CompareCol = { key: string; label: string; price: React.ReactNode; cta: React.ReactNode };
+type CompareCol = { key: string; label: string; price: React.ReactNode; ctaFor: (basis: MobileBasis) => React.ReactNode };
 
 /** Mobile compare columns: the left one is always monthly, the right one always yearly. */
 const MOBILE_BASES = ["monthly", "annual"] as const;
@@ -258,7 +258,7 @@ function MobileCompare({ cols, groups, currentPlan, priceOf }: { cols: CompareCo
                 {cols.map((o, i) => <option key={o.key} value={i}>{o.label}{currentPlan === o.key ? " ·" : ""}</option>)}
               </select>
               <span className="whitespace-nowrap text-[9.5px] text-gc-ink-muted">{c ? priceOf(c.key, basis) : null}</span>
-              <div className="w-full [&_a]:w-full [&_button]:w-full [&_a]:text-[11px] [&_button]:text-[11px]">{c?.cta}</div>
+              <div className="w-full [&_a]:w-full [&_button]:w-full [&_a]:text-[11px] [&_button]:text-[11px]">{c ? c.ctaFor(basis) : null}</div>
             </div>
           );
         })}
@@ -326,29 +326,40 @@ function PricingPage() {
   const smallStyle = (solid: boolean) =>
     solid ? `${smallBase} bg-foreground text-background hover:opacity-90` : `${smallBase} bg-gc-pill text-foreground hover:bg-gc-line`;
   const name = (k: PlanKey) => k[0].toUpperCase() + k.slice(1);
+  // The plan the account already holds: a plain white chip, never a green CTA.
+  const currentStyle = (small: boolean) => `${small ? smallBase : bigBase} border border-gc-line bg-background text-foreground`;
 
-  // Free plan: every sign-up starts on it.
-  const freeCta = (small = false) => {
+  // Free plan: every sign-up starts on it. Free costs nothing on either basis, so it stays
+  // "Current plan" in both mobile columns.
+  const freeCta = (small = false, basis: MobileBasis = "monthly") => {
     const btnBase = small ? smallBase : bigBase;
     const quiet = small ? "bg-gc-pill text-gc-ink-muted" : "border border-gc-line bg-background text-gc-ink-muted";
     if (signedOut) {
       return <Link to="/auth" search={{ mode: "signup" } as never} className={small ? smallStyle(false) : bigStyle(false)}>Sign up free</Link>;
     }
-    const onFree = (currentPlan === "free" || currentPlan === null) && !trial.active;
-    return <div className={`${btnBase} ${onFree ? "bg-gc-success text-gc-on-success" : quiet}`}>{onFree ? "Current plan" : "Included"}</div>;
+    const basisOfCurrent = currentPlanBasis(currentPlan);
+    const onThisBasis = basisOfCurrent === "both" || basisOfCurrent === basis;
+    const onFree = (currentPlan === "free" || currentPlan === null) && !trial.active && onThisBasis;
+    return <div className={`${btnBase} ${onFree ? currentStyle(small) : quiet}`}>{onFree ? "Current plan" : "Included"}</div>;
   };
 
-  const planCta = (key: PlanKey, small = false) => {
+  const planCta = (key: PlanKey, small = false, basis: MobileBasis = "monthly") => {
     const solid = key === "elite";
     const btnBase = small ? smallBase : bigBase;
     const btnStyle = small ? smallStyle : bigStyle;
     const trialPro = trial.active && key === "pro";
-    const isCurrent = currentPlan === key && !trialPro;
+    // "Current plan" only belongs to the basis the account is actually billed on (monthly: the
+    // Payments page charges the monthly price), so the yearly column never repeats it.
+    const basisOfCurrent = currentPlanBasis(currentPlan);
+    const onThisBasis = basisOfCurrent === "both" || basisOfCurrent === basis;
+    const isCurrent = currentPlan === key && !trialPro && onThisBasis;
     const disabled = currentPlan !== null && !isCurrent && !trialPro && upgradeLock.locked;
     // Pro during a running free trial shows the trial as the user's status.
     const quiet = small ? "bg-gc-pill text-gc-ink-muted" : "border border-gc-line bg-background text-gc-ink-muted";
     if (trialPro) return <div className={`${btnBase} ${quiet}`}>{small ? "On trial" : "You Got Free Trial"}</div>;
-    if (isCurrent) return <div className={`${btnBase} bg-gc-success text-gc-on-success`}>Current plan</div>;
+    if (isCurrent) return <div className={currentStyle(small)}>Current plan</div>;
+    // The plan the account holds, shown under the other billing basis.
+    if (currentPlan === key && !trialPro) return <div className={`${btnBase} ${quiet}`}>Monthly plan</div>;
     if (disabled) return <button type="button" disabled className={`${btnBase} cursor-not-allowed ${quiet}`}>Locked in trial</button>;
     if (!signedOut && !buyGate.canBuy) {
       return (
@@ -385,14 +396,14 @@ function PricingPage() {
 
   const groups = buildGroups();
   const cols: CompareCol[] = [
-                  { key: "free", label: "Free", price: colPrice("free", billing), cta: freeCta(true) } as { key: string; label: string; price: React.ReactNode; cta: React.ReactNode },
+                  { key: "free", label: "Free", price: colPrice("free", billing), ctaFor: (b: MobileBasis) => freeCta(true, b) } as CompareCol,
                   ...(["pro", "elite", "ultra"] as const).map((k) => ({
                     key: k,
                     label: name(k),
                     price: colPrice(k, billing),
-                    cta: planCta(k, true),
+                    ctaFor: (b: MobileBasis) => planCta(k, true, b),
                   })),
-                  { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },
+                  { key: "enterprise", label: "Enterprise", price: "Custom", ctaFor: () => <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },
                 ];
 
   return (
@@ -491,7 +502,7 @@ function PricingPage() {
                       {currentPlan === c.key && <span className="ml-1 text-[11px] font-normal text-gc-ink-muted">· current</span>}
                     </div>
                     <div className="mt-1 text-[12.5px] text-gc-ink-muted">{c.price}</div>
-                    <div className="mt-3">{c.cta}</div>
+                    <div className="mt-3">{c.ctaFor("monthly")}</div>
                   </th>
                 ))}
               </tr>

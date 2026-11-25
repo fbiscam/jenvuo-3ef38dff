@@ -78,6 +78,17 @@ export function paidPeriodEnd(args: { samePlan: boolean; currentEnd: string | nu
 /** Yearly billing discount, percent off twelve monthly payments. */
 export const ANNUAL_DISCOUNT_PCT = 22;
 
+/**
+ * Which billing basis the account's plan is actually billed on.
+ * The Payments page only ever charges the monthly price, so a paid plan is always monthly;
+ * Free costs nothing on either basis. The pricing page marks "Current plan" only on the basis
+ * the account really sits on, so the yearly column never shows a second current-plan chip.
+ */
+export function currentPlanBasis(planId: string | null | undefined): "monthly" | "annual" | "both" {
+  if (!planId || planId === "free") return "both";
+  return isPaidPlanId(planId) ? "monthly" : "both";
+}
+
 /** The pricing page opens on yearly so the discounted price is the first one shown. */
 export const DEFAULT_BILLING_CYCLE = "annual" as const;
 

@@ -251,3 +251,5 @@
 - [x] Mobile pricing compare table: drop the −22% pill from the yearly column price (desktop table and cards keep it). Phone view shows "$1,668 $1,301/year" with no pill, desktop thead still shows −22%, no browser errors.
 
 - [x] Mobile pricing compare table: yearly price now renders on one line ("$1,668 $1,301/year") with the column widths unchanged. Phone view measured 14.3px tall (was 33px) inside the 92px column, no overflow, feature labels still wrap to at most two lines, no browser errors.
+
+- [x] Pricing "Current plan" chip: white fill with a light border instead of green, and it marks only the basis the account is actually billed on (monthly) — the yearly column of the mobile compare table now reads "Monthly plan" for the held plan. Phone view verified MONTHLY Ultra "Current plan" (white) beside YEARLY Ultra "Monthly plan" (grey); desktop Ultra column chip white; 18 pricing tests pass, build OK.
