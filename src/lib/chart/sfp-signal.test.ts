@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { describe, it as test } from "node:test";
+import { expect } from "./test-expect";
 import { classifySfp } from "./sfp-signal";
 
 const base = (n: number) => Array.from({ length: n }, (_, k) => ({ t: k, o: 1.1, h: 1.101, l: 1.099, c: 1.1005 }));
