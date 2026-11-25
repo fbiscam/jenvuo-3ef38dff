@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Apply selected six-bar confirmed swings to Terminal, server evidence and emails; run swing/alert and utility regressions.
+- [x] Apply selected six-bar confirmed swings to Terminal, server evidence and emails using shared constants. Read chart rendering, AI context/server evidence, alert detector and scheduler; no separate SQL signal detector found. All 79 class-helper callers read, sole helper returns text and has no line 8; 47 focused regressions pass. Signed-in Terminal renders real candles without runtime errors; browser confirms peak absent after five bars and HH present after six. Latest build OK. Sent emails, settled records, permissions and settings unchanged; live email delivery not exercised.
 
 - [x] Restore the Terminal header, logo, toolbar and sidebar rail to their sizes and alignment before the compact update, while preserving newer volume and market-selection behavior. Source now matches the pre-compact layout except the newer volume/day-grid additions; signed-in desktop, fullscreen, phone toolbar and mobile drawer verified with no browser errors.
 - [x] Add compact chart-pair feed volume to the toolbar and independent Technicals & News pair selection. Signed-in temporary account verified panel EUR/USD leaves the Gold chart/volume unchanged; chart BTC/USD updates both, with matching real daily volume (9.56K vs 20.2K average) in header/panel. Light/dark and phone layout checked, no browser errors; 13 focused tests pass and build OK. Trading feeds and account records unchanged.

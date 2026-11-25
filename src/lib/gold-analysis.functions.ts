@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { isTerminalGoldProvider } from "@/lib/chart/gold-feed-policy";
+import { FRACTAL_RADIUS, FRACTAL_WINDOW } from "@/lib/chart/smc-overlay";
 import {
   analyzeTF,
   buildLiquidityPools,
@@ -126,8 +127,8 @@ async function _spendUserCredits(
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
 /** Shared non-repainting swing basis for chart labels, breaks, liquidity and AI evidence. */
-const SMC_FRACTAL_RADIUS = 6; // same as the chart (FRACTAL_RADIUS)
-const SMC_STRUCTURE_WINDOW = 400;
+const SMC_FRACTAL_RADIUS = FRACTAL_RADIUS;
+const SMC_STRUCTURE_WINDOW = FRACTAL_WINDOW;
 
 export type GoldSignal = {
   bias: "BULLISH" | "BEARISH" | "NEUTRAL";
