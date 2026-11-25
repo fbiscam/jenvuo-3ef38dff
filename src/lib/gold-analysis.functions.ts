@@ -1617,6 +1617,26 @@ async function fetchYahooEurCandles(fetchTf: string, symbol = "EURUSD%3DX"): Pro
   throw lastErr ?? new Error("EUR/USD forex feed unavailable");
 }
 
+/** True when most recent spot rows are sampled quotes with no range. */
+export function eurNeedsFuturesOhlc(rows: Candle[]): boolean {
+  const tail = rows.slice(-100);
+  if (tail.length < 20) return false;
+  return tail.filter((c) => c.h === c.l).length / tail.length > 0.3;
+}
+
+/** Shift futures OHLC by the median (spot close − futures close) on shared timestamps. */
+export function shiftFuturesToSpot(fut: Candle[], spot: Candle[]): Candle[] {
+  const spotByT = new Map(spot.map((c) => [c.t, c.c]));
+  const diffs = fut.slice(-300).flatMap((f) => (spotByT.has(f.t) ? [spotByT.get(f.t)! - f.c] : [])).sort((a, b) => a - b);
+  if (!diffs.length) return [];
+  const basis = diffs[Math.floor(diffs.length / 2)]!;
+  const r5 = (n: number) => Math.round(n * 1e5) / 1e5;
+  const out = fut.map((f) => ({ t: f.t, o: r5(f.o + basis), h: r5(f.h + basis), l: r5(f.l + basis), c: r5(f.c + basis), v: f.v }));
+  // Yahoo delays futures ~10 minutes; keep the live spot rows after that.
+  const lastT = out.at(-1)?.t ?? 0;
+  return [...out, ...spot.filter((c) => c.t > lastT)];
+}
+
 async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const key = `EURUSD:${tf}`;
   const hit = terminalChartCache.get(key);
@@ -1647,6 +1667,17 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
       if (hit && Date.now() - hit.at < TERMINAL_STALE_MAX) return { ...hit.data, serverTime: Date.now() };
       throw new Error("EUR/USD chart feed unavailable");
     }
+  }
+  // Yahoo's spot EUR/USD intraday rows are one sampled quote per minute
+  // (open = high = low = close), so 1m–30m charts drew flat dashes. Use CME
+  // Euro FX futures (6E=F, real traded OHLC + volume) shifted onto the spot
+  // level by the median spot–futures basis, so price matches interbank.
+  if (provider === "Forex" && (["1m", "5m", "15m"].includes(fetchTf) || eurNeedsFuturesOhlc(candles))) {
+    try {
+      const fut = await fetchYahooEurCandles(fetchTf, "6E%3DF");
+      const shifted = shiftFuturesToSpot(fut, candles);
+      if (shifted.length >= 50) candles = shifted;
+    } catch { /* keep spot rows */ }
   }
   const step = TF_MS[tf] ?? TF_MS["30m"];
   // Interbank forex publishes no volume (Yahoo sends 0). Borrow only the volume

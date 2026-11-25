@@ -35,3 +35,4 @@
 - 1H swing plan (`swing-trade-plan.ts`) is kept but switched off in the Terminal (user asked to hide Entry/SL/TP on fresh swings).
 
 - Fixed swings (`SHOW_LIVE_SWINGS = false` in `smc-overlay.ts`): unconfirmed live HH/HL/LH/LL swings are never drawn or fed to price action, sweeps, reversal reads or supply/demand zones; only confirmed 10-bar swings show. Why: user trades 1H price action + sweeps and needs highs/lows that never shift once shown.
+- EUR/USD 1m–30m candles use CME 6E=F futures OHLC shifted by the median spot basis (`shiftFuturesToSpot`, tested), with live spot rows after the futures' ~10-min delay: Yahoo spot intraday rows are flat sampled quotes.
