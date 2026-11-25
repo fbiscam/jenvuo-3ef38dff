@@ -11,6 +11,8 @@ export const ALERT_ASSETS = ["XAUUSD", "EURUSD", "BTCUSD"] as const;
 export const ALERT_TIMEFRAMES = ["1h", "2h", "3h"] as const;
 /** A swing counts as fresh only if it confirmed on one of the newest N closed candles. */
 export const FRESH_CONFIRM_BARS = 3;
+/** Alerts confirm swings after this many closed candles (chart labels keep FRACTAL_RADIUS) so emails arrive fast. */
+export const ALERT_FRACTAL_RADIUS = 3;
 
 export type StructureAlert = {
   key: string;
@@ -27,7 +29,7 @@ export type StructureAlert = {
 
 export function detectStructureAlerts(asset: string, timeframe: string, closed: OhlcvBar[]): StructureAlert[] {
   if (closed.length < 30) return [];
-  const smc = computeSmcOverlay(closed, closed[closed.length - 1]!.close, null, { useVolume: asset === "BTCUSD" });
+  const smc = computeSmcOverlay(closed, closed[closed.length - 1]!.close, null, { useVolume: asset === "BTCUSD", fractalRadius: ALERT_FRACTAL_RADIUS });
   const fractal = closed.slice(-FRACTAL_WINDOW);
   const out: StructureAlert[] = [];
   for (const p of smc.pivots) {

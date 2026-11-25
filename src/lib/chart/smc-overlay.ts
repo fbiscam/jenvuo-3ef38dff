@@ -567,8 +567,9 @@ export function computeSmcOverlay(
   bars: OhlcvBar[],
   currentPrice: number | null,
   forming: OhlcvBar | null = null,
-  opts: { useVolume?: boolean; seriesKey?: string } = {},
+  opts: { useVolume?: boolean; seriesKey?: string; fractalRadius?: number } = {},
 ): SmcOverlay {
+  const R = opts.fractalRadius ?? FRACTAL_RADIUS;
   // Gold spot has no central volume; different feeds report different (or zero)
   // tick volume, so volume-weighting made the same swing score differently.
   const useVolume = opts.useVolume ?? true;
@@ -593,7 +594,7 @@ export function computeSmcOverlay(
 
   // HH/HL/LH/LL labels: 10-bar fractal swings (like the Fractals indicator).
   const fractalBars = bars.slice(-FRACTAL_WINDOW).map(toCandle);
-  const fractal = detectMarketStructureEvidence(fractalBars, FRACTAL_RADIUS);
+  const fractal = detectMarketStructureEvidence(fractalBars, R);
   // Final-once: a confirmed swing keeps the first label it received on its own
   // candle forever — later window shifts can never rename or move it.
   const lockLabel = <T extends { t: number; kind: string; price: number; label: string }>(p: T): T => {
@@ -621,9 +622,9 @@ export function computeSmcOverlay(
       const i = barIdx.get(p.t);
       if (i == null || have.has(key)) continue;
       // Same swing re-detected on a neighbouring candle: keep one label only.
-      if (fractal.pivots.some((q) => q.kind === p.kind && Math.abs(q.index - i) < FRACTAL_RADIUS)) continue;
+      if (fractal.pivots.some((q) => q.kind === p.kind && Math.abs(q.index - i) < R)) continue;
       const c = fractalBars[i];
-      fractal.pivots.push({ ...p, index: i, confirmedIndex: Math.min(fractalBars.length - 1, i + FRACTAL_RADIUS), price: p.kind === "high" ? c.h : c.l });
+      fractal.pivots.push({ ...p, index: i, confirmedIndex: Math.min(fractalBars.length - 1, i + R), price: p.kind === "high" ? c.h : c.l });
     }
     fractal.pivots.sort((a, b) => a.index - b.index || (a.kind === "high" ? -1 : 1));
   }
@@ -643,7 +644,7 @@ export function computeSmcOverlay(
     const src = [...fractal.pivots]
       .reverse()
       .find((p) => p.index < b.index && Math.abs(p.price - b.level) < 1e-9);
-    return { ...b, fromT: src?.t ?? fractalBars[Math.max(0, b.index - FRACTAL_RADIUS)].t };
+    return { ...b, fromT: src?.t ?? fractalBars[Math.max(0, b.index - R)].t };
   });
   if (mem) {
     const have = new Set(breaks.map((b) => `${b.dir}:${b.t}`));
@@ -708,7 +709,7 @@ export function computeSmcOverlay(
     const rejectSide = clamp01(0.6 * (wick / range) + 0.4 * (high ? 1 - closeLoc : closeLoc));
     const rejection = high ? 1 - rejectSide : rejectSide;
     // 2) Reaction flow: volume-weighted close location + body direction.
-    const end = Math.min(all.length - 1, i + FRACTAL_RADIUS);
+    const end = Math.min(all.length - 1, i + R);
     const volumeSample = all.slice(Math.max(0, i - 20), i + 1);
     const avgV = volumeSample.reduce((s, c) => s + (c.v ?? 0), 0) / Math.max(1, volumeSample.length) || 1;
     let fb = 0, fw = 0, farClose = high ? Infinity : -Infinity;
@@ -751,7 +752,7 @@ export function computeSmcOverlay(
       farClose = high ? Math.min(farClose, c.c) : Math.max(farClose, c.c);
     }
     const bars = end - i;
-    const evidence = Math.min(1, bars / FRACTAL_RADIUS);
+    const evidence = Math.min(1, bars / R);
     const flow = fw > 0 ? fb / fw : 0.5;
     // 3) Displacement: distance price travelled away from the level (2 ATR = full).
     const move = bars > 0 && localAtr > 0
