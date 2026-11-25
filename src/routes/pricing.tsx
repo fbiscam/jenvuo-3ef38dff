@@ -222,6 +222,57 @@ function GroupMark({ icon }: { icon: GroupIcon }) {
   return null;
 }
 
+type CompareCol = { key: string; label: string; price: React.ReactNode; cta: React.ReactNode };
+
+/** Mobile-only compare table: two plan dropdowns side by side (x.ai pricing style). */
+function MobileCompare({ cols, groups, currentPlan }: { cols: CompareCol[]; groups: ReadonlyArray<Group>; currentPlan: string | null | undefined }) {
+  const [a, setA] = React.useState(1);
+  const [b, setB] = React.useState(2);
+  const picks = [a, b];
+  const cell = (v: Mark) =>
+    v === true ? <Check className="mx-auto h-3.5 w-3.5 text-foreground" aria-label="Included" />
+    : v === false ? <Minus className="mx-auto h-3.5 w-3.5 text-gc-ink-muted/50" aria-label="Not included" />
+    : <span className="text-[12px] text-ink-strong">{v}</span>;
+  return (
+    <div className="mt-10 md:hidden">
+      <div className="sticky top-[60px] z-20 grid grid-cols-[1fr_92px_92px] items-end gap-2 border-b border-gc-line bg-background pb-3 pt-3">
+        <span className="pb-1 text-[12px] text-gc-ink-muted">Feature</span>
+        {picks.map((idx, n) => {
+          const c = cols[idx];
+          return (
+            <div key={n} className="flex flex-col items-center gap-1 text-center">
+              <select
+                aria-label={`Plan ${n + 1}`}
+                value={idx}
+                onChange={(e) => (n === 0 ? setA : setB)(Number(e.target.value))}
+                className="h-9 w-full rounded-lg border border-gc-line bg-background px-2 text-[13px] text-gc-ink"
+              >
+                {cols.map((o, i) => <option key={o.key} value={i}>{o.label}{currentPlan === o.key ? " ·" : ""}</option>)}
+              </select>
+              <span className="text-[11px] text-gc-ink-muted">{c?.price}</span>
+              <div className="w-full [&_a]:w-full [&_button]:w-full [&_a]:text-[11px] [&_button]:text-[11px]">{c?.cta}</div>
+            </div>
+          );
+        })}
+      </div>
+      {groups.map((g) => (
+        <div key={g.title}>
+          <div className="flex items-center gap-2 border-b border-gc-line pb-3 pt-7 text-[13px] font-medium text-gc-ink">
+            <GroupMark icon={g.icon} />{g.title}
+          </div>
+          {g.rows.map((row) => (
+            <div key={row.f} className="grid grid-cols-[1fr_92px_92px] items-center gap-2 border-b border-gc-line py-3">
+              <span className="text-[12.5px] text-ink-strong">{row.f}</span>
+              <span className="text-center">{cell(row.v[a] as Mark)}</span>
+              <span className="text-center">{cell(row.v[b] as Mark)}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function PricingPage() {
   const currentPlan = useCurrentPlan();
   const upgradeLock = useUpgradeLock();
@@ -313,6 +364,18 @@ function PricingPage() {
   };
 
   const groups = buildGroups();
+  const cols: CompareCol[] = [
+                  { key: "free", label: "Free", price: annual ? "$0/year" : "$0/month", cta: freeCta(true) } as { key: string; label: string; price: React.ReactNode; cta: React.ReactNode },
+                  ...(["pro", "elite", "ultra"] as const).map((k) => ({
+                    key: k,
+                    label: name(k),
+                    price: annual
+                      ? <><span className="line-through">{money(annualFullPrice(k))}</span> {money(annualPrice(k))}/year <span className="ml-0.5 rounded-full bg-destructive px-1.5 py-px text-[10px] font-semibold text-destructive-foreground">−{ANNUAL_DISCOUNT_PCT}%</span></>
+                      : `${money(planPrice(k))}/month`,
+                    cta: planCta(k, true),
+                  })),
+                  { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },
+                ];
 
   return (
     <div className={`public-cloudflare min-h-dvh w-full bg-background text-gc-ink ${SANS} antialiased`}>
@@ -397,23 +460,13 @@ function PricingPage() {
       {/* COMPARE */}
       <section id="compare" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <h2 className="text-center text-[30px] font-medium leading-tight tracking-tight sm:text-[40px]">Compare features across plans</h2>
-        <div className="mt-12 overflow-x-auto lg:overflow-visible">
+        <MobileCompare cols={cols} groups={groups} currentPlan={currentPlan} />
+        <div className="mt-12 hidden overflow-x-auto md:block lg:overflow-visible">
           <table className="w-full min-w-[860px] border-collapse text-[14px]">
             <thead>
               <tr className="border-b border-gc-line">
                 <th className="w-[28%] bg-background pb-5 pt-4 text-left align-bottom text-[14px] font-normal text-gc-ink-muted lg:sticky lg:top-[60px] lg:z-20">Feature</th>
-                {[
-                  { key: "free", label: "Free", price: annual ? "$0/year" : "$0/month", cta: freeCta(true) } as { key: string; label: string; price: React.ReactNode; cta: React.ReactNode },
-                  ...(["pro", "elite", "ultra"] as const).map((k) => ({
-                    key: k,
-                    label: name(k),
-                    price: annual
-                      ? <><span className="line-through">{money(annualFullPrice(k))}</span> {money(annualPrice(k))}/year <span className="ml-0.5 rounded-full bg-destructive px-1.5 py-px text-[10px] font-semibold text-destructive-foreground">−{ANNUAL_DISCOUNT_PCT}%</span></>
-                      : `${money(planPrice(k))}/month`,
-                    cta: planCta(k, true),
-                  })),
-                  { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },
-                ].map((c) => (
+                {cols.map((c) => (
                   <th key={c.key} className="bg-background px-1.5 pb-5 pt-4 text-center align-bottom font-normal lg:sticky lg:top-[60px] lg:z-20">
                     <div className="text-[15px] font-medium text-gc-ink">
                       {c.label}
