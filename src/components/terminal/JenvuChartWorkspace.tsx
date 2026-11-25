@@ -39,7 +39,7 @@ import { getTerminalChart } from "@/lib/gold-analysis.functions";
 import { TvArrow, TvCircle, TvCross, TvEye, TvEyeOff, TvFib, TvHLine, TvMagnet, TvRay, TvRect, TvText, TvTrash, TvTrend, TvVLine } from "./tv-tool-icons";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarRange, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { CalendarRange, ChevronDown, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 /** TradingView-style quick ranges in the chart's bottom bar (each picks a timeframe). */
 const RANGE_BUTTONS = [

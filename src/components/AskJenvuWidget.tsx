@@ -1,8 +1,8 @@
 import * as React from "react";
 import { useRouterState } from "@tanstack/react-router";
 import {
-  ArrowLeft, ArrowUp, Copy, CornerDownRight, FileText, Maximize2, MoreVertical,
-  RotateCw, SearchCheck, ThumbsDown, ThumbsUp, X, CheckCircle2, Loader2,
+  ArrowLeft, Copy, CornerDownRight, FileText, Maximize2, MoreVertical,
+  RotateCw, ThumbsDown, ThumbsUp, X, CheckCircle2, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { MessageResponse } from "@/components/ai-elements/lazy-message-response";

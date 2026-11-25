@@ -1350,6 +1350,12 @@ body:has(.terminal-dark) .jenvu-terminal-shell .terminal-toolbar :is(button, [ro
 body:has(.terminal-dark) .jenvu-terminal-shell :is(header, .terminal-toolbar) svg {
   color: oklch(1 0 0) !important;
 }
+body:has(.terminal-dark) .jenvu-terminal-shell header .ask-jenvu-launcher,
+body:has(.terminal-dark) .jenvu-terminal-shell header .ask-jenvu-launcher :is(span, svg) {
+  --terminal-launcher-ink: #000000;
+  color: var(--terminal-launcher-ink) !important;
+}
+
 /* Black terminal: every icon and label in the widgets, watchlist and panels is white too. */
 .terminal-dark .lucide:not([class*="text-emerald"]):not([class*="text-green"]):not([class*="text-red"]):not([class*="text-rose"]):not([class*="text-orange"]):not([class*="text-amber"]):not([class*="text-yellow"]):not([class*="text-sky"]):not([class*="text-blue"]):not([class*="text-primary-foreground"]):not([class*="text-background"]),
 .terminal-dark :is(button, [role="button"], [role="tab"]):not(.bg-primary):not(.bg-foreground):not([class*="bg-white"]):not([class*="bg-orange"]):not([class*="text-emerald"]):not([class*="text-green"]):not([class*="text-red"]):not([class*="text-rose"]):not([class*="text-orange"]):not([class*="text-amber"]):not([class*="text-yellow"]):not([class*="text-sky"]):not([class*="text-blue"]):not([class*="text-primary-foreground"]):not([class*="text-background"]) {
