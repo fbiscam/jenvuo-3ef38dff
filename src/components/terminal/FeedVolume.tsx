@@ -37,8 +37,3 @@ export function FeedVolumeDisplay({ volume, loading, compact = false }: {
     </div>
   );
 }
-
-export function ToolbarFeedVolume({ asset }: { asset: ChartAsset }) {
-  const daily = useDailyMarket(asset);
-  return <div className="ml-auto hidden shrink-0 pl-3 xl:block" data-volume-asset={asset}><FeedVolumeDisplay volume={dailyFeedVolume(daily.data?.bars ?? [])} loading={daily.isPending} compact /></div>;
-}
