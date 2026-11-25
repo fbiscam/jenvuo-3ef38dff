@@ -1335,11 +1335,11 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   color: oklch(0.97 0 0);
 }
 
-/* Gentle label contrast increase, scoped to Terminal chrome only. */
+/* Terminal header labels retain the original dark ink without bold weight. */
 .jenvu-terminal-shell:not(:has(.terminal-dark)) .dashboard-topbar,
 .jenvu-terminal-shell:not(:has(.terminal-dark)) .terminal-toolbar {
-  --gc-ink-muted: #525660;
-  --muted-foreground: #525660;
+  --gc-ink-muted: var(--gc-ink);
+  --muted-foreground: var(--gc-ink);
 }
 
 /* Black terminal: every header and chart-toolbar icon/label is white. */
@@ -2210,16 +2210,17 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 .dashboard-topbar {
   border-bottom: 4px solid var(--color-terminal-line);
 }
-.dashboard-sidebar-root,
-.jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar {
+.dashboard-sidebar-root:not(.dashboard-terminal-sidebar),
+.jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar:not(.dashboard-terminal-sidebar) {
+  border-right: 0 !important;
+  box-shadow: none !important;
+}
+.dashboard-terminal-sidebar {
   border-right: 4px solid var(--color-terminal-line) !important;
   box-shadow: none !important;
 }
 .dash-dark .dashboard-topbar {
   border-bottom: 1px solid var(--console-line);
-}
-.jenvu-zoom-dashboard.dash-dark .dashboard-sidebar-root.console-sidebar {
-  border-right: 1px solid var(--console-line) !important;
 }
 body:has(.terminal-dark) .dashboard-topbar {
   border-bottom: 4px solid var(--terminal-dark-line);

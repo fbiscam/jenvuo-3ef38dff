@@ -10,13 +10,10 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   CornerDownRight,
   History,
-  ImagePlus,
   ListChecks,
-  Mic,
   Moon,
   Newspaper,
   PanelRightClose,
-  Square,
   SquarePen,
   Sun,
   Trash2,
@@ -45,14 +42,8 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
 import {
-  PromptInputActionAddAttachments,
-  PromptInputActionMenu,
-  PromptInputActionMenuContent,
-  PromptInputActionMenuTrigger,
   PromptInput,
   PromptInputHeader,
-  PromptInputButton,
-  PromptInputTools,
   usePromptInputAttachments,
 } from "@/components/ai-elements/prompt-input";
 import {
@@ -1074,40 +1065,7 @@ function TerminalPage() {
                     disabled={ask.isPending || voice.isPending || isRecording}
                     sendDisabled={ask.isPending || voice.isPending || isRecording || !input.trim()}
                     placeholder={messages.length === 0 ? "Ask a question" : "Ask a follow-up"}
-                  >
-                    <div className="mt-2 flex items-center px-1">
-                    <PromptInputTools>
-                      <PromptInputActionMenu>
-                        <PromptInputActionMenuTrigger
-                          aria-label="Attach chart image"
-                          tooltip="Attach chart image"
-                        >
-                          <ImagePlus className="size-4" />
-                        </PromptInputActionMenuTrigger>
-                        <PromptInputActionMenuContent>
-                          <PromptInputActionAddAttachments label="Upload chart image" />
-                        </PromptInputActionMenuContent>
-                      </PromptInputActionMenu>
-                      <PromptInputButton
-                        aria-label={isRecording ? "Stop recording" : "Record voice message"}
-                        tooltip={isRecording ? "Stop recording" : "Record voice message"}
-                        disabled={voice.isPending}
-                        onClick={() => void (isRecording ? stopRecording() : startRecording())}
-                        className={cn(
-                          isRecording &&
-                            "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-                        )}
-                      >
-                        {isRecording ? (
-                          <Square className="size-3 fill-current" />
-                        ) : (
-                          <Mic className="size-4" />
-                        )}
-                      </PromptInputButton>
-
-                    </PromptInputTools>
-                    </div>
-                  </AskJenvuComposer>
+                  />
                 </PromptInput>
                 <p className="mt-2 text-center text-[11px] text-gc-ink-muted sm:text-[12px]">Built with Jenvu AI</p>
               </div>
