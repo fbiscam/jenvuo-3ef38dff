@@ -1584,14 +1584,14 @@ const EUR_YAHOO: Record<string, { interval: string; range: string }> = {
   "5m-today": { interval: "5m", range: "1d" },
 };
 
-async function fetchYahooEurCandles(fetchTf: string): Promise<Candle[]> {
+async function fetchYahooEurCandles(fetchTf: string, symbol = "EURUSD%3DX"): Promise<Candle[]> {
   const cfg = EUR_YAHOO[fetchTf] ?? EUR_YAHOO["15m"];
   let lastErr: unknown = null;
   for (const host of ["query1.finance.yahoo.com", "query2.finance.yahoo.com"]) {
     try {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), 8000);
-      const res = await fetch(`https://${host}/v8/finance/chart/EURUSD%3DX?interval=${cfg.interval}&range=${cfg.range}`, {
+      const res = await fetch(`https://${host}/v8/finance/chart/${symbol}?interval=${cfg.interval}&range=${cfg.range}`, {
         signal: ctrl.signal,
         headers: { "User-Agent": "Mozilla/5.0" },
       }).finally(() => clearTimeout(timer));
@@ -1605,7 +1605,8 @@ async function fetchYahooEurCandles(fetchTf: string): Promise<Candle[]> {
       for (let i = 0; i < ts.length; i++) {
         const o = q.open?.[i], h = q.high?.[i], l = q.low?.[i], c = q.close?.[i];
         if (![o, h, l, c].every((x) => typeof x === "number" && Number.isFinite(x) && x > 0)) continue;
-        out.push({ t: ts[i] * 1000, o: r5(o), h: r5(h), l: r5(l), c: r5(c), v: 0 });
+        const vv = q.volume?.[i];
+        out.push({ t: ts[i] * 1000, o: r5(o), h: r5(h), l: r5(l), c: r5(c), v: typeof vv === "number" && Number.isFinite(vv) ? vv : 0 });
       }
       if (out.length < (fetchTf === "5m-today" ? 1 : 50)) throw new Error("too few candles");
       return out;
@@ -1652,10 +1653,15 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   // column from Binance EURUSDT for the same time buckets; prices stay interbank.
   if (provider === "Forex" && !candles.some((c) => (c.v || 0) > 0)) {
     try {
+      // The published server's network is often refused by Binance, so fall
+      // back to CME Euro FX futures (6E=F) volume from Yahoo, which it can reach.
       const proxy = await Promise.any([
         fetchBinanceHostDeep("data-api.binance.vision", "EURUSDT", fetchTf, limit),
         fetchBinanceHostDeep("api.binance.com", "EURUSDT", fetchTf, limit),
-      ]);
+      ]).then((rows) => {
+        if (!rows.some((r) => (r.v || 0) > 0)) throw new Error("no volume");
+        return rows;
+      }).catch(() => fetchYahooEurCandles(fetchTf === "5m-today" ? "5m" : fetchTf, "6E%3DF"));
       const vol = new Map<number, number>();
       for (const p of proxy) {
         const b = sessionBucketMs(p.t, step);

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronRight, PanelRightClose } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getMarketSnapshotsBatch, getTerminalChart } from "@/lib/gold-analysis.functions";
 import { getGoldOverview, getGoldSeasonals } from "@/lib/terminal-overview.functions";
@@ -101,7 +101,6 @@ export function TerminalWatchlist({
   upcomingNews = [],
   newsLoading,
   newsFailed,
-  onClose,
   className,
 }: {
   asset: ChartAsset;
@@ -200,19 +199,6 @@ export function TerminalWatchlist({
       aria-label="Seasonal Data & Market Info"
       className={cn("min-h-0 w-[330px] shrink-0 flex-col border-l border-border bg-card text-card-foreground", className)}
     >
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b border-border px-3">
-        <h2 className="truncate text-sm font-semibold text-foreground">Technicals &amp; News</h2>
-        <button
-          type="button"
-          onClick={onClose}
-          className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          title="Hide panel"
-          aria-label="Hide Seasonal Data & Market Info"
-        >
-          <PanelRightClose className="h-4 w-4" />
-        </button>
-      </div>
-
       <div className="sidebar-hover-scroll watchlist-scroll min-h-0 flex-1 overflow-y-auto">
         {/* Market switch */}
         <div className="flex gap-1 border-b border-border px-3 py-2">
