@@ -121,7 +121,6 @@ export function TerminalSymbolHeader({
           </div>
           <p className="mt-1.5 text-[12.5px] text-gc-ink-muted">
             {marketOpen ? "Live" : "Market closed"}
-            {now && ` · As of today at ${String(now.getUTCHours()).padStart(2, "0")}:${String(now.getUTCMinutes()).padStart(2, "0")} UTC`}
           </p>
         </div>
         <HeaderSidePanel asset={asset} quotes={allQuotes} now={now} />

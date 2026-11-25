@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import {
   AreaSeries,
   CandlestickSeries,
@@ -43,7 +43,7 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
   light: {
     bg: "#ffffff",
     text: "#131722",
-    grid: "#f0f3fa",
+    grid: "#e6e9f0",
     border: "#d6dae3",
     up: "#089981",
     down: "#f23645",
@@ -54,7 +54,7 @@ export const CHART_THEMES: Record<ChartTheme, { bg: string; text: string; grid: 
   dark: {
     bg: "#000000",
     text: "#f2f2f2",
-    grid: "#1a1a1a",
+    grid: "#222222",
     border: "#1f1f1f",
     up: "#089981",
     down: "#f23645",
@@ -1036,6 +1036,53 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         areaWidth={() => mainArea().width}
         actions={props.demoActions ?? null}
       />
+      <CandleCountdown chartRef={chartRef} candleRef={candleRef} propsRef={propsRef} />
     </div>
   );
 });
+
+/** TradingView-style time left on the forming candle, drawn under the live price on the right scale. */
+function CandleCountdown({
+  chartRef,
+  candleRef,
+  propsRef,
+}: {
+  chartRef: import("react").MutableRefObject<IChartApi | null>;
+  candleRef: import("react").MutableRefObject<ISeriesApi<"Candlestick"> | null>;
+  propsRef: import("react").MutableRefObject<Props>;
+}) {
+  const [s, setS] = useState<{ y: number; w: number; text: string; up: boolean } | null>(null);
+  useEffect(() => {
+    const tick = () => {
+      const chart = chartRef.current;
+      const series = candleRef.current;
+      const { bars, stepSeconds } = propsRef.current;
+      const last = bars[bars.length - 1];
+      if (!chart || !series || !last || !stepSeconds) return setS(null);
+      const left = last.time + stepSeconds - Math.floor(Date.now() / 1000);
+      const y = series.priceToCoordinate(last.close);
+      let w = 0;
+      try { w = chart.priceScale("right").width(); } catch { w = 0; }
+      if (left <= 0 || left > stepSeconds || y == null || !w) return setS(null);
+      const h = Math.floor(left / 3600);
+      const m = Math.floor((left % 3600) / 60);
+      const sec = left % 60;
+      const pad = (n: number) => String(n).padStart(2, "0");
+      setS({ y: Number(y), w, text: h ? `${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`, up: last.close >= last.open });
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [chartRef, candleRef, propsRef]);
+  if (!s) return null;
+  const c = s.up ? CHART_COLORS.up : CHART_COLORS.down;
+  return (
+    <div
+      className="pointer-events-none absolute right-0 z-[3] text-center text-[11px] leading-[16px] tabular-nums"
+      style={{ top: s.y + 10, width: s.w, background: c, color: "#ffffff" }}
+      aria-label="Time left on current candle"
+    >
+      {s.text}
+    </div>
+  );
+}
