@@ -373,12 +373,13 @@ function PricingPage() {
   };
 
   // One price row per plan and billing basis: used by the desktop table and both mobile columns.
-  const colPrice = (k: string, basis: "monthly" | "annual"): React.ReactNode => {
+  // The mobile columns pass badge=false so the yearly cell stays plain.
+  const colPrice = (k: string, basis: "monthly" | "annual", badge = true): React.ReactNode => {
     if (k === "free") return basis === "annual" ? "$0/year" : "$0/month";
     if (k === "enterprise") return "Custom";
     if (!isPaidPlanId(k)) return "";
     return basis === "annual"
-      ? <><span className="line-through">{money(annualFullPrice(k))}</span> {money(annualPrice(k))}/year <span className="ml-0.5 rounded-full bg-destructive px-1.5 py-px text-[10px] font-semibold text-destructive-foreground">−{ANNUAL_DISCOUNT_PCT}%</span></>
+      ? <><span className="line-through">{money(annualFullPrice(k))}</span> {money(annualPrice(k))}/year {badge && <span className="ml-0.5 rounded-full bg-destructive px-1.5 py-px text-[10px] font-semibold text-destructive-foreground">−{ANNUAL_DISCOUNT_PCT}%</span>}</>
       : `${money(planPrice(k))}/month`;
   };
 
@@ -477,7 +478,7 @@ function PricingPage() {
       {/* COMPARE */}
       <section id="compare" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <h2 className="text-center text-[30px] font-medium leading-tight tracking-tight sm:text-[40px]">Compare features across plans</h2>
-        <MobileCompare cols={cols} groups={groups} currentPlan={currentPlan} priceOf={colPrice} />
+        <MobileCompare cols={cols} groups={groups} currentPlan={currentPlan} priceOf={(k, basis) => colPrice(k, basis, false)} />
         <div className="mt-12 hidden overflow-x-auto md:block lg:overflow-visible">
           <table className="w-full min-w-[860px] border-collapse text-[14px]">
             <thead>
