@@ -953,7 +953,7 @@ function TerminalPage() {
                 <ConversationContent className="gap-5 px-4 pb-3 pt-2 sm:px-6 sm:pb-4">
                   {messages.length === 0 && (
                     <div className="flex min-h-[260px] flex-col justify-center py-4 sm:min-h-[330px]">
-                      <h2 className="mx-auto max-w-[460px] text-center text-[20px] font-normal leading-[1.3] tracking-normal sm:text-[26px]">What would you like to know about?</h2>
+                      <h2 className="mx-auto max-w-[460px] text-center text-[20px] font-normal leading-[1.3] tracking-normal sm:text-[26px]">What would you like to know ?</h2>
                       <div className="mt-4 space-y-2 sm:mt-6 sm:space-y-2.5">
                         {QUICK.map((q) => (
                           <Button type="button" variant="ghost" key={q} onClick={() => void send({ text: q })} className="h-auto w-full justify-between gap-3 whitespace-normal rounded-full bg-gc-surface px-4 py-2.5 text-left text-[13px] font-normal hover:bg-gc-blue-soft sm:px-6 sm:py-4 sm:text-[14px]">
