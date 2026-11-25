@@ -201,7 +201,7 @@ export function TerminalWatchlist({
       className={cn("min-h-0 w-[330px] shrink-0 flex-col border-l border-border bg-card text-card-foreground", className)}
     >
       <div className="flex h-11 shrink-0 items-center gap-2 border-b border-border px-3">
-        <h2 className="truncate text-sm font-semibold text-foreground">Seasonal Data &amp; Market Info</h2>
+        <h2 className="truncate text-sm font-semibold text-foreground">Technicals &amp; News</h2>
         <button
           type="button"
           onClick={onClose}
