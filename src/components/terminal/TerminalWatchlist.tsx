@@ -12,7 +12,7 @@ import { isMarketClosed } from "@/lib/signals/qualification";
 import { cn } from "@/lib/utils";
 import { AssetLogo, CHART_ASSETS, assetInfo, hasWeekendClose, type ChartAsset } from "./terminal-assets";
 
-/** "Seasonal Data & Market Info" side panel (TradingView symbol-overview style). */
+/** "Technicals & News" side panel (TradingView symbol-overview style). */
 
 const UP = "text-[#089981]";
 const DOWN = "text-[#f23645]";
@@ -196,7 +196,7 @@ export function TerminalWatchlist({
 
   return (
     <aside
-      aria-label="Seasonal Data & Market Info"
+      aria-label="Technicals & News"
       className={cn("min-h-0 w-[330px] shrink-0 flex-col border-l-4 border-terminal-line dark:border-border bg-card text-card-foreground", className)}
     >
       <div className="sidebar-hover-scroll watchlist-scroll min-h-0 flex-1 overflow-y-auto">

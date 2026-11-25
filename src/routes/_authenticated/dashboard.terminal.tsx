@@ -774,12 +774,12 @@ function TerminalPage() {
                       type="button"
                       onClick={() => setWatchlistOpen((v) => !v)}
                       aria-pressed={watchlistOpen}
-                      title={watchlistOpen ? "Hide Seasonal Data & Market Info" : "Show Seasonal Data & Market Info"}
-                      aria-label={watchlistOpen ? "Hide Seasonal Data & Market Info" : "Show Seasonal Data & Market Info"}
+                      title={watchlistOpen ? "Hide Technicals & News" : "Show Technicals & News"}
+                      aria-label={watchlistOpen ? "Hide Technicals & News" : "Show Technicals & News"}
                       className={cn("hidden h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium transition-colors lg:inline-flex", watchlistOpen ? "ask-jenvu-launcher" : "text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent")}
                     >
                       <ListChecks className="h-4 w-4" />
-                      <span className="hidden xl:inline">Seasonal Data &amp; Market Info</span>
+                      <span className="hidden xl:inline">Technicals &amp; News</span>
                     </button>
                   )}
                 </>
