@@ -25,6 +25,7 @@ import {
 
 } from "@/components/home/CloudHome";
 import { EntHero, EntShowcase, EntLatestNews } from "@/components/home/EnterpriseHome";
+import { CosmicOfferHero } from "@/components/home/CosmicOfferHero";
 import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
@@ -405,6 +406,7 @@ function HomePage() {
 
       <div className="jenvu-home-content">
         <main>
+          <CosmicOfferHero />
           <EntHero />
           <EntShowcase />
           <DevApiSection />
