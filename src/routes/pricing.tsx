@@ -12,7 +12,7 @@ import { useTrial } from "@/hooks/useTrial";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
-import { ANNUAL_DISCOUNT_PCT, DEFAULT_BILLING_CYCLE, PLAN_API_CREDIT, TERMINAL_API_PRICE, annualFullPrice, annualPrice, planPrice } from "@/lib/plan-pricing";
+import { ANNUAL_DISCOUNT_PCT, DEFAULT_BILLING_CYCLE, PLAN_API_CREDIT, TERMINAL_API_PRICE, annualFullPrice, annualPrice, isPaidPlanId, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
@@ -224,8 +224,12 @@ function GroupMark({ icon }: { icon: GroupIcon }) {
 
 type CompareCol = { key: string; label: string; price: React.ReactNode; cta: React.ReactNode };
 
+/** Mobile compare columns: the left one is always monthly, the right one always yearly. */
+const MOBILE_BASES = ["monthly", "annual"] as const;
+type MobileBasis = (typeof MOBILE_BASES)[number];
+
 /** Mobile-only compare table: two plan dropdowns side by side (x.ai pricing style). */
-function MobileCompare({ cols, groups, currentPlan }: { cols: CompareCol[]; groups: ReadonlyArray<Group>; currentPlan: string | null | undefined }) {
+function MobileCompare({ cols, groups, currentPlan, priceOf }: { cols: CompareCol[]; groups: ReadonlyArray<Group>; currentPlan: string | null | undefined; priceOf: (key: string, basis: MobileBasis) => React.ReactNode }) {
   const [a, setA] = React.useState(1);
   const [b, setB] = React.useState(2);
   const picks = [a, b];
@@ -239,17 +243,21 @@ function MobileCompare({ cols, groups, currentPlan }: { cols: CompareCol[]; grou
         <span className="pb-1 text-[12px] text-gc-ink-muted">Feature</span>
         {picks.map((idx, n) => {
           const c = cols[idx];
+          const basis = MOBILE_BASES[n];
           return (
             <div key={n} className="flex flex-col items-center gap-1 text-center">
+              <span className={`text-[10px] font-medium uppercase tracking-wide ${basis === "annual" ? "text-foreground" : "text-gc-ink-muted"}`}>
+                {basis === "annual" ? "Yearly" : "Monthly"}
+              </span>
               <select
-                aria-label={`Plan ${n + 1}`}
+                aria-label={basis === "annual" ? "Yearly plan" : "Monthly plan"}
                 value={idx}
                 onChange={(e) => (n === 0 ? setA : setB)(Number(e.target.value))}
                 className="h-9 w-full rounded-lg border border-gc-line bg-background px-2 text-[13px] text-gc-ink"
               >
                 {cols.map((o, i) => <option key={o.key} value={i}>{o.label}{currentPlan === o.key ? " ·" : ""}</option>)}
               </select>
-              <span className="text-[11px] text-gc-ink-muted">{c?.price}</span>
+              <span className="text-[11px] text-gc-ink-muted">{c ? priceOf(c.key, basis) : null}</span>
               <div className="w-full [&_a]:w-full [&_button]:w-full [&_a]:text-[11px] [&_button]:text-[11px]">{c?.cta}</div>
             </div>
           );
@@ -364,15 +372,23 @@ function PricingPage() {
     );
   };
 
+  // One price row per plan and billing basis: used by the desktop table and both mobile columns.
+  const colPrice = (k: string, basis: "monthly" | "annual"): React.ReactNode => {
+    if (k === "free") return basis === "annual" ? "$0/year" : "$0/month";
+    if (k === "enterprise") return "Custom";
+    if (!isPaidPlanId(k)) return "";
+    return basis === "annual"
+      ? <><span className="line-through">{money(annualFullPrice(k))}</span> {money(annualPrice(k))}/year <span className="ml-0.5 rounded-full bg-destructive px-1.5 py-px text-[10px] font-semibold text-destructive-foreground">−{ANNUAL_DISCOUNT_PCT}%</span></>
+      : `${money(planPrice(k))}/month`;
+  };
+
   const groups = buildGroups();
   const cols: CompareCol[] = [
-                  { key: "free", label: "Free", price: annual ? "$0/year" : "$0/month", cta: freeCta(true) } as { key: string; label: string; price: React.ReactNode; cta: React.ReactNode },
+                  { key: "free", label: "Free", price: colPrice("free", billing), cta: freeCta(true) } as { key: string; label: string; price: React.ReactNode; cta: React.ReactNode },
                   ...(["pro", "elite", "ultra"] as const).map((k) => ({
                     key: k,
                     label: name(k),
-                    price: annual
-                      ? <><span className="line-through">{money(annualFullPrice(k))}</span> {money(annualPrice(k))}/year <span className="ml-0.5 rounded-full bg-destructive px-1.5 py-px text-[10px] font-semibold text-destructive-foreground">−{ANNUAL_DISCOUNT_PCT}%</span></>
-                      : `${money(planPrice(k))}/month`,
+                    price: colPrice(k, billing),
                     cta: planCta(k, true),
                   })),
                   { key: "enterprise", label: "Enterprise", price: "Custom", cta: <Link to="/contact" className={smallStyle(false)}>Contact Sales</Link> },
@@ -461,7 +477,7 @@ function PricingPage() {
       {/* COMPARE */}
       <section id="compare" className="scroll-mt-24 mx-auto max-w-7xl px-5 py-14 sm:px-8">
         <h2 className="text-center text-[30px] font-medium leading-tight tracking-tight sm:text-[40px]">Compare features across plans</h2>
-        <MobileCompare cols={cols} groups={groups} currentPlan={currentPlan} />
+        <MobileCompare cols={cols} groups={groups} currentPlan={currentPlan} priceOf={colPrice} />
         <div className="mt-12 hidden overflow-x-auto md:block lg:overflow-visible">
           <table className="w-full min-w-[860px] border-collapse text-[14px]">
             <thead>

@@ -245,3 +245,5 @@
 - [x] News page Gold moves after releases are not being measured (all show "No data"), waiting on owner OK to fix
 - [x] JX Bot v4.03 (auto break-even +2.0/+0.5 pips, trailing step +3.5/+2.0 pips, confirmed M15 structure exit, PKT hours 04:00-11:15 + 12:30-17:00, NY off): owner-compiled package (JX_BOT_MT5-22) now the customer download; stored file matches the upload byte for byte.
 - [x] Fresh high/low email alerts (3 pairs, 1H/2H/3H) to Pro/Elite/Ultra only
+
+- [x] Mobile pricing compare table: left column fixed to monthly basis, right column fixed to yearly basis, each with its own plan dropdown; desktop table and cards still follow the Monthly/Yearly toggle. Phone view verified MONTHLY $239/month (Ultra) beside YEARLY $1,301/year −22% (Elite), dropdowns independent, no browser errors; 16 pricing tests pass and build OK.
