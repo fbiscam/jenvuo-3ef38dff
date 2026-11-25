@@ -257,7 +257,7 @@ function MobileCompare({ cols, groups, currentPlan, priceOf }: { cols: CompareCo
               >
                 {cols.map((o, i) => <option key={o.key} value={i}>{o.label}{currentPlan === o.key ? " ·" : ""}</option>)}
               </select>
-              <span className="text-[11px] text-gc-ink-muted">{c ? priceOf(c.key, basis) : null}</span>
+              <span className="whitespace-nowrap text-[9.5px] text-gc-ink-muted">{c ? priceOf(c.key, basis) : null}</span>
               <div className="w-full [&_a]:w-full [&_button]:w-full [&_a]:text-[11px] [&_button]:text-[11px]">{c?.cta}</div>
             </div>
           );

@@ -249,3 +249,5 @@
 - [x] Mobile pricing compare table: left column fixed to monthly basis, right column fixed to yearly basis, each with its own plan dropdown; desktop table and cards still follow the Monthly/Yearly toggle. Phone view verified MONTHLY $239/month (Ultra) beside YEARLY $1,301/year −22% (Elite), dropdowns independent, no browser errors; 16 pricing tests pass and build OK.
 
 - [x] Mobile pricing compare table: drop the −22% pill from the yearly column price (desktop table and cards keep it). Phone view shows "$1,668 $1,301/year" with no pill, desktop thead still shows −22%, no browser errors.
+
+- [x] Mobile pricing compare table: yearly price now renders on one line ("$1,668 $1,301/year") with the column widths unchanged. Phone view measured 14.3px tall (was 33px) inside the 92px column, no overflow, feature labels still wrap to at most two lines, no browser errors.
