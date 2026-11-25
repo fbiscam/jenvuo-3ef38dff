@@ -18,3 +18,22 @@ describe("EUR/USD short-timeframe candles", () => {
     expect(out[2]!.t).toBe(3);
   });
 });
+
+describe("joinEurSeams", () => {
+  it("snaps a small seam so the open equals the previous close", async () => {
+    const { joinEurSeams } = await import("./gold-analysis.functions");
+    const out = joinEurSeams([
+      { t: 1, o: 1.0948, h: 1.0949, l: 1.0947, c: 1.09488, v: 0 },
+      { t: 2, o: 1.09497, h: 1.09507, l: 1.09487, c: 1.09487, v: 0 },
+    ]);
+    expect(out[1]!.o).toBe(1.09488);
+  });
+  it("keeps a real gap above 5 pips", async () => {
+    const { joinEurSeams } = await import("./gold-analysis.functions");
+    const out = joinEurSeams([
+      { t: 1, o: 1.09, h: 1.09, l: 1.09, c: 1.09, v: 0 },
+      { t: 2, o: 1.092, h: 1.093, l: 1.092, c: 1.093, v: 0 },
+    ]);
+    expect(out[1]!.o).toBe(1.092);
+  });
+});

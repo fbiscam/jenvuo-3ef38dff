@@ -1637,6 +1637,24 @@ export function shiftFuturesToSpot(fut: Candle[], spot: Candle[]): Candle[] {
   return [...out, ...spot.filter((c) => c.t > lastT)];
 }
 
+/**
+ * Forex candles are continuous: each open is the previous close. Our EUR/USD
+ * intraday is stitched from shifted futures, a Binance tail and spot quotes,
+ * so seams left opens a few pips away from the prior close (candles that
+ * looked flipped/jumpy). Snap small seams (<= maxGap) and widen high/low.
+ */
+export function joinEurSeams(rows: Candle[], maxGap = 0.0005): Candle[] {
+  const out: Candle[] = [];
+  for (const c of rows) {
+    const prev = out.at(-1);
+    if (prev && c.o !== prev.c && Math.abs(c.o - prev.c) <= maxGap) {
+      const o = prev.c;
+      out.push({ ...c, o, h: Math.max(c.h, o), l: Math.min(c.l, o) });
+    } else out.push(c);
+  }
+  return out;
+}
+
 async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const key = `EURUSD:${tf}`;
   const hit = terminalChartCache.get(key);
@@ -1695,6 +1713,7 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
       }
     } catch { /* keep spot rows */ }
   }
+  if (provider === "Forex" && ["1m", "5m", "15m"].includes(fetchTf)) candles = joinEurSeams(candles);
   const step = TF_MS[tf] ?? TF_MS["30m"];
   // Interbank forex publishes no volume (Yahoo sends 0). Borrow only the volume
   // column from Binance EURUSDT for the same time buckets; prices stay interbank.

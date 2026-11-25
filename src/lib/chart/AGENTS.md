@@ -36,3 +36,4 @@
 
 - Fixed swings (`SHOW_LIVE_SWINGS = false` in `smc-overlay.ts`): unconfirmed live HH/HL/LH/LL swings are never drawn or fed to price action, sweeps, reversal reads or supply/demand zones; only confirmed 10-bar swings (FRACTAL_RADIUS) show; chart, alerts and Terminal AI use the same radius. Why: user tried 3 bars and found too many highs/lows; 10 bars keeps only major fixed swings.
 - EUR/USD 1m–30m candles use CME 6E=F futures OHLC shifted by the median spot basis (`shiftFuturesToSpot`, tested), with live spot rows after the futures' ~10-min delay: Yahoo spot intraday rows are flat sampled quotes.
+- EUR/USD 1m–30m: `joinEurSeams` snaps opens within 5 pips to the previous close after stitching futures/Binance/spot sources (tested): seams made candles look flipped.
