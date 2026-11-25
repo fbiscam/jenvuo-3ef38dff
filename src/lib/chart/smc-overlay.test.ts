@@ -31,8 +31,6 @@ describe("smc overlay fractal labels", () => {
     if (pivotTime === undefined) throw new Error("Missing test peak");
     const before = computeSmcOverlay(bars.slice(0, 47), 100);
     expect(before.pivots.some((p) => p.t === pivotTime * 1000)).toBe(false);
-    // Live swing shows immediately, before it locks.
-    expect(before.livePivots.some((p) => p.t === pivotTime * 1000)).toBe(true);
     const confirmed = computeSmcOverlay(bars.slice(0, 48), 100);
     const peak = confirmed.pivots.find((p) => p.t === pivotTime * 1000);
     expect(peak?.label).toBe("HH");
@@ -79,15 +77,21 @@ describe("smc overlay fractal labels", () => {
     }
   });
 
-  it("puts a live label on the forming candle when it makes the new extreme", () => {
-    const closed = Array.from({ length: 40 }, (_, i) => ({ t: i, o: 100, h: 101 + (i === 15 ? 5 : 0), l: 99, c: 100 }));
-    const forming = { t: 40, o: 100, h: 110, l: 99.5, c: 109 };
+  it("shows a fresh high only after the next closed candle reverses (Candle 1)", () => {
+    const base = Array.from({ length: 40 }, (_, i) => ({ t: i, o: 100, h: 101 + (i === 15 ? 5 : 0), l: 99, c: 100 }));
     const confirmed = [{ index: 15, confirmedIndex: 25, t: 15, price: 106, kind: "high" as const, label: "H" as const }];
-    const live = computeLivePivots(closed, forming, confirmed);
-    const high = live.find((p) => p.kind === "high");
+    const peak = { t: 40, o: 100, h: 110, l: 99.5, c: 108 };
+    // Peak still forming, or closed with no reversal candle yet: no label.
+    expect(computeLivePivots(base, peak, confirmed).find((p) => p.kind === "high")).toBe(undefined);
+    expect(computeLivePivots([...base, peak], null, confirmed).find((p) => p.kind === "high")).toBe(undefined);
+    // Candle 1 closes bullish: still no label.
+    const up = { t: 41, o: 108, h: 109, l: 107, c: 108.5 };
+    expect(computeLivePivots([...base, peak, up], null, confirmed).find((p) => p.kind === "high")).toBe(undefined);
+    // Candle 1 closes red below the peak close: HH shows.
+    const down = { t: 41, o: 108, h: 109, l: 105, c: 105.5 };
+    const high = computeLivePivots([...base, peak, down], null, confirmed).find((p) => p.kind === "high");
     expect(high?.label).toBe("HH");
-    expect(high?.onFormingCandle).toBe(true);
-    expect(high?.barsAfter).toBe(0);
+    expect(high?.price).toBe(110);
   });
 
   it("derives BOS/CHoCH and liquidity only from confirmed seven-bar pivots", () => {

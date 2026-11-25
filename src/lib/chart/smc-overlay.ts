@@ -493,10 +493,18 @@ export function computeLivePivots(
     const beats = (a: number, b: number) => (kind === "high" ? a > b : a < b);
     // Pick the most extreme candle in the unconfirmed tail (latest wins ties),
     // so the newest low/high — including the forming candle — always gets its label.
+    // 1-candle reversal confirmation: only closed candles are candidates, and the
+    // label appears only after the next closed candle reverses (bearish close below
+    // the peak's close for a high, bullish close above it for a low). No tick repaint.
     let best = -1;
-    for (let i = firstUnconfirmed; i < all.length; i++) {
-      if (best < 0 || !beats(val(all[best]), val(all[i]))) best = i;
+    for (let i = firstUnconfirmed; i < closed.length; i++) {
+      if (best < 0 || !beats(val(closed[best]), val(closed[i]))) best = i;
     }
+    if (forming && best >= 0 && beats(val(forming), val(closed[best]))) best = -1;
+    const nxt = best >= 0 ? closed[best + 1] : undefined;
+    if (!nxt) best = -1;
+    else if (kind === "high" ? !(nxt.c < nxt.o && nxt.c < closed[best].c) : !(nxt.c > nxt.o && nxt.c > closed[best].c)) best = -1;
+    if (best < 0) continue;
     for (let i = best; i >= 0 && i === best; i--) {
       const v = val(all[i]);
       let ok = true;
