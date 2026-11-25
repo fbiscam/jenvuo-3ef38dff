@@ -36,6 +36,7 @@ import type { DemoPosition } from "@/lib/chart/demo-trading";
 import { DemoOrderOverlay, type DemoOrderActions } from "./DemoOrderOverlay";
 import { formatVolume } from "@/lib/chart/relative-volume";
 import { buildIndicatorSeries, renderedIndicatorIds, type IndicatorId } from "./indicator-specs";
+import { createDayGrid } from "./day-grid";
 
 export type ChartTheme = "light" | "dark";
 
@@ -77,6 +78,7 @@ export type ChartCanvasHandle = {
 type Props = {
   bars: OhlcvBar[];
   stepSeconds: number;
+  sundayGridBreak?: boolean;
   indicators: IndicatorId[];
   scripts: Array<{ id: string; result: ScriptResult }>;
   smc: SmcOverlay | null;
@@ -221,7 +223,7 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         panes: { separatorColor: themeColors.border, enableResize: true },
       },
       grid: {
-        vertLines: { visible: true, color: themeColors.grid },
+        vertLines: { visible: false, color: themeColors.grid },
         horzLines: { visible: true, color: themeColors.grid },
       },
       crosshair: { mode: CrosshairMode.Normal },
@@ -331,12 +333,20 @@ export const ChartCanvas = forwardRef<ChartCanvasHandle, Props>(function ChartCa
         textColor: t.text,
         panes: { separatorColor: t.border, enableResize: true },
       },
-      grid: { vertLines: { visible: true, color: t.grid }, horzLines: { visible: true, color: t.grid } },
+      grid: { vertLines: { visible: false, color: t.grid }, horzLines: { visible: true, color: t.grid } },
       rightPriceScale: { borderColor: t.border },
       timeScale: { borderColor: t.border },
     });
     dirtyRef.current += 1;
   }, [props.theme]);
+
+  useEffect(() => {
+    const candles = candleRef.current;
+    if (!candles) return;
+    const grid = createDayGrid(CHART_THEMES[props.theme ?? "light"].grid, props.sundayGridBreak ?? false);
+    candles.attachPrimitive(grid);
+    return () => { candles.detachPrimitive(grid); };
+  }, [props.theme, props.sundayGridBreak]);
 
   const visibleDrawings = () => {
     const p = propsRef.current;

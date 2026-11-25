@@ -733,7 +733,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   );
 
   return (
-    <div ref={workspaceRef} className={cn("relative flex h-full min-h-0 w-full bg-background", toolbarHost && !fullscreen ? "" : "md:pt-12")}>
+    <div ref={workspaceRef} className={cn("relative flex h-full min-h-0 w-full bg-background", toolbarHost && !fullscreen ? "" : "md:pt-9")}>
       <IndicatorLibrary
         open={indicatorLibraryOpen} onOpenChange={setIndicatorLibraryOpen} theme={theme}
         indicators={indicators}
@@ -750,7 +750,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {toolbarHost && !fullscreen ? (
         createPortal(rail, toolbarHost)
       ) : (
-        <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-12 items-center border-b-4 border-terminal-line dark:border-border bg-background px-2 md:flex">{rail}</div>
+        <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-9 items-center border-b-4 border-terminal-line dark:border-border bg-background px-2 md:flex">{rail}</div>
       )}
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "terminal-page-scroll lg:gap-3 lg:overflow-y-auto lg:p-3")}>
       {sidePanelOpen && (
@@ -768,7 +768,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         )}
       >
       {/* Top bar — phones only: on laptops and tablets every control lives in the side bar. */}
-      <div className="flex h-11 shrink-0 items-center gap-1 overflow-x-auto border-b border-border pl-0 pr-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
+      <div className="flex h-9 shrink-0 items-center gap-1 overflow-x-auto border-b border-border pl-0 pr-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
 
         <div className="sticky left-0 z-10 mr-1 flex h-full shrink-0 items-center gap-0.5 border-r border-border bg-background pl-0.5 pr-1">
           <button
@@ -920,6 +920,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               ref={chartRef}
               bars={bars}
               stepSeconds={stepSeconds}
+              sundayGridBreak={hasWeekendClose(asset)}
               indicators={indicators}
               scripts={chartScripts}
               smc={smc}

@@ -10,3 +10,4 @@
 - Forex EUR/USD candles have no volume: the loader borrows Binance EURUSDT volume, falling back to Yahoo 6E=F futures volume because the published server is often refused by Binance.
 - Desktop and mobile share IndicatorLibrary, with entries backed by indicator-specs or the existing SMC switches; presets restore existing defaults and never bypass plan/timeframe gates. This avoids decorative or nonfunctional indicator listings.
 - Terminal and public Ask Jenvu share AskJenvuComposer for identical message-box styling while retaining separate services; Terminal keeps chart context, attachments, voice and history, with pointer-captured dragging and viewport clamping so its narrower panel stays reachable.
+- Terminal display grid uses a bottom-layer day-grid primitive with UTC day boundaries and a Sunday reference break for weekend-close markets; it never changes candle timestamps or feed/session bucketing. This keeps wide background blocks independent of candle logic.

@@ -146,7 +146,7 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`dashboard-topbar sticky top-0 z-30 ${pinned && !onTerminal ? "flex lg:hidden" : "flex"} ${onTerminal ? "terminal-topbar h-11" : white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-background" : "console-topbar bg-background"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`dashboard-topbar sticky top-0 z-30 ${pinned && !onTerminal ? "flex lg:hidden" : "flex"} ${onTerminal ? "terminal-topbar h-9" : white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-background" : "console-topbar bg-background"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}
@@ -156,8 +156,8 @@ export default function DashboardTopBar({
         <Menu className="h-5 w-5" />
       </button>
       <Link to="/dashboard" className={`${pinned || onTerminal ? "flex lg:hidden" : "flex"} shrink-0 items-center gap-2 pr-2`}>
-        <JenvuMark className="h-5 w-5 text-foreground" />
-        <span className="text-[20px] font-medium tracking-tight text-foreground">Jenvu</span>
+        <JenvuMark className={`${onTerminal ? "h-4 w-4" : "h-5 w-5"} text-foreground`} />
+        <span className={`${onTerminal ? "text-[16px]" : "text-[20px]"} font-medium text-foreground`}>Jenvu</span>
       </Link>
 
       {/* The Terminal's chart toolbar is placed here. The slot always stays mounted (hidden off the

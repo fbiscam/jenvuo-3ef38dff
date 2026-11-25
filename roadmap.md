@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Compact the Terminal header/logo and widen background grid blocks with UTC day boundaries and the Sunday 17:00 reference break; verify signed-in desktop/mobile and the reported utility error without changing candle feeds.
+
 - [x] Remove the selected Terminal chat upload/mic row, restore dark regular-weight header text, and retain sidebar dividers only on Terminal. Temporary signed-in test account verified usable chat input, Terminal 4px vs Overview 0px sidebar borders in both themes, and phone chat fit; latest build OK. Trading/AI services unchanged.
 
 - [x] Complete Terminal refinements: slightly darker header labels, duplicate SMC launchers removed on desktop/mobile, clear-background 700×540 indicator library, 460px draggable chat with shared homepage composer, visible dark shell dividers and readable launcher. Temporary signed-in account verified indicator selection, local add-RSI command, dragging, phone fit, upload preview, real AI chart-context reply (XAU/USD 10m) and homepage send. Read all 79 helper callers across shared UI, Terminal/demo, Chat, Models, Settings, app/Course/Profile/Security and notifications; sole cn returns string, no job/database/extension/electron counterpart. Reported line-8 error absent, 14 regressions pass, build OK and no browser errors. Settled records, permissions and account settings unchanged; microphone recording and published-site checks not performed.
