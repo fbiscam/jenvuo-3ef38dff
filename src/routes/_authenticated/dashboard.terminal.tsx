@@ -3,7 +3,7 @@ import { AskJenvuComposer } from "@/components/AskJenvuComposer";
 import { parseChartCommands } from "@/lib/chart/chart-commands";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import type * as React from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -28,6 +28,7 @@ import {
   type JenvuChartHandle,
 } from "@/components/terminal/JenvuChartWorkspace";
 import { TerminalWatchlist } from "@/components/terminal/TerminalWatchlist";
+import { selectTerminalMarket } from "@/components/terminal/market-selection";
 import { hasWeekendClose, parseChartAsset, type ChartAsset } from "@/components/terminal/terminal-assets";
 import { transcribeVoiceMessage } from "@/lib/transcription.functions";
 import { cn } from "@/lib/utils";
@@ -284,7 +285,7 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
 
 function TerminalPage() {
   const [tf, setTf] = useState(TIMEFRAMES[3]);
-  const [asset, setAsset] = useState<ChartAsset>("XAUUSD");
+  const [{ asset, infoAsset }, selectMarket] = useReducer(selectTerminalMarket, { asset: "XAUUSD", infoAsset: "XAUUSD" });
   // Daily terminal access fee ($0.30 per UTC day, charged once server-side).
   useEffect(() => {
     void import("@/integrations/supabase/client").then(({ supabase }) =>
@@ -296,13 +297,13 @@ function TerminalPage() {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("jenvu-terminal-asset");
-      setAsset(parseChartAsset(saved));
+      selectMarket({ target: "chart", asset: parseChartAsset(saved) });
     } catch {
       /* storage unavailable */
     }
   }, []);
   const changeAsset = (next: ChartAsset) => {
-    setAsset(next);
+    selectMarket({ target: "chart", asset: next });
     try {
       window.localStorage.setItem("jenvu-terminal-asset", next);
     } catch {
@@ -807,8 +808,8 @@ function TerminalPage() {
           {showWatchlist && (
             <TerminalWatchlist
               className="hidden lg:flex"
-              asset={asset}
-              onAssetChange={changeAsset}
+              asset={infoAsset}
+              onAssetChange={(next) => selectMarket({ target: "info", asset: next })}
               news={nextGoldNews}
               upcomingNews={relevantNews.slice(0, MAX_NEWS)}
               newsLoading={newsQuery.isPending}

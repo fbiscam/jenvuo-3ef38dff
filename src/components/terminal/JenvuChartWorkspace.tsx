@@ -88,6 +88,7 @@ import { sessionBucketMs } from "@/lib/chart/session-buckets";
 import { useLivePriceStream } from "@/hooks/useLivePriceStream";
 import { isMarketClosed } from "@/lib/signals/qualification";
 import { AssetLogo, CHART_ASSETS, assetInfo, hasWeekendClose, type ChartAsset } from "./terminal-assets";
+import { ToolbarFeedVolume } from "./FeedVolume";
 
 
 // Buyer/seller pressure is shown on every chart timeframe.
@@ -728,6 +729,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
       </button>
       </div>
+      <ToolbarFeedVolume asset={asset} />
       {railSlot && <div className="ml-auto flex shrink-0 items-center gap-0.5 pl-2">{railSlot}</div>}
     </nav>
   );

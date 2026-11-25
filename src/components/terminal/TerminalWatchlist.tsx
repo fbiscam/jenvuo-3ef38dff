@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getMarketSnapshotsBatch, getTerminalChart } from "@/lib/gold-analysis.functions";
+import { getMarketSnapshotsBatch } from "@/lib/gold-analysis.functions";
 import { getGoldOverview, getGoldSeasonals } from "@/lib/terminal-overview.functions";
 import type { NewsEvent } from "@/lib/news.functions";
 import type { OhlcvBar } from "@/lib/chart/indicators";
@@ -11,6 +11,8 @@ import { technicalSummary } from "@/lib/chart/technicals";
 import { isMarketClosed } from "@/lib/signals/qualification";
 import { cn } from "@/lib/utils";
 import { AssetLogo, CHART_ASSETS, assetInfo, hasWeekendClose, type ChartAsset } from "./terminal-assets";
+import { FeedVolumeDisplay, useDailyMarket } from "./FeedVolume";
+import { dailyFeedVolume } from "./feed-volume";
 
 /** "Technicals & News" side panel (TradingView symbol-overview style). */
 
@@ -31,7 +33,6 @@ const SEASON_DOT = ["bg-foreground", "bg-season-1", "bg-season-3"];
 
 const fmt = (v: number, d: number) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 const pct = (v: number) => `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
-const compact = (v: number) => new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(v);
 
 function newsStamp(iso: string): string {
   const mins = Math.round((new Date(iso).getTime() - Date.now()) / 60_000);
@@ -116,7 +117,6 @@ export function TerminalWatchlist({
   const fetchBatch = useServerFn(getMarketSnapshotsBatch);
   const fetchOverview = useServerFn(getGoldOverview);
   const fetchSeasonals = useServerFn(getGoldSeasonals);
-  const fetchChart = useServerFn(getTerminalChart);
   const [moreNews, setMoreNews] = useState(false);
 
   const quote = useQuery({
@@ -128,7 +128,6 @@ export function TerminalWatchlist({
     staleTime: 1_000,
     refetchInterval: 2_000,
     refetchIntervalInBackground: false,
-    placeholderData: (prev) => prev,
   });
   // Same key as the Overview tab so both share one cached request.
   const overview = useQuery({
@@ -143,28 +142,16 @@ export function TerminalWatchlist({
     queryFn: () => fetchSeasonals({ data: { asset } }),
     staleTime: 30 * 60_000,
   });
-  const daily = useQuery({
-    queryKey: ["terminal-info-daily", asset],
-    queryFn: () => fetchChart({ data: { timeframe: "1d", asset } }),
-    staleTime: 5 * 60_000,
-    refetchInterval: 5 * 60_000,
-    refetchIntervalInBackground: false,
-  });
+  const daily = useDailyMarket(asset);
 
   const bars = ((daily.data as { bars?: OhlcvBar[] } | undefined)?.bars ?? []) as OhlcvBar[];
   const tech = useMemo(() => (bars.length > 31 ? technicalSummary(bars.slice(0, -1)) : null), [bars]);
-  const volume = useMemo(() => {
-    if (bars.length < 5) return null;
-    const today = bars[bars.length - 1]?.volume ?? 0;
-    const prior = bars.slice(-31, -1).map((b) => b.volume).filter((v) => Number.isFinite(v) && v > 0);
-    if (!today || !prior.length) return null;
-    const avg = prior.reduce((a, b) => a + b, 0) / prior.length;
-    return { today, avg };
-  }, [bars]);
+  const volume = useMemo(() => dailyFeedVolume(bars), [bars]);
 
   const q = quote.data;
   const [tickDir, setTickDir] = useState<"up" | "down" | null>(null);
   const lastPrice = useRef<number | null>(null);
+  useEffect(() => { lastPrice.current = null; setTickDir(null); }, [asset]);
   useEffect(() => {
     const p = q?.price;
     if (p == null || !Number.isFinite(p)) return;
@@ -248,30 +235,8 @@ export function TerminalWatchlist({
 
         {/* Volume vs average */}
         <section className="border-b-4 border-terminal-line dark:border-border px-4 py-4">
-          {volume ? (
-            <>
-              <div className="flex justify-between text-[12px]">
-                <span className="text-muted-foreground">Volume</span>
-                <span className="text-muted-foreground">Avg. volume (30D)</span>
-              </div>
-              <div className="mt-0.5 flex justify-between text-[14px] font-medium tabular-nums text-foreground">
-                <span>{compact(volume.today)}</span>
-                <span>{compact(volume.avg)}</span>
-              </div>
-              <div className="mt-2 flex h-[5px] gap-[2px]">
-                <span
-                  className="h-full rounded-l-full bg-[#2962FF]"
-                  style={{ width: `${Math.max(2, Math.min(98, (volume.today / (volume.today + volume.avg)) * 100))}%` }}
-                />
-                <span className="h-full flex-1 rounded-r-full bg-[#22C4D8]" />
-              </div>
-              <p className="mt-1.5 text-[10px] text-muted-foreground">Feed volume, not centralized market order flow.</p>
-            </>
-          ) : (
-            <p className="text-[12px] text-muted-foreground">
-              {daily.isPending ? "Loading volume…" : "Volume isn't published for this market."}
-            </p>
-          )}
+          <FeedVolumeDisplay volume={volume} loading={daily.isPending} />
+          {volume && <p className="mt-1.5 text-[10px] text-muted-foreground">Feed volume, not centralized market order flow.</p>}
         </section>
 
         {/* News */}

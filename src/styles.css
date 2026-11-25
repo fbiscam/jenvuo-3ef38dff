@@ -73,6 +73,8 @@
 
 @theme inline {
   --color-terminal-line: #ebebeb;
+  --color-terminal-volume: oklch(0.55 0.23 264);
+  --color-terminal-volume-average: oklch(0.75 0.12 210);
   --font-display: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-sans: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-mono: "Google Sans Flex", "Google Sans", "Product Sans", system-ui, sans-serif;
