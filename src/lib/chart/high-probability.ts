@@ -12,10 +12,10 @@ import { LIQ_STRONG_SWEEP } from "./liquidity-sweeps";
 export const LIQ_HIGH_CONFIDENCE = Math.max(LIQ_STRONG_SWEEP, 80);
 
 /** Reversal side must hold at least this share of control for a drawn price-action mark. */
-export const PA_MIN_REVERSAL_SHARE = 60;
+export const PA_MIN_REVERSAL_SHARE = 65;
 
 /**
- * Reversal pattern printed, the reversal side clearly controls the swing (≥60%),
+ * Reversal pattern printed, the reversal side clearly controls the swing (≥65%),
  * the move held, and every reaction candle has closed (verdict can't flip later).
  */
 export function isHighProbabilityPriceAction(pa: SwingPriceAction | undefined | null): boolean {
