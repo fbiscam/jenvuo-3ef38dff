@@ -1,3 +1,4 @@
+import { bidAsk } from "@/lib/chart/demo-trading";
 import { createPortal } from "react-dom";
 import {
   forwardRef,
@@ -452,6 +453,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   } : null);
   const demoPositions = demo.account.positions;
   const demoActions = demo.actions;
+  const [quickQty, setQuickQty] = useState(1);
 
   // Use the SERVER clock to decide which candles are closed. A device clock that
   // is a few minutes off would otherwise include/exclude a candle and shift the
@@ -1052,6 +1054,29 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             )}
           </div>
           <div className="relative min-h-0 flex-1">
+            {demoTradingEnabled && currentPrice != null && (() => {
+              const q = bidAsk(currentPrice);
+              const d = currentPrice >= 1000 ? 2 : currentPrice >= 10 ? 3 : 5;
+              const fmt = (v: number) => { const t = v.toFixed(d); return <>{t.slice(0, -1)}<sup className="text-[10px]">{t.slice(-1)}</sup></>; };
+              const spread = ((q.ask - q.bid) * (d === 5 ? 10000 : d === 3 ? 100 : 10)).toFixed(1);
+              const buy = (side: "buy" | "sell") => { demo.place({ side, type: "market", quantity: quickQty }); };
+              return (
+                <div className="absolute left-2 top-2 z-20 hidden flex-col items-start gap-1 md:flex">
+                  <div className="flex items-stretch font-sans">
+                    <button type="button" onClick={() => buy("sell")} className="flex min-w-[78px] flex-col items-start rounded-l-md border border-[#f23645] bg-background px-2 py-1 text-[#f23645] hover:bg-[#f23645]/10">
+                      <span className="text-[13px] tabular-nums">{fmt(q.bid)}</span><span className="text-[10px] font-medium">SELL</span>
+                    </button>
+                    <span className="flex items-center border-y border-terminal-line dark:border-border bg-background px-1.5 text-[11px] tabular-nums text-muted-foreground">{spread}</span>
+                    <button type="button" onClick={() => buy("buy")} className="flex min-w-[78px] flex-col items-end rounded-r-md border border-[#2962ff] bg-background px-2 py-1 text-[#2962ff] hover:bg-[#2962ff]/10">
+                      <span className="text-[13px] tabular-nums">{fmt(q.ask)}</span><span className="text-[10px] font-medium">BUY</span>
+                    </button>
+                  </div>
+                  <select aria-label="Quantity" value={quickQty} onChange={(e) => setQuickQty(Number(e.target.value))} className="rounded-md border border-terminal-line dark:border-border bg-background px-1.5 py-0.5 text-[11px] tabular-nums">
+                    {[0.01, 0.1, 0.5, 1, 2, 5].map((v) => <option key={v} value={v}>{v.toFixed(2)}</option>)}
+                  </select>
+                </div>
+              );
+            })()}
             <MemoChart
               key={`${asset}:${timeframe.key}`}
               ref={chartRef}

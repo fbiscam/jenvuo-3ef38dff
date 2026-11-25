@@ -813,6 +813,17 @@ function TerminalPage() {
           )}
 
           {/* AI desk */}
+          {!deskOpen && (
+            <button
+              type="button"
+              onClick={() => setDeskOpen(true)}
+              aria-label="Ask Jenvu"
+              className="ask-jenvu-launcher fixed bottom-5 right-5 z-50 flex h-10 items-center gap-2 rounded-xl px-3.5 text-[13.5px] font-medium transition-all hover:brightness-95 sm:h-14 sm:gap-2.5 sm:rounded-2xl sm:px-6 sm:text-[15px]"
+            >
+              <JenvuMark className="h-4 w-4 shrink-0 sm:h-5 sm:w-5" />
+              <span className="whitespace-nowrap">Ask Jenvu</span>
+            </button>
+          )}
           {deskOpen && (
             <aside
               style={deskDrag.x || deskDrag.y ? ({ "--dx": `${deskDrag.x}px`, "--dy": `${deskDrag.y}px` } as React.CSSProperties) : undefined}
