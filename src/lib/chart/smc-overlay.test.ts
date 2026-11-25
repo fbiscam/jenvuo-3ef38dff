@@ -31,7 +31,8 @@ describe("smc overlay fractal labels", () => {
     if (pivotTime === undefined) throw new Error("Missing test peak");
     const before = computeSmcOverlay(bars.slice(0, 47), 100);
     expect(before.pivots.some((p) => p.t === pivotTime * 1000)).toBe(false);
-    expect(before.livePivots).toHaveLength(0);
+    // Live swing shows immediately, before it locks.
+    expect(before.livePivots.some((p) => p.t === pivotTime * 1000)).toBe(true);
     const confirmed = computeSmcOverlay(bars.slice(0, 48), 100);
     const peak = confirmed.pivots.find((p) => p.t === pivotTime * 1000);
     expect(peak?.label).toBe("HH");

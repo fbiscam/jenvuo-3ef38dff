@@ -476,8 +476,8 @@ function memoryFor(key: string): StructureMemory {
  * including the forming one. It updates live as the current candle moves and
  * becomes a confirmed pivot once FRACTAL_RADIUS later candles close.
  */
-/** Live (unconfirmed) swing labels are off: only confirmed, fixed highs/lows show. */
-export const SHOW_LIVE_SWINGS = false;
+/** Live swing labels are on: a fresh high/low shows immediately and may move until FRACTAL_RADIUS candles close and lock it. */
+export const SHOW_LIVE_SWINGS = true;
 
 export function computeLivePivots(
   closed: Candle[],
