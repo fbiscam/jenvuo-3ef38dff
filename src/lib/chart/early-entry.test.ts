@@ -20,7 +20,7 @@ describe("early entry (candle 1 trigger)", () => {
     const bars = flat(15);
     bars.push({ t: 15 * 3600_000, o: 100, h: 104, l: 99.5, c: 103 });
     bars.push({ t: 16 * 3600_000, o: 103, h: 104.5, l: 100.5, c: 101 });
-    expect(computeEarlyEntry(bars)?.t).not.toBe(15 * 3600_000);
+    expect(computeEarlyEntry(bars)?.t === 15 * 3600_000).toBe(false);
   });
   it("drops the trigger once a later wick hits SL", () => {
     const bars = flat(15);
