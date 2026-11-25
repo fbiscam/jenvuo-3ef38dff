@@ -15,7 +15,6 @@ import {
   Square,
   SquarePen,
   Sun,
-  Timer,
   Trash2,
   X,
 } from "lucide-react";
@@ -734,19 +733,10 @@ function TerminalPage() {
                     }
                     aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
                     title={theme === "dark" ? "Light theme" : "Dark theme"}
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent w-8 justify-center px-0"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent h-[38px] w-[38px] justify-center px-0"
                   >
-                    {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                    {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                   </button>
-                  <div
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-gc-console-search px-2.5 text-[12px] font-semibold tabular-nums text-gc-ink dark:bg-accent dark:text-foreground"
-                    title={marketClosed ? "XAU/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
-                    aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
-                  >
-                    <Timer className="h-4 w-4 text-muted-foreground" />
-                    {formatCountdown(secondsLeft)}
-                    {marketClosed && <span className="hidden font-normal text-gc-ink-muted xl:inline">Market closed</span>}
-                  </div>
                   {!deskOpen && (
                     <button
                       type="button"
@@ -764,19 +754,6 @@ function TerminalPage() {
               }
               rightSlot={
                 <>
-                  <div
-                    className="flex h-7 md:hidden items-center gap-1.5 rounded-full bg-muted px-2.5 font-mono text-xs font-semibold text-foreground"
-                    title={marketClosed ? "XAU/USD market is closed for the weekend" : `Time left on the current ${tf.label} candle`}
-                    aria-label={marketClosed ? "Market closed" : `Current ${tf.label} candle closes in ${formatCountdown(secondsLeft)}`}
-                  >
-                    <Timer className="h-3.5 w-3.5 text-muted-foreground" />
-                    {formatCountdown(secondsLeft)}
-                    {marketClosed && (
-                      <span className="whitespace-nowrap font-sans text-[10px] font-medium text-muted-foreground">
-                        Market closed
-                      </span>
-                    )}
-                  </div>
                   {false && !deskOpen && !watchlistOpen && (
                     <button
                       type="button"

@@ -1078,7 +1078,7 @@ function CandleCountdown({
   const c = s.up ? CHART_COLORS.up : CHART_COLORS.down;
   return (
     <div
-      className="pointer-events-none absolute right-0 z-[3] text-center text-[11px] leading-[16px] tabular-nums"
+      className="pointer-events-none absolute right-0 z-[3] pl-2 text-left font-mono font-bold text-[11px] leading-[16px] tabular-nums"
       style={{ top: s.y + 10, width: s.w, background: c, color: "#ffffff" }}
       aria-label="Time left on current candle"
     >
