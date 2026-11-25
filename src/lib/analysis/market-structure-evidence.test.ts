@@ -76,6 +76,28 @@ describe("mapMarketStructure", () => {
     assert.deepEqual(detectMarketStructureEvidence(input, 7).pivots, []);
   });
 
+  test("seven-bar equal-wick confirmation is independent of pair scale and timeframe", () => {
+    for (const scale of [1.1, 3500, 60000]) {
+      for (const step of [60, 180, 300, 600, 900, 1800, 2700, 3600, 7200, 10800, 14400, 21600, 43200, 86400]) {
+        const input = Array.from({ length: 25 }, (_, i) => ({
+          t: 1_700_000_000 + i * step,
+          o: scale, h: scale * 1.01, l: scale * 0.99, c: scale,
+        }));
+        for (const index of [10, 12]) {
+          const candle = input[index];
+          if (!candle) throw new Error("Missing equal-wick fixture");
+          input[index] = { ...candle, h: scale * 1.05, l: scale * 0.95 };
+        }
+        assert.deepEqual(detectMarketStructureEvidence(input.slice(0, 19), 7).pivots, []);
+        const confirmed = detectMarketStructureEvidence(input.slice(0, 20), 7).pivots;
+        assert.deepEqual(confirmed.map((p) => [p.kind, p.index, p.confirmedIndex]), [
+          ["high", 12, 19], ["low", 12, 19],
+        ]);
+        assert.deepEqual(detectMarketStructureEvidence(input, 7).pivots, confirmed);
+      }
+    }
+  });
+
   test("places break events only on close-through candles", () => {
     const input = candles(
       [10, 11, 15, 12, 11, 12, 14, 16, 14, 12, 11, 10, 9],
