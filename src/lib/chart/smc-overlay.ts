@@ -20,6 +20,7 @@ import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 import { classifySwingSweep, type SwingSweep } from "./swing-sweep";
 import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
 import { computeSwingTradePlan, type SwingTradePlan } from "./swing-trade-plan";
+import { computeEarlyEntry, type EarlyEntry } from "./early-entry";
 import {
   isHighProbabilityLiquiditySweep,
   isHighProbabilityPriceAction,
@@ -148,6 +149,8 @@ export type SmcOverlay = {
   swingSweeps?: Record<number, SwingSweep>;
   /** 1H fresh-swing Entry/SL/TP (price action and/or sweep). */
   swingPlan?: SwingTradePlan | null;
+  /** Candle 1 early entry trigger (Entry/SL/TP) at the newest fresh extreme. */
+  earlyEntry?: EarlyEntry | null;
 };
 
 export type ReversalSignal = {
@@ -284,6 +287,8 @@ export type SmcToggles = {
   swingSweep?: boolean;
   /** 1H fresh-swing Entry/SL/TP from price action / sweep. */
   swingPlan?: boolean;
+  /** Candle 1 early entry lines (1H and higher). */
+  earlyEntry?: boolean;
 };
 
 export const DEFAULT_SMC: SmcToggles = {
@@ -961,7 +966,9 @@ export function computeSmcOverlay(
       sweepOk: isHighProbabilitySweep(swingSweeps[p.t]),
     })).filter((p) => p.index >= 0),
   );
+  const earlyEntry = computeEarlyEntry(fractalBars);
   return {
+    earlyEntry,
     swingPlan,
     swingSweeps,
     priceAction,
@@ -1584,6 +1591,11 @@ export function renderSmcOverlay(
   if (toggles.swingPlan && smc.swingPlan) {
     const p = smc.swingPlan;
     sdPlan({ t: p.t, plan: { side: `${p.side} ${p.grade}`, entry: p.entry, sl: p.sl, tp1: p.tp1, tp2: p.tp2 } } as unknown as SdZone);
+  }
+  // Candle 1 early entry: lines start on the trigger candle — user request.
+  if (toggles.earlyEntry && smc.earlyEntry) {
+    const e = smc.earlyEntry;
+    sdPlan({ t: e.triggerT, plan: { side: `${e.side} (Candle 1)`, entry: e.entry, sl: e.sl, tp1: e.tp1, tp2: e.tp2 } } as unknown as SdZone);
   }
   ctx.restore();
 }
