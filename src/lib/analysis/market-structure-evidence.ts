@@ -104,7 +104,9 @@ function atrAt(candles: StructureCandle[], index: number, period = 14): number {
 
 /**
  * Produces confirmed, causal market-structure evidence from closed candles.
- * A two-sided pivot becomes available only after two later candles close.
+ * A two-sided pivot becomes available only after `radius` later candles close.
+ * Equal extremes within the window use the last touch: equality is allowed
+ * on the left, never on the right, so one plateau produces one fixed pivot.
  */
 export function detectMarketStructureEvidence(
   input: StructureCandle[],
@@ -130,9 +132,9 @@ export function detectMarketStructureEvidence(
     const left = candles.slice(i - radius, i);
     const right = candles.slice(i + 1, i + radius + 1);
     const isHigh =
-      left.every((item) => candle.h > item.h) && right.every((item) => candle.h > item.h);
+      left.every((item) => candle.h >= item.h) && right.every((item) => candle.h > item.h);
     const isLow =
-      left.every((item) => candle.l < item.l) && right.every((item) => candle.l < item.l);
+      left.every((item) => candle.l <= item.l) && right.every((item) => candle.l < item.l);
     if (isHigh) {
       raw.push({
         index: i,

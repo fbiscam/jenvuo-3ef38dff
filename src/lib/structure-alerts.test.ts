@@ -23,7 +23,7 @@ describe("structure alerts", () => {
       expect(["HH", "HL", "LH", "LL"]).toContain(a.label);
       expect(a.confirmedTime / 1000).toBeGreaterThanOrEqual(series[series.length - FRESH_CONFIRM_BARS]!.time);
     }
-    expect(FRACTAL_RADIUS).toBe(6);
+    expect(FRACTAL_RADIUS).toBe(8);
   });
   test("too little history fires nothing", () => {
     expect(detectStructureAlerts("XAUUSD", "1h", bars(20))).toEqual([]);
@@ -49,5 +49,5 @@ describe("alert recipients", () => {
 
 test("alerts confirm swings exactly like the chart labels (email only after the chart shows it)", () => {
   expect(ALERT_FRACTAL_RADIUS).toBe(FRACTAL_RADIUS);
-  expect(ALERT_FRACTAL_RADIUS).toBe(6);
+  expect(ALERT_FRACTAL_RADIUS).toBe(8);
 });

@@ -94,7 +94,7 @@ export function resolveZoneOverlaps(
 
 export const SMC_WINDOW = 150;
 /** HH/HL/LH/LL chart labels use a Fractals-style swing length of FRACTAL_RADIUS bars each side. */
-export const FRACTAL_RADIUS = 6;
+export const FRACTAL_RADIUS = 8;
 /** Closed bars scanned for FRACTAL_RADIUS-bar fractal labels (wider window so enough swings form). */
 export const FRACTAL_WINDOW = 400;
 
