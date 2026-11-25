@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { classifySwingStrength } from "./swing-strength";
 import type { SwingPriceAction } from "./swing-price-action";
 import type { SwingSweep } from "./swing-sweep";
