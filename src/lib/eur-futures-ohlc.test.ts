@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { eurNeedsFuturesOhlc, shiftFuturesToSpot } from "./gold-analysis.functions";
 
 const c = (t: number, o: number, h: number, l: number, cl: number) => ({ t, o, h, l, c: cl, v: 1 });
