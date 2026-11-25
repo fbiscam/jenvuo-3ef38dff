@@ -1675,8 +1675,24 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   if (provider === "Forex" && (["1m", "5m", "15m"].includes(fetchTf) || eurNeedsFuturesOhlc(candles))) {
     try {
       const fut = await fetchYahooEurCandles(fetchTf, "6E%3DF");
-      const shifted = shiftFuturesToSpot(fut, candles);
-      if (shifted.length >= 50) candles = shifted;
+      let shifted = shiftFuturesToSpot(fut, candles);
+      if (shifted.length >= 50) {
+        // Futures arrive ~10 min late, leaving flat spot dashes at the end.
+        // Fill that live tail with Binance EURUSDT real OHLC on the spot level.
+        try {
+          const live = await Promise.any([
+            fetchBinanceHostDeep("data-api.binance.vision", "EURUSDT", fetchTf, 60),
+            fetchBinanceHostDeep("api.binance.com", "EURUSDT", fetchTf, 60),
+          ]);
+          const futEnd = fut.at(-1)?.t ?? 0;
+          const tail = shiftFuturesToSpot(live, candles).filter((c) => c.t > futEnd && c.h > c.l);
+          if (tail.length) {
+            const tailEnd = tail.at(-1)!.t;
+            shifted = [...shifted.filter((c) => c.t <= futEnd), ...tail, ...candles.filter((c) => c.t > tailEnd)];
+          }
+        } catch { /* keep spot tail */ }
+        candles = shifted;
+      }
     } catch { /* keep spot rows */ }
   }
   const step = TF_MS[tf] ?? TF_MS["30m"];
