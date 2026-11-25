@@ -840,11 +840,11 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   );
 
   return (
-    <div ref={workspaceRef} className={cn("relative flex h-full min-h-0 w-full bg-background", toolbarHost && !fullscreen ? "" : "md:pt-11")}>
+    <div ref={workspaceRef} className={cn("relative flex h-full min-h-0 w-full bg-background", toolbarHost && !fullscreen ? "" : "md:pt-12")}>
       {toolbarHost && !fullscreen ? (
         createPortal(rail, toolbarHost)
       ) : (
-        <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-terminal-line dark:border-border bg-background px-2 md:flex">{rail}</div>
+        <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-12 items-center border-b-4 border-terminal-line dark:border-border bg-background px-2 md:flex">{rail}</div>
       )}
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "terminal-page-scroll lg:gap-3 lg:overflow-y-auto lg:p-3")}>
       {sidePanelOpen && (
@@ -1023,7 +1023,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <nav
           aria-label="Drawing tools"
           className={cn(
-            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:border-terminal-line md:dark:border-border [scrollbar-width:none] md:!flex [&::-webkit-scrollbar]:hidden",
+            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:border-r-4 md:border-terminal-line md:dark:border-border [scrollbar-width:none] md:!flex [&::-webkit-scrollbar]:hidden",
             mobileToolsOpen ? "flex" : "hidden",
           )}
         >
@@ -1200,7 +1200,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </div>
 
           {/* TradingView-style bottom bar: quick ranges + live clock (desktop). */}
-          <div className="hidden h-8 shrink-0 items-center gap-0.5 border-t border-terminal-line dark:border-border bg-background px-2 font-sans md:flex">
+          <div className="hidden h-8 shrink-0 items-center gap-0.5 border-t-4 border-terminal-line dark:border-border bg-background px-2 font-sans md:flex">
             {RANGE_BUTTONS.map((r) => (
               <button
                 key={r.key}

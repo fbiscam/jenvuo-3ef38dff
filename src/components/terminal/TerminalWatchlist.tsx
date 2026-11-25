@@ -197,11 +197,11 @@ export function TerminalWatchlist({
   return (
     <aside
       aria-label="Seasonal Data & Market Info"
-      className={cn("min-h-0 w-[330px] shrink-0 flex-col border-l border-terminal-line dark:border-border bg-card text-card-foreground", className)}
+      className={cn("min-h-0 w-[330px] shrink-0 flex-col border-l-4 border-terminal-line dark:border-border bg-card text-card-foreground", className)}
     >
       <div className="sidebar-hover-scroll watchlist-scroll min-h-0 flex-1 overflow-y-auto">
         {/* Market switch */}
-        <div className="flex gap-1 border-b border-terminal-line dark:border-border px-3 py-2">
+        <div className="flex gap-1 border-b-4 border-terminal-line dark:border-border px-3 py-2">
           {CHART_ASSETS.map((a) => (
             <button
               key={a.symbol}
@@ -220,7 +220,7 @@ export function TerminalWatchlist({
         </div>
 
         {/* Symbol identity + price */}
-        <section className="border-b border-terminal-line dark:border-border px-4 py-4">
+        <section className="border-b-4 border-terminal-line dark:border-border px-4 py-4">
           <div className="flex items-center gap-2.5">
             <AssetLogo asset={asset} size={32} />
             <div className="min-w-0">
@@ -247,7 +247,7 @@ export function TerminalWatchlist({
         </section>
 
         {/* Volume vs average */}
-        <section className="border-b border-terminal-line dark:border-border px-4 py-4">
+        <section className="border-b-4 border-terminal-line dark:border-border px-4 py-4">
           {volume ? (
             <>
               <div className="flex justify-between text-[12px]">
@@ -275,7 +275,7 @@ export function TerminalWatchlist({
         </section>
 
         {/* News */}
-        <section className="border-b border-terminal-line dark:border-border px-4 py-4">
+        <section className="border-b-4 border-terminal-line dark:border-border px-4 py-4">
           <div className="rounded-xl bg-secondary p-3">
             <p className="text-[11px] text-muted-foreground">
               {news ? `${news.country} · ${news.impact} impact · ${newsStamp(news.date)}` : "Economic calendar"}
@@ -324,7 +324,7 @@ export function TerminalWatchlist({
         </section>
 
         {/* Performance */}
-        <section className="border-b border-terminal-line dark:border-border px-4 py-4">
+        <section className="border-b-4 border-terminal-line dark:border-border px-4 py-4">
           <h3 className="text-[14px] font-semibold text-foreground">Performance</h3>
           <div className="mt-3 grid grid-cols-3 gap-1.5">
             {PERF.map((p) => {
@@ -348,7 +348,7 @@ export function TerminalWatchlist({
         </section>
 
         {/* Seasonals */}
-        <section className="border-b border-terminal-line dark:border-border px-4 py-4">
+        <section className="border-b-4 border-terminal-line dark:border-border px-4 py-4">
           <h3 className="text-[14px] font-semibold text-foreground">Seasonals</h3>
           {!geo ? (
             <p className="py-6 text-center text-[12px] text-muted-foreground">
