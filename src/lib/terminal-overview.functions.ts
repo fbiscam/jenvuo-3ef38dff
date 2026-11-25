@@ -134,12 +134,13 @@ export const getGoldOverview = createServerFn({ method: "POST" })
     }
   });
 
-/** Year-by-year % path of gold (seasonality), last 6 calendar years. */
+/** Year-by-year % path of a Terminal market (gold by default), last 6 calendar years. */
 export const getGoldSeasonals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async () => {
+  .inputValidator((d: { asset?: string } | undefined) => ({ asset: parseAsset(d?.asset) }))
+  .handler(async ({ data }) => {
     try {
-      const daily = await dailyHistory();
+      const daily = await dailyHistory(HISTORY_SYMBOL[data.asset]);
       const year = new Date().getUTCFullYear();
       const years = Array.from({ length: 6 }, (_, i) => year - 5 + i);
       return { series: seasonalSeries(daily.points, years), error: null as string | null };
