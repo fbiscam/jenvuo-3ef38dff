@@ -1,4 +1,5 @@
 import JenvuMark from "@/components/JenvuMark";
+import { parseChartCommands } from "@/lib/chart/chart-commands";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useEffect, useRef, useState } from "react";
@@ -86,13 +87,18 @@ export const Route = createFileRoute("/_authenticated/dashboard/terminal")({
 
 const TIMEFRAMES = [
   { key: "1m", tv: "1", label: "1m" },
+  { key: "3m", tv: "3", label: "3m" },
   { key: "5m", tv: "5", label: "5m" },
+  { key: "10m", tv: "10", label: "10m" },
   { key: "15m", tv: "15", label: "15m" },
   { key: "30m", tv: "30", label: "30m" },
   { key: "45m", tv: "45", label: "45m" },
   { key: "1h", tv: "60", label: "1H" },
   { key: "2h", tv: "120", label: "2H" },
+  { key: "3h", tv: "180", label: "3H" },
   { key: "4h", tv: "240", label: "4H" },
+  { key: "6h", tv: "360", label: "6H" },
+  { key: "12h", tv: "720", label: "12H" },
   { key: "1d", tv: "D", label: "1D" },
 ];
 
@@ -610,6 +616,25 @@ function TerminalPage() {
     const image = message.files?.find((file) => file.mediaType?.startsWith("image/") && file.url);
     const query = message.text.trim() || (image ? "Analyze this chart screenshot." : "");
     if (!query || sendLockedRef.current || ask.isPending) return;
+    // Chart commands ("add RSI", "switch to 4H") run directly on the live chart.
+    const commands = image ? [] : parseChartCommands(query, TIMEFRAMES.map((t) => t.key));
+    if (commands.length) {
+      const done: string[] = [];
+      for (const c of commands) {
+        if (c.kind === "timeframe") {
+          const next = TIMEFRAMES.find((t) => t.key === c.key);
+          if (next) { setTf(next); done.push(`timeframe → ${next.label}`); }
+        } else if (chartRef.current?.setIndicator(c.id, c.on)) {
+          done.push(`${c.on ? "added" : "removed"} ${c.id.toUpperCase()}`);
+        }
+      }
+      if (done.length) {
+        addMessage({ role: "user", text: query });
+        addMessage({ role: "assistant", text: `Done on the chart: ${done.join(", ")}.` });
+        setInput("");
+        return;
+      }
+    }
     sendLockedRef.current = true;
     // The AI desk always reads the exact chart state (drawings, indicators,
     // scripts) as text, so every question answers through the OmniRoute text
@@ -789,7 +814,7 @@ function TerminalPage() {
           {deskOpen && (
             <aside
               className={cn(
-                "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-border bg-card text-card-foreground lg:h-full lg:w-[380px] lg:border-l lg:border-t-0",
+                "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-border bg-card text-card-foreground lg:fixed lg:bottom-6 lg:right-6 lg:z-50 lg:h-[min(680px,calc(100vh-7rem))] lg:w-[400px] lg:rounded-2xl lg:border lg:shadow-2xl",
               )}
             >
               <div className="flex items-center justify-end gap-1 px-3 py-2">

@@ -628,15 +628,30 @@ export function hasSyntheticInstrumentCandles(
 
 const TF_MS: Record<string, number> = {
   "1m": 60_000,
+  "3m": 3 * 60_000,
   "5m": 5 * 60_000,
+  "10m": 10 * 60_000,
   "15m": 15 * 60_000,
   "30m": 30 * 60_000,
   "45m": 45 * 60_000,
   "1h": 60 * 60_000,
   "2h": 2 * 60 * 60_000,
+  "3h": 3 * 60 * 60_000,
   "4h": 4 * 60 * 60_000,
+  "6h": 6 * 60 * 60_000,
+  "12h": 12 * 60 * 60_000,
   "1d": 24 * 60 * 60_000,
 };
+
+/** Smaller source candles each Terminal timeframe is built from (session-bucketed). */
+const TERMINAL_SOURCE_TF: Record<string, string> = {
+  "3m": "1m", "10m": "5m", "45m": "15m", "2h": "1h", "3h": "1h", "4h": "1h", "6h": "1h", "12h": "1h", "1d": "1h",
+};
+const TERMINAL_SOURCE_LIMIT: Record<string, number> = {
+  "3m": 3000, "10m": 2000, "45m": 3000, "2h": 2000, "3h": 3000, "4h": 4000, "6h": 4000, "12h": 4000, "1d": 4000,
+};
+function terminalSourceTf(tf: string): string { return TERMINAL_SOURCE_TF[tf] ?? tf; }
+function terminalSourceLimit(tf: string): number { return TERMINAL_SOURCE_LIMIT[tf] ?? 1000; }
 
 function syntheticVolatility(inst: ResolvedInstrument): number {
   switch (inst.kind) {
@@ -1505,19 +1520,19 @@ async function loadBtcTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const key = `BTCUSD:${tf}`;
   const hit = terminalChartCache.get(key);
   if (hit && Date.now() - hit.at < 3000) return { ...hit.data, serverTime: Date.now() };
-  let fetchTf = tf === "45m" ? "15m" : tf;
+  let fetchTf = tf === "1d" ? "1d" : terminalSourceTf(tf);
   let candles: Candle[];
   let provider = "Binance";
   try {
     candles = await Promise.any([
-      fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, tf === "45m" ? 3000 : 1000),
-      fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, tf === "45m" ? 3000 : 1000),
+      fetchBinanceHostDeep("data-api.binance.vision", "BTCUSDT", fetchTf, tf === "1d" ? 1000 : terminalSourceLimit(tf)),
+      fetchBinanceHostDeep("api.binance.com", "BTCUSDT", fetchTf, tf === "1d" ? 1000 : terminalSourceLimit(tf)),
     ]);
   } catch {
     // Binance blocks some server regions — fall back to Coinbase (aggregated).
     const cbBase: Record<string, string> = {
-      "1m": "1m", "5m": "5m", "15m": "15m", "30m": "15m", "45m": "15m",
-      "1h": "1h", "2h": "1h", "4h": "1h", "1d": "1d", "1D": "1d",
+      "1m": "1m", "3m": "1m", "5m": "5m", "10m": "5m", "15m": "15m", "30m": "15m", "45m": "15m",
+      "1h": "1h", "2h": "1h", "3h": "1h", "4h": "1h", "6h": "1h", "12h": "1h", "1d": "1d", "1D": "1d",
     };
     fetchTf = cbBase[tf] ?? "15m";
     try {
@@ -1606,8 +1621,8 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   const hit = terminalChartCache.get(key);
   if (hit && Date.now() - hit.at < 4000) return { ...hit.data, serverTime: Date.now() };
   // Same session-anchored buckets as gold: 45m/2H/4H/1D built from smaller candles.
-  const fetchTf = tf === "45m" ? "15m" : tf === "2h" || tf === "4h" || tf === "1d" ? "1h" : tf;
-  const limit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : tf === "4h" || tf === "1d" ? 4000 : 1000;
+  const fetchTf = terminalSourceTf(tf);
+  const limit = terminalSourceLimit(tf);
   let candles: Candle[];
   let provider = "Forex";
   try {
@@ -1678,7 +1693,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "EURUSD"): P
   // TradingView starts 45m / 2H / 4H / 1D gold candles at the 17:00 New York
   // session open; exchanges bucket from UTC midnight. Build those timeframes
   // from smaller candles with session-anchored buckets so they match.
-  const fetchTf = tf === "45m" ? "15m" : tf === "2h" || tf === "4h" || tf === "1d" ? "1h" : tf;
+  const fetchTf = terminalSourceTf(tf);
   try {
     // Use one deep, fixed-priority source on every timeframe. Yahoo's XAUUSD=X
     // intraday endpoint currently returns no chart and, when it did answer, only
@@ -1686,7 +1701,7 @@ async function loadTerminalChart(tf: string, asset: TerminalAsset = "EURUSD"): P
     // timeframe history vary between refreshes and accounts.
     // 45m / 2H are built from smaller candles, so fetch enough source candles
     // for ~1000 finished bars of history.
-    const sourceLimit = tf === "45m" ? 3000 : tf === "2h" ? 2000 : tf === "4h" || tf === "1d" ? 4000 : 1000;
+    const sourceLimit = terminalSourceLimit(tf);
     const picked = await fetchGoldProxyDeepWithProvider(fetchTf, sourceLimit, true);
     // A momentary Gate hiccup must not swap the whole chart to another
     // exchange's candles (different wicks / gappy thin feeds = candles that

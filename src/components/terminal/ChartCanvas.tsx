@@ -1051,38 +1051,48 @@ function CandleCountdown({
   candleRef: import("react").MutableRefObject<ISeriesApi<"Candlestick"> | null>;
   propsRef: import("react").MutableRefObject<Props>;
 }) {
-  const [s, setS] = useState<{ y: number; w: number; text: string; up: boolean } | null>(null);
+  const [s, setS] = useState<{ y: number; w: number; text: string; price: string; up: boolean } | null>(null);
   useEffect(() => {
+    let raf = 0;
+    let lastKey = "";
     const tick = () => {
+      raf = window.requestAnimationFrame(tick);
       const chart = chartRef.current;
       const series = candleRef.current;
       const { bars, stepSeconds } = propsRef.current;
       const last = bars[bars.length - 1];
-      if (!chart || !series || !last || !stepSeconds) return setS(null);
+      if (!chart || !series || !last || !stepSeconds) { if (lastKey) { lastKey = ""; setS(null); } return; }
       const left = last.time + stepSeconds - Math.floor(Date.now() / 1000);
       const y = series.priceToCoordinate(last.close);
       let w = 0;
       try { w = chart.priceScale("right").width(); } catch { w = 0; }
-      if (left <= 0 || left > stepSeconds || y == null || !w) return setS(null);
+      if (left <= 0 || left > stepSeconds || y == null || !w) { if (lastKey) { lastKey = ""; setS(null); } return; }
       const h = Math.floor(left / 3600);
       const m = Math.floor((left % 3600) / 60);
       const sec = left % 60;
       const pad = (n: number) => String(n).padStart(2, "0");
-      setS({ y: Number(y), w, text: h ? `${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`, up: last.close >= last.open });
+      const text = h ? `${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
+      const price = series.priceFormatter().format(last.close);
+      const up = last.close >= last.open;
+      const key = `${Math.round(Number(y))}|${w}|${text}|${price}|${up}`;
+      if (key === lastKey) return;
+      lastKey = key;
+      setS({ y: Math.round(Number(y)), w, text, price, up });
     };
-    tick();
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
+    raf = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(raf);
   }, [chartRef, candleRef, propsRef]);
   if (!s) return null;
   const c = s.up ? CHART_COLORS.up : CHART_COLORS.down;
+  // One block: live price on top, time left underneath — covers the axis label so they never drift apart.
   return (
     <div
-      className="pointer-events-none absolute right-0 z-[3] pl-2 text-left font-mono font-bold text-[11px] leading-[16px] tabular-nums"
-      style={{ top: s.y + 10, width: s.w, background: c, color: "#ffffff" }}
-      aria-label="Time left on current candle"
+      className="pointer-events-none absolute right-0 z-[3] flex flex-col pl-2 text-left font-mono font-bold text-[11px] leading-[15px] tabular-nums"
+      style={{ top: s.y - 8, width: s.w, background: c, color: "#ffffff", paddingTop: 1, paddingBottom: 2 }}
+      aria-label="Live price and time left on current candle"
     >
-      {s.text}
+      <span>{s.price}</span>
+      <span className="opacity-90">{s.text}</span>
     </div>
   );
 }
