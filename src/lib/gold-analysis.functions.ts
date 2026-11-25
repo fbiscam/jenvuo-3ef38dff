@@ -1648,6 +1648,28 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
     }
   }
   const step = TF_MS[tf] ?? TF_MS["30m"];
+  // Interbank forex publishes no volume (Yahoo sends 0). Borrow only the volume
+  // column from Binance EURUSDT for the same time buckets; prices stay interbank.
+  if (provider === "Forex" && !candles.some((c) => (c.v || 0) > 0)) {
+    try {
+      const proxy = await Promise.any([
+        fetchBinanceHostDeep("data-api.binance.vision", "EURUSDT", fetchTf, limit),
+        fetchBinanceHostDeep("api.binance.com", "EURUSDT", fetchTf, limit),
+      ]);
+      const vol = new Map<number, number>();
+      for (const p of proxy) {
+        const b = sessionBucketMs(p.t, step);
+        vol.set(b, (vol.get(b) || 0) + (Number.isFinite(p.v) ? p.v : 0));
+      }
+      const seen = new Set<number>();
+      candles = candles.map((c) => {
+        const b = sessionBucketMs(c.t, step);
+        if (seen.has(b)) return { ...c, v: 0 };
+        seen.add(b);
+        return { ...c, v: vol.get(b) || 0 };
+      });
+    } catch { /* volume stays 0 */ }
+  }
   const byBucket = new Map<number, Candle>();
   for (const c of candles) {
     if (![c.t, c.o, c.h, c.l, c.c].every(Number.isFinite)) continue;

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight, PanelRightClose } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getMarketSnapshotsBatch, getTerminalChart } from "@/lib/gold-analysis.functions";
 import { getGoldOverview, getGoldSeasonals } from "@/lib/terminal-overview.functions";
 import type { NewsEvent } from "@/lib/news.functions";
@@ -41,11 +41,11 @@ function newsStamp(iso: string): string {
 }
 
 /** Large price with the last digit raised, like TradingView. */
-function BigPrice({ value, decimals }: { value: number; decimals: number }) {
+function BigPrice({ value, decimals, tone }: { value: number; decimals: number; tone?: string }) {
   const text = fmt(value, decimals);
   const split = decimals >= 4;
   return (
-    <span className="text-[30px] font-semibold leading-none tabular-nums text-foreground">
+    <span className={cn("text-[30px] font-semibold leading-none tabular-nums transition-colors", tone || "text-foreground")}>
       {split ? text.slice(0, -1) : text}
       {split && <sup className="ml-px align-super text-[16px]">{text.slice(-1)}</sup>}
     </span>
@@ -164,6 +164,18 @@ export function TerminalWatchlist({
   }, [bars]);
 
   const q = quote.data;
+  const [tickDir, setTickDir] = useState<"up" | "down" | null>(null);
+  const lastPrice = useRef<number | null>(null);
+  useEffect(() => {
+    const p = q?.price;
+    if (p == null || !Number.isFinite(p)) return;
+    const prev = lastPrice.current;
+    lastPrice.current = p;
+    if (prev == null || prev === p) return;
+    setTickDir(p > prev ? "up" : "down");
+    const t = setTimeout(() => setTickDir(null), 1200);
+    return () => clearTimeout(t);
+  }, [q?.price]);
   const change = q && q.prevClose != null ? q.price - q.prevClose : null;
   const closed = hasWeekendClose(asset) && isMarketClosed(new Date());
   const perf = overview.data?.performance ?? null;
@@ -233,7 +245,7 @@ export function TerminalWatchlist({
             </div>
           </div>
           <div className="mt-4 flex items-baseline gap-1.5">
-            {q ? <BigPrice value={q.price} decimals={info.decimals} /> : <span className="text-[30px] font-semibold leading-none">—</span>}
+            {q ? <BigPrice value={q.price} decimals={info.decimals} tone={tickDir === "up" ? UP : tickDir === "down" ? DOWN : undefined} /> : <span className="text-[30px] font-semibold leading-none">—</span>}
             <span className="text-[11px] text-muted-foreground">USD</span>
           </div>
           {q && change != null && (
@@ -260,11 +272,12 @@ export function TerminalWatchlist({
                 <span>{compact(volume.today)}</span>
                 <span>{compact(volume.avg)}</span>
               </div>
-              <div className="mt-2 flex h-1.5 overflow-hidden rounded-full bg-secondary">
+              <div className="mt-2 flex h-[5px] gap-[2px]">
                 <span
-                  className="h-full rounded-full bg-foreground/70"
-                  style={{ width: `${Math.min(100, (volume.today / Math.max(volume.today, volume.avg)) * 100)}%` }}
+                  className="h-full rounded-l-full bg-[#2962FF]"
+                  style={{ width: `${Math.max(2, Math.min(98, (volume.today / (volume.today + volume.avg)) * 100))}%` }}
                 />
+                <span className="h-full flex-1 rounded-r-full bg-[#22C4D8]" />
               </div>
               <p className="mt-1.5 text-[10px] text-muted-foreground">Feed volume, not centralized market order flow.</p>
             </>
