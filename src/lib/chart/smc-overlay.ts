@@ -19,6 +19,7 @@ import { computeLiquidityMap, type LiquidityMap } from "./liquidity-sweeps";
 import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 import { classifySwingSweep, type SwingSweep } from "./swing-sweep";
 import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
+import { computeSfpSignals, type SfpSignal } from "./sfp-signal";
 import { computeSwingTradePlan, type SwingTradePlan } from "./swing-trade-plan";
 import {
   isHighProbabilityLiquiditySweep,
@@ -146,6 +147,8 @@ export type SmcOverlay = {
   priceAction?: Record<number, SwingPriceAction>;
   /** Fresh-swing liquidity sweep verdict (previous 10 candles), keyed by pivot time. */
   swingSweeps?: Record<number, SwingSweep>;
+  /** One-candle strong SFP signals (confirmed on the sweep candle's own close). */
+  sfpSignals?: SfpSignal[];
   /** 1H fresh-swing Entry/SL/TP (price action and/or sweep). */
   swingPlan?: SwingTradePlan | null;
 };
@@ -961,9 +964,11 @@ export function computeSmcOverlay(
       sweepOk: isHighProbabilitySweep(swingSweeps[p.t]),
     })).filter((p) => p.index >= 0),
   );
+  const sfpSignals = computeSfpSignals(fractalBars);
   return {
     swingPlan,
     swingSweeps,
+    sfpSignals,
     priceAction,
     freshFvgs,
     reversal,
@@ -1376,6 +1381,7 @@ export function renderSmcOverlay(
     ctx.setLineDash([]);
   }
   if (toggles.sweeps && smc.liquidityMap) renderLiquidityMap(ctx, smc.liquidityMap, pr);
+  if (toggles.swingSweep && smc.sfpSignals) renderSfpSignals(ctx, smc.sfpSignals, pr);
   if (toggles.breaks) {
     for (const b of smc.breaks) {
       const x0 = pr.x(b.fromT / 1000);
@@ -1584,6 +1590,25 @@ export function renderSmcOverlay(
   if (toggles.swingPlan && smc.swingPlan) {
     const p = smc.swingPlan;
     sdPlan({ t: p.t, plan: { side: `${p.side} ${p.grade}`, entry: p.entry, sl: p.sl, tp1: p.tp1, tp2: p.tp2 } } as unknown as SdZone);
+  }
+  ctx.restore();
+}
+
+/** One-candle strong SFP: small "SFP ✓" tag beyond the sweeping wick (newest 6). */
+function renderSfpSignals(ctx: CanvasRenderingContext2D, list: SfpSignal[], pr: SmcProjector) {
+  ctx.save();
+  ctx.font = "700 10px 'JetBrains Mono', ui-monospace, monospace";
+  for (const s of list.slice(-6)) {
+    const x = pr.x(s.t / 1000);
+    const yx = pr.y(s.extreme);
+    if (x == null || yx == null || x < 0 || x > pr.width) continue;
+    const text = s.side === "sell" ? "SFP ✓ Sell" : "SFP ✓ Buy";
+    const w = ctx.measureText(text).width;
+    const y = s.side === "sell" ? yx - 8 : yx + 18;
+    ctx.fillStyle = plate(ctx, 0.9);
+    ctx.fillRect(x - w / 2 - 4, y - 11, w + 8, 14);
+    ctx.fillStyle = isDarkCanvas(ctx) ? "#ffffff" : s.side === "sell" ? "#f23645" : "#089981";
+    ctx.fillText(text, x - w / 2, y);
   }
   ctx.restore();
 }

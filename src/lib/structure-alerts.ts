@@ -6,6 +6,7 @@
 import { computeSmcOverlay, FRACTAL_RADIUS, FRACTAL_WINDOW } from "@/lib/chart/smc-overlay";
 import { isHighProbabilityPriceAction, isHighProbabilitySweep } from "@/lib/chart/high-probability";
 import type { OhlcvBar } from "@/lib/chart/indicators";
+import { classifySfp } from "@/lib/chart/sfp-signal";
 
 export const ALERT_ASSETS = ["XAUUSD", "EURUSD", "BTCUSD"] as const;
 export const ALERT_TIMEFRAMES = ["1h", "2h", "3h"] as const;
@@ -52,6 +53,24 @@ export function detectStructureAlerts(asset: string, timeframe: string, closed: 
       confirmedTime: conf.time * 1000,
       priceAction: paOk && pa ? `${pa.text}${pa.reversalShare != null ? ` (${pa.control} ${Math.round(pa.reversalShare)}%)` : ""}` : null,
       sweep: swOk && sw ? sw.text : null,
+    });
+  }
+  // One-candle strong SFP on the newest closed candle: emailed right at its close
+  // so the trade can be taken at the next candle's open.
+  const last = fractal.length - 1;
+  const sfp = classifySfp(fractal.map((b) => ({ t: b.time * 1000, o: b.open, h: b.high, l: b.low, c: b.close })), last);
+  if (sfp) {
+    out.push({
+      key: `${asset}:${timeframe}:sfp:${sfp.t}`,
+      asset,
+      timeframe,
+      label: sfp.side === "sell" ? "SFP High" : "SFP Low",
+      kind: sfp.side === "sell" ? "high" : "low",
+      price: sfp.extreme,
+      swingTime: sfp.t,
+      confirmedTime: sfp.t,
+      priceAction: `Strong 1-candle rejection · ${sfp.side === "sell" ? "Sellers" : "Buyers"}`,
+      sweep: `Sweep ✓ strong (previous 10 candles' ${sfp.side === "sell" ? "high" : "low"} ${sfp.level.toFixed(asset === "EURUSD" ? 5 : 2)})`,
     });
   }
   return out;

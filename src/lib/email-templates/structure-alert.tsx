@@ -15,7 +15,7 @@ interface Props {
   chartUrl?: string
 }
 
-const BULL = new Set(['HH', 'HL'])
+const BULL = new Set(['HH', 'HL', 'SFP Low'])
 
 const DetailRow = ({ icon, label, value }: { icon: string; label: string; value: string }) => (
   <tr>
