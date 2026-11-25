@@ -146,7 +146,7 @@ export default function DashboardTopBar({
   const seeAll = () => { const t = q.trim(); if (!t) return; close(); void navigate({ to: "/search", search: { q: t } }); };
 
   return (
-    <header className={`sticky top-0 z-30 ${pinned && !onTerminal ? "flex lg:hidden" : "flex"} ${onTerminal ? "terminal-topbar h-11" : white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-background" : "console-topbar bg-background"} px-2 sm:gap-3 sm:px-3`}>
+    <header className={`dashboard-topbar sticky top-0 z-30 ${pinned && !onTerminal ? "flex lg:hidden" : "flex"} ${onTerminal ? "terminal-topbar h-11" : white ? "h-[52px]" : "h-14"} shrink-0 items-center gap-2 ${white ? "bg-background" : "console-topbar bg-background"} px-2 sm:gap-3 sm:px-3`}>
       <button
         type="button"
         onClick={onMenu}

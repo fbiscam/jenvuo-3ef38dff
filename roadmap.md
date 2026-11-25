@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Apply Terminal-style dividers beneath the shared dashboard header and along every sidebar variant; verify light/dark desktop/mobile appearance and recheck the reported utility error.
+
 - [x] Follow-up utility/download sweep: reread all 76 production cn callers (shared UI, Chat, Models, Settings, Terminal/demo, Course/Profile/Security and app), sole helper/test, JX Bot onDownload and authenticated getBotDownloadUrl; all follow string-returning helper/current private archive rules. No independent helper/download job or SQL path found in extension/electron/scripts/migrations. Utility and 41 native bot tests pass; private stored archive still matches uploaded size/eTag. No new behavior fix needed; customer notes remain outdated, signed-in download button and MT5 binary execution/backtesting unverified. Settled records, settings and permissions unchanged.
 
 - [x] Replace customer download with uploaded JX_BOT_MT5_v4.08.zip unchanged (86214 bytes, SHA256 6bc443cb780bb3e21defcacec90483b66a7851304b16e119e892c20debfa7326); ZIP CRC passes, stored eTag matches local MD5 and bot-files remains private. EX5, preset and PDF present; no MQL source. Utility regression and 41 bot source/native tests pass; latest build OK, reported line-8 error absent. Uploaded README/VALIDATION still contain obsolete source-only wording; binary behavior, owner backtesting and actual signed-in dashboard button remain unverified. No EA, permissions or website code changed.

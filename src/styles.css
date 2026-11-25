@@ -2189,8 +2189,27 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
   .jenvu-zoom-dashboard main.dash-page { zoom: 0.666 !important; }
 }
 
-/* Dashboard side menu: no dividing lines on any side (right edge, footer row). */
-.jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar { border: 0 !important; box-shadow: none !important; }
+/* Continuous shell dividers, matching the Terminal's section edges. */
+.dashboard-topbar {
+  border-bottom: 4px solid var(--color-terminal-line);
+}
+.dashboard-sidebar-root,
+.jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar {
+  border-right: 4px solid var(--color-terminal-line) !important;
+  box-shadow: none !important;
+}
+.dash-dark .dashboard-topbar {
+  border-bottom: 1px solid var(--console-line);
+}
+.jenvu-zoom-dashboard.dash-dark .dashboard-sidebar-root.console-sidebar {
+  border-right: 1px solid var(--console-line) !important;
+}
+body:has(.terminal-dark) .dashboard-topbar {
+  border-bottom: 1px solid var(--border);
+}
+body:has(.terminal-dark) .dashboard-terminal-sidebar {
+  border-right-width: 1px !important;
+}
 
 /* JX Bot landing page animations */
 .jx-features { --jx-success: oklch(.58 .16 155); --jx-success-soft: oklch(.96 .035 160); --jx-info: oklch(.63 .14 250); --jx-lilac: oklch(.93 .035 295); --jx-lilac-ink: oklch(.53 .17 295); --jx-danger: oklch(.65 .18 25); --jx-warning: oklch(.8 .15 80); --jx-shadow: 0 10px 24px -8px color-mix(in oklab, var(--foreground) 18%, transparent); letter-spacing: 0; }
