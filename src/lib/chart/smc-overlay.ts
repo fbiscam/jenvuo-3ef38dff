@@ -93,8 +93,8 @@ export function resolveZoneOverlaps(
 
 
 export const SMC_WINDOW = 150;
-/** HH/HL/LH/LL chart labels use a 3-bar pivot each side (TradingView-style, confirms in 3 closed candles). */
-export const FRACTAL_RADIUS = 3;
+/** HH/HL/LH/LL chart labels use a Fractals-style swing length of 10 bars each side. */
+export const FRACTAL_RADIUS = 10;
 /** Closed bars scanned for 10-bar fractal labels (wider window so enough swings form). */
 export const FRACTAL_WINDOW = 400;
 
