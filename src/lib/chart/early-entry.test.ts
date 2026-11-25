@@ -1,4 +1,5 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./test-expect";
 import { computeEarlyEntry } from "./early-entry";
 
 const flat = (n: number, base = 100) =>
