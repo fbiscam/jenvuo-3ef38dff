@@ -107,7 +107,7 @@ const SD_ZONE_TIMEFRAMES = new Set(["1m", "3m", "5m", "10m", "15m", "30m", "45m"
 /** "Previous zones & FVG" (last 10 strategy zones) and its switch: 15m and higher only. */
 const SD_HISTORY_TIMEFRAMES = new Set(["15m", "30m", "45m", "1h", "2h", "3h", "4h", "6h", "12h", "1d"]);
 /** Swing price action, fresh swing sweep and liquidity sweeps: 1H, 2H, 4H and 1D only (lower timeframes are too noisy). */
-const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "4h", "1d"]);
+const SWING_SWEEP_TIMEFRAMES = new Set(["1h", "2h", "3h", "4h", "6h", "12h", "1d"]);
 const LOCKED_TOGGLE_KEYS = new Set<string>(LOCKED_STRATEGY_KEYS);
 
 const MemoChart = memo(ChartCanvas);
