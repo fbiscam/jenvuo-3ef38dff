@@ -6,7 +6,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Jenvu"
 #property link      "https://jenvu.com"
-#property version   "4.08"
+#property version   "4.09"
 #property description "Jenvu EA - single-cluster entries, confirmed M15 invalidation and daily drawdown guard."
 #include <Trade\Trade.mqh>
 
@@ -33,6 +33,12 @@ ENUM_JV_STRAT strattype = (ENUM_JV_STRAT)1; // Strategy (0 RSI, 1 MA, 2 RSI+MA, 
 //string ORDER           = "======= ORDER SETTINGS ======";
 input double lotSize         = 0.05;     // Auto lot per 1000 balance (0.05 per $1,000)
 bool   WaitFreshCandleOnAttach = true; // No entry on the candle the bot was attached
+double HardStopPips    = 7.5;       // v4.09: basket closes at this many pips against the average price
+bool   UseExhaustionGuard = true;  // v4.09: no SELL at an exhausted bottom, no BUY at an exhausted top
+int    ExhaustBars      = 12;      // Closed candles measured for the one-way move
+double ExhaustMovePips  = 25.0;    // One-way move that counts as exhausted
+double ExhaustRsiLow    = 25.0;    // RSI below this + big drop = no SELL
+double ExhaustRsiHigh   = 75.0;    // RSI above this + big rally = no BUY
 double takeprofit      = 5.0;       // Every basket: EA-managed take profit in EURUSD pips from average price
 double lotMul          = 1.2;       // Grid lot multiplier
 double lotMax          = 0.0;       // Max lot per trade (0 = no limit)
@@ -127,13 +133,13 @@ double StructMinBodyPct = 50.0;         // Break candle needs a real body (% of 
 double StructDispATR    = 0.2;          // v4.04 stronger: break candle must CLOSE at least this many M15 ATR(14) beyond the swing (was 0.5)
 bool   StructH1Confirm  = false;        // v4.04 stronger: no H1 wait - the M15 break alone cuts the losing basket
 // v4.07 Layer 1: Trap Shield - never SELL into active bullish FVG / demand, never BUY into active bearish FVG / supply
-bool   UseTrapShield    = true;
+bool   UseTrapShield    = false;        // v4.09: FVG/zone entry filter OFF
 int    ShieldLookback   = 20;           // Closed M15 candles scanned for FVGs and zones
 double ShieldNearATR    = 1.0;          // Block when price is inside the zone or within this many M15 ATR of it
 double FvgNearATR       = 0.2;          // v4.08: tighter FVG-only buffer; supply/demand keeps ShieldNearATR
 double ShieldMinGapATR  = 0.1;          // Ignore tiny FVGs smaller than this many ATR
 double ZoneImpulseATR   = 1.0;          // Demand/supply needs an impulse candle body of at least this many ATR
-bool   UseFvgProfitGuard = true;        // Only an opposing active FVG touch can arm this exit
+bool   UseFvgProfitGuard = false;       // Only an opposing active FVG touch can arm this exit
 double FvgGuardTrigPips  = 3.5;         // Minimum executable-quote profit at FVG touch
 double FvgGuardLockPips  = 2.0;         // Virtual floor after arming; not a guaranteed fill price
 // v4.07 Layer 2: local verified invalidation - anchor = extreme of the 5 closed M15 candles before entry
@@ -654,6 +660,18 @@ void DrawDashboard(const Basket &buy, const Basket &sell)
 
 //--- signals ----------------------------------------------------------
 // returns +1 buy, -1 sell, 0 none
+// v4.09: block entries at the end of a one-way move (exhausted bottom/top)
+bool ExhaustionBlocks(int dir)
+  {
+   if(!UseExhaustionGuard || dir == 0) return false;
+   double r[1]; if(CopyBuffer(hRSI, 0, 1, 1, r) < 1) return false;
+   double now = iClose(_Symbol, PERIOD_CURRENT, 1);
+   double hi = iHigh(_Symbol, PERIOD_CURRENT, iHighest(_Symbol, PERIOD_CURRENT, MODE_HIGH, ExhaustBars, 1));
+   double lo = iLow(_Symbol, PERIOD_CURRENT, iLowest(_Symbol, PERIOD_CURRENT, MODE_LOW, ExhaustBars, 1));
+   if(dir == -1) return r[0] < ExhaustRsiLow && (hi - now) >= ExhaustMovePips * PU();
+   return r[0] > ExhaustRsiHigh && (now - lo) >= ExhaustMovePips * PU();
+  }
+
 int RawSignal();
 // Fakeout filter: blocks signals against the H1 trend / momentum
 bool TrendAllows(int dir)
@@ -868,7 +886,8 @@ int Signal()
    int d = RawSignal();
    if(!TrendAllows(d)) return 0;
    if(!EntryQualityOk(d)) return 0;
-   if(TrapShieldBlocks(d)) return 0;   // v4.07 Layer 1: only removes trap entries, never creates new ones
+   if(TrapShieldBlocks(d)) return 0;
+   if(ExhaustionBlocks(d)) return 0;   // v4.09   // v4.07 Layer 1: only removes trap entries, never creates new ones
    return d;
   }
 
@@ -1072,6 +1091,7 @@ void ManageSide(ENUM_POSITION_TYPE type, int sig, bool canOpen)
       double avg = b.wsum / b.lots;
       double move = isBuy ? (bid - avg) : (avg - ask);
       if(move >= takeprofit * PU()) { CloseSide(type); Print("Jenvu: basket TP hit"); return; }
+      if(HardStopPips > 0 && move <= -HardStopPips * PU()) { CloseSide(type); Print("Jenvu: hard stop hit"); return; }
 
       bool fvgClose = isBuy ? UpdateFvgGuard(g_fvgBuy, type, avg, move) : UpdateFvgGuard(g_fvgSell, type, avg, move);
       if(fvgClose)
