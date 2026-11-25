@@ -12,7 +12,7 @@ import { useTrial } from "@/hooks/useTrial";
 import { useServerFn } from "@tanstack/react-start";
 import { getFoundingMembership } from "@/lib/mt5-licenses.functions";
 import { purchaseGate, type PurchaseGate } from "@/lib/founding-bot";
-import { ANNUAL_DISCOUNT_PCT, PLAN_API_CREDIT, TERMINAL_API_PRICE, annualFullPrice, annualPrice, planPrice } from "@/lib/plan-pricing";
+import { ANNUAL_DISCOUNT_PCT, DEFAULT_BILLING_CYCLE, PLAN_API_CREDIT, TERMINAL_API_PRICE, annualFullPrice, annualPrice, planPrice } from "@/lib/plan-pricing";
 import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
@@ -278,7 +278,8 @@ function PricingPage() {
   const upgradeLock = useUpgradeLock();
   const trial = useTrial();
   const signedOut = currentPlan === null;
-  const [billing, setBilling] = React.useState<"monthly" | "annual">("monthly");
+  // Yearly is the default so the page opens on the discounted price; Monthly stays one tap away.
+  const [billing, setBilling] = React.useState<"monthly" | "annual">(DEFAULT_BILLING_CYCLE);
   // Plans are open to everyone; approved Founding members still waiting on ID verify first.
   const membershipFn = useServerFn(getFoundingMembership);
   const [buyGate, setBuyGate] = React.useState<PurchaseGate>({ canBuy: true, reason: "ok" });

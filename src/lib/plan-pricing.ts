@@ -78,6 +78,9 @@ export function paidPeriodEnd(args: { samePlan: boolean; currentEnd: string | nu
 /** Yearly billing discount, percent off twelve monthly payments. */
 export const ANNUAL_DISCOUNT_PCT = 22;
 
+/** The pricing page opens on yearly so the discounted price is the first one shown. */
+export const DEFAULT_BILLING_CYCLE = "annual" as const;
+
 /** Full price of twelve months, before the yearly discount. */
 export function annualFullPrice(plan: PaidPlanId): number {
   return planPrice(plan) * 12;

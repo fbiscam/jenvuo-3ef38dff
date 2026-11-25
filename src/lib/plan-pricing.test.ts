@@ -58,8 +58,11 @@ describe("paid plan period", () => {
   });
 });
 
-import { annualPrice, annualFullPrice, ANNUAL_DISCOUNT_PCT } from "./plan-pricing";
+import { annualPrice, annualFullPrice, ANNUAL_DISCOUNT_PCT, DEFAULT_BILLING_CYCLE } from "./plan-pricing";
 describe("yearly pricing", () => {
+  it("the pricing page opens on yearly", () => {
+    expect(DEFAULT_BILLING_CYCLE).toBe("annual");
+  });
   it("gives 22% off twelve months", () => {
     expect(ANNUAL_DISCOUNT_PCT).toBe(22);
   });
