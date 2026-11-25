@@ -32,7 +32,8 @@ export function createDayGrid(color: string, sundayBreak: boolean): ISeriesPrimi
         context.beginPath();
         let previousX = -Infinity;
         for (const time of boundaries) {
-          const x = scale.timeToCoordinate(time as Time);
+          const index = scale.timeToIndex(time as Time, true);
+          const x = scale.timeToCoordinate(time as Time) ?? (index == null ? null : scale.logicalToCoordinate(index as never));
           if (x == null || x - previousX < 48) continue;
           previousX = x;
           const crispX = Math.round(x) + 0.5;

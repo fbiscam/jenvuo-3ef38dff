@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Compact the Terminal header/logo and widen background grid blocks with UTC day boundaries and the Sunday 17:00 reference break; verify signed-in desktop/mobile and the reported utility error without changing candle feeds.
+- [x] Compact Terminal header and phone toolbar to 36px, reduce Terminal logos, and render wide UTC-day background blocks with a Sunday 17:00 reference break independently of candle feeds. Temporary signed-in account verified desktop, phone fit and 1H light/dark charts with no runtime errors; three focused tests pass and latest build OK. Read all 79 shared class-helper callers: numeric inputs resolve to text; reported utility line 8 absent. No customer records, permissions or settings changed; published-site verification not performed.
 
 - [x] Remove the selected Terminal chat upload/mic row, restore dark regular-weight header text, and retain sidebar dividers only on Terminal. Temporary signed-in test account verified usable chat input, Terminal 4px vs Overview 0px sidebar borders in both themes, and phone chat fit; latest build OK. Trading/AI services unchanged.
 
