@@ -34,5 +34,5 @@
 - Tool how-to text lives in `src/lib/chart-tools-guide.ts`, read by the Help article and the Terminal AI prompt (Ask Jenvu gets it through the Help articles); update it when a tool's rules change so answers match the chart.
 - 1H swing plan (`swing-trade-plan.ts`) is kept but switched off in the Terminal (user asked to hide Entry/SL/TP on fresh swings).
 
-- Fixed swings (`SHOW_LIVE_SWINGS = false` in `smc-overlay.ts`): unconfirmed live HH/HL/LH/LL swings are never drawn or fed to price action, sweeps, reversal reads or supply/demand zones; only confirmed 10-bar swings show. Why: user trades 1H price action + sweeps and needs highs/lows that never shift once shown.
+- Fixed swings (`SHOW_LIVE_SWINGS = false` in `smc-overlay.ts`): unconfirmed live HH/HL/LH/LL swings are never drawn or fed to price action, sweeps, reversal reads or supply/demand zones; only confirmed 3-bar swings (FRACTAL_RADIUS) show. Why: user trades 1H price action + sweeps and needs fixed highs/lows that confirm within 3 candles like TradingView, not 10 hours late.
 - EUR/USD 1m–30m candles use CME 6E=F futures OHLC shifted by the median spot basis (`shiftFuturesToSpot`, tested), with live spot rows after the futures' ~10-min delay: Yahoo spot intraday rows are flat sampled quotes.
