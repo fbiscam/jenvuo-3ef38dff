@@ -93,9 +93,9 @@ export function resolveZoneOverlaps(
 
 
 export const SMC_WINDOW = 150;
-/** HH/HL/LH/LL chart labels use a Fractals-style swing length of 8 bars each side. */
+/** HH/HL/LH/LL chart labels use a Fractals-style swing length of FRACTAL_RADIUS bars each side. */
 export const FRACTAL_RADIUS = 4;
-/** Closed bars scanned for 8-bar fractal labels (wider window so enough swings form). */
+/** Closed bars scanned for FRACTAL_RADIUS-bar fractal labels (wider window so enough swings form). */
 export const FRACTAL_WINDOW = 400;
 
 export type LivePivot = {
@@ -592,7 +592,7 @@ export function computeSmcOverlay(
   const poi = detectPoiEvidence(recent);
   const price = currentPrice ?? recent[recent.length - 1].c;
 
-  // HH/HL/LH/LL labels: 8-bar fractal swings (like the Fractals indicator).
+  // HH/HL/LH/LL labels: FRACTAL_RADIUS-bar fractal swings (like the Fractals indicator).
   const fractalBars = bars.slice(-FRACTAL_WINDOW).map(toCandle);
   const fractal = detectMarketStructureEvidence(fractalBars, R);
   // Final-once: a confirmed swing keeps the first label it received on its own
@@ -639,7 +639,7 @@ export function computeSmcOverlay(
   const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
-  // confirmed 8-bar pivot set. Provisional tail pivots never create events.
+  // confirmed FRACTAL_RADIUS-bar pivot set. Provisional tail pivots never create events.
   const breaks = fractal.breaks.map((b) => {
     const src = [...fractal.pivots]
       .reverse()

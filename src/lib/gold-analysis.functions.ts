@@ -1988,7 +1988,7 @@ async function buildEvidenceContext(timeframe: string, dailyTradesTaken = 0, ass
     return "Last structure change: none inside the supplied window";
   })();
   const structureBlock = labelled.length
-    ? `CONFIRMED SWING STRUCTURE (10-bar fractal pivots, 10 closed candles required on each side, oldest -> newest):
+    ? `CONFIRMED SWING STRUCTURE (${SMC_FRACTAL_RADIUS}-bar fractal pivots, ${SMC_FRACTAL_RADIUS} closed candles required on each side, oldest -> newest):
 ${recentPivots.map(fmtPivot).join("\n")}
 CURRENT STRUCTURE: ${structureState}
 LAST CONFIRMED HIGH: ${lastHigh ? fmtPivot(lastHigh) : "n/a"}
