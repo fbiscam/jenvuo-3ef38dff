@@ -1,7 +1,7 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
 const expect = (v: unknown) => ({ toBe: (x: unknown) => assert.equal(v, x), toEqual: (x: unknown) => assert.deepEqual(v, x), toContain: (x: unknown) => assert.ok((v as unknown[]).includes(x)), toBeGreaterThanOrEqual: (x: number) => assert.ok((v as number) >= x) });
-import { detectStructureAlerts, ALERT_TIMEFRAMES, ALERT_ASSETS, FRESH_CONFIRM_BARS } from "./structure-alerts";
+import { detectStructureAlerts, ALERT_TIMEFRAMES, ALERT_ASSETS, FRESH_CONFIRM_BARS, ALERT_FRACTAL_RADIUS } from "./structure-alerts";
 import { FRACTAL_RADIUS } from "./chart/smc-overlay";
 
 const bars = (n: number) =>
@@ -44,4 +44,10 @@ describe("alert recipients", () => {
     expect(receivesStructureAlerts({ plan_id: "elite", status: "canceled", current_period_end: future })).toBe(false);
     expect(receivesStructureAlerts({ plan_id: "ultra", status: "active", current_period_end: new Date(Date.now() - 1000).toISOString() })).toBe(false);
   });
+});
+
+
+test("alerts confirm swings exactly like the chart labels (email only after the chart shows it)", () => {
+  expect(ALERT_FRACTAL_RADIUS).toBe(FRACTAL_RADIUS);
+  expect(ALERT_FRACTAL_RADIUS).toBe(10);
 });

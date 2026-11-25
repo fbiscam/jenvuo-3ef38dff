@@ -253,3 +253,5 @@
 - [x] Mobile pricing compare table: yearly price now renders on one line ("$1,668 $1,301/year") with the column widths unchanged. Phone view measured 14.3px tall (was 33px) inside the 92px column, no overflow, feature labels still wrap to at most two lines, no browser errors.
 
 - [x] Pricing "Current plan" chip: white fill with a light border instead of green, and it marks only the basis the account is actually billed on (monthly) — the yearly column of the mobile compare table now reads "Monthly plan" for the held plan. Phone view verified MONTHLY Ultra "Current plan" (white) beside YEARLY Ultra "Monthly plan" (grey); desktop Ultra column chip white; 18 pricing tests pass, build OK.
+
+- [x] Fresh high/low emails now use the chart's own 10-candle swing confirmation: an email goes out only once HH/HL/LH/LL is drawn on the chart. Test added; live scan of 3 pairs × 1H/2H/3H shows no pending alert.
