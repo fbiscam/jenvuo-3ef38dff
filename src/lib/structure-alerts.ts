@@ -41,20 +41,39 @@ export function detectStructureAlerts(asset: string, timeframe: string, closed: 
     const swOk = isHighProbabilitySweep(sw);
     if (!paOk && !swOk) continue;
     const conf = fractal[Math.min(p.confirmedIndex, fractal.length - 1)]!;
+    pushAlert(p.kind, p.label, p.price, p.t, conf.time * 1000, pa, sw, paOk, swOk);
+  }
+  // Candle-1 swings shown on the chart before they lock: email as soon as the
+  // reversal candle has closed and price action or sweep qualifies (dedupe key
+  // matches the later locked pivot, so one email per swing).
+  for (const p of smc.livePivots) {
+    if (!["HH", "HL", "LH", "LL"].includes(p.label) || p.barsAfter > 6) continue;
+    if (out.some((a) => a.swingTime === p.t && a.kind === p.kind)) continue;
+    const pa = smc.priceAction?.[p.t];
+    const sw = smc.swingSweeps?.[p.t];
+    const paOk = isHighProbabilityPriceAction(pa);
+    const swOk = isHighProbabilitySweep(sw);
+    if (!paOk && !swOk) continue;
+    const idx = fractal.findIndex((b) => b.time * 1000 === p.t);
+    const conf = fractal[Math.min(idx + 1, fractal.length - 1)]!;
+    pushAlert(p.kind, p.label, p.price, p.t, conf.time * 1000, pa, sw, paOk, swOk);
+  }
+  return out;
+
+  function pushAlert(kind: "high" | "low", label: string, price: number, t: number, confirmedTime: number, pa: NonNullable<typeof smc.priceAction>[number] | undefined, sw: NonNullable<typeof smc.swingSweeps>[number] | undefined, paOk: boolean, swOk: boolean) {
     out.push({
-      key: `${asset}:${timeframe}:${p.kind}:${p.t}`,
+      key: `${asset}:${timeframe}:${kind}:${t}`,
       asset,
       timeframe,
-      label: p.label,
-      kind: p.kind,
-      price: p.price,
-      swingTime: p.t,
-      confirmedTime: conf.time * 1000,
+      label,
+      kind,
+      price,
+      swingTime: t,
+      confirmedTime,
       priceAction: paOk && pa ? `${pa.text}${pa.reversalShare != null ? ` (${pa.control} ${Math.round(pa.reversalShare)}%)` : ""}` : null,
       sweep: swOk && sw ? sw.text : null,
     });
   }
-  return out;
 }
 
 export const ALERT_PLANS = ["pro", "elite", "ultra"] as const;
