@@ -3383,6 +3383,87 @@ export type Database = {
         }
         Relationships: []
       }
+      swing_audits: {
+        Row: {
+          asset: string
+          backfilled: boolean
+          bars_tracked: number
+          confluence: string
+          entry: number | null
+          first_seen_at: string
+          kind: string
+          label: string
+          locked: boolean
+          mae_pips: number
+          mfe_pips: number
+          outcome: string
+          price: number
+          price_action: string | null
+          price_action_strong: boolean
+          reached_next_swing: boolean | null
+          repainted: boolean
+          sweep: string | null
+          sweep_strong: boolean
+          swing_at: string
+          swing_key: string
+          target: number | null
+          timeframe: string
+          updated_at: string
+        }
+        Insert: {
+          asset: string
+          backfilled?: boolean
+          bars_tracked?: number
+          confluence?: string
+          entry?: number | null
+          first_seen_at?: string
+          kind: string
+          label: string
+          locked?: boolean
+          mae_pips?: number
+          mfe_pips?: number
+          outcome?: string
+          price: number
+          price_action?: string | null
+          price_action_strong?: boolean
+          reached_next_swing?: boolean | null
+          repainted?: boolean
+          sweep?: string | null
+          sweep_strong?: boolean
+          swing_at: string
+          swing_key: string
+          target?: number | null
+          timeframe: string
+          updated_at?: string
+        }
+        Update: {
+          asset?: string
+          backfilled?: boolean
+          bars_tracked?: number
+          confluence?: string
+          entry?: number | null
+          first_seen_at?: string
+          kind?: string
+          label?: string
+          locked?: boolean
+          mae_pips?: number
+          mfe_pips?: number
+          outcome?: string
+          price?: number
+          price_action?: string | null
+          price_action_strong?: boolean
+          reached_next_swing?: boolean | null
+          repainted?: boolean
+          sweep?: string | null
+          sweep_strong?: boolean
+          swing_at?: string
+          swing_key?: string
+          target?: number | null
+          timeframe?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           key: string

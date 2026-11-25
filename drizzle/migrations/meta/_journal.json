@@ -533,6 +533,20 @@
       "when": 1795599340647,
       "tag": "0075_structure_alert_sends",
       "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1795634116340,
+      "tag": "0076_create_swing_audits",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1795634218127,
+      "tag": "0077_swing_audits_backfilled_flag",
+      "breakpoints": true
     }
   ]
 }
