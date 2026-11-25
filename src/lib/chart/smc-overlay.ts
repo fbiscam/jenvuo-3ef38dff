@@ -932,7 +932,7 @@ export function computeSmcOverlay(
   // per-browser live ticks on the forming candle never create or move a zone.
   const confirmedKeys = new Set(fractal.pivots.map((p) => `${p.kind}:${p.t}`));
   const closedIdx = new Map(fractalBars.map((b, k) => [b.t, k] as const));
-  const liveZonePivots = computeLivePivots(fractalBars, null, fractal.pivots)
+  const liveZonePivots = (SHOW_LIVE_SWINGS ? computeLivePivots(fractalBars, null, fractal.pivots) : [])
     .filter((p) => !confirmedKeys.has(`${p.kind}:${p.t}`))
     .map((p) => ({ index: closedIdx.get(p.t) ?? -1, t: p.t, price: p.price, kind: p.kind, label: p.label, live: !p.confirmedByOpposite }))
     .filter((p) => p.index >= 0);
