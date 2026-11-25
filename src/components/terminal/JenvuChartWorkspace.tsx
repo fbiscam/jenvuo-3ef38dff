@@ -36,6 +36,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { getTerminalChart } from "@/lib/gold-analysis.functions";
+import { TvArrow, TvCircle, TvCross, TvEye, TvEyeOff, TvFib, TvHLine, TvMagnet, TvRay, TvRect, TvText, TvTrash, TvTrend, TvVLine } from "./tv-tool-icons";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarRange, ChevronDown, Clock3, Lock, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -182,17 +183,17 @@ type Props = {
   onSidePanelOpenChange?: (open: boolean) => void;
 };
 
-const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon; label: string }> = [
-  { id: "cursor", icon: MousePointer2, label: "Cursor (Esc)" },
-  { id: "trend", icon: TrendingUp, label: TOOL_LABELS.trend },
-  { id: "ray", icon: MoveUpRight, label: TOOL_LABELS.ray },
-  { id: "arrow", icon: ArrowUpRight, label: TOOL_LABELS.arrow },
-  { id: "hline", icon: Minus, label: TOOL_LABELS.hline },
-  { id: "vline", icon: SeparatorVertical, label: TOOL_LABELS.vline },
-  { id: "rect", icon: RectangleHorizontal, label: TOOL_LABELS.rect },
-  { id: "circle", icon: Circle, label: TOOL_LABELS.circle },
-  { id: "fib", icon: AlignJustify, label: TOOL_LABELS.fib },
-  { id: "text", icon: Type, label: TOOL_LABELS.text },
+const TOOLS: Array<{ id: DrawingTool; icon: LucideIcon | ((p: { className?: string }) => import("react").ReactElement); label: string }> = [
+  { id: "cursor", icon: TvCross, label: "Cursor (Esc)" },
+  { id: "trend", icon: TvTrend, label: TOOL_LABELS.trend },
+  { id: "ray", icon: TvRay, label: TOOL_LABELS.ray },
+  { id: "arrow", icon: TvArrow, label: TOOL_LABELS.arrow },
+  { id: "hline", icon: TvHLine, label: TOOL_LABELS.hline },
+  { id: "vline", icon: TvVLine, label: TOOL_LABELS.vline },
+  { id: "rect", icon: TvRect, label: TOOL_LABELS.rect },
+  { id: "circle", icon: TvCircle, label: TOOL_LABELS.circle },
+  { id: "fib", icon: TvFib, label: TOOL_LABELS.fib },
+  { id: "text", icon: TvText, label: TOOL_LABELS.text },
 ];
 
 const SMC_LABELS: Array<{ key: keyof SmcToggles; label: string; hint: string }> = [
@@ -671,7 +672,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <>
           {TOOLS.map((t) => (
             <ToolButton key={t.id} label={t.label} active={tool === t.id} onClick={() => setTool(t.id)}>
-              <t.icon className="h-4 w-4" />
+              <t.icon className="h-[22px] w-[22px]" />
             </ToolButton>
           ))}
           <ToolButton label={TOOL_LABELS.long} active={tool === "long"} onClick={() => setTool("long")}>
@@ -717,14 +718,14 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             </PopoverContent>
           </Popover>
           <ToolButton label={magnet ? "Magnet on (snaps to OHLC)" : "Magnet off"} active={magnet} onClick={() => setMagnet((m) => !m)}>
-            <Magnet className="h-4 w-4" />
+            <TvMagnet className="h-[22px] w-[22px]" />
           </ToolButton>
           <ToolButton
             label={drawingsVisible ? "Hide drawings" : "Show drawings"}
             active={!drawingsVisible}
             onClick={() => setDrawingsVisible((v) => !v)}
           >
-            {drawingsVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            {drawingsVisible ? <TvEye className="h-[22px] w-[22px]" /> : <TvEyeOff className="h-[22px] w-[22px]" />}
           </ToolButton>
           <ToolButton
             label={selected ? "Delete selected drawing (Del)" : "Remove all drawings"}
@@ -738,7 +739,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               }
             }}
           >
-            <Trash2 className="h-4 w-4" />
+            <TvTrash className="h-[22px] w-[22px]" />
           </ToolButton>
       </>
     );
@@ -841,7 +842,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       {toolbarHost && !fullscreen ? (
         createPortal(rail, toolbarHost)
       ) : (
-        <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-gc-line bg-background px-2 md:flex">{rail}</div>
+        <div className="terminal-toolbar absolute inset-x-0 top-0 z-[5] hidden h-11 items-center border-b border-terminal-line dark:border-border bg-background px-2 md:flex">{rail}</div>
       )}
       <div className={cn("flex min-h-0 min-w-0 flex-1 flex-col", sidePanelOpen && "terminal-page-scroll lg:gap-3 lg:overflow-y-auto lg:p-3")}>
       {sidePanelOpen && (
@@ -1020,7 +1021,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <nav
           aria-label="Drawing tools"
           className={cn(
-            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 [scrollbar-width:none] md:!flex [&::-webkit-scrollbar]:hidden",
+            "w-11 shrink-0 flex-col items-center gap-0.5 overflow-y-auto border-r border-border py-1.5 md:border-terminal-line md:dark:border-border [scrollbar-width:none] md:!flex [&::-webkit-scrollbar]:hidden",
             mobileToolsOpen ? "flex" : "hidden",
           )}
         >
@@ -1037,6 +1038,19 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </nav>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {/* TradingView-style symbol strip (desktop only). */}
+          <div className="hidden h-8 shrink-0 items-center gap-3 border-b border-terminal-line dark:border-border bg-background px-3 font-sans text-[12px] text-foreground md:flex">
+            <span className="truncate">{pairLabel} · {timeframe.label} · Jenvu</span>
+            <span className="inline-flex items-center gap-1 text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--chart-up,#089981)]" aria-hidden="true" />Open</span>
+            <span className="rounded-full border border-terminal-line dark:border-border px-2 py-0.5 text-[11px] text-muted-foreground">Real Time Data</span>
+            {hovered && (
+              <span className="ml-auto flex items-center gap-2 font-mono tabular-nums text-muted-foreground">
+                {(["open", "high", "low", "close"] as const).map((k) => (
+                  <span key={k}>{k[0]!.toUpperCase()} <span className={hovered.close >= hovered.open ? "text-[color:#089981]" : "text-[color:#f23645]"}>{hovered[k]}</span></span>
+                ))}
+              </span>
+            )}
+          </div>
           <div className="relative min-h-0 flex-1">
             <MemoChart
               key={`${asset}:${timeframe.key}`}
@@ -1197,7 +1211,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </div>
 
           {/* TradingView-style bottom bar: quick ranges + live clock (desktop). */}
-          <div className="hidden h-8 shrink-0 items-center gap-0.5 border-t border-border bg-background px-2 font-sans md:flex">
+          <div className="hidden h-8 shrink-0 items-center gap-0.5 border-t border-terminal-line dark:border-border bg-background px-2 font-sans md:flex">
             {RANGE_BUTTONS.map((r) => (
               <button
                 key={r.key}

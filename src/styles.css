@@ -72,6 +72,7 @@
  */
 
 @theme inline {
+  --color-terminal-line: #ebebeb;
   --font-display: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-sans: "Google Sans Flex", "Google Sans", "Product Sans", "Poppins", system-ui, sans-serif;
   --font-mono: "Google Sans Flex", "Google Sans", "Product Sans", system-ui, sans-serif;

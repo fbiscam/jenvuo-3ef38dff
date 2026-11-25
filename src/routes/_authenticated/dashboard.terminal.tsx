@@ -3,6 +3,7 @@ import { parseChartCommands } from "@/lib/chart/chart-commands";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
 import { useEffect, useRef, useState } from "react";
+import type * as React from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -319,6 +320,7 @@ function TerminalPage() {
     }
   };
   const [deskOpen, setDeskOpen] = useState(false);
+  const [deskDrag, setDeskDrag] = useState({ x: 0, y: 0 });
   useEffect(() => {
     const open = () => setDeskOpen(true);
     window.addEventListener("jenvu:terminal-ask-ai", open);
@@ -813,12 +815,35 @@ function TerminalPage() {
           {/* AI desk */}
           {deskOpen && (
             <aside
+              style={deskDrag.x || deskDrag.y ? ({ "--dx": `${deskDrag.x}px`, "--dy": `${deskDrag.y}px` } as React.CSSProperties) : undefined}
               className={cn(
+                "lg:[transform:translate(var(--dx,0px),var(--dy,0px))]",
                 "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-border bg-card text-card-foreground lg:fixed lg:bottom-6 lg:right-6 lg:z-50 lg:h-[min(680px,calc(100vh-7rem))] lg:w-[400px] lg:rounded-2xl lg:border lg:shadow-2xl",
               )}
             >
-              <div className="flex items-center justify-end gap-1 px-3 py-2">
-                <h2 className="sr-only">Ask Jenvu</h2>
+              <div
+                className="flex items-center justify-end gap-1 px-3 py-2 lg:cursor-grab lg:select-none lg:active:cursor-grabbing"
+                onPointerDown={(e) => {
+                  if ((e.target as HTMLElement).closest("button") || window.innerWidth < 1024) return;
+                  const sx = e.clientX - deskDrag.x;
+                  const sy = e.clientY - deskDrag.y;
+                  const move = (ev: PointerEvent) => {
+                    const maxX = 24;
+                    const minX = -(window.innerWidth - 448);
+                    const maxY = 24;
+                    const minY = -(window.innerHeight - 160);
+                    setDeskDrag({
+                      x: Math.min(maxX, Math.max(minX, ev.clientX - sx)),
+                      y: Math.min(maxY, Math.max(minY, ev.clientY - sy)),
+                    });
+                  };
+                  const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
+                  window.addEventListener("pointermove", move);
+                  window.addEventListener("pointerup", up);
+                }}
+                title="Drag to move"
+              >
+                <h2 className="mr-auto text-sm font-medium">Ask Jenvu</h2>
                 <Button
                   type="button"
                   variant="ghost"

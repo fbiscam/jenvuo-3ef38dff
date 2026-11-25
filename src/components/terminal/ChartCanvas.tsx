@@ -1087,7 +1087,7 @@ function CandleCountdown({
   // One block: live price on top, time left underneath — covers the axis label so they never drift apart.
   return (
     <div
-      className="pointer-events-none absolute right-0 z-[3] flex flex-col pl-2 text-left font-mono font-bold text-[11px] leading-[15px] tabular-nums"
+      className="pointer-events-none absolute right-0 z-[3] flex flex-col pl-2 text-left font-mono font-normal text-[11px] leading-[15px] tabular-nums"
       style={{ top: s.y - 8, width: s.w, background: c, color: "#ffffff", paddingTop: 1, paddingBottom: 2 }}
       aria-label="Live price and time left on current candle"
     >
