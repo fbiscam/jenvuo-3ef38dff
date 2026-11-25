@@ -660,7 +660,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const popClass = cn("font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground");
   // Google-style pill buttons; the toolbar sits in the dashboard top bar where the price strip was.
-  const railBtn = "relative inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-normal text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:text-foreground";
+  const railBtn = "relative inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] font-medium text-gc-ink-muted transition-colors hover:bg-gc-console-search hover:text-gc-ink data-[state=open]:bg-gc-blue-soft data-[state=open]:text-gc-blue dark:text-muted-foreground dark:hover:bg-accent dark:data-[state=open]:bg-accent dark:data-[state=open]:text-foreground";
 
 
   const rail = (
@@ -676,7 +676,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
             title={label}
             onClick={() => onAssetChange?.(a)}
             className={cn(
-              "inline-flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-normal text-muted-foreground hover:text-foreground",
+              "inline-flex h-7 items-center gap-1.5 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground hover:text-foreground",
               asset === a && "bg-background text-foreground shadow-sm",
             )}
           >
@@ -688,7 +688,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <Popover open={tfMenuOpen} onOpenChange={setTfMenuOpen}>
         <PopoverTrigger asChild>
-          <button type="button" aria-label="Chart timeframe" title="Chart timeframe" className={cn(railBtn, "px-2 font-normal text-foreground")}>
+          <button type="button" aria-label="Chart timeframe" title="Chart timeframe" className={cn(railBtn, "px-2 font-semibold text-foreground")}>
             {timeframe.label}
             <ChevronDown className="h-3 w-3 opacity-70" />
           </button>
@@ -703,7 +703,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               aria-pressed={item.key === timeframe.key}
               className={cn(
                 "flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[13px] text-foreground hover:bg-accent",
-                item.key === timeframe.key && "bg-accent font-normal",
+                item.key === timeframe.key && "bg-accent font-semibold",
               )}
             >
               {item.label}
@@ -801,7 +801,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               title={label}
               onClick={() => onAssetChange?.(a)}
               className={cn(
-                "inline-flex h-7 items-center gap-1 rounded-md px-1.5 font-mono text-[11px] font-normal text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                "inline-flex h-7 items-center gap-1 rounded-md px-1.5 font-mono text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                 asset === a && "bg-accent text-foreground",
                 asset === a && theme === "dark" && "bg-[#2a2a2a] text-white hover:bg-[#2a2a2a] hover:text-white",
               )}
@@ -821,7 +821,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
               onClick={() => onTimeframeChange(item)}
               aria-pressed={item.key === timeframe.key}
               className={cn(
-                "h-7 rounded-md px-2 font-mono text-xs font-normal text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                "h-7 rounded-md px-2 font-mono text-xs font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
                 item.key === timeframe.key && "bg-accent text-foreground",
                 item.key === timeframe.key && theme === "dark" && "bg-[#2a2a2a] text-white hover:bg-[#2a2a2a] hover:text-white",
               )}
@@ -832,7 +832,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </div>
         <span className="mx-1 h-5 w-px shrink-0 bg-border md:hidden" aria-hidden="true" />
 
-        <Button variant="ghost" type="button" onClick={() => setIndicatorLibraryOpen(true)} aria-label="Indicators" title="Indicators" className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-normal text-muted-foreground md:hidden">
+        <Button variant="ghost" type="button" onClick={() => setIndicatorLibraryOpen(true)} aria-label="Indicators" title="Indicators" className="flex h-7 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground md:hidden">
           <Activity className="h-3.5 w-3.5" />
           <span>{indicators.length}</span>
         </Button>
@@ -988,8 +988,8 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
                     <span
                       className={cn(
                         "rounded px-1",
-                        rvolLegend.level === "ultra" && "bg-destructive/15 font-normal text-destructive",
-                        rvolLegend.level === "high" && "bg-primary/10 font-normal text-primary",
+                        rvolLegend.level === "ultra" && "bg-destructive/15 font-semibold text-destructive",
+                        rvolLegend.level === "high" && "bg-primary/10 font-semibold text-primary",
                       )}
                     >
                       {rvolLegend.ratio.toFixed(1)}× {RVOL_LABEL[rvolLegend.level]}

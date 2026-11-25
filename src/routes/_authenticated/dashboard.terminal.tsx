@@ -776,7 +776,7 @@ function TerminalPage() {
                       aria-pressed={watchlistOpen}
                       title={watchlistOpen ? "Hide Seasonal Data & Market Info" : "Show Seasonal Data & Market Info"}
                       aria-label={watchlistOpen ? "Hide Seasonal Data & Market Info" : "Show Seasonal Data & Market Info"}
-                      className={cn("hidden h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-normal transition-colors lg:inline-flex", watchlistOpen ? "ask-jenvu-launcher" : "text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent")}
+                      className={cn("hidden h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-medium transition-colors lg:inline-flex", watchlistOpen ? "ask-jenvu-launcher" : "text-gc-ink-muted hover:bg-gc-console-search hover:text-gc-ink dark:text-muted-foreground dark:hover:bg-accent")}
                     >
                       <ListChecks className="h-4 w-4" />
                       <span className="hidden xl:inline">Seasonal Data &amp; Market Info</span>
@@ -850,7 +850,7 @@ function TerminalPage() {
                 onLostPointerCapture={() => { deskPointerRef.current = null; }}
                 title="Drag to move"
               >
-                <h2 className="mr-auto text-[15px] font-normal sm:text-[16px]">Ask Jenvu</h2>
+                <h2 className="mr-auto text-[15px] font-medium sm:text-[16px]">Ask Jenvu</h2>
                 <Button
                   type="button"
                   variant="ghost"
