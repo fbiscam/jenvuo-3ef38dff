@@ -105,9 +105,9 @@ export function TerminalSymbolHeader({
       <div className="flex items-center gap-5 px-5 pb-3 pt-4">
         <AssetLogo asset={asset} size={80} />
         <div className="min-w-0">
-          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-gc-ink 2xl:text-[34px]">{title}</h1>
+          <h1 className="text-[28px] font-normal leading-tight tracking-normal text-gc-ink 2xl:text-[34px]">{title}</h1>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <p className="text-[36px] font-semibold leading-none tabular-nums tracking-tight text-gc-ink 2xl:text-[44px]">
+            <p className="text-[36px] font-normal leading-none tabular-nums tracking-normal text-gc-ink 2xl:text-[44px]">
               {head}
               <span className={abs == null ? "" : abs >= 0 ? "text-gc-green" : "text-gc-red"}>{tail}</span>
               <span className="ml-1 text-[13px] font-normal text-gc-ink-muted">USD</span>

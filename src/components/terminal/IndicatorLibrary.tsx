@@ -44,7 +44,7 @@ export function IndicatorLibrary({ open, onOpenChange, theme, indicators, onTogg
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby="indicator-library-description" className={cn("flex h-[min(640px,calc(100dvh-2rem))] w-[calc(100vw-1rem)] max-w-[840px] flex-col gap-0 overflow-hidden rounded-lg border-border bg-background p-0 text-foreground font-sans", theme === "dark" && "dark terminal-dark")}>
         <div className="px-5 pb-4 pt-6 sm:px-6">
-          <DialogTitle className="pr-7 text-lg font-normal leading-6 sm:text-xl">Indicators, metrics, and strategies</DialogTitle>
+          <DialogTitle className="pr-7 text-lg font-normal leading-6 tracking-normal sm:text-xl">Indicators, metrics, and strategies</DialogTitle>
           <DialogDescription id="indicator-library-description" className="sr-only">Jenvu chart indicators and smart-money overlays</DialogDescription>
           <div className="relative mt-5">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

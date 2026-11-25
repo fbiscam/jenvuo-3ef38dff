@@ -7,6 +7,7 @@ import type * as React from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  ArrowUp,
   CornerDownRight,
   History,
   ImagePlus,
@@ -231,7 +232,7 @@ function ComposerAttachments() {
   const attachments = usePromptInputAttachments();
   if (attachments.files.length === 0) return null;
   return (
-    <PromptInputHeader>
+    <PromptInputHeader className="col-span-2">
       <Attachments variant="grid">
         {attachments.files.map((file) => (
           <Attachment data={file} key={file.id} onRemove={() => attachments.remove(file.id)}>
@@ -828,12 +829,12 @@ function TerminalPage() {
                   if ((e.target as HTMLElement).closest("button") || window.innerWidth < 1024) return;
                   const sx = e.clientX - deskDrag.x;
                   const sy = e.clientY - deskDrag.y;
+                  const panel = e.currentTarget.parentElement;
+                  const minX = -(window.innerWidth - (panel?.offsetWidth ?? 640) - 16);
+                  const minY = -Math.max(0, window.innerHeight - (panel?.offsetHeight ?? 560) - 16);
                   const move = (ev: PointerEvent) => {
-                    const maxX = 24;
-                    const panel = e.currentTarget.parentElement;
-                    const minX = -(window.innerWidth - (panel?.offsetWidth ?? 640) - 16);
-                    const maxY = 24;
-                    const minY = -Math.max(0, window.innerHeight - (panel?.offsetHeight ?? 560) - 16);
+                    const maxX = 8;
+                    const maxY = 8;
                     setDeskDrag({
                       x: Math.min(maxX, Math.max(minX, ev.clientX - sx)),
                       y: Math.min(maxY, Math.max(minY, ev.clientY - sy)),
@@ -1050,7 +1051,7 @@ function TerminalPage() {
                     )
                   }
                   onSubmit={(message) => send(message)}
-                  className="rounded-[24px] border-gc-line bg-background shadow-sm"
+                  className="[&>[data-slot=input-group]]:grid [&>[data-slot=input-group]]:grid-cols-[minmax(0,1fr)_auto] [&>[data-slot=input-group]]:rounded-[28px] [&>[data-slot=input-group]]:border-gc-line [&>[data-slot=input-group]]:bg-background [&>[data-slot=input-group]]:py-1 [&>[data-slot=input-group]]:pl-2 [&>[data-slot=input-group]]:pr-1 [&>[data-slot=input-group]]:shadow-sm"
                 >
                   <ComposerAttachments />
                   <PromptInputTextarea
@@ -1058,9 +1059,11 @@ function TerminalPage() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={messages.length === 0 ? "Ask a question" : "Ask a follow-up"}
-                    className="min-h-14 max-h-32 px-3 pt-3 text-sm"
+                    rows={1}
+                    aria-label="Ask a question"
+                    className="min-h-10 max-h-28 min-w-0 px-3 py-2.5 text-[16px]"
                   />
-                  <PromptInputFooter className="px-2 pb-2">
+                  <PromptInputFooter className="w-auto self-center px-1 pb-0 pt-0">
                     <PromptInputTools>
                       <PromptInputActionMenu>
                         <PromptInputActionMenuTrigger
@@ -1094,8 +1097,9 @@ function TerminalPage() {
                     <PromptInputSubmit
                       status={ask.isPending ? "submitted" : "ready"}
                       disabled={ask.isPending || voice.isPending || isRecording}
-                      className="h-8 w-8 rounded-full"
-                    />
+                      aria-label="Send"
+                      className="h-9 w-9 rounded-full bg-foreground text-background sm:h-10 sm:w-10"
+                    ><ArrowUp className="h-5 w-5 text-background" /></PromptInputSubmit>
                   </PromptInputFooter>
                 </PromptInput>
                 <p className="mt-2 text-center text-[11px] text-gc-ink-muted sm:text-[12px]">Built with Jenvu AI</p>

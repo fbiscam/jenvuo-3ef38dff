@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Complete approved Terminal update: regular-weight header text, searchable indicator library with SMC/ICT controls and practical defaults, homepage-style draggable Ask Jenvu; verify utility regression and signed-in desktop/mobile flow.
+- [x] Complete approved Terminal update: regular-weight toolbar/symbol header, searchable 18-indicator library with existing SMC/ICT strategy controls, favorites and restore-defaults; homepage-style draggable Ask Jenvu retains local chart commands, voice, uploads and history. Temporary signed-in account verified selection/reload, favorites, add-RSI command, dragging, phone fit and both themes without runtime errors; 30 focused tests pass and build OK. Read all 79 class-helper caller files: shared controls, Terminal/demo, Chat, Models, Settings, app/Course/Profile/Security and notifications follow the sole string-returning cn; no job/database/extension/electron counterpart found. Reported utility line 8 is absent. No settled records, permissions or account settings changed; full TradingView/community catalog and live AI-provider response not added/tested.
 
 - [x] Apply Terminal-style dividers beneath the shared dashboard header and along every sidebar variant; signed-in test account verified desktop Terminal and mobile menu light borders, plus dashboard/Terminal dark borders. Existing desktop Overview header remains hidden. Utility numeric-input regression passes; current helper has seven lines and the reported error is absent; latest build OK. No account records, permissions or settings changed.
 
