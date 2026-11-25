@@ -1,5 +1,6 @@
 # Roadmap
 
+- [x] Restore the Terminal header, logo, toolbar and sidebar rail to their sizes and alignment before the compact update, while preserving newer volume and market-selection behavior. Source now matches the pre-compact layout except the newer volume/day-grid additions; signed-in desktop, fullscreen, phone toolbar and mobile drawer verified with no browser errors.
 - [x] Add compact chart-pair feed volume to the toolbar and independent Technicals & News pair selection. Signed-in temporary account verified panel EUR/USD leaves the Gold chart/volume unchanged; chart BTC/USD updates both, with matching real daily volume (9.56K vs 20.2K average) in header/panel. Light/dark and phone layout checked, no browser errors; 13 focused tests pass and build OK. Trading feeds and account records unchanged.
 
 - [x] Compact Terminal header and phone toolbar to 36px, reduce Terminal logos, and render wide UTC-day background blocks with a Sunday 17:00 reference break independently of candle feeds. Temporary signed-in account verified desktop, phone fit and 1H light/dark charts with no runtime errors; three focused tests pass and latest build OK. Read all 79 shared class-helper callers: numeric inputs resolve to text; reported utility line 8 absent. No customer records, permissions or settings changed; published-site verification not performed.
