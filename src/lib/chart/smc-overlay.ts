@@ -20,6 +20,7 @@ import { computeFreshFvgs, FVG_MAX_TOTAL, type FreshFvg } from "./fresh-fvgs";
 import { classifySwingSweep, type SwingSweep } from "./swing-sweep";
 import { classifySwingPriceAction, type SwingPriceAction } from "./swing-price-action";
 import { computeSwingTradePlan, type SwingTradePlan } from "./swing-trade-plan";
+import { classifySwingStrength } from "./swing-strength";
 import {
   isHighProbabilityLiquiditySweep,
   isHighProbabilityPriceAction,
@@ -1475,6 +1476,23 @@ export function renderSmcOverlay(
     ctx.restore();
     sweepTag(t, xx, up ? baseline - 18 : baseline + 18);
   };
+  // Weak (hold) / Strong (exit) trade-management tag right of the swing label.
+  const strengthTag = (t: number, xx: number, yy: number) => {
+    const st = classifySwingStrength(smc.priceAction?.[t], smc.swingSweeps?.[t]);
+    if (st.strength === "pending") return;
+    ctx.save();
+    ctx.font = "700 10px 'JetBrains Mono', ui-monospace, monospace";
+    const w = ctx.measureText(st.text).width;
+    const bx = xx + 14;
+    ctx.fillStyle = st.strength === "strong" ? "#f59e0b" : isDarkCanvas(ctx) ? "#434651" : "#e0e3eb";
+    ctx.beginPath();
+    ctx.roundRect?.(bx, yy + 2, w + 10, 15, 4);
+    if (!ctx.roundRect) ctx.rect(bx, yy + 2, w + 10, 15);
+    ctx.fill();
+    ctx.fillStyle = st.strength === "strong" ? "#131722" : isDarkCanvas(ctx) ? "#ffffff" : "#131722";
+    ctx.fillText(st.text, bx + 5, yy + 13);
+    ctx.restore();
+  };
   // HH/HL/LH/LL: plain text (no filled block) — pure white in black theme, green/red in white theme.
   const swingText = (text: string, xx: number, yy: number, color: string) => {
     ctx.save();
@@ -1496,6 +1514,7 @@ export function renderSmcOverlay(
        const yy = up ? y - 24 : y + 5;
        const xx = x;
       swingText(p.label, xx, yy, color);
+      strengthTag(p.t, xx, yy);
       pressureBadge(p.t, xx, yy, up);
       priceActionTag(p.t, xx, yy, up);
     }
@@ -1515,6 +1534,7 @@ export function renderSmcOverlay(
       if (p.confirmedByOpposite) {
         // Solid badge, same as a confirmed pivot — no countdown.
         swingText(text, xx, yy, color);
+        strengthTag(p.t, xx, yy);
         pressureBadge(p.t, xx, yy, up);
       priceActionTag(p.t, xx, yy, up);
         continue;
@@ -1524,6 +1544,7 @@ export function renderSmcOverlay(
         // New swing shown immediately with its real label (HH/HL/LH/LL)
         // plus fresh buyer/seller pressure as soon as the high/low forms.
         swingText(text, xx, yy, color);
+        strengthTag(p.t, xx, yy);
         pressureBadge(p.t, xx, yy, up);
       priceActionTag(p.t, xx, yy, up);
         continue;
