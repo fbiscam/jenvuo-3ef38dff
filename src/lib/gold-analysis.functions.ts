@@ -1708,7 +1708,7 @@ async function loadEurTerminalChart(tf: string): Promise<TerminalChartPayload> {
   return data;
 }
 
-async function loadTerminalChart(tf: string, asset: TerminalAsset = "EURUSD"): Promise<TerminalChartPayload> {
+export async function loadTerminalChart(tf: string, asset: TerminalAsset = "EURUSD"): Promise<TerminalChartPayload> {
   if (asset === "BTCUSD") return loadBtcTerminalChart(tf);
   if (asset === "EURUSD") return loadEurTerminalChart(tf);
   const cached = terminalChartCache.get(tf);

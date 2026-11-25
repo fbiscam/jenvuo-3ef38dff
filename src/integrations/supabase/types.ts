@@ -3323,6 +3323,42 @@ export type Database = {
         }
         Relationships: []
       }
+      structure_alert_sends: {
+        Row: {
+          alert_key: string
+          asset: string
+          created_at: string
+          label: string
+          price: number
+          price_action: string | null
+          sweep: string | null
+          swing_at: string
+          timeframe: string
+        }
+        Insert: {
+          alert_key: string
+          asset: string
+          created_at?: string
+          label: string
+          price: number
+          price_action?: string | null
+          sweep?: string | null
+          swing_at: string
+          timeframe: string
+        }
+        Update: {
+          alert_key?: string
+          asset?: string
+          created_at?: string
+          label?: string
+          price?: number
+          price_action?: string | null
+          sweep?: string | null
+          swing_at?: string
+          timeframe?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string

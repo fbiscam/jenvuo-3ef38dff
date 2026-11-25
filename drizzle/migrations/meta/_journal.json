@@ -526,6 +526,13 @@
       "when": 1795501687898,
       "tag": "0074_news_releases_server_only",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1795599340647,
+      "tag": "0075_structure_alert_sends",
+      "breakpoints": true
     }
   ]
 }

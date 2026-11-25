@@ -244,3 +244,4 @@
 - [x] Ask Jenvu open to signed-out visitors
 - [x] News page Gold moves after releases are not being measured (all show "No data"), waiting on owner OK to fix
 - [x] JX Bot v4.03 (auto break-even +2.0/+0.5 pips, trailing step +3.5/+2.0 pips, confirmed M15 structure exit, PKT hours 04:00-11:15 + 12:30-17:00, NY off): owner-compiled package (JX_BOT_MT5-22) now the customer download; stored file matches the upload byte for byte.
+- [x] Fresh high/low email alerts (3 pairs, 1H/2H/3H) to Pro/Elite/Ultra only

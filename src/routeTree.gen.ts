@@ -129,6 +129,7 @@ import { Route as ApiPublicHooksPaperTradeResolverRouteImport } from './routes/a
 import { Route as ApiPublicHooksReindexInsightsRouteImport } from './routes/api/public/hooks/reindex-insights'
 import { Route as ApiPublicHooksScanSignalsRouteImport } from './routes/api/public/hooks/scan-signals'
 import { Route as ApiPublicHooksSignalReversalMonitorRouteImport } from './routes/api/public/hooks/signal-reversal-monitor'
+import { Route as ApiPublicHooksStructureAlertsRouteImport } from './routes/api/public/hooks/structure-alerts'
 import { Route as ApiPublicInsightImageSplatRouteImport } from './routes/api/public/insight-image.$'
 import { Route as ApiPublicLicensesReportRouteImport } from './routes/api/public/licenses/report'
 import { Route as ApiPublicLicensesValidateRouteImport } from './routes/api/public/licenses/validate'
@@ -789,6 +790,12 @@ const ApiPublicHooksSignalReversalMonitorRoute =
     path: '/api/public/hooks/signal-reversal-monitor',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksStructureAlertsRoute =
+  ApiPublicHooksStructureAlertsRouteImport.update({
+    id: '/api/public/hooks/structure-alerts',
+    path: '/api/public/hooks/structure-alerts',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicInsightImageSplatRoute =
   ApiPublicInsightImageSplatRouteImport.update({
     id: '/api/public/insight-image/$',
@@ -954,6 +961,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
+  '/api/public/hooks/structure-alerts': typeof ApiPublicHooksStructureAlertsRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
   '/api/public/licenses/report': typeof ApiPublicLicensesReportRoute
   '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
@@ -1079,6 +1087,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
+  '/api/public/hooks/structure-alerts': typeof ApiPublicHooksStructureAlertsRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
   '/api/public/licenses/report': typeof ApiPublicLicensesReportRoute
   '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
@@ -1210,6 +1219,7 @@ export interface FileRoutesById {
   '/api/public/hooks/reindex-insights': typeof ApiPublicHooksReindexInsightsRoute
   '/api/public/hooks/scan-signals': typeof ApiPublicHooksScanSignalsRoute
   '/api/public/hooks/signal-reversal-monitor': typeof ApiPublicHooksSignalReversalMonitorRoute
+  '/api/public/hooks/structure-alerts': typeof ApiPublicHooksStructureAlertsRoute
   '/api/public/insight-image/$': typeof ApiPublicInsightImageSplatRoute
   '/api/public/licenses/report': typeof ApiPublicLicensesReportRoute
   '/api/public/licenses/validate': typeof ApiPublicLicensesValidateRoute
@@ -1341,6 +1351,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
+    | '/api/public/hooks/structure-alerts'
     | '/api/public/insight-image/$'
     | '/api/public/licenses/report'
     | '/api/public/licenses/validate'
@@ -1466,6 +1477,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
+    | '/api/public/hooks/structure-alerts'
     | '/api/public/insight-image/$'
     | '/api/public/licenses/report'
     | '/api/public/licenses/validate'
@@ -1596,6 +1608,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/reindex-insights'
     | '/api/public/hooks/scan-signals'
     | '/api/public/hooks/signal-reversal-monitor'
+    | '/api/public/hooks/structure-alerts'
     | '/api/public/insight-image/$'
     | '/api/public/licenses/report'
     | '/api/public/licenses/validate'
@@ -1666,6 +1679,7 @@ export interface RootRouteChildren {
   ApiPublicHooksReindexInsightsRoute: typeof ApiPublicHooksReindexInsightsRoute
   ApiPublicHooksScanSignalsRoute: typeof ApiPublicHooksScanSignalsRoute
   ApiPublicHooksSignalReversalMonitorRoute: typeof ApiPublicHooksSignalReversalMonitorRoute
+  ApiPublicHooksStructureAlertsRoute: typeof ApiPublicHooksStructureAlertsRoute
   ApiPublicInsightImageSplatRoute: typeof ApiPublicInsightImageSplatRoute
   ApiPublicLicensesReportRoute: typeof ApiPublicLicensesReportRoute
   ApiPublicLicensesValidateRoute: typeof ApiPublicLicensesValidateRoute
@@ -2518,6 +2532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSignalReversalMonitorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/structure-alerts': {
+      id: '/api/public/hooks/structure-alerts'
+      path: '/api/public/hooks/structure-alerts'
+      fullPath: '/api/public/hooks/structure-alerts'
+      preLoaderRoute: typeof ApiPublicHooksStructureAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/insight-image/$': {
       id: '/api/public/insight-image/$'
       path: '/api/public/insight-image/$'
@@ -2825,6 +2846,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksScanSignalsRoute: ApiPublicHooksScanSignalsRoute,
   ApiPublicHooksSignalReversalMonitorRoute:
     ApiPublicHooksSignalReversalMonitorRoute,
+  ApiPublicHooksStructureAlertsRoute: ApiPublicHooksStructureAlertsRoute,
   ApiPublicInsightImageSplatRoute: ApiPublicInsightImageSplatRoute,
   ApiPublicLicensesReportRoute: ApiPublicLicensesReportRoute,
   ApiPublicLicensesValidateRoute: ApiPublicLicensesValidateRoute,
