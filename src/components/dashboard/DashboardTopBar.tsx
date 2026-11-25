@@ -284,7 +284,7 @@ export default function DashboardTopBar({
             onClick={() => window.dispatchEvent(new CustomEvent("jenvu:terminal-ask-ai"))}
             aria-label="Ask Jenvu"
             title="Ask Jenvu"
-            className="inline-flex h-9 items-center gap-2 rounded-full bg-gc-sky px-2.5 text-[13px] font-medium text-gc-blue-deep hover:brightness-95 sm:px-3.5"
+            className="ask-jenvu-launcher inline-flex h-9 items-center gap-2 rounded-xl px-2.5 text-[13px] font-medium transition-all hover:brightness-95 sm:px-3.5"
           >
             <JenvuMark className="h-3.5 w-3.5 shrink-0" />
             <span className="hidden lg:inline">Ask Jenvu</span>

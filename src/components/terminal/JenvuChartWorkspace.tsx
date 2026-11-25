@@ -1040,43 +1040,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         </nav>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          {/* TradingView-style symbol strip (desktop only). */}
-          <div className="hidden h-8 shrink-0 items-center gap-3 border-b border-terminal-line dark:border-border bg-background px-3 font-sans text-[12px] text-foreground md:flex">
-            <span className="truncate">{pairLabel} · {timeframe.label} · Jenvu</span>
-            <span className="inline-flex items-center gap-1 text-muted-foreground"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--chart-up,#089981)]" aria-hidden="true" />Open</span>
-            <span className="rounded-full border border-terminal-line dark:border-border px-2 py-0.5 text-[11px] text-muted-foreground">Real Time Data</span>
-            {hovered && (
-              <span className="ml-auto flex items-center gap-2 font-mono tabular-nums text-muted-foreground">
-                {(["open", "high", "low", "close"] as const).map((k) => (
-                  <span key={k}>{k[0]!.toUpperCase()} <span className={hovered.close >= hovered.open ? "text-[color:#089981]" : "text-[color:#f23645]"}>{hovered[k]}</span></span>
-                ))}
-              </span>
-            )}
-          </div>
           <div className="relative min-h-0 flex-1">
-            {demoTradingEnabled && currentPrice != null && (() => {
-              const q = bidAsk(currentPrice);
-              const d = currentPrice >= 1000 ? 2 : currentPrice >= 10 ? 3 : 5;
-              const fmt = (v: number) => { const t = v.toFixed(d); return <>{t.slice(0, -1)}<sup className="text-[10px]">{t.slice(-1)}</sup></>; };
-              const spread = ((q.ask - q.bid) * (d === 5 ? 10000 : d === 3 ? 100 : 10)).toFixed(1);
-              const buy = (side: "buy" | "sell") => { demo.place({ side, type: "market", quantity: quickQty }); };
-              return (
-                <div className="absolute left-2 top-2 z-20 hidden flex-col items-start gap-1 md:flex">
-                  <div className="flex items-stretch font-sans">
-                    <button type="button" onClick={() => buy("sell")} className="flex min-w-[78px] flex-col items-start rounded-l-md border border-[#f23645] bg-background px-2 py-1 text-[#f23645] hover:bg-[#f23645]/10">
-                      <span className="text-[13px] tabular-nums">{fmt(q.bid)}</span><span className="text-[10px] font-medium">SELL</span>
-                    </button>
-                    <span className="flex items-center border-y border-terminal-line dark:border-border bg-background px-1.5 text-[11px] tabular-nums text-muted-foreground">{spread}</span>
-                    <button type="button" onClick={() => buy("buy")} className="flex min-w-[78px] flex-col items-end rounded-r-md border border-[#2962ff] bg-background px-2 py-1 text-[#2962ff] hover:bg-[#2962ff]/10">
-                      <span className="text-[13px] tabular-nums">{fmt(q.ask)}</span><span className="text-[10px] font-medium">BUY</span>
-                    </button>
-                  </div>
-                  <select aria-label="Quantity" value={quickQty} onChange={(e) => setQuickQty(Number(e.target.value))} className="rounded-md border border-terminal-line dark:border-border bg-background px-1.5 py-0.5 text-[11px] tabular-nums">
-                    {[0.01, 0.1, 0.5, 1, 2, 5].map((v) => <option key={v} value={v}>{v.toFixed(2)}</option>)}
-                  </select>
-                </div>
-              );
-            })()}
             <MemoChart
               key={`${asset}:${timeframe.key}`}
               ref={chartRef}
