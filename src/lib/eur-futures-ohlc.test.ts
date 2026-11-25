@@ -1,4 +1,5 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "node:test";
+import { expect } from "./chart/test-expect";
 import { eurNeedsFuturesOhlc, shiftFuturesToSpot } from "./gold-analysis.functions";
 
 const c = (t: number, o: number, h: number, l: number, cl: number) => ({ t, o, h, l, c: cl, v: 1 });
