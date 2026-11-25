@@ -12,6 +12,7 @@ import { submitContactMessage } from "@/lib/contact.functions";
 import JenvuMark from "@/components/JenvuMark";
 import { LiveChatPanel } from "@/components/LiveChatWidget";
 import { wantsLiveAgent } from "@/lib/live-agent-intent";
+import { AskJenvuComposer } from "@/components/AskJenvuComposer";
 
 type Msg = { role: "user" | "assistant"; content: string; followUps?: string[]; showSales?: boolean; error?: boolean };
 
@@ -252,29 +253,15 @@ export function AskJenvuWidget() {
               <div className="shrink-0 px-3 pb-2 sm:px-5 sm:pb-3">
                 <form
                   onSubmit={(e) => { e.preventDefault(); void send(input); }}
-                  className="flex items-center gap-2 rounded-full bg-background py-1 pl-4 pr-1.5 sm:gap-3 sm:py-2 sm:pl-5 sm:pr-2 shadow-[0_1px_3px_rgba(60,64,67,0.2),0_2px_8px_rgba(60,64,67,0.15)] ring-1 ring-gc-line"
                 >
-                  <SearchCheck className="h-5 w-5 shrink-0 text-gc-ink-muted" />
-                  <textarea
-                    ref={inputRef}
-                    rows={1}
+                  <AskJenvuComposer
+                    inputRef={inputRef}
                     value={input}
-                    maxLength={4000}
+                    onChange={setInput}
                     disabled={busy}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(input); } }}
+                    sendDisabled={busy || !input.trim()}
                     placeholder={empty ? "Ask a question" : "Ask a follow-up"}
-                    aria-label="Ask a question"
-                    className="max-h-28 min-w-0 flex-1 resize-none bg-transparent py-2 text-[16px] outline-none placeholder:text-gc-ink-muted"
                   />
-                  <button
-                    type="submit"
-                    aria-label="Send"
-                    disabled={busy || !input.trim()}
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gc-blue sm:h-10 sm:w-10 text-gc-on-blue transition disabled:bg-gc-surface disabled:text-gc-ink-muted"
-                  >
-                    <ArrowUp className="h-5 w-5" />
-                  </button>
                 </form>
                 <p className="mt-1.5 text-center text-[11px] text-gc-ink-muted sm:mt-2.5 sm:text-[12px]">Built with Jenvu AI</p>
               </div>

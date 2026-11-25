@@ -1282,6 +1282,7 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
 
 /* Terminal black theme — TradingView-style near-black surfaces, scoped to the terminal. */
 .dark.terminal-dark {
+  --terminal-dark-line: #333333;
   --background: oklch(0 0 0);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.1 0 0);
@@ -1296,13 +1297,14 @@ html:not(.ms-icons-ready) .material-symbols-rounded {
   --muted-foreground: oklch(0.9 0 0);
   --accent: oklch(0.25 0.012 275);
   --accent-foreground: oklch(1 0 0);
-  --border: oklch(0.25 0.01 275);
+  --border: #333333;
   --input: oklch(0.27 0.01 275);
 }
 
 /* Black terminal: the whole page (top bar, live prices, menu, rail) goes dark, not just the chart. */
 body:has(.terminal-dark) .jenvu-terminal-shell {
   color-scheme: dark;
+  --terminal-dark-line: #333333;
   --background: oklch(0 0 0);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.1 0 0);
@@ -1310,7 +1312,7 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   --muted: oklch(0.22 0.01 275);
   --muted-foreground: oklch(0.9 0 0);
   --accent: oklch(0.25 0.012 275);
-  --border: oklch(0.25 0.01 275);
+  --border: #333333;
   --gc-console-bar: oklch(0 0 0);
   --gc-console-search: oklch(0.22 0.012 275);
   --gc-console-rail-active: oklch(0.3 0.08 275);
@@ -1318,7 +1320,7 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   --gc-section: oklch(0.12 0 0);
   --gc-ink: oklch(0.97 0 0);
   --gc-ink-muted: oklch(0.9 0 0);
-  --gc-line: oklch(0.25 0.01 275);
+  --gc-line: var(--border);
   --gc-panel: oklch(0.1 0 0);
   --gc-notice: oklch(0.22 0.01 275);
   --gc-surface: oklch(0.1 0 0);
@@ -1331,6 +1333,13 @@ body:has(.terminal-dark) .jenvu-terminal-shell {
   --gc-red-soft: oklch(0.3 0.07 25);
   background-color: oklch(0 0 0) !important;
   color: oklch(0.97 0 0);
+}
+
+/* Gentle label contrast increase, scoped to Terminal chrome only. */
+.jenvu-terminal-shell:not(:has(.terminal-dark)) .dashboard-topbar,
+.jenvu-terminal-shell:not(:has(.terminal-dark)) .terminal-toolbar {
+  --gc-ink-muted: #525660;
+  --muted-foreground: #525660;
 }
 
 /* Black terminal: every header and chart-toolbar icon/label is white. */
@@ -1354,7 +1363,7 @@ body:has(.terminal-dark) .jenvu-terminal-shell :is(header, .terminal-toolbar) sv
 body:has(.terminal-dark) .dashboard-terminal-sidebar,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .bg-sidebar {
   background-color: oklch(0 0 0) !important;
-  border-color: oklch(0.25 0.01 275) !important;
+  border-color: var(--terminal-dark-line) !important;
 }
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-link,
 body:has(.terminal-dark) .dashboard-terminal-sidebar .dashboard-sidebar-brand,
@@ -1943,6 +1952,7 @@ h1.font-medium, h2.font-medium { letter-spacing: -0.025em; }
    The widget mounts outside the dashboard wrapper, so the dashboard sets
    data-dash-theme on <html>; public pages use .dark on <html>. */
 .ask-jenvu-root {
+  --ask-composer-shadow: 0 1px 3px rgb(60 64 67 / 0.2), 0 2px 8px rgb(60 64 67 / 0.15);
   --ask-bg: #ffffff;
   --gc-blue: #000000;
   --gc-blue-hover: #333333;
@@ -1955,6 +1965,7 @@ h1.font-medium, h2.font-medium { letter-spacing: -0.025em; }
   --gc-ink-muted: #52525b;
   --gc-line: rgba(0, 0, 0, 0.1);
 }
+.ask-jenvu-composer { box-shadow: var(--ask-composer-shadow); }
 .dark .ask-jenvu-root,
 html[data-dash-theme="dark"] .ask-jenvu-root {
   color-scheme: dark;
@@ -2205,10 +2216,11 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
   border-right: 1px solid var(--console-line) !important;
 }
 body:has(.terminal-dark) .dashboard-topbar {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 4px solid var(--terminal-dark-line);
 }
 body:has(.terminal-dark) .dashboard-terminal-sidebar {
-  border-right-width: 1px !important;
+  --terminal-dark-line: #333333;
+  border-right: 4px solid var(--terminal-dark-line) !important;
 }
 
 /* JX Bot landing page animations */

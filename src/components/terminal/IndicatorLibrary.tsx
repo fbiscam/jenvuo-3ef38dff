@@ -42,17 +42,17 @@ export function IndicatorLibrary({ open, onOpenChange, theme, indicators, onTogg
   const visible = rows.filter((r) => query ? `${r.name} ${r.hint} ${r.category}`.toLowerCase().includes(query) : category === "Favorites" ? favorites.includes(r.id) : category === "SMC Concepts" ? r.category !== "Technicals" : r.category === category);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent aria-describedby="indicator-library-description" className={cn("flex h-[min(640px,calc(100dvh-2rem))] w-[calc(100vw-1rem)] max-w-[840px] flex-col gap-0 overflow-hidden rounded-lg border-border bg-background p-0 text-foreground font-sans", theme === "dark" && "dark terminal-dark")}>
-        <div className="px-5 pb-4 pt-6 sm:px-6">
+      <DialogContent overlayClassName="bg-transparent backdrop-filter-none" aria-describedby="indicator-library-description" className={cn("flex h-[min(540px,calc(100dvh-2rem))] w-[calc(100vw-1rem)] max-w-[700px] flex-col gap-0 overflow-hidden rounded-lg border-border bg-background p-0 text-foreground font-sans", theme === "dark" && "dark terminal-dark")}>
+        <div className="px-5 pb-3 pt-5">
           <DialogTitle className="pr-7 text-lg font-normal leading-6 tracking-normal sm:text-xl">Indicators, metrics, and strategies</DialogTitle>
           <DialogDescription id="indicator-library-description" className="sr-only">Jenvu chart indicators and smart-money overlays</DialogDescription>
-          <div className="relative mt-5">
+          <div className="relative mt-3">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input aria-label="Search indicators" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} className="h-10 rounded-lg border-border pl-10 font-normal shadow-none" />
           </div>
         </div>
         <div className="flex min-h-0 flex-1 flex-col sm:flex-row">
-          <nav aria-label="Indicator categories" className="flex shrink-0 gap-1 overflow-x-auto border-b border-border px-3 pb-3 sm:w-52 sm:flex-col sm:border-b-0 sm:px-4">
+          <nav aria-label="Indicator categories" className="flex shrink-0 gap-1 overflow-x-auto border-b border-border px-3 pb-3 sm:w-44 sm:flex-col sm:border-b-0 sm:px-3">
             {categories.map((name) => {
               const Icon = name === "Favorites" ? Star : name === "Technicals" ? Activity : name === "Strategies" ? TrendingUp : Layers;
               return <Button key={name} variant="ghost" onClick={() => { setCategory(name); setSearch(""); }} aria-pressed={category === name} className={cn("h-10 shrink-0 justify-start gap-3 rounded-lg px-3 font-normal", category === name && "bg-accent text-accent-foreground")}><Icon />{name}</Button>;

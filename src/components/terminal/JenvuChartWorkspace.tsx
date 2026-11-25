@@ -21,7 +21,6 @@ import {
   Circle,
   Eye,
   EyeOff,
-  Layers,
   Magnet,
   Maximize2,
   Minimize2,
@@ -66,20 +65,8 @@ function UtcClock() {
   return <span className="ml-auto font-mono text-[12px] tabular-nums text-foreground/80">{now ? `${now} UTC` : ""}</span>;
 }
 import { useStrategyAccess } from "./useStrategyAccess";
-import { TERMINAL_DAILY_HOURS, type StrategyTier } from "@/lib/free-plan";
 
-function strategyHoursLabel(tier: StrategyTier | null): string {
-  const h = tier && tier !== "unlimited" ? TERMINAL_DAILY_HOURS[tier] : TERMINAL_DAILY_HOURS.free;
-  return `${h} hours`;
-}
-
-function formatTimeLeft(seconds: number): string {
-  const m = Math.max(0, Math.floor(seconds / 60));
-  const h = Math.floor(m / 60);
-  return h > 0 ? `${h}h ${m % 60}m` : `${m}m`;
-}
 import { LOCKED_STRATEGY_KEYS } from "@/lib/strategy-access";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { IndicatorLibrary } from "./IndicatorLibrary";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -593,58 +580,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
 
   const selected = drawings.find((d) => d.id === selectedId) ?? null;
 
-  const smcMenu = (
-    <>
-      <p className="px-2 pb-1 pt-1 text-[13px] font-normal text-foreground sm:text-sm">Smart-money overlays</p>
-      <p className="px-2 pb-1.5 text-[11px] font-normal leading-4 text-muted-foreground sm:pb-2 sm:text-xs">
-        Same 10-bar structure engine as the AI desk
-      </p>
-      {!strategyAccess.loading && !strategiesUnlocked && (
-        <p className="mx-2 mb-1.5 flex items-start gap-1.5 rounded-md bg-accent px-2 py-1.5 text-[11px] leading-4 text-muted-foreground sm:text-xs">
-          <Lock className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-          <span>
-            Today's {strategyHoursLabel(strategyAccess.tier)} of Fresh sweep, price action and Zone + FVG is used up. They come back at 00:00 UTC, or upgrade for more hours.
-          </span>
-        </p>
-      )}
-      {!strategyAccess.loading && strategiesUnlocked && strategyAccess.secondsLeft !== null && (
-        <p className="mx-2 mb-1.5 flex items-start gap-1.5 rounded-md bg-accent px-2 py-1.5 text-[11px] leading-4 text-muted-foreground sm:text-xs">
-          <Clock3 className="mt-0.5 h-3 w-3 shrink-0" aria-hidden="true" />
-          <span>
-            {formatTimeLeft(strategyAccess.secondsLeft)} left today ({strategyHoursLabel(strategyAccess.tier)} a day on your plan).
-          </span>
-        </p>
-      )}
-      {SMC_LABELS.filter(
-        (item) =>
-          (item.key !== "sdStrategy" || SD_ZONE_TIMEFRAMES.has(timeframe.key)) &&
-          (item.key !== "sdHistory" || SD_HISTORY_TIMEFRAMES.has(timeframe.key)) &&
-          ((item.key !== "swingSweep" && item.key !== "sweeps" && item.key !== "priceAction") || SWING_SWEEP_TIMEFRAMES.has(timeframe.key)),
-      ).map((item) => {
-        const locked = !strategiesUnlocked && (LOCKED_TOGGLE_KEYS.has(item.key) || item.key === "sdHistory");
-        return (
-        <label
-          key={item.key}
-          className={cn("flex items-center justify-between gap-3 rounded-md px-2 py-1.5 sm:py-2", locked ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:bg-accent")}
-        >
-          <span className="min-w-0">
-            <span className="flex items-center gap-1.5 text-[13px] font-normal leading-4 text-foreground sm:text-[15px] sm:leading-5">
-              {item.label}
-              {locked && <Lock className="h-3 w-3 shrink-0 text-muted-foreground" aria-label="Locked" />}
-            </span>
-            <span className="block text-[11px] font-normal leading-4 text-muted-foreground sm:text-xs">{item.hint}</span>
-          </span>
-          <Switch
-            disabled={locked}
-            checked={locked ? false : (smcToggles[item.key] ?? DEFAULT_SMC[item.key])}
-            onCheckedChange={(v) => setSmcToggles((cur) => ({ ...cur, [item.key]: v }))}
-            className="shrink-0 scale-90 data-[state=checked]:bg-home-accent sm:scale-100 dark:data-[state=checked]:bg-white"
-          />
-        </label>
-        );
-      })}
-    </>
-  );
   function renderTools(vertical: boolean) {
     return (
       <>
@@ -782,17 +717,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
         <span className="hidden xl:inline">Indicators</span>
         {indicators.length > 0 && <span className="rounded bg-secondary px-1 font-mono text-[10px]">{indicators.length}</span>}
       </Button>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button type="button" aria-label="Jenvu SMC" title="Jenvu SMC" className={railBtn}>
-            <Layers className="h-4 w-4" />
-            <span className="hidden xl:inline">Jenvu SMC</span>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent side="bottom" align="start" className={cn("max-h-[80vh] w-80 overflow-y-auto sidebar-hover-scroll p-2", popClass)}>
-          {smcMenu}
-        </PopoverContent>
-      </Popover>
       <span className="mx-1 h-5 w-px shrink-0 bg-gc-line" aria-hidden="true" />
       <button type="button" onClick={downloadSnapshot} aria-label="Download chart snapshot" title="Download chart snapshot" className={railBtn}>
         <Camera className="h-4 w-4" />
@@ -912,23 +836,6 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           <Activity className="h-3.5 w-3.5" />
           <span>{indicators.length}</span>
         </Button>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              aria-label="Jenvu SMC"
-              title="Jenvu SMC"
-              className="flex h-7 md:hidden shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              <Layers className="h-3.5 w-3.5" />
-              <span className="hidden 2xl:inline">Jenvu SMC</span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent align="start" collisionPadding={8} className={cn("max-h-[min(62vh,480px)] w-[min(17rem,calc(100vw-1rem))] overflow-y-auto sidebar-hover-scroll overscroll-contain p-1.5 sm:max-h-[min(75vh,640px)] sm:w-80 sm:p-2 font-sans subpixel-antialiased", theme === "dark" && "dark terminal-dark border-border bg-popover text-popover-foreground")}>
-            {smcMenu}
-          </PopoverContent>
-        </Popover>
 
         <Tooltip>
           <TooltipTrigger asChild>

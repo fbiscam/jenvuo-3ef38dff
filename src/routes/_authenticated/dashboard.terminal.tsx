@@ -1,4 +1,5 @@
 import JenvuMark from "@/components/JenvuMark";
+import { AskJenvuComposer } from "@/components/AskJenvuComposer";
 import { parseChartCommands } from "@/lib/chart/chart-commands";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCredits } from "@/hooks/useCredits";
@@ -7,7 +8,6 @@ import type * as React from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  ArrowUp,
   CornerDownRight,
   History,
   ImagePlus,
@@ -50,11 +50,8 @@ import {
   PromptInputActionMenuContent,
   PromptInputActionMenuTrigger,
   PromptInput,
-  PromptInputFooter,
   PromptInputHeader,
   PromptInputButton,
-  PromptInputSubmit,
-  PromptInputTextarea,
   PromptInputTools,
   usePromptInputAttachments,
 } from "@/components/ai-elements/prompt-input";
@@ -323,6 +320,21 @@ function TerminalPage() {
   };
   const [deskOpen, setDeskOpen] = useState(false);
   const [deskDrag, setDeskDrag] = useState({ x: 0, y: 0 });
+  const deskPanelRef = useRef<HTMLElement | null>(null);
+  const deskPointerRef = useRef<{ id: number; x: number; y: number } | null>(null);
+  useEffect(() => {
+    const clamp = () => {
+      const panel = deskPanelRef.current;
+      if (!panel) return;
+      setDeskDrag((position) => ({
+        x: Math.min(8, Math.max(-Math.max(0, window.innerWidth - panel.offsetWidth - 16), position.x)),
+        y: Math.min(8, Math.max(-Math.max(0, window.innerHeight - panel.offsetHeight - 16), position.y)),
+      }));
+    };
+    clamp();
+    window.addEventListener("resize", clamp);
+    return () => window.removeEventListener("resize", clamp);
+  }, [deskOpen]);
   useEffect(() => {
     const open = () => setDeskOpen(true);
     window.addEventListener("jenvu:terminal-ask-ai", open);
@@ -817,33 +829,34 @@ function TerminalPage() {
           {/* AI desk (opened from the header Ask Jenvu button) */}
           {deskOpen && (
             <aside
+              ref={deskPanelRef}
+              role="dialog"
+              aria-label="Terminal Ask Jenvu"
               style={deskDrag.x || deskDrag.y ? ({ "--dx": `${deskDrag.x}px`, "--dy": `${deskDrag.y}px` } as React.CSSProperties) : undefined}
               className={cn(
-                "lg:[transform:translate(var(--dx,0px),var(--dy,0px))]",
-                "ask-jenvu-root fixed inset-x-2 bottom-2 z-40 flex h-[min(480px,calc(100dvh-5rem))] min-h-0 flex-col overflow-hidden rounded-2xl bg-[var(--ask-bg)] text-gc-ink shadow-xl ring-1 ring-gc-line sm:inset-x-auto sm:bottom-4 sm:right-4 sm:h-[min(560px,calc(100dvh-6rem))] sm:w-[min(640px,calc(100vw-2rem))]",
+                "sm:[transform:translate(var(--dx,0px),var(--dy,0px))]",
+                "ask-jenvu-root fixed inset-x-2 bottom-2 z-40 flex h-[min(480px,calc(100dvh-5rem))] min-h-0 flex-col overflow-hidden rounded-2xl bg-[var(--ask-bg)] text-gc-ink shadow-xl ring-1 ring-gc-line sm:inset-x-auto sm:bottom-4 sm:right-4 sm:h-[min(560px,calc(100dvh-6rem))] sm:w-[min(460px,calc(100vw-2rem))]",
               )}
             >
               <div
-                className="flex h-12 shrink-0 items-center justify-end gap-1 px-4 sm:h-14 sm:px-5 lg:cursor-grab lg:select-none lg:active:cursor-grabbing"
+                className="flex h-12 shrink-0 items-center justify-end gap-1 px-4 sm:h-14 sm:px-5 sm:cursor-grab sm:select-none sm:touch-none sm:active:cursor-grabbing"
                 onPointerDown={(e) => {
-                  if ((e.target as HTMLElement).closest("button") || window.innerWidth < 1024) return;
-                  const sx = e.clientX - deskDrag.x;
-                  const sy = e.clientY - deskDrag.y;
-                  const panel = e.currentTarget.parentElement;
-                  const minX = -(window.innerWidth - (panel?.offsetWidth ?? 640) - 16);
-                  const minY = -Math.max(0, window.innerHeight - (panel?.offsetHeight ?? 560) - 16);
-                  const move = (ev: PointerEvent) => {
-                    const maxX = 8;
-                    const maxY = 8;
-                    setDeskDrag({
-                      x: Math.min(maxX, Math.max(minX, ev.clientX - sx)),
-                      y: Math.min(maxY, Math.max(minY, ev.clientY - sy)),
-                    });
-                  };
-                  const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
-                  window.addEventListener("pointermove", move);
-                  window.addEventListener("pointerup", up);
+                  if (e.button !== 0 || (e.target as HTMLElement).closest("button") || window.innerWidth < 640) return;
+                  deskPointerRef.current = { id: e.pointerId, x: e.clientX - deskDrag.x, y: e.clientY - deskDrag.y };
+                  e.currentTarget.setPointerCapture(e.pointerId);
                 }}
+                onPointerMove={(e) => {
+                  const pointer = deskPointerRef.current;
+                  const panel = deskPanelRef.current;
+                  if (!pointer || pointer.id !== e.pointerId || !panel) return;
+                  setDeskDrag({
+                    x: Math.min(8, Math.max(-Math.max(0, window.innerWidth - panel.offsetWidth - 16), e.clientX - pointer.x)),
+                    y: Math.min(8, Math.max(-Math.max(0, window.innerHeight - panel.offsetHeight - 16), e.clientY - pointer.y)),
+                  });
+                }}
+                onPointerUp={() => { deskPointerRef.current = null; }}
+                onPointerCancel={() => { deskPointerRef.current = null; }}
+                onLostPointerCapture={() => { deskPointerRef.current = null; }}
                 title="Drag to move"
               >
                 <h2 className="mr-auto text-[15px] font-normal sm:text-[16px]">Ask Jenvu</h2>
@@ -945,7 +958,7 @@ function TerminalPage() {
               )}
 
               <Conversation className="min-h-0 flex-1">
-                <ConversationContent className="gap-5 px-4 py-5">
+                <ConversationContent className="gap-5 px-4 pb-3 pt-2 sm:px-6 sm:pb-4">
                   {messages.length === 0 && (
                     <div className="flex min-h-[260px] flex-col justify-center py-4 sm:min-h-[330px]">
                       <h2 className="mx-auto max-w-[460px] text-center text-[20px] font-normal leading-[1.3] tracking-normal sm:text-[26px]">What would you like to know about?</h2>
@@ -963,9 +976,9 @@ function TerminalPage() {
                     <Message key={`${m.role}-${i}`} from={m.role}>
                       <MessageContent
                         className={cn(
-                          "text-[15px] leading-7",
+                          "text-[15px] leading-[1.6] [&_li]:my-1 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-3 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-6",
                           m.role === "user" &&
-                            "rounded-2xl bg-gc-notice px-4 py-2.5 text-gc-ink",
+                            "max-w-[80%] whitespace-pre-wrap break-words rounded-2xl bg-gc-notice px-4 py-2.5 leading-snug text-gc-ink",
                         )}
                       >
                         {m.signal &&
@@ -1051,19 +1064,18 @@ function TerminalPage() {
                     )
                   }
                   onSubmit={(message) => send(message)}
-                  className="[&>[data-slot=input-group]]:grid [&>[data-slot=input-group]]:grid-cols-[minmax(0,1fr)_auto] [&>[data-slot=input-group]]:rounded-[28px] [&>[data-slot=input-group]]:border-gc-line [&>[data-slot=input-group]]:bg-background [&>[data-slot=input-group]]:py-1 [&>[data-slot=input-group]]:pl-2 [&>[data-slot=input-group]]:pr-1 [&>[data-slot=input-group]]:shadow-sm"
+                  className="[&>[data-slot=input-group]]:block [&>[data-slot=input-group]]:h-auto [&>[data-slot=input-group]]:overflow-visible [&>[data-slot=input-group]]:border-0 [&>[data-slot=input-group]]:bg-transparent [&>[data-slot=input-group]]:shadow-none [&>[data-slot=input-group]]:ring-0"
                 >
                   <ComposerAttachments />
-                  <PromptInputTextarea
-                    ref={textareaRef}
+                  <AskJenvuComposer
+                    inputRef={textareaRef}
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={setInput}
+                    disabled={ask.isPending || voice.isPending || isRecording}
+                    sendDisabled={ask.isPending || voice.isPending || isRecording || !input.trim()}
                     placeholder={messages.length === 0 ? "Ask a question" : "Ask a follow-up"}
-                    rows={1}
-                    aria-label="Ask a question"
-                    className="min-h-10 max-h-28 min-w-0 px-3 py-2.5 text-[16px]"
-                  />
-                  <PromptInputFooter className="w-auto self-center px-1 pb-0 pt-0">
+                  >
+                    <div className="mt-2 flex items-center px-1">
                     <PromptInputTools>
                       <PromptInputActionMenu>
                         <PromptInputActionMenuTrigger
@@ -1094,13 +1106,8 @@ function TerminalPage() {
                       </PromptInputButton>
 
                     </PromptInputTools>
-                    <PromptInputSubmit
-                      status={ask.isPending ? "submitted" : "ready"}
-                      disabled={ask.isPending || voice.isPending || isRecording}
-                      aria-label="Send"
-                      className="h-9 w-9 rounded-full bg-foreground text-background sm:h-10 sm:w-10"
-                    ><ArrowUp className="h-5 w-5 text-background" /></PromptInputSubmit>
-                  </PromptInputFooter>
+                    </div>
+                  </AskJenvuComposer>
                 </PromptInput>
                 <p className="mt-2 text-center text-[11px] text-gc-ink-muted sm:text-[12px]">Built with Jenvu AI</p>
               </div>
