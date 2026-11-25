@@ -22,17 +22,17 @@ const bar = (i: number, mid: number): OhlcvBar => ({
 });
 
 describe("smc overlay fractal labels", () => {
-  it("confirms a fixed swing after eight closed candles, not seven", () => {
-    expect(FRACTAL_RADIUS).toBe(8);
+  it("confirms a fixed swing after seven closed candles, not six", () => {
+    expect(FRACTAL_RADIUS).toBe(7);
     const bars = Array.from({ length: 50 }, (_, i) => bar(i, 100 + i * 0.01));
     bars[15] = bar(15, 110);
     bars[40] = bar(40, 120);
     const pivotTime = bars[40]?.time;
     if (pivotTime === undefined) throw new Error("Missing test peak");
-    const before = computeSmcOverlay(bars.slice(0, 48), 100);
+    const before = computeSmcOverlay(bars.slice(0, 47), 100);
     expect(before.pivots.some((p) => p.t === pivotTime * 1000)).toBe(false);
     expect(before.livePivots).toHaveLength(0);
-    const confirmed = computeSmcOverlay(bars.slice(0, 49), 100);
+    const confirmed = computeSmcOverlay(bars.slice(0, 48), 100);
     const peak = confirmed.pivots.find((p) => p.t === pivotTime * 1000);
     expect(peak?.label).toBe("HH");
     expect(peak?.price).toBe(121);
@@ -48,16 +48,16 @@ describe("smc overlay fractal labels", () => {
     expect(breakLabelBaseline(299, false, 300)).toBe(297);
   });
 
-  it("labels an equal-low double bottom once after eight candles from the last touch", () => {
+  it("labels an equal-low double bottom once after seven candles from the last touch", () => {
     const bars = Array.from({ length: 55 }, (_, i) => bar(i, 100));
     bars[15] = bar(15, 90);
     bars[40] = bar(40, 95);
     bars[42] = bar(42, 95);
     const lastTouch = bars[42]?.time;
     if (lastTouch === undefined) throw new Error("Missing double-bottom candle");
-    const before = computeSmcOverlay(bars.slice(0, 50), 100);
+    const before = computeSmcOverlay(bars.slice(0, 49), 100);
     expect(before.pivots.some((p) => p.t === lastTouch * 1000)).toBe(false);
-    const confirmed = computeSmcOverlay(bars.slice(0, 51), 100);
+    const confirmed = computeSmcOverlay(bars.slice(0, 50), 100);
     const lows = confirmed.pivots.filter((p) => p.kind === "low" && p.price === 94);
     expect(lows).toHaveLength(1);
     expect(lows[0]?.t).toBe(lastTouch * 1000);
@@ -65,7 +65,7 @@ describe("smc overlay fractal labels", () => {
     expect(computeSmcOverlay(bars, 100).pivots.find((p) => p.t === lastTouch * 1000)?.label).toBe("HL");
   });
 
-  it("only labels swings with eight lower candles on each side", () => {
+  it("only labels swings with seven lower candles on each side", () => {
     // Zig-zag with a 25-bar period: swings every ~12 bars.
     const bars = Array.from({ length: 200 }, (_, i) => bar(i, 100 + 10 * Math.sin((i / 25) * 2 * Math.PI) + i * 0.05));
     const smc = computeSmcOverlay(bars, bars.at(-1)!.close);
@@ -89,7 +89,7 @@ describe("smc overlay fractal labels", () => {
     expect(high?.barsAfter).toBe(0);
   });
 
-  it("derives BOS/CHoCH and liquidity only from confirmed eight-bar pivots", () => {
+  it("derives BOS/CHoCH and liquidity only from confirmed seven-bar pivots", () => {
     const bars = Array.from({ length: 80 }, (_, i): OhlcvBar => ({
       time: 1_700_000_000 + i * 1800,
       open: 100,

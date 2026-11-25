@@ -56,24 +56,24 @@ describe("mapMarketStructure", () => {
     assert.deepEqual(mapMarketStructure(input).flatMap((candle, index) => candle.is_swing_high ? [index] : []), [3]);
   });
 
-  test("equal highs and lows lock once after eight closed bars from the last touch", () => {
+  test("equal highs and lows lock once after seven closed bars from the last touch", () => {
     const input = Array.from({ length: 30 }, (_, i) => ({ t: i, o: 7, h: 10, l: 5, c: 7 }));
     input[10] = { t: 10, o: 7, h: 15, l: 2, c: 7 };
     input[12] = { t: 12, o: 7, h: 15, l: 2, c: 7 };
-    assert.deepEqual(detectMarketStructureEvidence(input.slice(0, 20), 8).pivots, []);
-    const confirmed = detectMarketStructureEvidence(input.slice(0, 21), 8).pivots;
+    assert.deepEqual(detectMarketStructureEvidence(input.slice(0, 19), 7).pivots, []);
+    const confirmed = detectMarketStructureEvidence(input.slice(0, 20), 7).pivots;
     assert.deepEqual(confirmed.map((p) => [p.kind, p.index, p.confirmedIndex, p.price]), [
-      ["high", 12, 20, 15], ["low", 12, 20, 2],
+      ["high", 12, 19, 15], ["low", 12, 19, 2],
     ]);
-    assert.deepEqual(detectMarketStructureEvidence(input, 8).pivots, confirmed);
+    assert.deepEqual(detectMarketStructureEvidence(input, 7).pivots, confirmed);
   });
 
-  test("a more extreme candle during eight-bar confirmation rejects the earlier candidate", () => {
+  test("a more extreme candle during seven-bar confirmation rejects the earlier candidate", () => {
     const input = Array.from({ length: 21 }, (_, i) => ({ t: i, o: 7, h: 10, l: 5, c: 7 }));
     input[10] = { t: 10, o: 7, h: 15, l: 2, c: 7 };
     input[12] = { t: 12, o: 7, h: 15, l: 2, c: 7 };
     input[18] = { t: 18, o: 7, h: 16, l: 1, c: 7 };
-    assert.deepEqual(detectMarketStructureEvidence(input, 8).pivots, []);
+    assert.deepEqual(detectMarketStructureEvidence(input, 7).pivots, []);
   });
 
   test("places break events only on close-through candles", () => {
