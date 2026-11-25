@@ -818,7 +818,7 @@ function TerminalPage() {
               style={deskDrag.x || deskDrag.y ? ({ "--dx": `${deskDrag.x}px`, "--dy": `${deskDrag.y}px` } as React.CSSProperties) : undefined}
               className={cn(
                 "lg:[transform:translate(var(--dx,0px),var(--dy,0px))]",
-                "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-border bg-card text-card-foreground lg:fixed lg:bottom-6 lg:right-6 lg:z-50 lg:h-[min(680px,calc(100vh-7rem))] lg:w-[400px] lg:rounded-2xl lg:border lg:shadow-2xl",
+                "relative flex h-[45%] min-h-0 w-full shrink-0 flex-col overflow-hidden border-t border-terminal-line dark:border-border bg-card text-card-foreground lg:fixed lg:bottom-6 lg:right-6 lg:z-50 lg:h-[min(680px,calc(100vh-7rem))] lg:w-[400px] lg:rounded-2xl lg:border lg:shadow-2xl",
               )}
             >
               <div
@@ -881,7 +881,7 @@ function TerminalPage() {
 
               {historyOpen && (
                 <div className="absolute inset-0 z-30 flex flex-col bg-card">
-                  <div className="flex min-h-17 items-center border-b border-border px-4">
+                  <div className="flex min-h-17 items-center border-b border-terminal-line dark:border-border px-4">
                     <History className="mr-2 h-4 w-4" />
                     <h2 className="text-sm font-medium">Past chats</h2>
                     <Button
@@ -1034,7 +1034,7 @@ function TerminalPage() {
                 <ConversationScrollButton className="bottom-2 h-8 w-8" />
               </Conversation>
 
-              <div className="mt-auto shrink-0 border-t border-border bg-card px-3.5 pb-3 pt-2">
+              <div className="mt-auto shrink-0 border-t border-terminal-line dark:border-border bg-card px-3.5 pb-3 pt-2">
                 {(voiceError || isRecording || voice.isPending) && (
                   <p
                     className={cn(
