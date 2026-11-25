@@ -126,7 +126,7 @@ async function _spendUserCredits(
 type Candle = { t: number; o: number; h: number; l: number; c: number; v: number };
 
 /** Shared non-repainting swing basis for chart labels, breaks, liquidity and AI evidence. */
-const SMC_FRACTAL_RADIUS = 4; // same as the chart (FRACTAL_RADIUS)
+const SMC_FRACTAL_RADIUS = 6; // same as the chart (FRACTAL_RADIUS)
 const SMC_STRUCTURE_WINDOW = 400;
 
 export type GoldSignal = {

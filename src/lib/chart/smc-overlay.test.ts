@@ -22,6 +22,25 @@ const bar = (i: number, mid: number): OhlcvBar => ({
 });
 
 describe("smc overlay fractal labels", () => {
+  it("confirms a fixed swing after six closed candles, not five", () => {
+    expect(FRACTAL_RADIUS).toBe(6);
+    const bars = Array.from({ length: 50 }, (_, i) => bar(i, 100 + i * 0.01));
+    bars[15] = bar(15, 110);
+    bars[40] = bar(40, 120);
+    const pivotTime = bars[40]?.time;
+    if (pivotTime === undefined) throw new Error("Missing test peak");
+    const before = computeSmcOverlay(bars.slice(0, 46), 100);
+    expect(before.pivots.some((p) => p.t === pivotTime * 1000)).toBe(false);
+    expect(before.livePivots).toHaveLength(0);
+    const confirmed = computeSmcOverlay(bars.slice(0, 47), 100);
+    const peak = confirmed.pivots.find((p) => p.t === pivotTime * 1000);
+    expect(peak?.label).toBe("HH");
+    expect(peak?.price).toBe(121);
+    const later = computeSmcOverlay(bars, 100);
+    expect(later.pivots.find((p) => p.t === pivotTime * 1000)?.label).toBe("HH");
+    expect(later.pivots.find((p) => p.t === pivotTime * 1000)?.price).toBe(121);
+  });
+
   it("keeps structure and break labels inside the chart at extreme wicks", () => {
     expect(structureBadgeTop(1, true, 300)).toBe(2);
     expect(structureBadgeTop(299, false, 300)).toBe(280);
@@ -29,7 +48,7 @@ describe("smc overlay fractal labels", () => {
     expect(breakLabelBaseline(299, false, 300)).toBe(297);
   });
 
-  it("only labels swings with 10 lower candles on each side", () => {
+  it("only labels swings with six lower candles on each side", () => {
     // Zig-zag with a 25-bar period: swings every ~12 bars.
     const bars = Array.from({ length: 200 }, (_, i) => bar(i, 100 + 10 * Math.sin((i / 25) * 2 * Math.PI) + i * 0.05));
     const smc = computeSmcOverlay(bars, bars.at(-1)!.close);
@@ -53,7 +72,7 @@ describe("smc overlay fractal labels", () => {
     expect(high?.barsAfter).toBe(0);
   });
 
-  it("derives BOS/CHoCH and liquidity only from confirmed 10-bar pivots", () => {
+  it("derives BOS/CHoCH and liquidity only from confirmed six-bar pivots", () => {
     const bars = Array.from({ length: 80 }, (_, i): OhlcvBar => ({
       time: 1_700_000_000 + i * 1800,
       open: 100,
