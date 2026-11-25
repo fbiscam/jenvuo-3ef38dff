@@ -745,7 +745,7 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
   const rail = (
     <nav aria-label="Chart tools" className="flex min-w-0 flex-1 items-center gap-0.5">
       <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5">
+      <div role="group" aria-label="Pair" className="mr-1 flex shrink-0 items-center gap-0.5 rounded-lg bg-muted/60 p-0.5 md:-ml-2">
         {CHART_ASSETS.map(({ symbol: a, label }) => (
           <button
             key={a}
