@@ -1,4 +1,6 @@
-import { describe, expect, test } from "bun:test";
+import { describe, test } from "node:test";
+import assert from "node:assert/strict";
+const expect = (v: unknown) => ({ toBe: (x: unknown) => assert.equal(v, x), toEqual: (x: unknown) => assert.deepEqual(v, x), toContain: (x: unknown) => assert.ok((v as unknown[]).includes(x)), toBeGreaterThanOrEqual: (x: number) => assert.ok((v as number) >= x) });
 import { detectStructureAlerts, ALERT_TIMEFRAMES, ALERT_ASSETS, FRESH_CONFIRM_BARS } from "./structure-alerts";
 import { FRACTAL_RADIUS } from "./chart/smc-overlay";
 

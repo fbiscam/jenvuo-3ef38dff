@@ -30,8 +30,8 @@ export const Route = createFileRoute('/api/public/hooks/structure-alerts')({
 
         const { receivesStructureAlerts } = await import('@/lib/structure-alerts')
         const { data: subs } = await db.from('user_subscriptions').select('user_id,plan_id,status,is_trial,current_period_end').in('plan_id', ['pro', 'elite', 'ultra'])
-        const ids = Array.from(new Set((subs ?? []).filter((s: any) => receivesStructureAlerts(s)).map((s: any) => s.user_id as string)))
-        const emails = (await Promise.all(ids.map(async (id) => {
+        const ids: string[] = Array.from(new Set<string>((subs ?? []).filter((s: any) => receivesStructureAlerts(s)).map((s: any) => String(s.user_id))))
+        const emails = (await Promise.all(ids.map(async (id: string) => {
           const { data } = await supabaseAdmin.auth.admin.getUserById(id)
           return data?.user?.email ?? null
         }))).filter((e): e is string => !!e)
