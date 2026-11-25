@@ -5,6 +5,9 @@ import {
   macd,
   rsi,
   sma,
+  wma,
+  highest,
+  lowest,
   vwap,
   type OhlcvBar,
 } from "@/lib/chart/indicators";
@@ -17,6 +20,12 @@ export type IndicatorId =
   | "ema50"
   | "ema200"
   | "sma20"
+  | "sma50"
+  | "sma200"
+  | "wma20"
+  | "donchian"
+  | "stochastic"
+  | "roc"
   | "bb"
   | "vwap"
   | "rsi"
@@ -136,6 +145,59 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
       const b = bollinger(closes(bars), 20, 2);
       return [b.basis, b.upper, b.lower];
     },
+  },
+  sma50: {
+    id: "sma50", name: "SMA 50", description: "Simple moving average · 50 bars", pane: "main",
+    lines: [{ title: "SMA 50", color: "#00897b", kind: "line", width: 2 }],
+    compute: (bars) => [sma(closes(bars), 50)],
+  },
+  sma200: {
+    id: "sma200", name: "SMA 200", description: "Simple moving average · 200 bars", pane: "main",
+    lines: [{ title: "SMA 200", color: "#9c27b0", kind: "line", width: 2 }],
+    compute: (bars) => [sma(closes(bars), 200)],
+  },
+  wma20: {
+    id: "wma20", name: "WMA 20", description: "Weighted moving average · 20 bars", pane: "main",
+    lines: [{ title: "WMA 20", color: "#ff9800", kind: "line", width: 2 }],
+    compute: (bars) => [wma(closes(bars), 20)],
+  },
+  donchian: {
+    id: "donchian", name: "Donchian Channels", description: "20-bar high / low channel", pane: "main",
+    lines: [
+      { title: "DC upper", color: "#00897b", kind: "line" },
+      { title: "DC middle", color: "#787b86", kind: "line" },
+      { title: "DC lower", color: "#f23645", kind: "line" },
+    ],
+    compute: (bars) => {
+      const upper = highest(bars.map((b) => b.high), 20);
+      const lower = lowest(bars.map((b) => b.low), 20);
+      return [upper, upper.map((v, i) => (v + (lower[i] ?? NaN)) / 2), lower];
+    },
+  },
+  stochastic: {
+    id: "stochastic", name: "Stochastic 14/3/3", description: "Smoothed %K / %D · 80 / 20 levels", pane: "separate",
+    lines: [{ title: "%K", color: "#2962ff", kind: "line", width: 2 }, { title: "%D", color: "#ff9800", kind: "line" }],
+    levels: [{ price: 80, color: "#f23645" }, { price: 20, color: "#089981" }],
+    compute: (bars) => {
+      const hi = highest(bars.map((b) => b.high), 14);
+      const lo = lowest(bars.map((b) => b.low), 14);
+      const raw = bars.map((b, i) => {
+        const h = hi[i]; const l = lo[i];
+        if (h === undefined || l === undefined || !Number.isFinite(h) || !Number.isFinite(l)) return NaN;
+        return h === l ? 50 : 100 * (b.close - l) / (h - l);
+      });
+      const k = sma(raw, 3);
+      return [k, sma(k, 3)];
+    },
+  },
+  roc: {
+    id: "roc", name: "Rate of Change 9", description: "9-bar percentage momentum", pane: "separate",
+    lines: [{ title: "ROC 9", color: "#00897b", kind: "line", width: 2 }],
+    levels: [{ price: 0, color: "#787b86" }],
+    compute: (bars) => [bars.map((b, i) => {
+      const prior = bars[i - 9]?.close;
+      return prior === undefined || prior === 0 ? NaN : 100 * (b.close - prior) / prior;
+    })],
   },
   vwap: {
     id: "vwap",

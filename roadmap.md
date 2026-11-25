@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Complete approved Terminal update: regular-weight header text, searchable indicator library with SMC/ICT controls and practical defaults, homepage-style draggable Ask Jenvu; verify utility regression and signed-in desktop/mobile flow.
+
 - [x] Apply Terminal-style dividers beneath the shared dashboard header and along every sidebar variant; signed-in test account verified desktop Terminal and mobile menu light borders, plus dashboard/Terminal dark borders. Existing desktop Overview header remains hidden. Utility numeric-input regression passes; current helper has seven lines and the reported error is absent; latest build OK. No account records, permissions or settings changed.
 
 - [x] Follow-up utility/download sweep: reread all 76 production cn callers (shared UI, Chat, Models, Settings, Terminal/demo, Course/Profile/Security and app), sole helper/test, JX Bot onDownload and authenticated getBotDownloadUrl; all follow string-returning helper/current private archive rules. No independent helper/download job or SQL path found in extension/electron/scripts/migrations. Utility and 41 native bot tests pass; private stored archive still matches uploaded size/eTag. No new behavior fix needed; customer notes remain outdated, signed-in download button and MT5 binary execution/backtesting unverified. Settled records, settings and permissions unchanged.
