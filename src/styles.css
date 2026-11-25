@@ -2595,6 +2595,7 @@ html body :is(.dark, .dash-dark) .vsc-studio .tok-var { color: #a8dcff !importan
 /* Terminal slim page rail: icon-only, compact so every page fits in one column. */
 .terminal-rail nav { padding: 2px 6px !important; }
 .terminal-rail nav > div { margin-top: 2px !important; }
+.terminal-rail nav > div:first-child { margin-top: 0 !important; }
 .terminal-rail nav > div > .flex { gap: 2px !important; }
 .terminal-rail .dashboard-sidebar-link { padding: 8px !important; border-radius: 10px !important; }
 .terminal-rail .dashboard-sidebar-icon { width: 21px !important; height: 21px !important; }
