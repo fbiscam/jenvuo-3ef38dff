@@ -471,6 +471,9 @@ function memoryFor(key: string): StructureMemory {
  * including the forming one. It updates live as the current candle moves and
  * becomes a confirmed pivot once FRACTAL_RADIUS later candles close.
  */
+/** Live (unconfirmed) swing labels are off: only confirmed, fixed highs/lows show. */
+export const SHOW_LIVE_SWINGS = false;
+
 export function computeLivePivots(
   closed: Candle[],
   forming: Candle | null,
@@ -625,9 +628,13 @@ export function computeSmcOverlay(
     fractal.pivots.sort((a, b) => a.index - b.index || (a.kind === "high" ? -1 : 1));
   }
   const pivotsLabelled = fractal.pivots.filter((p) => p.label.length === 2).map(lockLabel);
-  const livePivots = computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots)
-    .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p))
-    .filter((p) => !pivotsLabelled.some((q) => q.kind === p.kind && q.t === p.t));
+  // Fixed highs/lows only: unconfirmed (live, forming) swings are never drawn or
+  // used, so a high/low that appears on the chart never shifts to a later candle.
+  const livePivots: LivePivot[] = SHOW_LIVE_SWINGS
+    ? computeLivePivots(fractalBars, forming ? toCandle(forming) : null, fractal.pivots)
+        .map((p) => (p.confirmedByOpposite && p.label.length === 2 ? lockLabel(p) : p))
+        .filter((p) => !pivotsLabelled.some((q) => q.kind === p.kind && q.t === p.t))
+    : [];
   const selectedPois = selectHighConfidencePois(poi, price);
 
   // Structure labels, breaks, trend and liquidity must all come from this same
