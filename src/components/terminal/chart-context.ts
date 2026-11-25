@@ -1,3 +1,4 @@
+import { FRACTAL_RADIUS } from "@/lib/chart/smc-overlay";
 import { describeDrawing, type Drawing } from "@/lib/chart/drawings";
 import { lastFinite, type OhlcvBar } from "@/lib/chart/indicators";
 import type { ScriptResult } from "@/lib/chart/jenvu-script";
@@ -68,7 +69,7 @@ export function buildChartContext(input: {
     .filter(([, v]) => v)
     .map(([k]) => k);
   lines.push(
-    `Jenvu SMC overlays shown: ${on.length ? on.join(", ") : "none"} (confirmed structure, BOS/CHoCH and liquidity all use the same 10-bar fractal pivots over up to 400 closed candles).`,
+    `Jenvu SMC overlays shown: ${on.length ? on.join(", ") : "none"} (confirmed structure, BOS/CHoCH and liquidity all use the same ${FRACTAL_RADIUS}-bar fractal pivots over up to 400 closed candles).`,
   );
   if (input.smc && input.smcToggles.structure) {
     const recentPivots = input.smc.pivots
@@ -77,7 +78,7 @@ export function buildChartContext(input: {
       .join(", ");
     if (recentPivots)
       lines.push(
-        `Chart HH/HL/LH/LL labels use a 10-bar fractal (10 candles each side, like the Fractals indicator); latest confirmed: ${recentPivots}.`,
+        `Chart HH/HL/LH/LL labels use a ${FRACTAL_RADIUS}-bar fractal (${FRACTAL_RADIUS} candles each side, like the Fractals indicator); latest confirmed: ${recentPivots}.`,
       );
     if (input.includePressure) {
       const confirmedPressure = input.smc.pivots
@@ -114,11 +115,11 @@ export function buildChartContext(input: {
       .slice(-5)
       .map((b) => `${b.type === "CHOCH" ? "CHoCH" : b.type} ${b.dir} through ${b.level.toFixed(2)} @ ${fmt(b.t / 1000)}`)
       .join("; ");
-    lines.push(`Chart confirmed 10-bar structure breaks: ${recentBreaks || "none"}.`);
+    lines.push(`Chart confirmed ${FRACTAL_RADIUS}-bar structure breaks: ${recentBreaks || "none"}.`);
   }
   if (input.smc && input.smcToggles.liquidity) {
     lines.push(
-      `Chart confirmed 10-bar liquidity: BSL ${input.smc.buySide.map((p) => p.toFixed(2)).join(", ") || "none"}; SSL ${input.smc.sellSide.map((p) => p.toFixed(2)).join(", ") || "none"}.`,
+      `Chart confirmed ${FRACTAL_RADIUS}-bar liquidity: BSL ${input.smc.buySide.map((p) => p.toFixed(2)).join(", ") || "none"}; SSL ${input.smc.sellSide.map((p) => p.toFixed(2)).join(", ") || "none"}.`,
     );
   }
 

@@ -34,6 +34,6 @@
 - Tool how-to text lives in `src/lib/chart-tools-guide.ts`, read by the Help article and the Terminal AI prompt (Ask Jenvu gets it through the Help articles); update it when a tool's rules change so answers match the chart.
 - 1H swing plan (`swing-trade-plan.ts`) is kept but switched off in the Terminal (user asked to hide Entry/SL/TP on fresh swings).
 
-- Fixed swings (`SHOW_LIVE_SWINGS = false` in `smc-overlay.ts`): unconfirmed live HH/HL/LH/LL swings are never drawn or fed to price action, sweeps, reversal reads or supply/demand zones; only confirmed 10-bar swings (FRACTAL_RADIUS) show; chart, alerts and Terminal AI use the same radius. Why: user tried 3 bars and found too many highs/lows; 10 bars keeps only major fixed swings.
+- Fixed swings (`SHOW_LIVE_SWINGS = false` in `smc-overlay.ts`): unconfirmed live HH/HL/LH/LL swings are never drawn or fed to price action, sweeps, reversal reads or supply/demand zones; only confirmed swings at FRACTAL_RADIUS show; chart, alerts and Terminal AI (chart-context prompt) all read that one constant. Why: 3 bars gave too many highs/lows; user chose a larger radius for major fixed swings.
 - EUR/USD 1m–30m candles use CME 6E=F futures OHLC shifted by the median spot basis (`shiftFuturesToSpot`, tested), with live spot rows after the futures' ~10-min delay: Yahoo spot intraday rows are flat sampled quotes.
 - EUR/USD 1m–30m: `joinEurSeams` snaps opens within 5 pips to the previous close after stitching futures/Binance/spot sources (tested): seams made candles look flipped.
