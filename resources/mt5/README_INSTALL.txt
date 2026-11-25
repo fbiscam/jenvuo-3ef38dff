@@ -1,10 +1,18 @@
-JX BOT v4.08 — OWNER SOURCE PACKAGE
+JX BOT v4.09 — OWNER SOURCE PACKAGE
 ==========================================
 This contains MQL5 source, not a compiled EX5. Customer downloads are not
 replaced by this package. Compile and test it in MetaEditor/MT5 first.
 
 APPROVED CHANGES
-v4.08 (new)
+v4.09 (new)
+- FVG removed from the bot: Trap Shield entry filter and FVG profit guard
+  are both OFF. FVGs no longer block entries or close trades early.
+- Hard stop: a basket closes at 7.5 pips against its average price.
+- Exhaustion guard: no SELL when the last 12 M15 candles fell 25+ pips and
+  RSI < 25; no BUY when they rose 25+ pips and RSI > 75.
+- TP 5 pips, lot 0.05 per $1,000 and the 4.7% daily drawdown are unchanged.
+
+v4.08 (older notes below)
 - 5-pip EA-managed basket TP for ALL trades, BUY and SELL alike.
 - FVG entry buffer reduced to 0.2 M15 ATR. Supply/demand buffer remains
   1.0 ATR; its existing logic is unchanged.
