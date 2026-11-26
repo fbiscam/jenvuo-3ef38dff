@@ -1294,7 +1294,9 @@ export type Database = {
       }
       extension_api_keys: {
         Row: {
+          allowed_models: string[] | null
           created_at: string
+          expires_at: string | null
           id: string
           key_ciphertext: string | null
           key_hash: string
@@ -1305,7 +1307,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          allowed_models?: string[] | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           key_ciphertext?: string | null
           key_hash: string
@@ -1316,7 +1320,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          allowed_models?: string[] | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           key_ciphertext?: string | null
           key_hash?: string

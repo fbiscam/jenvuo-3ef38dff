@@ -1,0 +1,3 @@
+ALTER TABLE public.extension_api_keys ADD COLUMN IF NOT EXISTS allowed_models text[] DEFAULT NULL, ADD COLUMN IF NOT EXISTS expires_at timestamptz DEFAULT NULL;
+COMMENT ON COLUMN public.extension_api_keys.allowed_models IS 'NULL allows all public models; otherwise only the listed public model IDs are allowed.';
+COMMENT ON COLUMN public.extension_api_keys.expires_at IS 'Key is rejected at or after this time; NULL means no expiry.';

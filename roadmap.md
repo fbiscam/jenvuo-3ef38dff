@@ -282,3 +282,8 @@
 - [x] Move the multi-pair Economic Calendar below News Impact with matching console sections; remove the separate menu entry and redirect old Calendar links to News. Temporary signed-in account verified live weekly rows, High + EUR/USD filters, desktop/393px layout without overflow, old-link redirect and no runtime errors. Six utility/news-filter tests pass; latest build OK. All 81 helper files inspected: shared cn returns string, no line 8; no duplicate callers in extension/electron/scripts or 79 migration files. Account records, permissions and settings unchanged.
 
 - [x] JX Bot removed from site/dashboard; Help Centre under Settings; Scam Protection page (/scam-protection) with checker, founder, live report and daily slider
+
+- [ ] Enable API-key model selection and enforced expiry; remove endpoint controls.
+- [ ] Increase Code page readability and prevent API/Code navigation reloads.
+- [ ] Reopen Ask Jenvu to visitors with abuse limits.
+- [ ] Match Terminal drawer sizing to the dashboard menu; verify all changes.
