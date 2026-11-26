@@ -95,7 +95,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
     <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Welcome, {name}</h1>
-        <Link to="/dashboard/api" className="console-pill console-pill-white">
+        <Link to="/dashboard/api" className="console-pill console-pill-solid">
           <Plus className="h-4 w-4" aria-hidden="true" /> Create API key
         </Link>
       </div>
@@ -119,7 +119,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <span className="text-muted-foreground">{hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
             <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">{hasKeys ? "Manage API keys →" : "Create API key →"}</Link>
           </div>
-          <div className="mt-5 grid grid-cols-5 items-center gap-1 border-t border-border pt-4" aria-label="Compatible developer tools">
+          <div className="mt-7 grid grid-cols-5 items-center gap-1 border-t border-border pt-4" aria-label="Compatible developer tools">
             {WORKS_WITH.map((w) => (
               <span key={w.name} className="flex min-w-0 flex-col items-center gap-1.5 whitespace-nowrap text-[9px] font-medium text-foreground sm:text-[11px]">
                 <img src={w.logo} alt="" aria-hidden="true" className="h-5 w-5 object-contain sm:h-6 sm:w-6" loading="lazy" />
