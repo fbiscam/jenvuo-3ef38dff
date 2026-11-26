@@ -10,6 +10,7 @@ import { IdViewOnly } from "@/components/IdViewOnly";
 import { idActionsLocked, idViewOnly } from "@/lib/id-gate";
 import { useTerminalAccess, IdVerificationDeadlineNotice, showsIdDeadline } from "@/components/TerminalLockGate";
 import { Lock as TerminalLockIcon } from "lucide-react";
+import { CalendarDays as CalendarNavIcon } from "lucide-react";
 import xaiLogo from "@/assets/xai-logo.png";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -184,6 +185,7 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
       },
       { to: "/dashboard/terminal", label: "Terminal", icon: Terminal },
       { to: "/dashboard/news", label: "News ", icon: Newspaper },
+      { to: "/dashboard/calendar", label: "Calendar", icon: CalendarNavIcon },
     ],
   },
   {

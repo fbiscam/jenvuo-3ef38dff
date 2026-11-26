@@ -11,9 +11,10 @@ import {
   vwap,
   type OhlcvBar,
 } from "@/lib/chart/indicators";
+import { EXTRA_SPECS } from "./indicator-specs-extra";
 import { RVOL_PERIOD, rvolLevel, volumeBaseline, volumeSplit } from "@/lib/chart/relative-volume";
 
-export type IndicatorId =
+type BaseIndicatorId =
   | "volume"
   | "rvol"
   | "ema20"
@@ -32,6 +33,8 @@ export type IndicatorId =
   | "macd"
   | "atr"
   | "sr";
+/** Base ids plus the extra anti-fakeout library ids. */
+export type IndicatorId = BaseIndicatorId | (string & { readonly __extra?: never });
 
 export type IndicatorLine = {
   title: string;
@@ -55,7 +58,7 @@ export type IndicatorSpec = {
 
 const closes = (bars: OhlcvBar[]) => bars.map((b) => b.close);
 
-const SPECS: Record<IndicatorId, IndicatorSpec> = {
+const BASE_SPECS: Record<BaseIndicatorId, IndicatorSpec> = {
   volume: {
     id: "volume",
     name: "Volume",
@@ -296,10 +299,13 @@ const SPECS: Record<IndicatorId, IndicatorSpec> = {
   },
 };
 
+const SPECS: Record<string, IndicatorSpec> = { ...BASE_SPECS };
+for (const e of EXTRA_SPECS) SPECS[e.id] = e as IndicatorSpec;
+
 export const INDICATOR_LIST: IndicatorSpec[] = Object.values(SPECS);
 
 export function buildIndicatorSeries(id: IndicatorId): IndicatorSpec {
-  return SPECS[id];
+  return SPECS[id]!;
 }
 
 /** Creation and updates must use the same list: RVOL replaces plain Volume. */
@@ -308,5 +314,5 @@ export function renderedIndicatorIds(ids: IndicatorId[]): IndicatorId[] {
 }
 
 export function isIndicatorId(v: unknown): v is IndicatorId {
-  return typeof v === "string" && v in SPECS;
+  return typeof v === "string" && Object.prototype.hasOwnProperty.call(SPECS, v);
 }

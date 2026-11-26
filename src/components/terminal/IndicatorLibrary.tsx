@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type { SmcToggles } from "@/lib/chart/smc-overlay";
 import { INDICATOR_LIST, type IndicatorId } from "./indicator-specs";
+import { EXTRA_SPECS } from "./indicator-specs-extra";
 
-type Category = "Technicals" | "SMC Concepts" | "ICT" | "Strategies" | "Favorites";
+const EXTRA_IDS = new Set(EXTRA_SPECS.map((s) => s.id));
+
+type Category = "Technicals" | "Anti-fakeout" | "SMC Concepts" | "ICT" | "Strategies" | "Favorites";
 type Overlay = { key: keyof SmcToggles; label: string; hint: string; locked: boolean; available: boolean; active: boolean };
 type Props = {
   open: boolean; onOpenChange: (open: boolean) => void; theme: "light" | "dark";
@@ -16,7 +19,7 @@ type Props = {
   onDefaults: () => void;
 };
 const FAVORITES_KEY = "jenvu:terminal:indicator-favorites:v1";
-const categories: Category[] = ["Favorites", "Technicals", "SMC Concepts", "ICT", "Strategies"];
+const categories: Category[] = ["Favorites", "Technicals", "Anti-fakeout", "SMC Concepts", "ICT", "Strategies"];
 
 export function IndicatorLibrary({ open, onOpenChange, theme, indicators, onToggle, overlays, onOverlayToggle, onDefaults }: Props) {
   const [category, setCategory] = useState<Category>("Technicals");
@@ -35,11 +38,11 @@ export function IndicatorLibrary({ open, onOpenChange, theme, indicators, onTogg
     try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites)); } catch { /* storage unavailable */ }
   }, [favorites, ready]);
   const rows = [
-    ...INDICATOR_LIST.map((spec) => ({ id: spec.id, name: spec.name, hint: spec.description, category: "Technicals" as Category, active: indicators.includes(spec.id), locked: false, available: true, toggle: () => onToggle(spec.id) })),
+    ...INDICATOR_LIST.map((spec) => ({ id: spec.id, name: spec.name, hint: spec.description, category: (EXTRA_IDS.has(spec.id) ? "Anti-fakeout" : "Technicals") as Category, active: indicators.includes(spec.id), locked: false, available: true, toggle: () => onToggle(spec.id) })),
     ...overlays.map((item) => ({ id: `smc:${item.key}`, name: item.label, hint: item.hint, category: (item.key === "sdStrategy" || item.key === "sdHistory" || item.key === "priceAction" || item.key === "swingSweep" ? "Strategies" : item.key === "freshFvg" || item.key === "orderBlocks" || item.key === "liquidity" || item.key === "sweeps" ? "ICT" : "SMC Concepts") as Category, active: item.active, locked: item.locked, available: item.available, toggle: () => onOverlayToggle(item.key) })),
   ];
   const query = search.trim().toLowerCase();
-  const visible = rows.filter((r) => query ? `${r.name} ${r.hint} ${r.category}`.toLowerCase().includes(query) : category === "Favorites" ? favorites.includes(r.id) : category === "SMC Concepts" ? r.category !== "Technicals" : r.category === category);
+  const visible = rows.filter((r) => query ? `${r.name} ${r.hint} ${r.category}`.toLowerCase().includes(query) : category === "Favorites" ? favorites.includes(r.id) : category === "SMC Concepts" ? r.category !== "Technicals" && r.category !== "Anti-fakeout" : r.category === category);
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent overlayClassName="bg-transparent backdrop-filter-none" aria-describedby="indicator-library-description" className={cn("flex h-[min(540px,calc(100dvh-2rem))] w-[calc(100vw-1rem)] max-w-[700px] flex-col gap-0 overflow-hidden rounded-lg border-border bg-background p-0 text-foreground font-sans", theme === "dark" && "dark terminal-dark")}>
@@ -54,7 +57,7 @@ export function IndicatorLibrary({ open, onOpenChange, theme, indicators, onTogg
         <div className="flex min-h-0 flex-1 flex-col sm:flex-row">
           <nav aria-label="Indicator categories" className="flex shrink-0 gap-1 overflow-x-auto border-b border-border px-3 pb-3 sm:w-44 sm:flex-col sm:border-b-0 sm:px-3">
             {categories.map((name) => {
-              const Icon = name === "Favorites" ? Star : name === "Technicals" ? Activity : name === "Strategies" ? TrendingUp : Layers;
+              const Icon = name === "Favorites" ? Star : name === "Technicals" || name === "Anti-fakeout" ? Activity : name === "Strategies" ? TrendingUp : Layers;
               return <Button key={name} variant="ghost" onClick={() => { setCategory(name); setSearch(""); }} aria-pressed={category === name} className={cn("h-10 shrink-0 justify-start gap-3 rounded-lg px-3 font-normal", category === name && "bg-accent text-accent-foreground")}><Icon />{name}</Button>;
             })}
           </nav>

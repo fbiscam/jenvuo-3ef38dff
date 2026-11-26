@@ -80,6 +80,7 @@ import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated/dashboard.api'
 import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardBotUsageRouteImport } from './routes/_authenticated/dashboard.bot-usage'
+import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
 import { Route as AuthenticatedDashboardChatRouteImport } from './routes/_authenticated/dashboard.chat'
 import { Route as AuthenticatedDashboardCodeRouteImport } from './routes/_authenticated/dashboard.code'
 import { Route as AuthenticatedDashboardCoderRouteImport } from './routes/_authenticated/dashboard.coder'
@@ -502,6 +503,12 @@ const AuthenticatedDashboardBotUsageRoute =
     path: '/bot-usage',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardCalendarRoute =
+  AuthenticatedDashboardCalendarRouteImport.update({
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardChatRoute =
   AuthenticatedDashboardChatRouteImport.update({
     id: '/chat',
@@ -918,6 +925,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
+  '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/chat': typeof AuthenticatedDashboardChatRoute
   '/dashboard/code': typeof AuthenticatedDashboardCodeRoute
   '/dashboard/coder': typeof AuthenticatedDashboardCoderRoute
@@ -1045,6 +1053,7 @@ export interface FileRoutesByTo {
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
+  '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/dashboard/chat': typeof AuthenticatedDashboardChatRoute
   '/dashboard/code': typeof AuthenticatedDashboardCodeRoute
   '/dashboard/coder': typeof AuthenticatedDashboardCoderRoute
@@ -1178,6 +1187,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/bot-usage': typeof AuthenticatedDashboardBotUsageRoute
+  '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/dashboard/chat': typeof AuthenticatedDashboardChatRoute
   '/_authenticated/dashboard/code': typeof AuthenticatedDashboardCodeRoute
   '/_authenticated/dashboard/coder': typeof AuthenticatedDashboardCoderRoute
@@ -1311,6 +1321,7 @@ export interface FileRouteTypes {
     | '/dashboard/api'
     | '/dashboard/billing'
     | '/dashboard/bot-usage'
+    | '/dashboard/calendar'
     | '/dashboard/chat'
     | '/dashboard/code'
     | '/dashboard/coder'
@@ -1438,6 +1449,7 @@ export interface FileRouteTypes {
     | '/dashboard/api'
     | '/dashboard/billing'
     | '/dashboard/bot-usage'
+    | '/dashboard/calendar'
     | '/dashboard/chat'
     | '/dashboard/code'
     | '/dashboard/coder'
@@ -1570,6 +1582,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/bot-usage'
+    | '/_authenticated/dashboard/calendar'
     | '/_authenticated/dashboard/chat'
     | '/_authenticated/dashboard/code'
     | '/_authenticated/dashboard/coder'
@@ -2203,6 +2216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardBotUsageRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/calendar': {
+      id: '/_authenticated/dashboard/calendar'
+      path: '/calendar'
+      fullPath: '/dashboard/calendar'
+      preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/chat': {
       id: '/_authenticated/dashboard/chat'
       path: '/chat'
@@ -2624,6 +2644,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
   AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardBotUsageRoute: typeof AuthenticatedDashboardBotUsageRoute
+  AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedDashboardChatRoute: typeof AuthenticatedDashboardChatRoute
   AuthenticatedDashboardCodeRoute: typeof AuthenticatedDashboardCodeRoute
   AuthenticatedDashboardCoderRoute: typeof AuthenticatedDashboardCoderRoute
@@ -2666,6 +2687,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
     AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardBotUsageRoute: AuthenticatedDashboardBotUsageRoute,
+    AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
     AuthenticatedDashboardChatRoute: AuthenticatedDashboardChatRoute,
     AuthenticatedDashboardCodeRoute: AuthenticatedDashboardCodeRoute,
     AuthenticatedDashboardCoderRoute: AuthenticatedDashboardCoderRoute,

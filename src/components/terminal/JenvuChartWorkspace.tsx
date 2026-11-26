@@ -884,14 +884,16 @@ export const JenvuChartWorkspace = forwardRef<JenvuChartHandle, Props>(function 
           </div>
         )}
 
+        {mobileNewsRow && (
+          <>
+            <span className="mx-1 h-5 w-px shrink-0 bg-border md:hidden" aria-hidden="true" />
+            <div className="flex shrink-0 items-center md:hidden">{mobileNewsRow}</div>
+          </>
+        )}
+
         <div className="ml-auto flex shrink-0 items-center gap-2">{rightSlot}</div>
       </div>
 
-      {mobileNewsRow && (
-        <div className="flex shrink-0 items-center border-b border-border px-2 py-1.5 md:hidden">
-          {mobileNewsRow}
-        </div>
-      )}
 
       <div className="flex min-h-0 flex-1">
         {/* Drawing toolbar */}

@@ -90,3 +90,20 @@ export const getGoldNewsBoard = createServerFn({ method: "GET" }).handler(
     return splitNews(toNewsEvents(raw, now), now);
   },
 );
+
+/** Every High/Medium/Low event this week that can move Gold, EUR/USD or BTC. */
+export const getPairNewsWeek = createServerFn({ method: "GET" }).handler(async () => {
+  const { impactLevel, pairsFor } = await import("./pair-news");
+  const raw = await loadCalendar();
+  return raw
+    .map((e) => {
+      const impact = impactLevel(e.impact || "");
+      const t = new Date(e.date).getTime();
+      if (!impact || !Number.isFinite(t)) return null;
+      const pairs = pairsFor(e.country, impact);
+      if (!pairs.length) return null;
+      return { title: e.title, country: e.country, date: new Date(t).toISOString(), impact, forecast: e.forecast || null, previous: e.previous || null, pairs };
+    })
+    .filter((e): e is NonNullable<typeof e> => e !== null)
+    .sort((a, b) => +new Date(a.date) - +new Date(b.date));
+});

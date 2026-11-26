@@ -263,3 +263,8 @@
 - [x] Pricing "Current plan" chip: white fill with a light border instead of green, and it marks only the basis the account is actually billed on (monthly) — the yearly column of the mobile compare table now reads "Monthly plan" for the held plan. Phone view verified MONTHLY Ultra "Current plan" (white) beside YEARLY Ultra "Monthly plan" (grey); desktop Ultra column chip white; 18 pricing tests pass, build OK.
 
 - [x] Fresh high/low emails now use the chart's own 10-candle swing confirmation: an email goes out only once HH/HL/LH/LL is drawn on the chart. Test added; live scan of 3 pairs × 1H/2H/3H shows no pending alert.
+
+- [x] Instant high/low emails for BTC/Gold/EUR on 15m/1h/2h/4h when sweep or price action confirms
+- [x] Mobile Terminal toolbar on one scrolling line
+- [x] 40+ anti-fakeout indicators with best settings
+- [x] Calendar page: High/Medium/Low for EUR/USD, Gold, BTC with filter chips

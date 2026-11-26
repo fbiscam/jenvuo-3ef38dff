@@ -60,3 +60,16 @@ describe("expanded technical indicators", () => {
     assert.equal(buildIndicatorSeries("stochastic").compute(flat)[1]?.at(-1), 50);
   });
 });
+describe("anti-fakeout indicator library", () => {
+  const bars = Array.from({ length: 300 }, (_, i) => { const c = 100 + 10 * Math.sin(i / 9) + i * 0.05; return { time: i * 900, open: c - 0.3, high: c + 1, low: c - 1, close: c, volume: 500 + (i % 7) * 40 }; });
+  it("offers 60+ indicators, each with aligned finite values after warmup", async () => {
+    const { INDICATOR_LIST } = await import("./indicator-specs");
+    assert.ok(INDICATOR_LIST.length >= 60, `only ${INDICATOR_LIST.length}`);
+    for (const spec of INDICATOR_LIST) {
+      if (spec.id === "sr") continue; // a level may legitimately be absent
+      const out = spec.compute(bars);
+      assert.equal(out.length, spec.lines.length, spec.id);
+      for (const l of out) { assert.equal(l.length, bars.length, spec.id); assert.ok(Number.isFinite(l[299]), `${spec.id} last value`); }
+    }
+  });
+});
