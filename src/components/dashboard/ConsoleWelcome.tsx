@@ -7,9 +7,9 @@ import { highlight } from "@/components/dashboard/CodeHighlight";
 import { ProviderLogo } from "@/components/models/ModelsExplorer";
 import { PlatformLogo } from "@/components/brand/ProductLogos";
 
-function PythonLogo() {
+function PythonLogo({ className = "h-5 w-5" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 256 255" className="h-5 w-5" aria-hidden="true">
+    <svg viewBox="0 0 256 255" className={className} aria-hidden="true">
       <path fill="#3776AB" d="M126.9.1c-64.8 0-60.8 28.1-60.8 28.1l.1 29.1h61.9v8.7H41.6S0 61.4 0 126.8c0 65.4 36.3 63.1 36.3 63.1h21.7v-30.4s-1.2-36.3 35.7-36.3h61.5s34.6.6 34.6-33.4V33.5S194.9.1 126.9.1ZM92.8 19.7a11.1 11.1 0 1 1 0 22.2 11.1 11.1 0 0 1 0-22.2Z"/>
       <path fill="#FFD43B" d="M128.8 254.1c64.8 0 60.8-28.1 60.8-28.1l-.1-29.1h-61.9v-8.7h86.5s41.6 4.7 41.6-60.7c0-65.4-36.3-63.1-36.3-63.1h-21.7v30.4s1.2 36.3-35.7 36.3h-61.5s-34.6-.6-34.6 33.4v56.2s-5.3 33.4 62.9 33.4Zm34.1-19.7a11.1 11.1 0 1 1 0-22.2 11.1 11.1 0 0 1 0 22.2Z"/>
     </svg>
@@ -17,6 +17,26 @@ function PythonLogo() {
 }
 
 
+function CurlLogo() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+      <rect width="24" height="24" rx="5" fill="#073551" />
+      <path d="M6 8l4 4-4 4" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 16h6" stroke="#0FA0CE" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function NodeLogo() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+      <path fill="#5FA04E" d="M12 1.85 2.9 7.1v10.5L12 22.85l9.1-5.25V7.1L12 1.85Z" />
+      <path fill="#fff" d="M12.6 16.6c-2.2 0-2.7-1-2.7-1.9h1.1c.1.6.4.9 1.6.9.9 0 1.3-.2 1.3-.7 0-.3-.1-.5-1.5-.6-1.2-.1-2-.4-2-1.4 0-.9.8-1.5 2.1-1.5 1.5 0 2.2.5 2.3 1.6h-1.1c-.1-.5-.4-.7-1.2-.7-.8 0-1 .3-1 .6 0 .3.2.5 1.4.6 1.3.2 2 .4 2 1.4 0 1-.8 1.6-2.3 1.6Z" />
+    </svg>
+  );
+}
+
+const LANG_LOGO = { cURL: <CurlLogo />, Python: <PythonLogo className="h-3.5 w-3.5" />, "Node.js": <NodeLogo /> } as const;
 
 const BASE = "https://jenvu.com/api/public/v1";
 
@@ -55,14 +75,14 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
     });
   };
   return (
-    <div className="console-card flex min-h-[184px] flex-col p-6">
+    <div className="console-card flex min-h-[184px] flex-col bg-white p-6 text-neutral-900">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-[16px] font-medium text-foreground">Quickstart</p>
         <div className="flex items-center gap-1">
           {(Object.keys(SNIPPETS) as Lang[]).map((l) => (
             <button key={l} type="button" onClick={() => setLang(l)}
-              className={`rounded-full px-2.5 py-1 text-[12px] font-medium transition ${lang === l ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
-              {l}
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium transition ${lang === l ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+              {LANG_LOGO[l]}{l}
             </button>
           ))}
           <button type="button" onClick={copy} aria-label="Copy code" className="ml-1 rounded-full p-1.5 text-muted-foreground hover:text-foreground">
@@ -70,7 +90,7 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
           </button>
         </div>
       </div>
-      <div className="code-box mt-4 min-w-0 flex-1"><pre className="whitespace-pre-wrap break-words font-code text-[13px] leading-[1.7] [overflow-wrap:anywhere]"><code>{highlight(SNIPPETS[lang])}</code></pre></div>
+      <div className="code-box mt-4 min-w-0 flex-1 !bg-white"><pre className="whitespace-pre-wrap break-words font-code text-[13px] leading-[1.7] [overflow-wrap:anywhere]"><code>{highlight(SNIPPETS[lang])}</code></pre></div>
       <div className="mt-3 text-[13px] text-muted-foreground">
         {hasKeys ? "Use one of your active keys as JENVU_API_KEY." : (
           <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">Generate API key →</Link>
@@ -146,7 +166,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             ) : null}
             {r.title === "Models & Limits" ? (
               <span className="mt-3 flex items-center gap-1.5">
-                {(["openai", "anthropic", "deepseek", "google"] as const).map((p) => <ProviderLogo key={p} provider={p} size="sm" />)}
+                {(["openai", "anthropic", "deepseek", "google"] as const).map((p) => <ProviderLogo key={p} provider={p} bare />)}
               </span>
             ) : null}
             <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">{r.text}</p>
