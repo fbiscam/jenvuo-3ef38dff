@@ -268,3 +268,5 @@
 - [x] Mobile Terminal toolbar on one scrolling line
 - [x] 40+ anti-fakeout indicators with best settings
 - [x] Calendar page: High/Medium/Low for EUR/USD, Gold, BTC with filter chips
+
+- [ ] Move the multi-pair Economic Calendar into News with matching section styling, preserve old links, and verify the utility regression.

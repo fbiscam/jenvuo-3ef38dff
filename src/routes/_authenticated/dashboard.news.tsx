@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Activity, ArrowDown, ArrowUp, CalendarClock, CalendarDays, History, Minus, Newspaper, RefreshCw, Zap } from "lucide-react";
+import { Activity, ArrowDown, ArrowUp, CalendarClock, History, Minus, Newspaper, RefreshCw, Zap } from "lucide-react";
 import { getNewsImpact, type UpcomingRelease } from "@/lib/news-impact.functions";
 import {
   NEWS_EVENTS,
@@ -20,14 +20,16 @@ import {
 } from "@/lib/news-impact";
 import { readPageCache, writePageCache } from "@/lib/page-cache";
 import { pollWhileVisible } from "@/lib/poll";
+import { EconomicCalendar } from "@/components/news/EconomicCalendar";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/news")({
   head: () => ({
     meta: [
       { title: "News Impact — Jenvu" },
-      { name: "description", content: "The next US high-impact release, its countdown and how Gold moved after the same kind of result in the last 24 releases." },
+      { name: "description", content: "News Impact and the weekly high, medium and low impact economic calendar for Gold, EUR/USD and Bitcoin." },
       { property: "og:title", content: "News Impact — Jenvu" },
-      { property: "og:description", content: "Next US high-impact news with Gold UP / DOWN read and confidence from past releases." },
+      { property: "og:description", content: "Gold news reactions and the economic calendar for XAU/USD, EUR/USD and BTC/USD." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -88,9 +90,9 @@ function NewsImpactPage() {
         <div>
           <h1 className="text-[30px] font-normal tracking-tight sm:text-[34px]">News Impact</h1>
         </div>
-        <button type="button" onClick={() => void refetch()} aria-label="Refresh news data" className="console-pill self-start sm:self-auto">
+        <Button type="button" variant="ghost" onClick={() => void refetch()} aria-label="Refresh news data" className="console-pill self-start sm:self-auto">
           <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} /> Refresh
-        </button>
+        </Button>
       </div>
       <p className="mt-1 text-[14px] text-muted-foreground sm:text-[16px]">Next US news and how Gold moved after it.</p>
 
@@ -100,7 +102,7 @@ function NewsImpactPage() {
 
       <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
 
-      <WeekCalendar upcoming={data?.upcoming ?? []} now={now} loading={!data} nextId={nextTracked?.id ?? null} />
+      <EconomicCalendar />
       <RecentResults releases={releases} now={now} loading={!data} />
     </div>
   );
@@ -147,7 +149,8 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
       </section>
     );
   }
-  const def = eventDef(next.event_key)!;
+  const def = eventDef(next.event_key);
+  if (!def) return null;
   const t = Date.parse(next.released_at);
   const history = lastReleases(releases, next.event_key, now);
   const released = next.actual != null && t <= now;
@@ -238,62 +241,6 @@ function SectionHead({ icon: Icon, title, sub }: { icon: typeof Newspaper; title
   );
 }
 
-const dayKey = (iso: string) => new Date(iso).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
-const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-
-/** Section 2: every US high-impact release in the next 8 days, grouped by day. */
-function WeekCalendar({ upcoming, now, loading, nextId }: { upcoming: UpcomingRelease[]; now: number; loading: boolean; nextId: string | null }) {
-  const groups = new Map<string, UpcomingRelease[]>();
-  for (const u of upcoming) {
-    const k = dayKey(u.released_at);
-    groups.set(k, [...(groups.get(k) ?? []), u]);
-  }
-  return (
-    <section className="mt-10">
-      <SectionHead icon={CalendarDays} title="This week's calendar" sub="Next 8 days, local time." />
-      {loading ? (
-        <div className="console-card h-[180px] animate-pulse" />
-      ) : groups.size === 0 ? (
-        <div className="console-card p-5 text-[14px] text-muted-foreground">No US high-impact releases scheduled in the next 8 days.</div>
-      ) : (
-        <div className="console-card divide-y divide-border overflow-hidden">
-          {Array.from(groups, ([day, items]) => (
-            <div key={day} className="grid gap-3 p-4 sm:grid-cols-[150px_1fr] sm:p-5">
-              <div className="text-[14px] font-medium text-muted-foreground">{day}</div>
-              <ul className="space-y-2">
-                {items.map((u) => {
-                  const def = eventDef(u.event_key);
-                  const t = Date.parse(u.released_at);
-                  const done = u.actual != null && t <= now;
-                  const isNext = u.id === nextId;
-                  return (
-                    <li
-                      key={u.id}
-                      className={`flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl px-3 py-2.5 ${isNext ? "bg-background ring-1 ring-foreground/15" : ""}`}
-                    >
-                      <span className="w-[80px] shrink-0 whitespace-nowrap font-mono text-[14px] tabular-nums">{clock(u.released_at)}</span>
-                      <span className="min-w-[170px] flex-1 text-[14px] font-medium">
-                        {u.title}
-                        {def && <span className="ml-2 rounded-full bg-foreground px-2 py-0.5 align-middle text-[11px] font-semibold uppercase tracking-wider text-background">{def.short}</span>}
-                      </span>
-                      <span className="text-[13px] tabular-nums text-muted-foreground">
-                        F {fmtVal(u.forecast, u.unit, u.scale)} · P {fmtVal(u.previous, u.unit, u.scale)}
-                      </span>
-                      <span className="ml-auto w-[104px] text-right font-mono text-[13px] tabular-nums">
-                        {done ? <>A {fmtVal(u.actual, u.unit, u.scale)}</> : t <= now ? "Waiting" : countdown(t - now)}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
 /** Section 3: how Gold moved 15 minutes after each tracked release type. */
 function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]; now: number; loading: boolean }) {
   const recent = releases
@@ -315,7 +262,8 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
           <ul className="divide-y divide-border">
             {recent.map((r) => {
               const def = eventDef(r.event_key);
-              const g = r.reactions!.gold!;
+              const g = r.reactions?.gold;
+              if (!g) return null;
               const read = usdRead(r.event_key, surpriseOf(r));
               const result = read == null ? "—" : read === 0 ? "In line" : read > 0 ? "Beat" : "Miss";
               const move = (v: number) => <span className={`font-medium ${v > 0 ? "pl-up" : v < 0 ? "pl-down" : ""}`}>{usd(v)}</span>;
