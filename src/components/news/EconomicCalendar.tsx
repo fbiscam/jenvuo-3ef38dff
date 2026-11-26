@@ -3,14 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { CalendarDays, Loader2, RefreshCw } from "lucide-react";
 import { getPairNewsWeek } from "@/lib/news.functions";
-import { NEWS_PAIRS, type NewsImpactLevel, type NewsPair } from "@/lib/pair-news";
+import { NEWS_PAIRS, type NewsPair } from "@/lib/pair-news";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { NewsSection } from "./NewsSection";
+import { isUpcomingHighImpact } from "./upcoming-news";
 
 const PAIR_LABEL: Record<NewsPair, string> = { XAUUSD: "XAU/USD", EURUSD: "EUR/USD", BTCUSD: "BTC/USD" };
-const IMPACTS: Array<"All" | NewsImpactLevel> = ["All", "High", "Medium", "Low"];
-const dot: Record<NewsImpactLevel, string> = { High: "bg-destructive", Medium: "bg-gc-yellow", Low: "bg-muted-foreground/50" };
 
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -20,24 +19,20 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
   );
 }
 
-export function EconomicCalendar() {
+export function EconomicCalendar({ now }: { now: number }) {
   const fetchWeek = useServerFn(getPairNewsWeek);
   const q = useQuery({ queryKey: ["pair-news-week"], queryFn: () => fetchWeek(), staleTime: 5 * 60_000, refetchInterval: 10 * 60_000, retry: 2 });
-  const [impact, setImpact] = useState<"All" | NewsImpactLevel>("All");
   const [pair, setPair] = useState<"All" | NewsPair>("All");
-  const now = Date.now();
-  const rows = (q.data ?? []).filter((e) => (impact === "All" || e.impact === impact) && (pair === "All" || e.pairs.includes(pair)));
+  const rows = (q.data ?? []).filter((e) => isUpcomingHighImpact(e, now) && (pair === "All" || e.pairs.includes(pair)));
   const days = new Map<string, typeof rows>();
   for (const e of rows) {
     const k = new Date(e.date).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "short" });
     days.set(k, [...(days.get(k) ?? []), e]);
   }
   return (
-    <NewsSection icon={CalendarDays} title="Economic Calendar" sub="This week · Gold, EUR/USD and Bitcoin · Local time." id="economic-calendar-heading"
+    <NewsSection icon={CalendarDays} title="Economic Calendar" sub="Upcoming high-impact news · Gold, EUR/USD and Bitcoin · Local time." id="economic-calendar-heading"
       action={<Button variant="ghost" size="icon-sm" className="console-pill shrink-0" aria-label="Refresh calendar" title="Refresh calendar" onClick={() => void q.refetch()}><RefreshCw className={cn("h-4 w-4", q.isFetching && "animate-spin")} /></Button>}>
       <div className="flex gap-2 overflow-x-auto border-b border-border px-5 py-3 [scrollbar-width:none]">
-        {IMPACTS.map((i) => <Chip key={i} on={impact === i} onClick={() => setImpact(i)}>{i}</Chip>)}
-        <span className="mx-1 w-px shrink-0 bg-border" aria-hidden="true" />
         <Chip on={pair === "All"} onClick={() => setPair("All")}>All pairs</Chip>
         {NEWS_PAIRS.map((p) => <Chip key={p} on={pair === p} onClick={() => setPair(p)}>{PAIR_LABEL[p]}</Chip>)}
       </div>
@@ -46,18 +41,17 @@ export function EconomicCalendar() {
       ) : q.isError ? (
         <p className="p-5 text-[14px] text-muted-foreground">Calendar unavailable right now. Please try again shortly.</p>
       ) : rows.length === 0 ? (
-        <p className="p-5 text-[14px] text-muted-foreground">No matching news this week.</p>
+        <p className="p-5 text-[14px] text-muted-foreground">No upcoming high-impact news this week.</p>
       ) : (
         [...days.entries()].map(([day, list]) => (
-          <div key={day} className="border-b border-border last:border-b-0">
-            <h3 className="border-b border-border px-5 py-3 text-[12px] font-semibold uppercase text-muted-foreground">{day}</h3>
-            <ul className="divide-y divide-border">
+          <div key={day} className="grid gap-3 border-b border-border p-4 last:border-b-0 sm:grid-cols-[150px_1fr] sm:p-5">
+            <h3 className="text-[14px] font-medium text-muted-foreground">{day}</h3>
+            <ul className="space-y-2">
               {list.map((e) => {
-                const done = new Date(e.date).getTime() <= now;
                 return (
-                  <li key={e.date + e.country + e.title} className={cn("flex items-start gap-3 px-5 py-3.5", done && "opacity-70")}>
+                  <li key={e.date + e.country + e.title} className="flex items-start gap-3 px-3 py-2.5">
                     <span className="w-14 shrink-0 pt-0.5 text-xs tabular-nums text-muted-foreground">{new Date(e.date).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</span>
-                    <span aria-hidden="true" className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", dot[e.impact])} />
+                    <span aria-hidden="true" className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-destructive" />
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm">{e.country} · {e.title}</span>
                       <span className="block text-xs text-muted-foreground">

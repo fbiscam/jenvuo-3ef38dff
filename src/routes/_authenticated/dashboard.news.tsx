@@ -2,35 +2,31 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Activity, ArrowDown, ArrowUp, CalendarClock, History, Minus, Newspaper, RefreshCw, Zap } from "lucide-react";
+import { ArrowDown, ArrowUp, CalendarClock, Minus, Newspaper, RefreshCw, Zap } from "lucide-react";
 import { getNewsImpact, type UpcomingRelease } from "@/lib/news-impact.functions";
 import {
-  NEWS_EVENTS,
-  RELEASES_PER_EVENT,
   eventDef,
   inPreNewsWindow,
   lastReleases,
   moveStats,
   outlookFrom,
   sameReadReactions,
-  surpriseOf,
-  usdRead,
   type FiveMinReaction,
   type Outlook,
 } from "@/lib/news-impact";
 import { readPageCache, writePageCache } from "@/lib/page-cache";
 import { pollWhileVisible } from "@/lib/poll";
 import { EconomicCalendar } from "@/components/news/EconomicCalendar";
-import { NewsSection } from "@/components/news/NewsSection";
+import { isUpcomingHighImpact } from "@/components/news/upcoming-news";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/news")({
   head: () => ({
     meta: [
       { title: "News Impact — Jenvu" },
-      { name: "description", content: "News Impact and the weekly high, medium and low impact economic calendar for Gold, EUR/USD and Bitcoin." },
+      { name: "description", content: "Upcoming high-impact news, countdowns and Gold outlooks for XAU/USD, EUR/USD and BTC/USD." },
       { property: "og:title", content: "News Impact — Jenvu" },
-      { property: "og:description", content: "Gold news reactions and the economic calendar for XAU/USD, EUR/USD and BTC/USD." },
+      { property: "og:description", content: "Upcoming high-impact economic releases and Gold outlooks based on measured past reactions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -83,7 +79,7 @@ function NewsImpactPage() {
   useEffect(() => pollWhileVisible(() => setNow(Date.now()), 1000), []);
 
   const releases = data?.releases ?? [];
-  const nextTracked = (data?.upcoming ?? []).find((u) => u.event_key !== "other" && Date.parse(u.released_at) > now - 2 * 3600_000);
+  const nextTracked = (data?.upcoming ?? []).find((u) => u.event_key !== "other" && isUpcomingHighImpact({ date: u.released_at, impact: "High", actual: u.actual }, now));
 
   return (
     <div className="mx-auto w-full max-w-[900px] pb-10 text-foreground">
@@ -95,18 +91,14 @@ function NewsImpactPage() {
           <RefreshCw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} /> Refresh
         </Button>
       </div>
-      <p className="mt-1 text-[14px] text-muted-foreground sm:text-[16px]">Next US news and how Gold moved after it.</p>
+      <p className="mt-1 text-[14px] text-muted-foreground sm:text-[16px]">Upcoming high-impact news and Gold outlook.</p>
 
       {data?.feedError && (
         <div className="console-card mt-4 px-4 py-3 text-[14px] text-muted-foreground">The news feed did not answer this time; showing the last saved results.</div>
       )}
 
-      <NewsSection icon={Newspaper} title="Next release" sub="Next US news and Gold outlook." id="next-release-heading">
-        <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
-      </NewsSection>
-
-      <EconomicCalendar />
-      <RecentResults releases={releases} now={now} loading={!data} />
+      <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
+      <EconomicCalendar now={now} />
     </div>
   );
 }
@@ -118,7 +110,8 @@ function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook;
   const word = dir === "up" ? "UP" : dir === "down" ? "DOWN" : dir === "mixed" ? "MIXED" : "NO DATA";
   return (
     <div
-      className="min-w-0 p-5"
+      className="min-w-0 border border-border p-5"
+      style={color ? { borderColor: tint(color, 40), background: tint(color, 7) } : undefined}
     >
       <div className="text-[14px] text-muted-foreground">{title}</div>
       <div className={`mt-3 flex items-center gap-3 ${toneOf(dir)}`}>
@@ -143,33 +136,29 @@ function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook;
 }
 
 function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; releases: UpcomingRelease[]; now: number; loading: boolean }) {
-  if (loading) return <div className="min-h-[260px] p-5 text-[14px] text-muted-foreground">Loading the next release…</div>;
+  if (loading) return <section className="console-card mt-6 min-h-[260px] p-5 text-[14px] text-muted-foreground">Loading the next release…</section>;
   if (!next) {
     return (
-      <div className="flex items-center gap-3 p-5 text-[14px] text-muted-foreground">
+      <section className="console-card mt-6 flex items-center gap-3 p-5 text-[14px] text-muted-foreground">
         <CalendarClock className="h-5 w-5" /> No tracked US high-impact release in the next 8 days.
-      </div>
+      </section>
     );
   }
   const def = eventDef(next.event_key);
   if (!def) return null;
   const t = Date.parse(next.released_at);
   const history = lastReleases(releases, next.event_key, now);
-  const released = next.actual != null && t <= now;
   const preWindow = inPreNewsWindow(t, now);
-  const s = surpriseOf(next);
-  const read = usdRead(next.event_key, s);
-  const live = released && s != null ? outlookFrom(moveStats(sameReadReactions(history, next.event_key, s), "t15")) : null;
   const beat = outlookFrom(moveStats(sameReadReactions(history, next.event_key, def.usdDir), "t15"));
   const miss = outlookFrom(moveStats(sameReadReactions(history, next.event_key, -def.usdDir), "t15"));
   const all = history.map((r) => r.reactions?.gold).filter((x): x is FiveMinReaction => !!x);
   const allStats = moveStats(all, "t15");
   const overall = outlookFrom(allStats);
   return (
-    <div className="p-5">
+    <section className="console-card mt-6 p-5 sm:p-6">
       {preWindow && (
         <div
-          className="pl-down mb-5 flex items-center gap-2 border-b border-border pb-3 text-[14px] font-medium"
+          className="pl-down mb-5 flex items-center gap-2 border border-border px-4 py-3 text-[14px] font-medium"
           style={{ borderColor: tint(DOWN, 40), background: tint(DOWN, 7) }}
           role="status"
         >
@@ -183,8 +172,8 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
           <div className="mt-1 text-[14px] text-muted-foreground">{fmtTime(next.released_at)}</div>
         </div>
         <div className="text-right">
-          <div className="text-[13px] text-muted-foreground">{released ? "Released" : "Starts in"}</div>
-          <div className="mt-1 font-mono text-[28px] tabular-nums sm:text-[34px]">{released ? fmtVal(next.actual, next.unit, next.scale) : countdown(t - now)}</div>
+          <div className="text-[13px] text-muted-foreground">Starts in</div>
+          <div className="mt-1 font-mono text-[28px] tabular-nums sm:text-[34px]">{countdown(t - now)}</div>
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-[14px] tabular-nums">
@@ -193,87 +182,20 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
         <span><span className="text-muted-foreground">Typical Gold move in 15 min </span><b className="font-medium">±${allStats.avgAbsT15.toFixed(2)}</b></span>
       </div>
 
-      {live ? (
-        <div className="-mx-5 mt-5 border-y border-border">
-          <OutlookCard
-            big
-            title={`Released: ${fmtVal(next.actual, next.unit, next.scale)} vs forecast ${fmtVal(next.forecast, next.unit, next.scale)} (${read === 0 ? "in line" : (read ?? 0) > 0 ? "beat, USD stronger" : "miss, USD weaker"})`}
-            outlook={live}
-          />
-        </div>
-      ) : (
-        <div className="-mx-5 mt-5 grid grid-cols-1 divide-y divide-border border-y border-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-          <OutlookCard title="If the number beats forecast (USD stronger)" outlook={beat} />
-          <OutlookCard title="If the number misses forecast (USD weaker)" outlook={miss} />
-        </div>
-      )}
+      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <OutlookCard title="If the number beats forecast (USD stronger)" outlook={beat} />
+        <OutlookCard title="If the number misses forecast (USD weaker)" outlook={miss} />
+      </div>
 
       <div className="mt-4 text-[14px] leading-relaxed">
-        {live ? (
-          <>
-            <div>Verdict: after a {read === 0 ? "in-line" : (read ?? 0) > 0 ? "beat" : "miss"} like this, Gold went <b className={toneOf(live.dir)}>{sideWord(live)}</b>{live.dir === "up" || live.dir === "down" ? ` ${live.confidence}% of the time` : ""}.</div>
-            <div className="text-muted-foreground">Typical 15-minute move {usd(live.avgMove)} · {live.n} past releases.</div>
-          </>
-        ) : (
-          <>
-            <div>
-              Beat → Gold <b className={toneOf(beat.dir)}>{sideWord(beat)}</b>{beat.dir === "up" || beat.dir === "down" ? ` (${beat.confidence}%, avg ${usd(beat.avgMove)})` : ""} · Miss → Gold{" "}
-              <b className={toneOf(miss.dir)}>{sideWord(miss)}</b>{miss.dir === "up" || miss.dir === "down" ? ` (${miss.confidence}%, avg ${usd(miss.avgMove)})` : ""}.
-            </div>
-            <div className="text-muted-foreground">
-              Overall after {def.short}: Gold {overall.dir === "up" || overall.dir === "down" ? `${sideWord(overall)} ${overall.confidence}% of the time over the last ${overall.n} releases` : `has no clear side over the last ${overall.n} releases`}.
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/** Section 3: how Gold moved 15 minutes after each tracked release type. */
-function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]; now: number; loading: boolean }) {
-  const recent = releases
-    .filter((r) => r.actual != null && Date.parse(r.released_at) <= now && r.reactions?.gold)
-    .sort((a, b) => Date.parse(b.released_at) - Date.parse(a.released_at))
-    .slice(0, 8);
-  return (
-    <NewsSection icon={History} title="Latest results" sub="Recent releases and Gold moves." id="latest-results-heading">
-      {loading ? (
-        <div className="h-[220px] animate-pulse" />
-      ) : recent.length === 0 ? (
-        <div className="p-5 text-[14px] text-muted-foreground">No measured releases yet.</div>
-      ) : (
         <div>
-          <div className="hidden grid-cols-[1.4fr_1fr_0.8fr_repeat(3,0.7fr)] gap-3 border-b border-border px-5 py-3 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid">
-            <span>Release</span><span>Actual / forecast</span><span>Result</span><span className="text-right">5 min</span><span className="text-right">15 min</span><span className="text-right">1 hour</span>
-          </div>
-          <ul className="divide-y divide-border">
-            {recent.map((r) => {
-              const def = eventDef(r.event_key);
-              const g = r.reactions?.gold;
-              if (!g) return null;
-              const read = usdRead(r.event_key, surpriseOf(r));
-              const result = read == null ? "—" : read === 0 ? "In line" : read > 0 ? "Beat" : "Miss";
-              const move = (v: number) => <span className={`font-medium ${v > 0 ? "pl-up" : v < 0 ? "pl-down" : ""}`}>{usd(v)}</span>;
-              return (
-                <li key={r.id} className="grid grid-cols-2 gap-x-3 gap-y-1.5 px-5 py-3.5 text-[14px] tabular-nums sm:grid-cols-[1.4fr_1fr_0.8fr_repeat(3,0.7fr)] sm:items-center">
-                  <div className="col-span-2 sm:col-span-1">
-                    <div className="font-medium">{def?.label ?? r.title}</div>
-                    <div className="text-[13px] text-muted-foreground">{new Date(r.released_at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}</div>
-                  </div>
-                  <div>{fmtVal(r.actual, r.unit, r.scale)} <span className="text-muted-foreground">/ {fmtVal(r.forecast, r.unit, r.scale)}</span></div>
-                  <div>
-                    <span className="rounded-full bg-background px-2.5 py-0.5 text-[13px] font-medium">{result}</span>
-                  </div>
-                  <div className="sm:text-right"><span className="text-muted-foreground sm:hidden">5m </span>{move(g.t5)}</div>
-                  <div className="sm:text-right"><span className="text-muted-foreground sm:hidden">15m </span>{move(g.t15)}</div>
-                  <div className="sm:text-right"><span className="text-muted-foreground sm:hidden">1h </span>{move(g.t60)}</div>
-                </li>
-              );
-            })}
-          </ul>
+          Beat → Gold <b className={toneOf(beat.dir)}>{sideWord(beat)}</b>{beat.dir === "up" || beat.dir === "down" ? ` (${beat.confidence}%, avg ${usd(beat.avgMove)})` : ""} · Miss → Gold{" "}
+          <b className={toneOf(miss.dir)}>{sideWord(miss)}</b>{miss.dir === "up" || miss.dir === "down" ? ` (${miss.confidence}%, avg ${usd(miss.avgMove)})` : ""}.
         </div>
-      )}
-    </NewsSection>
+        <div className="text-muted-foreground">
+          Overall after {def.short}: Gold {overall.dir === "up" || overall.dir === "down" ? `${sideWord(overall)} ${overall.confidence}% of the time over the last ${overall.n} releases` : `has no clear side over the last ${overall.n} releases`}.
+        </div>
+      </div>
+    </section>
   );
 }

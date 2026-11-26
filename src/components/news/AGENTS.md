@@ -1,2 +1,2 @@
 - EconomicCalendar owns the existing weekly query and filters inside the News page; the former Calendar route redirects there so navigation has one calendar destination.
-- News sections use NewsSection for the heading, spacing and outer console surface; keep inner content border-divided rather than nested cards so every section matches Latest results.
+- News uses the original standalone next-release console and separate beat/miss outlook panels; NewsSection wraps the calendar heading and surface. Keep upcoming-event filtering in isUpcomingHighImpact so the calendar and countdown share the same release boundary, while stored history remains available for outlook calculations.
