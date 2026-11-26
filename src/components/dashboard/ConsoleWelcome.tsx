@@ -135,7 +135,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
       <div className="mt-12 grid gap-4 md:grid-cols-3">
         {[
           { t: "Developer quickstart", d: "Generate an active key and run your first request without any delays.", l: "Explore docs", to: "/docs" },
-          { t: "Workflow scripts", d: "Need rapid market signals? Run custom trading scripts directly through our fast API endpoints daily.", l: "Open code studio", to: "/dashboard/code" },
+          { t: "Workflow scripts", d: "Need rapid market signals? Run custom trading scripts directly through our fast API .", l: "Open code studio", to: "/dashboard/code" },
           { t: "Market model intelligence", d: "Choose the optimal intelligence engine for accurate analysis, speed and low latency.", l: "Browse model catalog", to: "/models" },
         ].map((c) => (
           <div key={c.t} className="console-card flex min-w-0 flex-col p-6">
