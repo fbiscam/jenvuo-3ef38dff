@@ -74,7 +74,10 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
           </> : <p className="mt-2 leading-relaxed text-muted-foreground">A liquidity sweep moves beyond a prior high or low, then reverses back into the range.</p>}
         </div>
       </div>
-      <div className="mt-2 px-1 text-[12px] text-muted-foreground">{"\n"}</div>
+      <div className="mt-2 px-1 text-[12px] text-muted-foreground">
+        {hasKeys ? "Use one of your active keys as JENVU_API_KEY." : <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">Generate API key →</Link>}
+        {" · "}<Link to="/dashboard/code" className="underline-offset-4 hover:underline">More examples</Link>
+      </div>
     </div>
   );
 }
