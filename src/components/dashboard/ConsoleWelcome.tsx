@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, Newspaper, CandlestickChart, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpRight, Plus, KeyRound, CircleDollarSign, Copy, Check, MessagesSquare, BrainCircuit, Newspaper, CandlestickChart, type LucideIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
-import { PlatformLogo } from "@/components/brand/ProductLogos";
 
 
 
@@ -30,60 +30,69 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
     <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Welcome, {name}</h1>
-        <Link to="/dashboard/api" className="console-pill console-pill-solid">
-          <Plus className="h-4 w-4" aria-hidden="true" /> Create API key
-        </Link>
-      </div>
-
-      <div className="overview-summary mt-8 grid items-stretch gap-4 md:grid-cols-2">
-        <div className="console-card flex flex-col p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <PlatformLogo framed className="h-8 w-8" />
-              <p className="text-[16px] font-medium text-foreground">API credit</p>
-            </div>
-            <span className="shrink-0 text-[14px] text-muted-foreground">{balance > 0 ? "Balance" : "Pick a plan for more"}</span>
-          </div>
-          <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
-            <p
-              className={`text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground ${shown.flash ? `value-flash-${shown.flash}` : ""}`}
-              aria-label={credits.isLoading ? undefined : `$${balance.toFixed(2)}`}
-            >
-              {credits.isLoading ? "—" : `$${shown.value.toFixed(2)}`}
-            </p>
-            <Link to="/dashboard/api" className="console-pill console-pill-white">
-              {hasKeys ? "Manage API keys" : "Create API key"}
-            </Link>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-4 border-t border-border pt-6 ">
-            <div className="min-w-0">
-              <p className="text-[16px] font-medium text-foreground">
-                {hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}
-              </p>
-              <p className="mt-2 text-[14px] text-muted-foreground">
-                Use a key to send requests to Jenvu models from your code.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="console-card flex flex-col p-6">
-          <div className="flex items-center gap-2.5">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-foreground text-background">
-              <Newspaper className="h-4 w-4" aria-hidden="true" />
-            </span>
-            <p className="text-[16px] font-medium text-foreground">News</p>
-          </div>
-          <p className="mt-6 text-[16px] font-medium text-foreground">Next high-impact release</p>
-          <p className="mt-2 text-[14px] text-muted-foreground">
-            See the upcoming high-impact economic releases with a countdown and beat/miss outlook.
-          </p>
-          <Link to="/dashboard/news" className="console-pill console-pill-white mt-6 self-start">
-            Open News
+        {hasKeys && (
+          <Link to="/dashboard/api" className="console-pill console-pill-solid">
+            <Plus className="h-4 w-4" aria-hidden="true" /> Create API key
           </Link>
-        </div>
+        )}
       </div>
+
+      {hasKeys ? (
+        <div className="overview-summary mt-8 flex flex-col gap-4">
+          <div className="console-card flex flex-wrap items-center justify-between gap-4 p-5">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-foreground text-background">
+                <CircleDollarSign className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-[16px] font-medium text-foreground">Add credits to start using the API</p>
+                <p className={`mt-1 text-[14px] tabular-nums text-muted-foreground ${shown.flash ? `value-flash-${shown.flash}` : ""}`}>
+                  Credit balance: {credits.isLoading ? "—" : `$${shown.value.toFixed(2)}`}
+                </p>
+              </div>
+            </div>
+            <Link to="/dashboard/pay" className="console-pill console-pill-solid">Add credits</Link>
+          </div>
+
+          <div className="console-card p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <KeyRound className="h-5 w-5 text-foreground" aria-hidden="true" />
+                <div>
+                  <p className="text-[16px] font-medium text-foreground">Start using your API keys</p>
+                  <p className="mt-1 text-[14px] text-muted-foreground">
+                    You have {keysCount} API key{keysCount === 1 ? "" : "s"}. Send your first request below.
+                  </p>
+                </div>
+              </div>
+              <Link to="/dashboard/api" className="inline-flex items-center gap-1 text-[14px] text-foreground hover:underline">
+                API keys <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+            <CodeConsole />
+          </div>
+        </div>
+      ) : (
+        <div className="overview-summary mt-8 flex flex-col gap-4">
+          <Link to="/dashboard/billing" className="console-card flex items-center justify-between gap-3 px-5 py-3">
+            <span className="flex items-center gap-2.5 text-[14px] text-foreground">
+              <CircleDollarSign className="h-4 w-4" aria-hidden="true" />
+              Credits: {credits.isLoading ? "—" : `$${shown.value.toFixed(2)}`}
+            </span>
+            <span className="text-[14px] text-muted-foreground">Billing</span>
+          </Link>
+          <div className="console-card flex flex-wrap items-center justify-between gap-4 p-6">
+            <div className="flex items-center gap-3">
+              <KeyRound className="h-5 w-5 text-foreground" aria-hidden="true" />
+              <div>
+                <p className="text-[16px] font-medium text-foreground">Create your first API Key</p>
+                <p className="mt-1 text-[14px] text-muted-foreground">API keys are used to authenticate API requests</p>
+              </div>
+            </div>
+            <Link to="/dashboard/api" className="console-pill console-pill-white">Create API key</Link>
+          </div>
+        </div>
+      )}
 
       <h2 className="mt-12 text-[18px] font-medium text-foreground">Explore our products</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,5 +125,73 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         ))}
       </div>
     </section>
+  );
+}
+
+type Tab = "Code" | "Chat" | "Image" | "Voice";
+type Lang = "bash" | "python" | "node.js";
+const PROMPTS: Record<Tab, string> = {
+  Code: "Write a Python function that reverses a string.",
+  Chat: "Explain what an API key is in one sentence.",
+  Image: "A gold bar on a dark desk, studio light.",
+  Voice: "Say hello and welcome the user to Jenvu.",
+};
+function snippet(tab: Tab, lang: Lang): string {
+  const prompt = PROMPTS[tab];
+  if (lang === "python")
+    return `from openai import OpenAI\n\nclient = OpenAI(api_key="YOUR_JENVU_API_KEY", base_url="https://jenvu.com/api/public/v1")\n\nres = client.chat.completions.create(\n    model="deepseek-v3.2",\n    messages=[{"role": "user", "content": "${prompt}"}],\n)\nprint(res.choices[0].message.content)`;
+  if (lang === "node.js")
+    return `import OpenAI from "openai";\n\nconst client = new OpenAI({ apiKey: process.env.JENVU_API_KEY, baseURL: "https://jenvu.com/api/public/v1" });\n\nconst res = await client.chat.completions.create({\n  model: "deepseek-v3.2",\n  messages: [{ role: "user", content: "${prompt}" }],\n});\nconsole.log(res.choices[0].message.content);`;
+  return `curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer $JENVU_API_KEY" \\\n  -d '{\n    "model": "deepseek-v3.2",\n    "messages": [{"role": "user", "content": "${prompt}"}]\n  }'`;
+}
+
+function CodeConsole() {
+  const [tab, setTab] = useState<Tab>("Code");
+  const [lang, setLang] = useState<Lang>("bash");
+  const [copied, setCopied] = useState(false);
+  const code = snippet(tab, lang);
+  const copy = () => {
+    void navigator.clipboard?.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+  return (
+    <div className="mt-5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border">
+        <div className="flex gap-1">
+          {(Object.keys(PROMPTS) as Tab[]).map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`-mb-px border-b-2 px-3 py-2 text-[14px] ${tab === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+        <Link to="/docs" className="inline-flex items-center gap-1 pb-2 text-[14px] text-muted-foreground hover:text-foreground">
+          View docs <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      </div>
+      <div className="mt-3 overflow-hidden border border-border bg-muted/40">
+        <div className="flex items-center justify-between border-b border-border px-3 py-2">
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as Lang)}
+            className="bg-transparent text-[13px] text-foreground outline-none"
+            aria-label="Language"
+          >
+            <option value="bash">bash</option>
+            <option value="python">python</option>
+            <option value="node.js">node.js</option>
+          </select>
+          <button type="button" onClick={copy} className="inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground" aria-label="Copy code">
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
+        <pre className="overflow-x-auto p-4 text-[13px] leading-relaxed text-foreground"><code>{code}</code></pre>
+      </div>
+    </div>
   );
 }
