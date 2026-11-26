@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { CalendarDays, ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { MODEL_CATALOG } from "@/lib/model-catalog";
+import { MODEL_CATALOG, PROVIDERS } from "@/lib/model-catalog";
+import { ProviderLogo } from "@/components/models/ModelsExplorer";
 import type { ApiKeyOptions } from "@/lib/api-key-policy";
 
 export function CreateApiKeyDialog({ open, onOpenChange, name, onNameChange, creating, onCreate, planName, keyLimit }: {
@@ -53,7 +54,7 @@ export function CreateApiKeyDialog({ open, onOpenChange, name, onNameChange, cre
                   <label className="mb-2 flex items-center gap-2 border-b border-border pb-2"><Search className="h-3.5 w-3.5 text-muted-foreground" /><input aria-label="Search models" placeholder="Search models" value={query} onChange={(e) => setQuery(e.target.value)} className="min-w-0 flex-1 bg-transparent text-xs outline-none" /></label>
                   <div className="mb-1 flex justify-between"><Button type="button" variant="ghost" size="sm" onClick={() => setSelected(null)}>Select all</Button><Button type="button" variant="ghost" size="sm" onClick={() => setSelected([])}>Clear</Button></div>
                   <div className="max-h-48 overflow-y-auto">
-                    {MODEL_CATALOG.filter((m) => `${m.name} ${m.id}`.toLowerCase().includes(query.toLowerCase())).map((model) => <label key={model.id} className="flex cursor-pointer items-center gap-2 rounded px-2 py-2 hover:bg-muted"><input type="checkbox" checked={selected === null || selected.includes(model.id)} onChange={() => toggleModel(model.id)} className="accent-foreground" /><span className="text-xs">{model.name}</span></label>)}
+                    {MODEL_CATALOG.filter((m) => `${m.name} ${m.id}`.toLowerCase().includes(query.toLowerCase())).map((model) => <label key={model.id} className="grid cursor-pointer grid-cols-[16px_20px_minmax(0,1fr)] items-center gap-2 rounded px-2 py-2 hover:bg-muted"><input type="checkbox" aria-label={model.name} checked={selected === null || selected.includes(model.id)} onChange={() => toggleModel(model.id)} className="m-0 h-3.5 w-3.5 accent-foreground" /><ProviderLogo provider={model.provider} bare /><span className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-0.5"><span className="min-w-0 break-words text-xs">{model.name}</span><span className="text-[10px] text-muted-foreground">{PROVIDERS[model.provider].label}</span></span></label>)}
                     {!MODEL_CATALOG.some((m) => `${m.name} ${m.id}`.toLowerCase().includes(query.toLowerCase())) && <p className="p-2 text-xs text-muted-foreground">No models found.</p>}
                   </div>
                 </div>}

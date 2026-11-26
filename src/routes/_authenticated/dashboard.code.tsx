@@ -91,7 +91,7 @@ function CodePage() {
     } catch { toast.error("Could not copy code"); }
   };
   return (
-    <section className="code-api-page mx-auto w-full max-w-[1100px] pb-10 text-foreground">
+    <section className="code-api-page w-full min-w-0 pb-10 text-foreground">
       <h1 className="text-[28px] font-normal">Code API</h1>
       <h2 className="mt-8 text-base font-medium">API Usage Examples</h2>
       <div className="mt-4 flex flex-wrap gap-1" role="tablist" aria-label="API usage examples">
@@ -100,11 +100,11 @@ function CodePage() {
           return <Button key={t} type="button" role="tab" id={`tab-${t.replaceAll(' ', '-')}`} aria-controls="code-example" aria-selected={t === tab} variant={t === tab ? "secondary" : "ghost"} className={`rounded-full text-sm font-normal ${t === tab ? "text-foreground" : "text-muted-foreground"}`} onClick={() => { setTab(t); setCopied(false); }}><Icon />{t}</Button>;
         })}
       </div>
-      <div id="code-example" role="tabpanel" aria-labelledby={`tab-${tab.replaceAll(' ', '-')}`} className="code-api-workspace mt-4 grid min-w-0 gap-2 p-2 lg:grid-cols-2">
+      <div id="code-example" role="tabpanel" aria-labelledby={`tab-${tab.replaceAll(' ', '-')}`} className="code-api-workspace mt-4 grid min-w-0 grid-cols-1 gap-2 p-2">
         <div className="code-api-setup min-w-0 p-3">
           <div className="flex items-center justify-between"><span className="text-xs text-muted-foreground">Setup</span><Button variant="ghost" size="icon-sm" aria-label={copied ? "Code copied" : "Copy code"} title={copied ? "Copied" : "Copy code"} onClick={() => void copy()}>{copied ? <Check /> : <Copy />}</Button></div>
           <div className="mt-1 flex min-w-0 items-center gap-2 text-xs text-muted-foreground"><File className="h-3.5 w-3.5 shrink-0" /><span className="break-all font-code">{ex.file}</span></div>
-          <div className="code-box mt-4 max-h-[230px] overflow-y-auto overflow-x-hidden"><pre className="whitespace-pre-wrap break-words font-code text-[15px] leading-[1.7] [overflow-wrap:anywhere]"><code>{highlight(ex.code)}</code></pre></div>
+          <div className="code-box mt-4 min-w-0"><pre className="whitespace-pre-wrap break-words font-code text-[15px] leading-[1.7] [overflow-wrap:anywhere]"><code>{highlight(ex.code)}</code></pre></div>
           <Button asChild variant="link" className="mt-3 h-auto p-0 text-xs font-normal text-muted-foreground"><Link to="/docs"><Terminal />Read API docs<ArrowUpRight /></Link></Button>
         </div>
         <div className="min-w-0 p-4">
@@ -112,8 +112,8 @@ function CodePage() {
           {tab === "Code review" ? <>
             <p className="mt-4 flex flex-wrap items-center gap-2 text-sm"><GitPullRequest className="h-4 w-4" />jenvu-review-bot <span className="text-muted-foreground">requested changes</span></p>
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{ex.result}</p>
-            <div className="code-api-diff mt-5 p-3 font-code text-[14px]"><p className="mb-2 break-all">Edit <span className="text-muted-foreground">src/api/pagination.ts:41</span></p><pre className="whitespace-pre-wrap break-words leading-relaxed"><code><span className="code-api-diff-remove block">- const end = start + pageSize - 1;</span><span className="code-api-diff-add block">+ const end = start + pageSize;</span></code></pre></div>
-          </> : <><p className="mt-4 text-sm font-medium">{ex.result}</p><pre className="mt-5 whitespace-pre-wrap break-words font-code text-[14px] leading-relaxed text-muted-foreground">{ex.output}</pre></>}
+            <div className="code-api-diff mt-5 p-3 font-code text-[14px]"><p className="mb-2 break-all">Edit <span className="text-muted-foreground">src/api/pagination.ts:41</span></p><pre className="whitespace-pre-wrap break-words leading-relaxed [overflow-wrap:anywhere]"><code><span className="code-api-diff-remove block">- const end = start + pageSize - 1;</span><span className="code-api-diff-add block">+ const end = start + pageSize;</span></code></pre></div>
+          </> : <><p className="mt-4 text-sm font-medium">{ex.result}</p><pre className="mt-5 whitespace-pre-wrap break-words font-code text-[14px] leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">{ex.output}</pre></>}
         </div>
       </div>
     </section>
