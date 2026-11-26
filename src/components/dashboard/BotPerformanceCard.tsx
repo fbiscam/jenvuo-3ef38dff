@@ -25,7 +25,7 @@ export default function BotPerformanceCard() {
           <JxBotLogo framed className="h-8 w-8" />
           <p className="text-[16px] font-medium text-foreground">JX Bot profit</p>
         </div>
-        <span className="text-[14px] text-muted-foreground">Last 30 days      </span>
+        <span className="shrink-0 text-[14px] text-muted-foreground">Last 30 days</span>
       </div>
 
       <div className="mt-6 flex flex-wrap items-end justify-between gap-4">

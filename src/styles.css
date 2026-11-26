@@ -2123,6 +2123,12 @@ html.dark body .ask-jenvu-launcher, html.dark body .ask-jenvu-launcher *,
 /* Console sections: warm #F9F8F6 panels, no borders (light); dark keeps #141414 */
 .jenvu-zoom-dashboard { --console-card: #f9f8f6; }
 .jenvu-zoom-dashboard.dash-dark { --console-card: #141414; }
+/* Overview account summaries retain the original white, square console frames. */
+html body .jenvu-zoom-dashboard main .overview-summary > .console-card {
+  background-color: var(--background) !important;
+  border: 1px solid var(--console-line) !important;
+  border-radius: 0 !important;
+}
 html body .jenvu-zoom-dashboard main :is(.shadow, .shadow-sm, .shadow-md, .shadow-lg) { box-shadow: none !important; }
 html body .jenvu-zoom-dashboard main :is(.bg-gc-panel, .bg-gc-canvas, .bg-zinc-50, .bg-\[\#F4F4F4\]):not(.dash-dark *) { background-color: #f9f8f6 !important; }
 /* Important section icons/logos in orange */

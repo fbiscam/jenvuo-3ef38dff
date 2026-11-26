@@ -36,14 +36,14 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         </Link>
       </div>
 
-      <div className="mt-8 grid items-stretch gap-4 md:grid-cols-2">
+      <div className="overview-summary mt-8 grid items-stretch gap-4 md:grid-cols-2">
         <div className="console-card flex flex-col p-6">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <PlatformLogo framed className="h-8 w-8" />
               <p className="text-[16px] font-medium text-foreground">API credit</p>
             </div>
-            <span className="text-[14px] text-muted-foreground">{balance > 0 ? "Balance      " : "Pick a plan for more"}</span>
+            <span className="shrink-0 text-[14px] text-muted-foreground">{balance > 0 ? "Balance" : "Pick a plan for more"}</span>
           </div>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
             <p
