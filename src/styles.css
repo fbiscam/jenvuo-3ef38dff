@@ -3084,10 +3084,3 @@ html.dark body .console-pill.console-pill-white {
 @media (prefers-reduced-motion: reduce) {
   .value-flash-up, .value-flash-down { animation: none; }
 }
-
-/* Quickstart card on dashboard home stays pure white */
-html body .jenvu-zoom-dashboard main .console-card.quickstart-card,
-html body .jenvu-zoom-dashboard main .quickstart-card pre,
-html body .jenvu-zoom-dashboard main .quickstart-card .code-box {
-  background-color: #ffffff !important;
-}
