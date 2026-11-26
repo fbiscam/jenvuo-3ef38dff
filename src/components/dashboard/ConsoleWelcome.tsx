@@ -116,7 +116,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <Link to="/dashboard/pay" className="console-pill console-pill-white">Upgrade plan</Link>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[14px]">
-            <span className="text-muted-foreground">{hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
+            <span className="text-muted-foreground">{hasKeys ? `  You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
             <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">{hasKeys ? "Manage API keys →" : "Create API key →"}</Link>
           </div>
           <div className="mt-7 grid grid-cols-5 items-center gap-1 border-t border-border pt-5" aria-label="Compatible developer tools">
