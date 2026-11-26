@@ -124,8 +124,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         <QuickstartCard hasKeys={hasKeys} />
       </div>
 
-      <h2 className="mt-12 text-[18px] font-medium text-foreground">Works with your tools</h2>
-      <div className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12">
+      <div className="mx-auto mt-12 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12">
         {WORKS_WITH.map((w) => (
           <span key={w.name} className="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-foreground sm:text-2xl">
             <img src={w.logo} alt="" aria-hidden="true" className="h-7 w-7 object-contain sm:h-8 sm:w-8" loading="lazy" />
