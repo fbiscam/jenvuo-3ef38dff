@@ -253,9 +253,6 @@ function ChatPlayground() {
   const [modelOpen, setModelOpen] = useState(false);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
-  useEffect(() => {
-    try { const d = sessionStorage.getItem("jenvu-chat-draft"); if (d) { sessionStorage.removeItem("jenvu-chat-draft"); setInput(d); } } catch { /* ignore */ }
-  }, []);
   const [busy, setBusy] = useState(false);
   const [instructions, setInstructions] = useState("");
   const [maxTokens, setMaxTokens] = useState(1200);
