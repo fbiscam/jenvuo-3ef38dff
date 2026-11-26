@@ -5,19 +5,23 @@ import { GitHubBrand, SlackBrand } from "@/components/dashboard/CodeBrandIcons";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { highlight } from "@/components/dashboard/CodeHighlight";
-import { SiPython, SiNodedotjs, SiCurl, SiLangchain } from "react-icons/si";
-import { ProviderLogo } from "@/components/models/ModelsExplorer";
 import { PlatformLogo } from "@/components/brand/ProductLogos";
 
 const BASE = "https://jenvu.com/api/public/v1";
 
-/** SDKs and tools that work with the Jenvu API, shown as one aligned logo row. */
-const SDKS = [
-  { label: "OpenAI SDK", icon: <span className="inline-flex h-8 w-8 items-center justify-center [&_img]:h-8 [&_img]:w-8"><ProviderLogo provider="openai" bare /></span> },
-  { label: "Python", icon: <SiPython color="#3776AB" /> },
-  { label: "Node.js", icon: <SiNodedotjs color="#5FA04E" /> },
-  { label: "cURL", icon: <SiCurl color="#073551" /> },
-  { label: "LangChain", icon: <SiLangchain color="#1C3C3C" /> },
+import openaiLogo from "@/assets/platform-logos/openai.svg";
+import pythonLogo from "@/assets/platform-logos/python.svg";
+import nodeLogo from "@/assets/platform-logos/nodejs.svg";
+import curlLogo from "@/assets/platform-logos/curl.svg";
+import langchainLogo from "@/assets/platform-logos/langchain.svg";
+
+/** Same logo row as the Platform page. */
+const WORKS_WITH = [
+  { name: "OpenAI SDK", logo: openaiLogo },
+  { name: "Python", logo: pythonLogo },
+  { name: "Node.js", logo: nodeLogo },
+  { name: "cURL", logo: curlLogo },
+  { name: "LangChain", logo: langchainLogo },
 ];
 
 const MINI = {
@@ -121,11 +125,12 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
       </div>
 
       <h2 className="mt-12 text-[18px] font-medium text-foreground">Works with your tools</h2>
-      <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-5">
-        {SDKS.map(({ label, icon }) => (
-          <Link key={label} to="/docs" className="flex items-center justify-center gap-3 py-2 text-[17px] font-medium text-foreground transition hover:opacity-70 [&_svg]:h-8 [&_svg]:w-8">
-            {icon}<span>{label}</span>
-          </Link>
+      <div className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12">
+        {WORKS_WITH.map((w) => (
+          <span key={w.name} className="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-foreground sm:text-2xl">
+            <img src={w.logo} alt="" aria-hidden="true" className="h-7 w-7 object-contain sm:h-8 sm:w-8" loading="lazy" />
+            {w.name}
+          </span>
         ))}
       </div>
     </section>
