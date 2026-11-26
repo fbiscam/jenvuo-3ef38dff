@@ -95,7 +95,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
     <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Welcome, {name}</h1>
-        <Link to="/dashboard/api" className="console-pill console-pill-solid">
+        <Link to="/dashboard/api" className="console-pill console-pill-white">
           <Plus className="h-4 w-4" aria-hidden="true" /> Create API key
         </Link>
       </div>
@@ -113,7 +113,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
               {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}
             </p>
-            <Link to="/dashboard/pay" className="console-pill console-pill-solid">Upgrade plan</Link>
+            <Link to="/dashboard/pay" className="console-pill console-pill-white">Upgrade plan</Link>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[14px]">
             <span className="text-muted-foreground">{hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
