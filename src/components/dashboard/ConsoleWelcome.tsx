@@ -5,20 +5,20 @@ import { GitHubBrand, SlackBrand } from "@/components/dashboard/CodeBrandIcons";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { highlight } from "@/components/dashboard/CodeHighlight";
-import { PRICE_PER_MILLION } from "@/lib/model-catalog";
-import starsNebula from "@/assets/platform/stars-nebula.webp";
-import starsPlain from "@/assets/platform/stars-plain.webp";
+import { SiPython, SiNodedotjs, SiCurl, SiLangchain } from "react-icons/si";
+import { ProviderLogo } from "@/components/models/ModelsExplorer";
 import { PlatformLogo } from "@/components/brand/ProductLogos";
 
 const BASE = "https://jenvu.com/api/public/v1";
 
-/** Top (heaviest) model from each lab, shown as starfield cards like the Platform page. */
-const TOP_MODELS = [
-  { id: "claude-opus-5.5", name: "Claude Opus 5.5", a: "Deep reasoning and long documents", b: "Code review and refactoring", img: starsNebula },
-  { id: "gpt-5.5-pro", name: "GPT-5.5 Pro", a: "Extra thinking for hard problems", b: "Trading scripts and coding help", img: starsPlain },
-  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", a: "Text and image understanding", b: "Charts and screenshots", img: starsPlain },
-  { id: "deepseek-v4-pro-max", name: "DeepSeek V4 Pro Max", a: "Strongest DeepSeek for maths", b: "Code and high-volume workloads", img: starsPlain },
-] as const;
+/** SDKs and tools that work with the Jenvu API, shown as one aligned logo row. */
+const SDKS = [
+  { label: "OpenAI SDK", icon: <span className="inline-flex h-8 w-8 items-center justify-center [&_img]:h-8 [&_img]:w-8"><ProviderLogo provider="openai" bare /></span> },
+  { label: "Python", icon: <SiPython color="#3776AB" /> },
+  { label: "Node.js", icon: <SiNodedotjs color="#5FA04E" /> },
+  { label: "cURL", icon: <SiCurl color="#073551" /> },
+  { label: "LangChain", icon: <SiLangchain color="#1C3C3C" /> },
+];
 
 const MINI = {
   "Code review": { icon: GitHubBrand, file: "review.py", code: `from openai import OpenAI
@@ -120,29 +120,14 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         <QuickstartCard hasKeys={hasKeys} />
       </div>
 
-      <h2 className="mt-12 text-[18px] font-medium text-foreground">Top models</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {TOP_MODELS.map((m, i) => (
-          <Link key={m.id} to="/dashboard/models"
-            className="group relative flex aspect-[5/4] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-6 pb-8 text-left text-gc-on-night sm:aspect-[5/7]">
-            <img src={m.img} alt="" width={768} height={1056} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-              style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }} />
-            <span className="relative block">
-              <span className="block text-[1.5rem] font-medium leading-tight tracking-tight">{m.name}</span>
-              <span className="mt-3 block text-[13px] font-medium">Input: ${PRICE_PER_MILLION.toFixed(2)} per 1M tokens</span>
-              <span className="mt-1 block text-[13px] font-medium">Output: ${PRICE_PER_MILLION.toFixed(2)} per 1M tokens</span>
-              <span className="mt-4 block text-[13px] font-medium">{m.a}</span>
-              <span className="mt-1 block text-[13px] font-medium">{m.b}</span>
-              <span className="mt-4 block break-all text-[13px] font-medium">Model ID: {m.id}</span>
-            </span>
+      <h2 className="mt-12 text-[18px] font-medium text-foreground">Works with your tools</h2>
+      <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-5">
+        {SDKS.map(({ label, icon }) => (
+          <Link key={label} to="/docs" className="flex items-center justify-center gap-3 py-2 text-[17px] font-medium text-foreground transition hover:opacity-70 [&_svg]:h-8 [&_svg]:w-8">
+            {icon}<span>{label}</span>
           </Link>
         ))}
       </div>
-      <p className="mt-6 text-center text-[13px] italic text-muted-foreground">
-        One flat rate for every model, paid from your API credit. See the{" "}
-        <Link to="/docs" className="underline underline-offset-2">API docs</Link> and{" "}
-        <Link to="/dashboard/models" className="underline underline-offset-2">all models</Link>.
-      </p>
     </section>
   );
 }
