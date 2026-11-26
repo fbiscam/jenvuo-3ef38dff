@@ -115,11 +115,11 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             </p>
             <Link to="/dashboard/pay" className="console-pill console-pill-white">Upgrade plan</Link>
           </div>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-[14px]">
-            <span className="text-muted-foreground">{hasKeys ? `  You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[14px]">
+            <span className="text-muted-foreground">{hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
             <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">{hasKeys ? "Manage API keys →" : "Create API key →"}</Link>
           </div>
-          <div className="mt-9 grid grid-cols-5 items-center gap-1 border-t border-border pt-6" aria-label="Compatible developer tools">
+          <div className="mt-5 grid grid-cols-5 items-center gap-1 border-t border-border pt-4" aria-label="Compatible developer tools">
             {WORKS_WITH.map((w) => (
               <span key={w.name} className="flex min-w-0 flex-col items-center gap-1.5 whitespace-nowrap text-[9px] font-medium text-foreground sm:text-[11px]">
                 <img src={w.logo} alt="" aria-hidden="true" className="h-5 w-5 object-contain sm:h-6 sm:w-6" loading="lazy" />
