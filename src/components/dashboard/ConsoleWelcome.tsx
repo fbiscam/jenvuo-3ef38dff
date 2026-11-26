@@ -1,20 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowUpRight, Plus, KeyRound, CircleDollarSign, Copy, Check, MessagesSquare, BrainCircuit, Newspaper, CandlestickChart, type LucideIcon } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { ArrowUpRight, Plus, KeyRound, CircleDollarSign, Copy, Check } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
 
 
-
-type Product = { title: string; text: string; to: string; img?: string; aurora?: number; icon?: LucideIcon; badge?: string };
-
-const PRODUCTS: Product[] = [
-  { title: "Chat API", text: "One API for all Jenvu models.", to: "/dashboard/api", aurora: 1, icon: MessagesSquare },
-  { title: "Models", text: "Compare model pricing & limits.", to: "/dashboard/models", aurora: 2, icon: BrainCircuit, badge: "New" },
-  { title: "News", text: "Upcoming high-impact releases.", to: "/dashboard/news", aurora: 3, icon: Newspaper },
-  { title: "Terminal", text: "Live SMC sweeps, zones and desk.", to: "/dashboard/terminal", aurora: 1, icon: CandlestickChart },
-];
 
 /** xAI console-style dashboard home: welcome line, two start cards, product grid. */
 export default function ConsoleWelcome({ name: profileName, keysCount }: { name?: string; keysCount: number | null }) {
@@ -38,7 +29,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
       </div>
 
       {keysCount === null ? (
-        <div className="mt-8 h-40 animate-pulse bg-muted/40" aria-hidden="true" />
+        <div className="mt-8 h-40 animate-pulse rounded-[18px] bg-muted/40" aria-hidden="true" />
       ) : hasKeys ? (
         <div className="overview-summary mt-8 flex flex-col gap-4">
           <div className="console-card flex flex-wrap items-center justify-between gap-4 p-5">
@@ -96,36 +87,6 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         </div>
       )}
 
-      <h2 className="mt-12 text-[18px] font-medium text-foreground">Explore our products</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {PRODUCTS.map((p) => (
-          <Link key={p.title} to={p.to} className="console-card group flex flex-col overflow-hidden">
-            <div className="relative aspect-[16/10] overflow-hidden">
-              {p.aurora ? (
-                <div className="flex h-full w-full items-center justify-center" style={{ backgroundImage: `var(--platform-aurora-${p.aurora})` }}>
-                  <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-background text-foreground transition duration-500 group-hover:scale-110">
-                    {p.icon && <p.icon className="h-7 w-7" aria-hidden="true" />}
-                  </span>
-                </div>
-              ) : (
-              <img
-                src={p.img}
-                alt=""
-                loading="lazy"
-                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
-              />
-              )}
-              {p.badge && <span className="absolute left-3 top-3 rounded-full bg-background px-2.5 py-0.5 text-[12px] font-medium text-foreground">{p.badge}</span>}
-            </div>
-            <div className="flex flex-1 flex-col p-5">
-              <p className="flex items-center justify-between text-[16px] font-medium text-foreground">
-                {p.title}
-                <ArrowUpRight className="h-4 w-4 opacity-60 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true" />
-              </p>
-            </div>
-          </Link>
-        ))}
-      </div>
     </section>
   );
 }
@@ -176,7 +137,7 @@ function CodeConsole() {
           View docs <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
-      <div className="mt-3 overflow-hidden border border-border bg-muted/40">
+      <div className="code-panel mt-3 overflow-hidden border border-border">
         <div className="flex items-center justify-between border-b border-border px-3 py-2">
           <select
             value={lang}
@@ -192,8 +153,24 @@ function CodeConsole() {
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} {copied ? "Copied" : "Copy"}
           </button>
         </div>
-        <pre className="overflow-x-auto p-4 text-[13px] leading-relaxed text-foreground"><code>{code}</code></pre>
+        <pre className="overflow-x-auto p-4 text-[13px] leading-relaxed text-foreground"><code>{highlight(code)}</code></pre>
       </div>
     </div>
   );
+}
+
+const TOKEN_RE = /("(?:[^"\\]|\\.)*"|'[^']*')|\b(from|import|const|await|print|curl|new)\b|(\s-[a-zA-Z]+\b)|\b([A-Za-z_][\w.]*)(?=\()/g;
+function highlight(code: string) {
+  const out: ReactNode[] = [];
+  let last = 0;
+  let i = 0;
+  for (const m of code.matchAll(TOKEN_RE)) {
+    const at = m.index ?? 0;
+    if (at > last) out.push(code.slice(last, at));
+    const cls = m[1] ? "tok-str" : m[2] ? "tok-kw" : m[3] ? "tok-flag" : "tok-fn";
+    out.push(<span key={i++} className={cls}>{m[0]}</span>);
+    last = at + m[0].length;
+  }
+  out.push(code.slice(last));
+  return out;
 }
