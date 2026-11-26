@@ -12,6 +12,7 @@ import {
 import { callChatCompletion, AiGatewayError } from "@/lib/ai-gateway";
 import type { ChatMessage } from "@/lib/ai-gateway";
 import { jenvuServiceError } from "@/lib/jenvu-api-errors";
+import { apiKeyAllowsModel } from "@/lib/api-key-policy";
 import {
   PUBLIC_API_MODEL_IDS,
   gatewayChainFor,
@@ -128,6 +129,9 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
           );
         }
 
+        if (!apiKeyAllowsModel(auth.allowedModels, modelId)) {
+          return extJson({ error: { message: "This model is not enabled for this API key.", type: "invalid_request_error", code: "model_not_allowed", param: "model" } }, 403);
+        }
         const maxTokens = Math.min(4000, Math.max(16, Number(body?.max_tokens ?? 1200) || 1200));
         const requestId = `chatcmpl-${crypto.randomUUID()}`;
 

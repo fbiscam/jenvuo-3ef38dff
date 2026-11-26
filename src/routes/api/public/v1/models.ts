@@ -2,23 +2,28 @@
 // Auth is optional here: many clients (Claude Desktop, OpenAI SDKs, LibreChat)
 // probe /v1/models before they attach the key, and a 401 makes them fail setup.
 import { createFileRoute } from "@tanstack/react-router";
-import { extJson, EXT_CORS_HEADERS } from "@/lib/extension-auth.server";
+import { extJson, EXT_CORS_HEADERS, authenticateExtensionRequest } from "@/lib/extension-auth.server";
+import { apiKeyAllowsModel } from "@/lib/api-key-policy";
 import { PUBLIC_API_MODEL_IDS } from "@/lib/public-api-models";
 
 export const Route = createFileRoute("/api/public/v1/models")({
   server: {
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: EXT_CORS_HEADERS }),
-      GET: async () =>
-        extJson({
+      GET: async ({ request }) => {
+        const supplied = request.headers.has("authorization") || request.headers.has("x-jenvu-key");
+        const auth = supplied ? await authenticateExtensionRequest(request) : null;
+        if (auth && !auth.ok) return extJson({ error: { message: auth.error } }, auth.status);
+        return extJson({
           object: "list",
-          data: PUBLIC_API_MODEL_IDS.map((id) => ({
+          data: PUBLIC_API_MODEL_IDS.filter((id) => !auth || (auth.ok && apiKeyAllowsModel(auth.allowedModels, id))).map((id) => ({
             id,
             object: "model",
             created: 1_750_000_000,
             owned_by: "jenvu",
           })),
-        }),
+        });
+      },
     },
   },
 });

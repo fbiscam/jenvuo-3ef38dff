@@ -283,7 +283,7 @@
 
 - [x] JX Bot removed from site/dashboard; Help Centre under Settings; Scam Protection page (/scam-protection) with checker, founder, live report and daily slider
 
-- [ ] Enable API-key model selection and enforced expiry; remove endpoint controls.
-- [ ] Increase Code page readability and prevent API/Code navigation reloads.
-- [ ] Reopen Ask Jenvu to visitors with abuse limits.
-- [ ] Match Terminal drawer sizing to the dashboard menu; verify all changes.
+- [x] Enable API-key model selection and enforced expiry; remove endpoint controls. Temporary account created a GPT-5.5-only key with a one-day expiry; readback and 403 for a different model verified.
+- [x] Increase Code page readability and prevent API/Code navigation reloads. All tabs use 15px wrapping code; both directions produce no main-document requests and share the same content scale.
+- [x] Reopen Ask Jenvu to visitors with abuse limits. A signed-out visitor received a real answer; limiter tests pass.
+- [x] Match Terminal drawer sizing to the dashboard menu; verify all changes. Both measured 243px at 1280px; mobile Code has no horizontal overflow, no runtime errors, nine focused tests pass, latest build OK. Not published.

@@ -2210,6 +2210,7 @@ html body .jenvu-zoom-dashboard main :is(.console-icon-chip, .console-card > svg
 /* Desktop dashboard: side menu 7% smaller; page area 15% then another 13% smaller (centred). */
 @media (min-width: 1024px) {
   .jenvu-zoom-dashboard .dashboard-sidebar-root.console-sidebar { zoom: 0.93; }
+  .dashboard-terminal-sidebar.jenvu-zoom-chrome:not(.terminal-rail) { width: calc(260px * 0.93); }
   .jenvu-zoom-dashboard .dashboard-right-col.lg\:pl-\[260px\] { padding-left: calc(260px * 0.93); }
   .jenvu-zoom-dashboard main.dash-page { zoom: 0.666 !important; }
 }

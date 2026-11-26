@@ -5,6 +5,8 @@ import { computeSignalPlan, isSupportedTradeableSymbol } from '@/lib/gold-analys
 async function handle({ request }: { request: Request }) {
   const auth = await authenticateExtensionRequest(request)
   if (!auth.ok) return extJson({ ok: false, error: auth.error }, auth.status)
+  // Analysis chooses several models internally; a scoped key may never bypass its model list.
+  if (auth.allowedModels !== null) return extJson({ ok: false, error: 'Use chat completions with a selected model, or an all-models key for multi-model analysis.' }, 403)
 
   let symbol = 'XAUUSD'
   if (request.method === 'POST') {

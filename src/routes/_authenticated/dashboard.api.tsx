@@ -3,10 +3,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Copy, Check, Plus, Search, FileText, X, Terminal } from "lucide-react";
+import { Copy, Check, Plus, Search, FileText, X } from "lucide-react";
 import { KeyActionsMenu } from "@/components/dashboard/KeyActionsMenu";
 import { CreateApiKeyDialog } from "@/components/dashboard/CreateApiKeyDialog";
-import { EndpointPanel, QuickstartPanel } from "@/components/dashboard/ApiDocsPanels";
+import { QuickstartPanel } from "@/components/dashboard/ApiDocsPanels";
 import {
   listExtensionKeys,
   createExtensionKey,
@@ -20,6 +20,7 @@ import {
 } from "@/lib/extension-keys.functions";
 import { getPlanCapabilities } from "@/lib/plan-entitlements";
 import { readPageCache, writePageCache } from "@/lib/page-cache";
+import { apiKeyExpired, type ApiKeyOptions } from "@/lib/api-key-policy";
 import { useCredits } from "@/hooks/useCredits";
 
 const MONO = "font-sans";
@@ -57,7 +58,6 @@ function ExtensionPage() {
   const [creating, setCreating] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
-  const [showEndpoint, setShowEndpoint] = useState(false);
   const [name, setName] = useState("");
   const [freshKey, setFreshKey] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -116,10 +116,10 @@ function ExtensionPage() {
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [credits.plan?.id, credits.balance]);
 
-  const onCreate = async () => {
+  const onCreate = async (options: ApiKeyOptions) => {
     setCreating(true);
     try {
-      const res = await create({ data: { name } });
+      const res = await create({ data: { name, ...options } });
       if (!res.ok) {
         toast.error(res.error);
         return;
@@ -284,9 +284,6 @@ function ExtensionPage() {
           <button onClick={() => setShowGuide((v) => !v)} className="console-pill hidden sm:inline-flex">
             <FileText className="h-4 w-4" /> Quickstart
           </button>
-          <button onClick={() => setShowEndpoint((v) => !v)} className="console-pill hidden sm:inline-flex">
-            <Terminal className="h-4 w-4" /> Endpoint
-          </button>
           <button
             onClick={() => {
               setShowCreate(true);
@@ -339,9 +336,6 @@ function ExtensionPage() {
           </div>
         </div>
       )}
-
-      {/* Public API endpoint panel */}
-      {showEndpoint && <EndpointPanel onClose={() => setShowEndpoint(false)} />}
 
       {/* API key search + table (xAI console style) */}
       <div className="mt-6">
@@ -399,12 +393,13 @@ function ExtensionPage() {
                     </td>
                     <td className="py-3.5 pr-4 text-foreground">
                       {new Date(k.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      <div className="mt-1 text-xs text-muted-foreground">{k.expires_at ? `Expires ${new Date(k.expires_at).toLocaleString()}` : "No expiry"}</div>
                     </td>
                     <td className="py-3.5 pr-4 text-muted-foreground">
                       {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}
                     </td>
                     <td className="py-3.5 pr-4">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Disabled" : "Active"}</span>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Disabled" : apiKeyExpired(k.expires_at) ? "Expired" : "Active"}</span>
                     </td>
                     <td className="py-3.5 text-right">
                       <KeyActionsMenu

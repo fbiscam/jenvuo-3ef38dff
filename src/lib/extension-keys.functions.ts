@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
+import { validateApiKeyOptions } from './api-key-policy'
 
 export type ExtensionKeyRow = {
   id: string
@@ -8,6 +9,8 @@ export type ExtensionKeyRow = {
   last_used_at: string | null
   revoked_at: string | null
   created_at: string
+  allowed_models: string[] | null
+  expires_at: string | null
 }
 
 export type ExtensionKeyAccess = { plan: string; planName: string; keyLimit: number; balance: number; wallet: number; active: boolean }
@@ -31,7 +34,7 @@ export const listExtensionKeys = createServerFn({ method: 'POST' })
     const client = context.supabase as any
     const [{ data, error }, access] = await Promise.all([client
       .from('extension_api_keys')
-      .select('id,name,key_prefix,last_used_at,revoked_at,created_at')
+      .select('id,name,key_prefix,last_used_at,revoked_at,created_at,allowed_models,expires_at')
       .eq('user_id', context.userId)
       .order('created_at', { ascending: false }), readAccess(client, context.userId)])
     if (error) return { ok: false as const, error: error.message, keys: [] as ExtensionKeyRow[], access }
@@ -41,9 +44,9 @@ export const listExtensionKeys = createServerFn({ method: 'POST' })
 export const createExtensionKey = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => {
-    const obj = (d ?? {}) as { name?: string }
+    const obj = (d ?? {}) as { name?: string; allowedModels?: unknown; expiresAt?: unknown }
     const name = typeof obj.name === 'string' ? obj.name.trim().slice(0, 60) : ''
-    return { name: name || 'Extension key' }
+    return { name: name || 'Extension key', ...validateApiKeyOptions(obj) }
   })
   .handler(async ({ data, context }) => {
     const { idActionBlock } = await import('./id-gate.server')
@@ -73,6 +76,8 @@ export const createExtensionKey = createServerFn({ method: 'POST' })
       key_prefix: raw.slice(0, 18),
       key_hash,
       key_ciphertext,
+      allowed_models: data.allowedModels,
+      expires_at: data.expiresAt,
     })
     if (error) return { ok: false as const, error: error.message }
 
@@ -189,7 +194,7 @@ export const rotateExtensionKey = createServerFn({ method: 'POST' })
     if (!access.active || access.plan === 'free' || access.keyLimit < 1) return { ok: false as const, error: 'Upgrade to Pro, Elite, or Ultra to rotate API keys.' }
     const { data: old } = await client
       .from('extension_api_keys')
-      .select('id,name,revoked_at')
+      .select('id,name,revoked_at,allowed_models,expires_at')
       .eq('id', data.id)
       .eq('user_id', context.userId)
       .maybeSingle()
@@ -201,6 +206,8 @@ export const rotateExtensionKey = createServerFn({ method: 'POST' })
     const { error: insertError } = await client.from('extension_api_keys').insert({
       user_id: context.userId,
       name: old.name,
+      allowed_models: old.allowed_models,
+      expires_at: old.expires_at,
       key_prefix: raw.slice(0, 18),
       key_hash: await hashExtensionKey(raw),
       key_ciphertext: await encryptExtensionKey(raw),

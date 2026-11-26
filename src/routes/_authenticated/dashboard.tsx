@@ -1208,7 +1208,7 @@ function DashboardLayout() {
           className={`dashboard-sidebar-root ${pinned ? "console-sidebar" : ""} ${onTerminal && !terminalRail ? "jenvu-zoom-chrome" : ""} ${
             drawerMode && onTerminal
               ? mobileNavOpen
-                ? "dashboard-terminal-sidebar fixed inset-y-0 left-0 z-50 w-[280px] translate-x-0 rounded-r-2xl shadow-2xl"
+                ? "dashboard-terminal-sidebar fixed inset-y-0 left-0 z-50 w-[260px] translate-x-0 rounded-r-2xl shadow-2xl"
                 : "dashboard-terminal-sidebar terminal-rail fixed inset-y-0 left-0 z-20 w-[52px] -translate-x-full border-r border-zinc-200 max-lg:invisible lg:translate-x-0"
               : pinned
               ? `fixed inset-y-0 left-0 z-50 w-[260px] border-0 lg:z-20 lg:translate-x-0 lg:shadow-none ${mobileNavOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full max-lg:invisible"}`
@@ -1291,6 +1291,7 @@ function DashboardLayout() {
                         key={t.to}
                         to={t.to as "/dashboard"}
                         resetScroll={false}
+                        preload="intent"
                         onClick={() => {
                           markTabSeen(t.countKey);
                           setMobileNavOpen(false);
@@ -1444,7 +1445,7 @@ function DashboardLayout() {
               ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-background"
               : embedMode
                 ? `dash-page${isSettingsPath(pathname) ? " settings-page" : ""} w-full flex-1 bg-background px-5 pt-7 pb-7 sm:px-8`
-                : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""}${["/dashboard/models", "/dashboard/usage", "/dashboard/api", ].includes(pathname) ? " page-plus5" : ""} w-full max-w-7xl flex-1 bg-white px-5 ${pathname === "/dashboard/chat" ? "pt-14" : "pt-14 lg:pt-20"} pb-7 sm:px-8 lg:pb-2`
+                : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""}${["/dashboard/models", "/dashboard/usage", "/dashboard/api", "/dashboard/code", ].includes(pathname) ? " page-plus5" : ""} w-full max-w-7xl flex-1 bg-white px-5 ${pathname === "/dashboard/chat" ? "pt-14" : "pt-14 lg:pt-20"} pb-7 sm:px-8 lg:pb-2`
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >

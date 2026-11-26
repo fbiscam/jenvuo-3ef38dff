@@ -114,7 +114,7 @@ function CodePage() {
         <div className="code-api-setup min-w-0 p-3">
           <div className="flex items-center justify-between"><span className="text-xs text-muted-foreground">Setup</span><Button variant="ghost" size="icon-sm" aria-label={copied ? "Code copied" : "Copy code"} title={copied ? "Copied" : "Copy code"} onClick={() => void copy()}>{copied ? <Check /> : <Copy />}</Button></div>
           <div className="mt-1 flex min-w-0 items-center gap-2 text-xs text-muted-foreground"><File className="h-3.5 w-3.5 shrink-0" /><span className="break-all font-code">{ex.file}</span></div>
-          <div className="code-box mt-4 max-h-[150px] overflow-y-auto overflow-x-hidden"><pre className="whitespace-pre-wrap break-words font-code text-[11px] leading-[1.7] [overflow-wrap:anywhere]"><code>{highlight(ex.code)}</code></pre></div>
+          <div className="code-box mt-4 max-h-[230px] overflow-y-auto overflow-x-hidden"><pre className="whitespace-pre-wrap break-words font-code text-[15px] leading-[1.7] [overflow-wrap:anywhere]"><code>{highlight(ex.code)}</code></pre></div>
           <Button asChild variant="link" className="mt-3 h-auto p-0 text-xs font-normal text-muted-foreground"><Link to="/docs"><Terminal />Read API docs<ArrowUpRight /></Link></Button>
         </div>
         <div className="min-w-0 p-4">
@@ -122,8 +122,8 @@ function CodePage() {
           {tab === "Code review" ? <>
             <p className="mt-4 flex flex-wrap items-center gap-2 text-sm"><GitPullRequest className="h-4 w-4" />jenvu-review-bot <span className="text-muted-foreground">requested changes</span></p>
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{ex.result}</p>
-            <div className="code-api-diff mt-5 p-3 font-code text-xs"><p className="mb-2 break-all">Edit <span className="text-muted-foreground">src/api/pagination.ts:41</span></p><pre className="whitespace-pre-wrap break-words leading-relaxed"><code><span className="code-api-diff-remove block">- const end = start + pageSize - 1;</span><span className="code-api-diff-add block">+ const end = start + pageSize;</span></code></pre></div>
-          </> : <><p className="mt-4 text-sm font-medium">{ex.result}</p><pre className="mt-5 whitespace-pre-wrap break-words font-code text-xs leading-relaxed text-muted-foreground">{ex.output}</pre></>}
+            <div className="code-api-diff mt-5 p-3 font-code text-[14px]"><p className="mb-2 break-all">Edit <span className="text-muted-foreground">src/api/pagination.ts:41</span></p><pre className="whitespace-pre-wrap break-words leading-relaxed"><code><span className="code-api-diff-remove block">- const end = start + pageSize - 1;</span><span className="code-api-diff-add block">+ const end = start + pageSize;</span></code></pre></div>
+          </> : <><p className="mt-4 text-sm font-medium">{ex.result}</p><pre className="mt-5 whitespace-pre-wrap break-words font-code text-[14px] leading-relaxed text-muted-foreground">{ex.output}</pre></>}
         </div>
       </div>
     </section>

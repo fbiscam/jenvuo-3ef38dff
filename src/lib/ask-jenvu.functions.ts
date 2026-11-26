@@ -42,8 +42,7 @@ export const askJenvu = createServerFn({ method: "POST" })
     const { getOptionalUserId } = await import("@/lib/optional-auth.server");
     const userId = await getOptionalUserId().catch(() => null);
 
-    // Ask Jenvu is free but signed-in only, so visitors cannot run up AI usage.
-    if (!userId) return { ok: false, error: "Please sign in to use Ask Jenvu. It's free." };
+    // Visitors can converse without creating an account; rate limits still apply.
     const ip =
       getRequestHeader("cf-connecting-ip") ||
       getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
