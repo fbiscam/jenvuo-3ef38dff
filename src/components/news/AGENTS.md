@@ -1,0 +1,1 @@
+- EconomicCalendar owns the existing weekly query and filters inside the News page; the former Calendar route redirects there so navigation has one calendar destination.
