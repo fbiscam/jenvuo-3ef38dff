@@ -3064,7 +3064,7 @@ html.dark body .console-pill.console-pill-white {
 .value-flash-up { animation: value-flash-up 1.2s ease-out; }
 .value-flash-down { animation: value-flash-down 1.2s ease-out; }
 .api-create-overlay { background: color-mix(in oklab, var(--foreground) 48%, transparent); }
-.api-create-dialog { background: var(--background); color: var(--foreground); box-shadow: 0 8px 18px color-mix(in oklab, var(--foreground) 16%, transparent); }
+.api-create-dialog { --border: color-mix(in oklab, var(--foreground) 14%, var(--background)); background: var(--background); color: var(--foreground); box-shadow: 0 8px 18px color-mix(in oklab, var(--foreground) 16%, transparent); }
 .api-create-dialog .api-create-option { height: 34px; opacity: 1; color: var(--muted-foreground); box-shadow: none; }
 .code-api-brand { width: 16px; height: 16px; flex-shrink: 0; }
 .slack-brand { --slack-blue: #36c5f0; --slack-green: #2eb67d; --slack-yellow: #ecb22e; --slack-red: #e01e5a; }

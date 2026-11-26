@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Compact API key dialog, idle/focused input borders and reference-style advanced layout; show unsupported restrictions disabled without changing key permissions. Add official GitHub/Slack marks and seven-line, wrapping Code examples; verify utility regression and signed-in desktop/mobile flow.
+- [x] Compact API key dialog with neutral idle / black focused borders and reference-style advanced layout. Unsupported custom restrictions stay disabled; existing plan limits unchanged. Official GitHub/Slack marks and all four seven-line, wrapping examples verified at desktop/393px using a temporary signed-in test account. Real key creation/readback, copy, disclosure and cancel verified; test key removed, no runtime errors, utility regression passes and build OK. Not published; custom model/endpoint/rate/expiry enforcement is not implemented.
 
 - [x] Match Create API key popup and Code API page to supplied references. Existing 60-character server limit and supported GPT-5.5 retained rather than copying another provider's model/CLI. Temporary signed-in test user verified real key creation/readback, advanced disclosure, cancel, four tabs, copy, Playground/Docs links and desktop/393px layout without overflow/runtime errors. Utility regression passes; latest build OK. No publishing or account-rule changes.
 
