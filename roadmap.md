@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Match all News sections to Latest results without changing news data or filters; verify the reported utility error.
+- [x] Match all News sections to Latest results using one shared heading/surface and divided rows, with no data/filter changes. Temporary signed-in test user verified three equal-width sections with one outer surface each, working High/EUR filters, desktop/393px fit and no runtime errors. Six utility/news tests pass; all 81 helper-containing files read and use the single string-returning helper, no separate job/SQL/extension/electron counterpart found. Current utils.ts has seven lines; reported error absent; build OK. Existing customer records, permissions and settings unchanged.
 
 - [x] Extend swing audit to Gold and Bitcoin on 15M/1H using the same chart feeds and existing 15-minute schedule. Authorized local HTTP run completed all six asset/timeframe checks without errors; database readback confirms 63 Gold and 69 Bitcoin rows. Seven targeted tests pass and latest build OK. Read all 80 helper/caller files: shared cn returns string, reported line 8 absent. Published callback still requires publishing; initial historical observations do not establish live repaint rates. No permissions or settings changed.
 
