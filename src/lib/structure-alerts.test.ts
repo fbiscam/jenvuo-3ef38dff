@@ -13,7 +13,7 @@ const bars = (n: number) =>
 describe("structure alerts", () => {
   test("scans the three pairs on 1H, 2H and 3H", () => {
     expect([...ALERT_ASSETS]).toEqual(["XAUUSD", "EURUSD", "BTCUSD"]);
-    expect([...ALERT_TIMEFRAMES]).toEqual(["1h", "2h", "3h", "4h"]);
+    expect([...ALERT_TIMEFRAMES]).toEqual(["1h"]);
   });
   test("only swings confirmed on the newest candles fire, each with PA or sweep", () => {
     const series = bars(300);

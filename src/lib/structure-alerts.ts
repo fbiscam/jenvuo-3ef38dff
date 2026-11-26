@@ -8,7 +8,7 @@ import { isHighProbabilityPriceAction, isHighProbabilitySweep } from "@/lib/char
 import type { OhlcvBar } from "@/lib/chart/indicators";
 
 export const ALERT_ASSETS = ["XAUUSD", "EURUSD", "BTCUSD"] as const;
-export const ALERT_TIMEFRAMES = ["1h", "2h", "3h", "4h"] as const;
+export const ALERT_TIMEFRAMES = ["1h"] as const;
 /** A swing counts as fresh only if it confirmed on one of the newest N closed candles. */
 export const FRESH_CONFIRM_BARS = 3;
 /** Alerts use the chart's own swing confirmation, so an email only goes out once the label is drawn on the chart. */
