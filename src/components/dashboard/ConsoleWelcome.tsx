@@ -77,7 +77,7 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
     });
   };
   return (
-    <div className="console-card flex min-h-[184px] flex-col bg-white p-6 text-neutral-900">
+    <div className="console-card flex min-h-[184px] min-w-0 flex-col bg-white p-6 text-neutral-900">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-[16px] font-medium text-foreground">Quickstart</p>
         <div className="flex items-center gap-1">
@@ -121,7 +121,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="console-card flex min-h-[184px] flex-col p-6">
+        <div className="console-card flex min-h-[184px] min-w-0 flex-col p-6">
           <div className="flex items-center gap-3">
             <PlatformLogo framed className="h-9 w-9" />
             <div>
