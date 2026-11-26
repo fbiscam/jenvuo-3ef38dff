@@ -75,7 +75,7 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
         </div>
       </div>
       <div className="mt-2 whitespace-nowrap px-1 text-[13px] text-muted-foreground">
-        {hasKeys ? <span title="Use one of your active keys as JENVU_API_KEY.">Use JENVU_API_KEY In Your Code.</span> : <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">Generate API key →</Link>}
+        {hasKeys ? <span title="Use one of your active keys as JENVU_API_KEY.">  Use JENVU_API_KEY In Your Code.</span> : <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">Generate API key →</Link>}
         {" · "}<Link to="/dashboard/code" className="underline-offset-4 hover:underline">More examples</Link>
       </div>
     </div>
