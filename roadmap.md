@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Add aligned provider logos to API-key model choices; expand Code examples to full width with wrapping and no internal scrolling; verify signed-in desktop/mobile behavior and the reported utility error.
+- [x] Add aligned provider logos to API-key model choices; expand Code examples to full width with wrapping and no internal scrolling. Signed-in desktop/393px checks passed for loaded logos, model selection, all four examples and copy; utility regression passed and latest build OK. Not published.
 
 - [x] Compact API key dialog with neutral idle / black focused borders and reference-style advanced layout. Unsupported custom restrictions stay disabled; existing plan limits unchanged. Official GitHub/Slack marks and all four seven-line, wrapping examples verified at desktop/393px using a temporary signed-in test account. Real key creation/readback, copy, disclosure and cancel verified; test key removed, no runtime errors, utility regression passes and build OK. Not published; custom model/endpoint/rate/expiry enforcement is not implemented.
 
