@@ -50,7 +50,7 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
     void navigator.clipboard?.writeText(ex.code).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500); });
   };
   return (
-    <div className="console-card flex min-h-[184px] min-w-0 flex-col p-3">
+    <div className="flex min-h-[184px] min-w-0 flex-col rounded-[8px] border border-border bg-background p-3">
       <div className="flex flex-wrap items-center gap-1" role="tablist" aria-label="Code examples">
         {(Object.keys(MINI) as MiniTab[]).map((t) => { const Icon = MINI[t].icon; return (
           <button key={t} type="button" role="tab" aria-selected={t === tab} onClick={() => { setTab(t); setCopied(false); }}
@@ -101,7 +101,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
       </div>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="console-card flex min-h-[184px] min-w-0 flex-col p-6">
+        <div className="flex min-h-[184px] min-w-0 flex-col rounded-[8px] border border-border bg-background p-6">
           <div className="flex items-center gap-3">
             <PlatformLogo framed className="h-9 w-9" />
             <div>
@@ -119,7 +119,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <span className="text-muted-foreground">{hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
             <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">{hasKeys ? "Manage API keys →" : "Create API key →"}</Link>
           </div>
-          <div className="mt-5 grid grid-cols-5 items-center gap-1 border-t border-border pt-4" aria-label="Compatible developer tools">
+          <div className="mt-7 grid grid-cols-5 items-center gap-1 border-t border-border pt-5" aria-label="Compatible developer tools">
             {WORKS_WITH.map((w) => (
               <span key={w.name} className="flex min-w-0 flex-col items-center gap-1.5 whitespace-nowrap text-[9px] font-medium text-foreground sm:text-[11px]">
                 <img src={w.logo} alt="" aria-hidden="true" className="h-5 w-5 object-contain sm:h-6 sm:w-6" loading="lazy" />
