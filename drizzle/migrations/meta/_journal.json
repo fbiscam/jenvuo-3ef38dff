@@ -547,6 +547,13 @@
       "when": 1795634218127,
       "tag": "0077_swing_audits_backfilled_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1795696702053,
+      "tag": "0078_scam_protection_daily_stats",
+      "breakpoints": true
     }
   ]
 }

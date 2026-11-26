@@ -121,7 +121,7 @@ export function AdminAnnouncementsPage() {
             value={form.link_url}
             maxLength={300}
             onChange={(e) => setForm({ ...form, link_url: e.target.value })}
-            placeholder="Button link (optional), e.g. /dashboard/jx-bot"
+            placeholder="Button link (optional), e.g. /dashboard/news"
             className={ops.input}
           />
           <input

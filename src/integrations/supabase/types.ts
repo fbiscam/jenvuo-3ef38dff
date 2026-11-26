@@ -2808,6 +2808,33 @@ export type Database = {
           },
         ]
       }
+      scam_daily_stats: {
+        Row: {
+          day: string
+          flagged: number
+          page_views: number
+          scans: number
+          suspicious: number
+          updated_at: string
+        }
+        Insert: {
+          day: string
+          flagged?: number
+          page_views?: number
+          scans?: number
+          suspicious?: number
+          updated_at?: string
+        }
+        Update: {
+          day?: string
+          flagged?: number
+          page_views?: number
+          scans?: number
+          suspicious?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_status_probe_requests: {
         Row: {
           request_id: number
@@ -4181,6 +4208,10 @@ export type Database = {
         Returns: undefined
       }
       bump_ask_jenvu_anon: { Args: { _bucket: string }; Returns: number }
+      bump_scam_stat: {
+        Args: { _kind: string; _verdict?: string }
+        Returns: undefined
+      }
       cancel_user_plan: { Args: { _user_id: string }; Returns: Json }
       charge_extension_usage: {
         Args: {

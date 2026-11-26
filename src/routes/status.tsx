@@ -3,7 +3,7 @@ import ServiceStatusPage, { serviceStatusQuery } from '@/components/ServiceStatu
 export const Route = createFileRoute('/status')({
   head: () => ({ meta: [
     { title: 'Jenvu Service Status — Live Availability' },
-    { name: 'description', content: 'Live availability checks and recorded service history for Jenvu Platform, developer API, Gold quotes and JX Bot licensing.' },
+    { name: 'description', content: 'Live availability checks and recorded service history for Jenvu Platform, developer API, Gold quotes and Scam Protection.' },
     { property: 'og:title', content: 'Jenvu Service Status' },
     { property: 'og:description', content: 'Current Jenvu service availability and genuine recorded observations.' },
     { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' },

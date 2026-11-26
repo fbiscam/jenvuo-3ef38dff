@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { DAILY_DRAWDOWN_PCT, FREE_BOT, dailyTargetLabel } from "@/lib/mt5-licenses";
 
 export type DocSection = { id: string; title: string; keywords?: string; body: ReactNode };
 export type DocGroup = { title: string; sections: DocSection[] };
@@ -53,7 +52,7 @@ export const DOC_GROUPS: DocGroup[] = [
               <li>Enter the 6-digit code we email you.</li>
               <li>You land on API keys: create your first key and start building.</li>
             </ol>
-            <p>JX Bot is included on Free with {FREE_BOT.licenses} IP and a {dailyTargetLabel("free")} daily profit stop. Open Dashboard → JX Bot to get started; profit is not guaranteed.</p>
+            <p>Free also includes News and Scam Protection checks.</p>
           </>
         ),
       },
@@ -63,8 +62,8 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding program apply id verification trial credit pro elite 30 days api credit seats",
         body: (
           <>
-            <p>The Free plan gives every account $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. JX Bot is included on Free with {FREE_BOT.licenses} IP, a {dailyTargetLabel("free")} daily profit stop and live Bot Usage updates.</p>
-            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with JX Bot and the plan's API credit ($40 Pro, $70 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
+            <p>The Free plan gives every account $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators. API keys can send up to 10 requests per minute on Free, 20 on Pro, 40 on Elite and 80 on Ultra. Daily token limits are Free 1M, Pro 4M, Elite 10M and Ultra 20M. News and Scam Protection are free on every plan.</p>
+            <p>Approved Founding Program members get Pro or Elite for 30 days, counted from the day their ID is verified, with the plan's API credit ($40 Pro, $70 Elite). Every plan is open to everyone: pick, upgrade or renew it anytime from Payments in your dashboard.</p>
           </>
         ),
       },
@@ -164,7 +163,7 @@ export const DOC_GROUPS: DocGroup[] = [
             <p>The Terminal is open to <strong>every signed-in account</strong>, Free included.</p>
             <ul>
               <li>The paid indicators (Fresh sweep, price action, Zone + FVG) run a set time each UTC day: Free 2 hours, Pro 8, Elite 16, Ultra all day. When the time is used up they lock until 00:00 UTC.</li>
-              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. Their Founding plan (its Terminal hours and JX Bot target) starts once the ID is verified, and the plan's API credit is added ($40 Pro, $70 Elite). After 30 days the plan, credit and bot access end, and you are told whether the bot reached $200 profit; a paid plan keeps JX Bot running.</li>
+              <li>Founding members get 1 month of Pro or Elite, and have <strong>2 days</strong> to upload an identity document. Their Founding plan (its Terminal hours) starts once the ID is verified, and the plan's API credit is added ($40 Pro, $70 Elite). After 30 days the plan and its credit end; continue on Free or buy a plan.</li>
             </ul>
             <p>Apply at <a href="https://jenvu.com/founding">jenvu.com/founding</a>.</p>
           </>
@@ -279,47 +278,24 @@ export const DOC_GROUPS: DocGroup[] = [
     ],
   },
   {
-    title: "JX Bot for MT5",
+    title: "Scam Protection",
     sections: [
       {
-        id: "jx-bot",
-        title: "JX Bot",
-        keywords: "mt5 metatrader expert advisor ea bot ip address verification license automated",
+        id: "scam-protection",
+        title: "Scam Protection",
+        keywords: "scam fraud check broker website link payment crypto wallet iban signal seller report",
         body: (
           <>
             <p>
-              JX Bot is Jenvu's Expert Advisor for <strong>EUR/USD on MetaTrader 5</strong> (M15 chart). It comes with every plan:
-              Free {FREE_BOT.licenses} IP, Pro 1 IP, Elite 3, Ultra 4. There is no license key: you add the IP of the PC or RDP that runs MT5, and one IP works with one MT5 account.
+              Scam Protection checks a <strong>website link</strong>, <strong>payment method</strong>, <strong>broker</strong> or{" "}
+              <strong>signal seller</strong> for common warning signs before you send money. It is free on every plan for signed-in accounts.
             </p>
             <ul>
-              <li>Download it from Dashboard → JX Bot and follow the install steps there.</li>
-              <li>Type the same IP into the bot's MyIP input; the bot checks with jenvu.com that it runs from that IP before it trades.</li>
-              <li>It pauses for the day at {dailyTargetLabel("free")} profit (Free), or 2% (Pro), 4% (Elite) or 6% (Ultra) of the day's starting balance, or at the {DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).</li>
-              <li>Bot Usage shows live profit, balance, equity, trades and ON / OFF logs; connected bots report about once a minute.</li>
+              <li>Open <a href="https://jenvu.com/scam-protection">jenvu.com/scam-protection</a>, pick what you want to check and paste it.</li>
+              <li>You get a risk score, the reasons behind it and the steps to verify before you pay.</li>
+              <li>The page shows a public daily report: page views, checks run and how many were flagged.</li>
             </ul>
-            <Note>Targets are stop limits, not promised profit. Every account gets JX Bot; your plan sets its IP limit and daily target. API credit does not change those limits.</Note>
-          </>
-        ),
-      },
-      {
-        id: "jx-bot-prop-firms",
-        title: "Prop firms, VPS and mobile",
-        keywords: "prop firm the5ers ftmo funded challenge vps rdp ip change mobile phone news rules allowed",
-        body: (
-          <>
-            <p>
-              Based on what The5ers support told us in November 2026. Every firm has its own rules and they can change, so check your firm's current rules first.
-            </p>
-            <ul>
-              <li><strong>Is the strategy allowed?</strong> The5ers said JX Bot looks consistent with their EA rules: a visible hard stop loss on every trade, no martingale, no grid, no tick scalping, no arbitrage. EUR/USD and M15 are not restricted. They also ask that you own the EA you run.</li>
-              <li><strong>New VPS or RDP, new IP?</strong> Not a rule break by itself when it's your own account. Delete the old IP in Dashboard → JX Bot, add the new one, type it into MyIP and stop the bot on the old VPS. Never use a VPS or VPN to hide your location.</li>
-              <li><strong>Phone login?</strong> Yes, you can check trades on the MT5 phone app while the bot runs on the VPS. Use the investor (read-only) password and don't trade manually on that account.</li>
-              <li><strong>News?</strong> The bot has no news calendar, but it opens no new trades during the London open (06:15–09:00 UTC) or the New York session (no new trades after 12:00 UTC), skips spreads above 2 pips and spike candles, and stops at the fixed {DAILY_DRAWDOWN_PCT}% daily drawdown guard.</li>
-            </ul>
-            <p>
-              Full answers: <a href="https://support.jenvu.com/help/signal-engine/jx-bot-prop-firms">JX Bot on prop firms</a>.
-            </p>
-            <Note>Prop firm rules and losses are your responsibility. No setup guarantees you pass a challenge or keep a funded account.</Note>
+            <Note>The checker reads what you paste; it never visits links or moves money. Always verify with the regulator before paying.</Note>
           </>
         ),
       },
@@ -383,10 +359,10 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <ul>
-              <li><strong>Free</strong> — $0 per month, JX Bot included on {FREE_BOT.licenses} IP with a {dailyTargetLabel("free")} daily target.</li>
-              <li><strong>Pro</strong> — $69 per month, JX Bot included.</li>
-              <li><strong>Elite</strong> — $139 per month, JX Bot included.</li>
-              <li><strong>Ultra</strong> — $239 per month, JX Bot included.</li>
+              <li><strong>Free</strong> — $0 per month, with News and Scam Protection.</li>
+              <li><strong>Pro</strong> — $69 per month.</li>
+              <li><strong>Elite</strong> — $139 per month.</li>
+              <li><strong>Ultra</strong> — $239 per month.</li>
             </ul>
             <p>
               Each paid plan includes a monthly AI wallet. AI use is charged by actual tokens at $3 per million. See{" "}
@@ -418,7 +394,7 @@ export const DOC_GROUPS: DocGroup[] = [
         keywords: "founding apply early access",
         body: (
           <p>
-            The Founding Program gives early traders 1 month of Pro or Elite and Terminal access, plus the plan's API credit and JX Bot after ID verification. Apply at{" "}
+            The Founding Program gives early traders 1 month of Pro or Elite and Terminal access, plus the plan's API credit after ID verification. Apply at{" "}
             <a href="https://jenvu.com/founding">jenvu.com/founding</a>, choose a plan and wait for approval. See{" "}
             <a href="#terminal-access">Who can use the Terminal</a> for the verification step.
           </p>

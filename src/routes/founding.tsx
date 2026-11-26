@@ -24,12 +24,12 @@ export const Route = createFileRoute("/founding")({
       {
         name: "description",
         content:
-          "Invite-only program for 50 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; the plan's API credit ($40 Pro, $70 Elite) and JX Bot unlock once their ID is verified within 2 days.",
+          "Invite-only program for 50 Gold, Bitcoin and EUR/USD traders a month. Approved traders get 1 month of Pro or Elite; the plan's API credit ($40 Pro, $70 Elite) unlock once their ID is verified within 2 days.",
       },
       { property: "og:title", content: "Founding Trader Program" },
       {
         property: "og:description",
-        content: "Approval unlocks 1 month of Pro or Elite. Verify your ID within 2 days to unlock the plan's API credit and JX Bot.",
+        content: "Approval unlocks 1 month of Pro or Elite. Verify your ID within 2 days to unlock the plan's API credit.",
       },
       { property: "og:url", content: "https://jenvu.com/founding" },
       { property: "og:type", content: "website" },
@@ -129,7 +129,7 @@ function FoundingPage() {
           <div className="rounded-xl bg-gc-surface px-5 py-4">
             <p className="text-[12px] text-gc-ink-muted">What you get</p>
             <p className="mt-1.5 text-[15px] leading-relaxed text-foreground">
-              Approved traders get 1 month of Pro or Elite, with the Terminal, JX Bot and API credit ($40 Pro, $70 Elite).
+              Approved traders get 1 month of Pro or Elite, with the Terminal, News, Scam Protection and API credit ($40 Pro, $70 Elite).
             </p>
           </div>
           <div className="rounded-xl bg-gc-surface px-5 py-4">

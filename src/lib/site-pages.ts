@@ -15,6 +15,7 @@ export const SITE_PAGES: SitePage[] = [
   { to: "/founding", label: "Founding Program", keywords: "founding apply application invite" },
   { to: "/founder", label: "Founder", keywords: "founder ceo" },
   { to: "/killzones", label: "Killzones", keywords: "sessions london new york asia times" },
+  { to: "/scam-protection", label: "Scam Protection", keywords: "scam protection fraud broker payment website check report" },
   { to: "/scam-check", label: "Scam Check", keywords: "scam fraud check broker safety" },
   { to: "/download", label: "Download", keywords: "extension app install chrome mobile" },
   { to: "/terms", label: "Terms of service", keywords: "terms legal conditions" },

@@ -41,3 +41,4 @@
 - Site black/white theme is one choice in `src/lib/site-theme.ts` (tested): public pages get `.dark` on `<html>` (boot script in `__root.tsx` prevents a white flash), the footer Sun/Moon button and the dashboard's own switch both save it; `<html>` never gets `.dark` under /dashboard because the dashboard wrapper applies its own `dark dash-dark` class on every page except the Terminal (own switch); dashboard white/black colors live in the scoped `.jenvu-zoom-dashboard` rules at the end of `src/styles.css`.
 - Header/footer use `.site-edge` (zoom-scaled): edges match sections.
 - Wrap reused route boundaries in inline route-option functions so code splitting defines their exports instead of dropping shared bindings.
+- JX Bot UI removed; see `src/lib/scam-check/AGENTS.md`.

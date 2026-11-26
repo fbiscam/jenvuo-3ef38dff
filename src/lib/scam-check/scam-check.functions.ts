@@ -46,6 +46,13 @@ export const scamCheck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ScamCheckResult> => {
+    const result = await analyseInput(data);
+    const { recordScamEvent } = await import("./scam-stats.server");
+    await recordScamEvent("scan", result.verdict);
+    return result;
+  });
+
+async function analyseInput(data: z.infer<typeof InputSchema>): Promise<ScamCheckResult> {
     const { getRequestHeader } = await import("@tanstack/react-start/server");
     const ip =
       getRequestHeader("cf-connecting-ip") ||
@@ -158,4 +165,4 @@ export const scamCheck = createServerFn({ method: "POST" })
       aiUsed,
       ...(note ? { note } : {}),
     };
-  });
+}

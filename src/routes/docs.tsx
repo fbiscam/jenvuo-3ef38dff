@@ -10,13 +10,13 @@ import { DocsOverview, OVERVIEW_TOC } from "@/components/docs/DocsOverview";
 export const Route = createFileRoute("/docs")({
   head: () => ({
     meta: [
-      { title: "Jenvu Docs — API, Terminal and JX Bot guide" },
+      { title: "Jenvu Docs — API, Terminal and Scam Protection guide" },
       {
         name: "description",
         content:
-          "Get started with the Jenvu API: quickstart, models, pricing and code samples, plus guides for the Terminal chart, JX Bot, AI chat, plans and a full A–Z glossary.",
+          "Get started with the Jenvu API: quickstart, models, pricing and code samples, plus guides for the Terminal chart, Scam Protection, AI chat, plans and a full A–Z glossary.",
       },
-      { property: "og:title", content: "Jenvu Docs — API, Terminal and JX Bot guide" },
+      { property: "og:title", content: "Jenvu Docs — API, Terminal and Scam Protection guide" },
       {
         property: "og:description",
         content: "Quickstart, models, pricing and code samples for the Jenvu API, plus every Jenvu guide in one place.",
@@ -51,7 +51,7 @@ function sectionText(s: { title: string; keywords?: string }) {
 const TOP_LINKS = [
   { label: "API", href: "#docs-overview" },
   { label: "Terminal", href: "#terminal-access" },
-  { label: "JX Bot", href: "#jx-bot" },
+  { label: "Scam Protection", href: "#scam-protection" },
   { label: "Models", href: "/models" },
   { label: "Pricing", href: "/pricing" },
 ];

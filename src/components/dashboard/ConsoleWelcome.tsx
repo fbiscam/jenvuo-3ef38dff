@@ -1,9 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, Bot, CandlestickChart, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, ShieldCheck, CandlestickChart, type LucideIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
-import BotPerformanceCard from "@/components/dashboard/BotPerformanceCard";
 import { PlatformLogo } from "@/components/brand/ProductLogos";
 
 
@@ -13,7 +12,7 @@ type Product = { title: string; text: string; to: string; img?: string; aurora?:
 const PRODUCTS: Product[] = [
   { title: "Chat API", text: "One API for all Jenvu models.", to: "/dashboard/api", aurora: 1, icon: MessagesSquare },
   { title: "Models", text: "Compare model pricing & limits.", to: "/dashboard/models", aurora: 2, icon: BrainCircuit, badge: "New" },
-  { title: "JX Bot", text: "EUR/USD M15 automated EA.", to: "/dashboard/jx-bot", aurora: 3, icon: Bot },
+  { title: "Scam Protection", text: "Check links, brokers and payments.", to: "/scam-protection", aurora: 3, icon: ShieldCheck },
   { title: "Terminal", text: "Live SMC sweeps, zones and desk.", to: "/dashboard/terminal", aurora: 1, icon: CandlestickChart },
 ];
 
@@ -69,7 +68,21 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
           </div>
         </div>
 
-        <BotPerformanceCard />
+        <div className="console-card flex flex-col p-6">
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-foreground text-background">
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+            </span>
+            <p className="text-[16px] font-medium text-foreground">Scam Protection</p>
+          </div>
+          <p className="mt-6 text-[16px] font-medium text-foreground">Check before you pay</p>
+          <p className="mt-2 text-[14px] text-muted-foreground">
+            Paste a website, payment method, broker or signal seller and see the warning signs in seconds.
+          </p>
+          <Link to="/scam-protection" className="console-pill console-pill-white mt-6 self-start">
+            Open Scam Protection
+          </Link>
+        </div>
       </div>
 
       <h2 className="mt-12 text-[18px] font-medium text-foreground">Explore our products</h2>

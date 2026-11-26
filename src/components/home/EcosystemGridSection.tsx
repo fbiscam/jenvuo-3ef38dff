@@ -25,11 +25,11 @@ type Tile = {
   logo?: string;
   /** Mono black logos need inverting on the dark theme. */
   mono?: boolean;
-  to?: "/jx-bot" | "/models" | "/docs" | "/insights";
+  to?: "/models" | "/docs" | "/insights";
 };
 
 const TILES: Tile[] = [
-  { name: "MetaTrader 5", logo: metaTraderLogo.url, to: "/jx-bot" },
+  { name: "MetaTrader 5", logo: metaTraderLogo.url },
   { name: "TradingView", icon: SiTradingview },
   { name: "OpenAI", logo: openAiLogo, mono: true, to: "/models" },
   { name: "Claude", logo: claudeLogo },

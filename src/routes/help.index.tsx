@@ -6,7 +6,6 @@ import SiteFooter from "@/components/SiteFooter";
 import PublicFaqs from "@/components/PublicFaqs";
 
 import { collections, allArticles } from "@/lib/help-content";
-import { FREE_BOT, dailyTargetLabel, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
 import { SUPPORT_GUIDES } from "@/lib/support-guides";
 
 export const Route = createFileRoute("/help/")({
@@ -64,7 +63,7 @@ function HelpCenterPage() {
     { q: "How do I cancel my plan?", a: "Open Dashboard → Billing and choose Cancel plan. You keep access until the end of the period you already paid for. See the Cancellation policy for details." },
     { q: "How do I get a Jenvu account?", a: "Sign up at jenvu.com with Google or your email. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators." },
     { q: "Who can use the Terminal?", a: "Every signed-in account can open the Terminal. Its paid indicators (Fresh sweep, price action, Zone + FVG) run a set time each UTC day: Free 2 hours, Pro 8, Elite 16 and Ultra all day, then lock until 00:00 UTC. Credit never unlocks the Terminal." },
-    { q: "How do I get JX Bot?", a: `JX Bot comes with every plan. Free includes ${FREE_BOT.licenses} IP and a fixed ${dailyTargetLabel("free")} daily profit stop; Pro 1 IP, Elite 3 IPs, Ultra 4 IPs. Open Dashboard → JX Bot to download it, add the IP of the PC or RDP that runs MT5 and follow the install steps. Bot Usage shows live updates. ${TARGET_DISCLAIMER}` },
+    { q: "How do I check a scam?", a: "Open Scam Protection from the menu, pick Website link, Payment method, Broker or Signal seller, paste what you were sent and choose Check now. It is free on every plan for signed-in accounts." },
     { q: "How many API keys do I get?", a: "Free 1, Pro 3, Elite 5 and Ultra 7. Create and revoke them on Dashboard → API Keys." },
     { q: "How do I contact Jenvu support?", a: "Email support@jenvu.com or use the Contact page. We reply within one business day, Monday to Friday." },
   ];

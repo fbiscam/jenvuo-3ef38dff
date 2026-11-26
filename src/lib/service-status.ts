@@ -8,7 +8,6 @@ export const STATUS_GROUPS: { name: string; services: { id: ServiceId; name: str
   { name: 'Jenvu Platform', services: [{ id: 'website', name: 'Website' }, { id: 'dashboard', name: 'Dashboard access' }, { id: 'auth', name: 'Sign-in access' }] },
   { name: 'Developer API', services: [{ id: 'api', name: 'Model catalog' }, { id: 'docs', name: 'Documentation' }] },
   { name: 'Terminal & Market Data', services: [{ id: 'gold', name: 'Gold quote feed' }, { id: 'candles', name: 'Gold candle stream' }] },
-  { name: 'JX Bot', services: [{ id: 'licensing', name: 'MT5 license validator' }, { id: 'reports', name: 'Bot telemetry & reporting' }] },
   { name: 'API Keys', services: [{ id: 'keys', name: 'API key authentication' }, { id: 'keys_console', name: 'API key management' }] },
   { name: 'Workspace', services: [{ id: 'terminal', name: 'Web Terminal' }, { id: 'chat', name: 'AI Chat & script studio' }] },
   { name: 'Billing & Payments', services: [{ id: 'payments', name: 'Billing & checkout' }, { id: 'payment_page', name: 'Payment submission' }] },

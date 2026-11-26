@@ -1,10 +1,15 @@
-import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT, FREE_BOT, dailyTargetLabel, MT5_PLANS, TARGET_DISCLAIMER } from "@/lib/mt5-licenses";
+import { FREE_BOT, MT5_PLANS } from "@/lib/mt5-licenses";
 import { FOUNDING_SEATS_PER_MONTH } from "@/lib/founding-seats";
 import { showBuyBlocked } from "@/components/BuyNowButton";
 import SiteHeader from "@/components/SiteHeader";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import * as React from "react";
-import { Check, Minus, Plus } from "lucide-react";
+import { Check, Minus, Plus, ShieldCheck } from "lucide-react";
+
+const SCAM_ITEMS = ["Website link checks", "Payment method checks", "Broker and signal seller checks", "Public daily scam report"];
+function ShieldLogo({ className = "" }: { className?: string }) {
+  return <ShieldCheck className={className} strokeWidth={1.75} aria-hidden="true" />;
+}
 import SiteFooter from "@/components/SiteFooter";
 import { useCurrentPlan } from "@/hooks/useCurrentPlan";
 import { useUpgradeLock } from "@/hooks/useUpgradeLock";
@@ -17,7 +22,7 @@ import { PLAN_DAILY_TOKEN_LIMITS } from "@/lib/plan-entitlements";
 import { PLAN_API_RPM } from "@/lib/plan-entitlements";
 import { FREE_PLAN_API_KEYS, FREE_PLAN_CREDIT_USD, PLAN_API_KEYS, TERMINAL_DAILY_HOURS } from "@/lib/free-plan";
 import { MODEL_CATALOG } from "@/lib/model-catalog";
-import { JxBotLogo, NewsLogo, PlatformLogo, TerminalLogo } from "@/components/brand/ProductLogos";
+import { NewsLogo, PlatformLogo, TerminalLogo } from "@/components/brand/ProductLogos";
 import { RELEASES_PER_EVENT } from "@/lib/news-impact";
 import openAiLogo from "@/assets/model-logos/openai.svg";
 import grokLogo from "@/assets/model-logos/grok.svg";
@@ -28,23 +33,22 @@ const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',sy
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["Is there a free plan?", `Yes. Anyone can sign up and use Jenvu on the Free plan. Multiple accounts are allowed; each email can belong to only one account. Free includes $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Free also includes JX Bot on ${FREE_BOT.licenses} IP with a ${dailyTargetLabel("free")} daily profit stop and live Bot Usage updates; profit is not guaranteed. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
-  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day; Pro $${PLAN_API_CREDIT.pro} credit and ${TERMINAL_DAILY_HOURS.pro} hours; Elite $${PLAN_API_CREDIT.elite} credit and ${TERMINAL_DAILY_HOURS.elite} hours; Ultra $${PLAN_API_CREDIT.ultra} credit, all day. Every plan also includes JX Bot (Free: ${FREE_BOT.licenses} IP, ${dailyTargetLabel("free")} daily target): Pro $${TERMINAL_API_PRICE.pro}, Elite $${TERMINAL_API_PRICE.elite}, Ultra $${TERMINAL_API_PRICE.ultra} a month. Plans only: credit top-ups are not sold.`],
-  ["Who gets JX Bot?", `Every account gets JX Bot, with no limit on how many people can join. Free includes ${FREE_BOT.licenses} IP, a fixed ${dailyTargetLabel("free")} daily profit stop and live Bot Usage updates. Targets: Pro ${DAILY_TARGET_PCT.pro}% on ${MT5_PLANS.pro.licenses} IPs, Elite ${DAILY_TARGET_PCT.elite}% on ${MT5_PLANS.elite.licenses} IPs and Ultra ${DAILY_TARGET_PCT.ultra}% on ${MT5_PLANS.ultra.licenses} IPs. ${TARGET_DISCLAIMER} Founding members (${FOUNDING_SEATS_PER_MONTH} seats a month) also get JX Bot during their 30-day Founding month.`],
-  ["When does JX Bot trade?", `New trades open Monday to Thursday between 01:00 and 14:00 broker time and on Friday until 13:00. It trades only the Asia and London sessions: it skips the London open (06:15–09:00 UTC), the whole New York session (no new trades after 12:00 UTC) and weekends. It stops for the day at ${dailyTargetLabel("free")} profit on Free, or a fixed daily target of ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`],
+  ["Is there a free plan?", `Yes. Anyone can sign up and use Jenvu on the Free plan. Multiple accounts are allowed; each email can belong to only one account. Free includes $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Free also includes News and Scam Protection checks. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
+  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day; Pro $${PLAN_API_CREDIT.pro} credit and ${TERMINAL_DAILY_HOURS.pro} hours; Elite $${PLAN_API_CREDIT.elite} credit and ${TERMINAL_DAILY_HOURS.elite} hours; Ultra $${PLAN_API_CREDIT.ultra} credit, all day. Every plan also includes News and Scam Protection: Pro $${TERMINAL_API_PRICE.pro}, Elite $${TERMINAL_API_PRICE.elite}, Ultra $${TERMINAL_API_PRICE.ultra} a month. Plans only: credit top-ups are not sold.`],
   ["Who can use the Terminal?", `Every signed-in user can open the Terminal. Its paid indicators run for a set time each UTC day by plan: Free ${TERMINAL_DAILY_HOURS.free} hours, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite} and Ultra all day. Time counts only while one of them is switched on and the Terminal is open; when it is used up they lock and disappear until 00:00 UTC.`],
+  ["What is Scam Protection?", "A free checker on every plan: paste a website link, payment method, broker name or signal seller and see the warning signs before you send money. It reads what you paste; it never visits links or moves money."],
   ["Is News Trading free?", `Yes. The News Trading page is free on every plan, including Free. It counts down to the next US high-impact release (NFP, CPI, FOMC, PCE, PPI, GDP) and shows how Gold moved after the same kind of result in the last ${RELEASES_PER_EVENT} real releases. It is a read of past reactions, not a promise of the next move.`],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
-  ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). JX Bot trades EUR/USD only."],
+  ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). "],
 ];
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Free, Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Jenvu pricing: Free includes $35 monthly API credit and JX Bot on 1 IP with a $10 daily target. Pro $69, Elite $139 and Ultra $239 include JX Bot too." },
+      { name: "description", content: "Jenvu pricing: Free includes $35 monthly API credit, News and Scam Protection. Pro $69, Elite $139 and Ultra $239 add more Terminal time and API credit." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Compare Jenvu Free, Pro, Elite and Ultra. JX Bot is included on every plan; Free has 1 IP and a $10 daily target, not guaranteed profit." },
+      { property: "og:description", content: "Compare Jenvu Free, Pro, Elite and Ultra. Every plan includes the Terminal, News, Scam Protection and API credit." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -85,9 +89,6 @@ const PAID: [Mark, Mark, Mark, Mark, Mark] = [false, true, true, true, true];
 const ELITE_UP: [Mark, Mark, Mark, Mark, Mark] = [false, false, true, true, true];
 
 function buildGroups(): ReadonlyArray<Group> {
-  // Every plan includes JX Bot; Free uses the server's fixed-dollar target.
-  const BOT: [Mark, Mark, Mark, Mark, Mark] = ALL;
-  const botVal = (v: string): Mark => v;
   return [
   {
     title: "Usage",
@@ -132,18 +133,13 @@ function buildGroups(): ReadonlyArray<Group> {
     ],
   },
   {
-    title: "JX Bot (MT5)",
+    title: "Scam Protection",
     icon: "bot",
-    bot: true,
     rows: [
-      { f: "Included with every plan", v: BOT },
-      { f: "IPs (PC or RDP)", v: [String(FREE_BOT.licenses), botVal(String(MT5_PLANS.pro.licenses)), botVal(String(MT5_PLANS.elite.licenses)), botVal(String(MT5_PLANS.ultra.licenses)), "Custom"] },
-      { f: "Daily profit target per IP (not guaranteed)", v: [dailyTargetLabel("free"), botVal(`${DAILY_TARGET_PCT.pro}%`), botVal(`${DAILY_TARGET_PCT.elite}%`), botVal(`${DAILY_TARGET_PCT.ultra}%`), "Custom"] },
-      { f: `Auto-stop at target or ${DAILY_DRAWDOWN_PCT}% drawdown`, v: BOT },
-      { f: "IP sign-in, no license key", v: BOT },
-      { f: "Live Bot Usage updates & ON / OFF log", v: BOT },
-      { f: "Safe hours: London open block, New York off", v: BOT },
-      { f: "Download, presets & updates", v: BOT },
+      { f: "Website link checks", v: ALL },
+      { f: "Payment method checks (crypto, bank, PayPal)", v: ALL },
+      { f: "Broker and signal seller checks", v: ALL },
+      { f: "Public daily scam report", v: ALL },
     ],
   },
   {
@@ -205,7 +201,7 @@ const CUSTOM: ReadonlyArray<[string, string]> = [
 
 function GroupMark({ icon }: { icon: GroupIcon }) {
   if (icon === "terminal") return <TerminalLogo className="h-[18px] w-[18px]" />;
-  if (icon === "bot") return <JxBotLogo className="h-[18px] w-[18px]" />;
+  if (icon === "bot") return <ShieldLogo className="h-[18px] w-[18px]" />;
   if (icon === "news") return <NewsLogo className="h-[18px] w-[18px]" />;
   if (icon === "platform") return <PlatformLogo className="h-[18px] w-[18px]" />;
   if (icon === "models") {
@@ -312,7 +308,7 @@ function PricingPage() {
   const [open, setOpen] = React.useState<number | null>(null);
 
   const plans: Array<{ key: CardKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
-    { key: "free", name: "Free", description: "Try the Terminal, API & JX Bot", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: FREE_BOT.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
+    { key: "free", name: "Free", description: "Try the Terminal, News, API & Scam Protection", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: FREE_BOT.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
     { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: `$${PLAN_API_CREDIT.pro}`, bigLabel: "API credit every month", ips: MT5_PLANS.pro.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.pro}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("pro")} daily tokens`, `${PLAN_API_KEYS.pro} API keys`] },
     { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: `$${PLAN_API_CREDIT.elite}`, bigLabel: "API credit & senior review", ips: MT5_PLANS.elite.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.elite}h a day`, "Claude Fable 5.1 senior review", `${TOKENS("elite")} daily tokens`, `${PLAN_API_KEYS.elite} API keys, webhooks & logs`] },
     { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: `$${PLAN_API_CREDIT.ultra}`, bigLabel: "API credit & priority desk", ips: MT5_PLANS.ultra.licenses, features: ["Terminal indicators all day", `${TOKENS("ultra")} daily tokens`, `${PLAN_API_KEYS.ultra} API keys`, "Priority desk support"] },
@@ -412,8 +408,8 @@ function PricingPage() {
 
       {/* HEADER */}
       <section className="mx-auto max-w-[900px] px-5 pb-10 pt-16 text-center sm:px-8 sm:pt-24">
-        <div className="mx-auto flex items-center justify-center gap-3.5" aria-label="Terminal, JX Bot, News Trading and Platform">
-          {([["Terminal", TerminalLogo], ["JX Bot", JxBotLogo], ["News Trading", NewsLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
+        <div className="mx-auto flex items-center justify-center gap-3.5" aria-label="Terminal, News Trading, Scam Protection and Platform">
+          {([["Terminal", TerminalLogo], ["News Trading", NewsLogo], ["Scam Protection", ShieldLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
             <Logo key={label} className="h-[22px] w-[22px] text-foreground" />
           ))}
         </div>
@@ -464,7 +460,7 @@ function PricingPage() {
               <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
                 {plan.key === "free"
                   ? "Free forever, start with your email"
-                  : "Terminal, API & JX Bot"}
+                  : "Terminal, News, API & Scam Protection"}
               </p>
               <div className="mt-4">{plan.key === "free" ? freeCta() : planCta(plan.key)}</div>
               <p className="mt-6 min-h-[20px] text-[13px] text-gc-ink-muted">
@@ -473,15 +469,15 @@ function PricingPage() {
               <Summary big={plan.big} label={plan.bigLabel} />
               <FeatureList title="Platform & AI" items={plan.features} />
               <FeatureList
-                title="JX Bot (MT5)"
-                items={[`${plan.ips} IP${plan.ips > 1 ? "s" : ""} included`, `${dailyTargetLabel(plan.key)} daily target per IP`, `${DAILY_DRAWDOWN_PCT}% drawdown guard`, "Auto-stop at daily target", "Live Bot Usage updates"]}
+                title="Scam Protection"
+                items={SCAM_ITEMS}
               />
               <FeatureList title="News Trading" items={NEWS_ITEMS} />
             </article>
           ))}
         </div>
         <p className="mt-5 text-center text-[13px] text-gc-ink-muted">
-          Prices in USD. Live market data is free on every plan. Terminal hours reset at 00:00 UTC. {TARGET_DISCLAIMER}
+          Prices in USD. Live market data is free on every plan. Terminal hours reset at 00:00 UTC.
         </p>
       </section>
 
@@ -616,7 +612,7 @@ function FeatureList({ title, items, muted }: { title: string; items: string[]; 
   return (
     <div className="mt-6">
       <p className="flex items-center gap-2 border-b border-gc-line pb-2.5 text-[13px] text-gc-ink-muted">
-        {title.startsWith("JX") ? <JxBotLogo className="h-3.5 w-3.5" /> : title.startsWith("News") ? <NewsLogo className="h-3.5 w-3.5" /> : title.includes("Terminal") ? <TerminalLogo className="h-3.5 w-3.5" /> : <PlatformLogo className="h-3.5 w-3.5" />}
+        {title.startsWith("Scam") ? <ShieldLogo className="h-3.5 w-3.5" /> : title.startsWith("News") ? <NewsLogo className="h-3.5 w-3.5" /> : title.includes("Terminal") ? <TerminalLogo className="h-3.5 w-3.5" /> : <PlatformLogo className="h-3.5 w-3.5" />}
         {title}
       </p>
       <ul className="mt-3.5 space-y-2.5 text-[13.5px]">

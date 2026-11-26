@@ -3,17 +3,15 @@ import { expect } from "./chart/test-expect";
 import { planFeatures } from "./plan-features";
 
 describe("billing plan features", () => {
-  it("shows JX Bot with its IPs and daily target when the plan includes it", () => {
-    expect(planFeatures("pro")[1]).toBe("JX Bot on 1 IP · 2% daily target");
-    expect(planFeatures("elite")[1]).toBe("JX Bot on 3 IPs · 4% daily target");
-    expect(planFeatures("ultra")[1]).toBe("JX Bot on 4 IPs · 6% daily target");
+  it("never lists JX Bot (discontinued)", () => {
+    for (const p of ["pro", "elite", "ultra"] as const) {
+      expect(planFeatures(p).some((f) => f.includes("JX Bot"))).toBe(false);
+    }
   });
-  it("always lists JX Bot (every paid plan includes it)", () => {
-    expect(planFeatures("pro", false)[1]).toBe("JX Bot on 1 IP · 2% daily target");
-  });
-  it("lists Terminal, API credit and keys", () => {
+  it("lists Terminal, News/Scam Protection, API credit and keys", () => {
     const f = planFeatures("ultra");
     expect(f).toContain("Terminal paid strategies");
+    expect(f).toContain("News and Scam Protection");
     expect(f).toContain("$90 API credit");
     expect(f).toContain("7 API keys");
   });

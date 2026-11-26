@@ -86,8 +86,8 @@ const WelcomeEmail = ({
             </Text>
             <Text style={listItem}>
               4. Free plan: ${FREE_PLAN_CREDIT_USD} API credit every month, 1 API key and {TERMINAL_DAILY_HOURS.free} hours a day
-              of the Terminal&apos;s paid indicators. Want JX Bot? Apply for the{' '}
-              <Link href={`${SITE}/founding`} style={linkStyle}>Founding Program</Link>.
+              of the Terminal&apos;s paid indicators. Check scams for free with{' '}
+              <Link href={`${SITE}/scam-protection`} style={linkStyle}>Scam Protection</Link>.
             </Text>
 
             <Section style={{ textAlign: 'center', marginTop: 28 }}>

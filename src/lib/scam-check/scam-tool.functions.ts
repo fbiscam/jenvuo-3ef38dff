@@ -133,6 +133,13 @@ export const scamToolCheck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ScamToolResult> => {
+    const result = await analyse(data);
+    const { recordScamEvent } = await import("./scam-stats.server");
+    await recordScamEvent("scan", result.verdict);
+    return result;
+  });
+
+async function analyse(data: z.infer<typeof InputSchema>): Promise<ScamToolResult> {
     const { getRequestHeader } = await import("@tanstack/react-start/server");
     const ip =
       getRequestHeader("cf-connecting-ip") ||
@@ -270,4 +277,4 @@ export const scamToolCheck = createServerFn({ method: "POST" })
     } catch {
       return bail("AI review unavailable right now — heuristic result shown.");
     }
-  });
+}

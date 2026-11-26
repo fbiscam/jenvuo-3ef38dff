@@ -154,6 +154,7 @@ export const GLOBAL_PATHS = new Set([
   "privacy",
   "refund",
   "scam-check",
+  "scam-protection",
   "scam-tool",
   "search",
   "strategies",

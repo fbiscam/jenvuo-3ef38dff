@@ -41,6 +41,7 @@ import { Route as RefundRouteImport } from './routes/refund'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ScamCheckRouteImport } from './routes/scam-check'
+import { Route as ScamProtectionRouteImport } from './routes/scam-protection'
 import { Route as ScamToolRouteImport } from './routes/scam-tool'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -298,6 +299,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const ScamCheckRoute = ScamCheckRouteImport.update({
   id: '/scam-check',
   path: '/scam-check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScamProtectionRoute = ScamProtectionRouteImport.update({
+  id: '/scam-protection',
+  path: '/scam-protection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScamToolRoute = ScamToolRouteImport.update({
@@ -887,6 +893,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/scam-check': typeof ScamCheckRoute
+  '/scam-protection': typeof ScamProtectionRoute
   '/scam-tool': typeof ScamToolRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1016,6 +1023,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/scam-check': typeof ScamCheckRoute
+  '/scam-protection': typeof ScamProtectionRoute
   '/scam-tool': typeof ScamToolRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1149,6 +1157,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/scam-check': typeof ScamCheckRoute
+  '/scam-protection': typeof ScamProtectionRoute
   '/scam-tool': typeof ScamToolRoute
   '/search': typeof SearchRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1283,6 +1292,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/scam-check'
+    | '/scam-protection'
     | '/scam-tool'
     | '/search'
     | '/sitemap.xml'
@@ -1412,6 +1422,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/scam-check'
+    | '/scam-protection'
     | '/scam-tool'
     | '/search'
     | '/sitemap.xml'
@@ -1544,6 +1555,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/scam-check'
+    | '/scam-protection'
     | '/scam-tool'
     | '/search'
     | '/sitemap.xml'
@@ -1678,6 +1690,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   ScamCheckRoute: typeof ScamCheckRoute
+  ScamProtectionRoute: typeof ScamProtectionRoute
   ScamToolRoute: typeof ScamToolRoute
   SearchRoute: typeof SearchRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1941,6 +1954,13 @@ declare module '@tanstack/react-router' {
       path: '/scam-check'
       fullPath: '/scam-check'
       preLoaderRoute: typeof ScamCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scam-protection': {
+      id: '/scam-protection'
+      path: '/scam-protection'
+      fullPath: '/scam-protection'
+      preLoaderRoute: typeof ScamProtectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scam-tool': {
@@ -2859,6 +2879,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   ScamCheckRoute: ScamCheckRoute,
+  ScamProtectionRoute: ScamProtectionRoute,
   ScamToolRoute: ScamToolRoute,
   SearchRoute: SearchRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

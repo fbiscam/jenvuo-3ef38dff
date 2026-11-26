@@ -1,4 +1,3 @@
-import { DAILY_TARGET_PCT, DAILY_DRAWDOWN_PCT, FREE_BOT, dailyTargetLabel } from "@/lib/mt5-licenses";
 // Static Help Center content. Edit this file to add/update articles.
 // Structure mirrors OpenAI Help (Collections → Articles).
 import { INDICATOR_GUIDES, SMC_TOOL_GUIDES, TOOLS_HOW_TO_OPEN, TOOLS_WORKFLOW } from "@/lib/chart-tools-guide";
@@ -81,7 +80,7 @@ export const collections: Collection[] = [
         summary: "Sign up in a minute and start on the Free plan with $35 API credit a month.",
         updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan. JX Bot is included on Free too: 1 IP, a fixed $10 daily profit stop and live Bot Usage updates. Profit is not guaranteed." },
+          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan. News and Scam Protection are free on every plan. Profit is not guaranteed." },
 
           { type: "h2", content: "Sign up" },
           { type: "ol", items: [
@@ -90,7 +89,7 @@ export const collections: Collection[] = [
             "You land on API keys, ready to create your first key.",
           ]},
 
-          { type: "h2", content: "Want JX Bot? Apply for the Founding Program" },
+          { type: "h2", content: "Apply for the Founding Program" },
           { type: "ol", items: [
             "Open the Founding Trader Program page from the top-right of any page.",
             "Choose your preferred plan and complete the short application.",
@@ -101,7 +100,7 @@ export const collections: Collection[] = [
           { type: "h2", content: "What happens next" },
           { type: "ul", items: [
             "Approved applicants receive a private account invitation by email.",
-            "Your Founding month (30 days, JX Bot included) starts on the day your ID is verified.",
+            "Your Founding month (30 days) starts on the day your ID is verified.",
             "You can then sign in and access your dashboard and trading terminal.",
           ]},
 
@@ -347,41 +346,17 @@ export const collections: Collection[] = [
         ],
       },
       {
-        slug: "jx-bot-mt5-setup",
-        title: "Install the JX Bot on MT5",
-        summary: "Who can use the JX Bot, how to register your IP and how to install it in MetaTrader 5.",
-        updatedAt: "2026-10-31",
+        slug: "scam-protection",
+        title: "Check a scam with Scam Protection",
+        summary: "How to check a website, payment method, broker or signal seller before you send money.",
+        updatedAt: "2026-11-26",
         body: [
-          { type: "p", content: "The JX Bot is Jenvu's EUR/USD Expert Advisor for MetaTrader 5. It comes with every plan: Free includes 1 IP and a fixed $10 daily profit stop; Pro $69, Elite $139 and Ultra $239 a month have their own IP limits and percentage targets. There is no limit on how many people can join. The plan decides how many IPs you get and the daily profit target. Daily profit targets are maximum safety caps — profit is not guaranteed. Open Dashboard → JX Bot to download it. How the bot decides its trades is proprietary and not published." },
-          { type: "h2", content: "Plans" },
-          { type: "ul", items: [`Free: ${dailyTargetLabel("free")} daily profit stop, ${FREE_BOT.licenses} IP.`, `Every plan with the bot: ${DAILY_DRAWDOWN_PCT}% drawdown guard.`, `Pro: ${DAILY_TARGET_PCT.pro}% daily target, 1 IP.`, `Elite: ${DAILY_TARGET_PCT.elite}% daily target, 3 IPs.`, `Ultra: ${DAILY_TARGET_PCT.ultra}% daily target, 4 IPs.`, "Free has a fixed $10 daily target; paid plans use a percentage of the day's starting balance, per IP: each MT5 account has its own target, and when one reaches it that bot closes its trades and starts again the next day.", "See live profit, balance, equity, trades and ON / OFF logs for each account at Dashboard → Usage → Bot Usage; reports arrive about once a minute while connected."] },
-          { type: "h2", content: "Trading hours and safety" },
-          { type: "ul", items: ["New trades Monday to Thursday 01:00–14:00 and Friday until 13:00 (broker server time). No trading on Saturday and Sunday.", "The bot trades only the Asia and London sessions. No new trades during the London open (06:15–09:00 UTC), and the New York session is off (no new trades after 12:00 UTC). Open trades are still managed, and a trade already in profit at 06:15 UTC is protected at break-even.", `Daily stop (fixed, can't be changed): $10 profit (Free), ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance. Fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard (counted from the day's highest closed balance, so profit already closed today is protected).`, "Before each entry the bot checks the H1 trend, the spread (max 2 pips), a confirming candle and skips spike candles, so some days have fewer trades.", "After an update, download again, attach the bot again and load the Jenvu EURUSD 15M preset in Inputs."] },
-          { type: "h2", content: "Setup" },
-          { type: "ol", items: ["On the PC or RDP that runs MT5, open whatismyip.com and copy the IP. Then Dashboard → JX Bot: add that IP.", "In MT5: File → Open Data Folder → MQL5 → Experts, paste the Jenvu EA file; put the .set files in MQL5 → Presets; refresh the Navigator.", "Tools → Options → Expert Advisors: tick Allow WebRequest and add https://jenvu.com.", "Turn on Algo Trading, open EURUSD M15, drag Jenvu EA on the chart, load the Jenvu EURUSD 15M preset and type the same IP into MyIP."] },
-          { type: "note", tone: "info", content: "No license key is needed: the bot trades only when it runs from the IP you added, and one IP works with one MT5 account. If your IP changes, delete the old IP and add the new one. Targets are stop limits, not promised profit. Start with a small lot size." },
-        ],
-      },
-      {
-        slug: "jx-bot-prop-firms",
-        title: "JX Bot on prop firms (The5ers, FTMO), VPS and mobile",
-        summary: "Prop firm rules, changing your VPS or RDP IP, checking trades on your phone, and how the bot handles news.",
-        updatedAt: "2026-11-08",
-        body: [
-          { type: "p", content: "Many members run JX Bot on a funded or challenge account at a prop firm such as The5ers or FTMO. These answers are based on what The5ers support told us in November 2026. Every firm has its own rules and they can change, so always check your own firm's current rules before you start." },
-          { type: "h2", content: "Can I use JX Bot on a prop firm account like The5ers?" },
-          { type: "p", content: "The5ers support said JX Bot looks consistent with their EA rules: it places a visible hard stop loss on every trade and does not use any of their prohibited strategies. Their rules do not restrict EUR/USD or the M15 timeframe." },
-          { type: "ul", items: ["Prohibited at The5ers: copying other traders' or signal trades, hidden (stealth) stop losses, tick scalping, latency or other arbitrage, and emulators.", "JX Bot uses none of these. It has no martingale and no grid.", "The5ers also asks that you own the EA you run. Check what your firm requires for a third-party EA.", "Check the account sizes your firm offers: The5ers told us it does not offer a $2,500 account."] },
-          { type: "h2", content: "Can I change my VPS or RDP and get a new IP?" },
-          { type: "p", content: "The5ers support said moving to a new VPS provider and getting a new IP is not, by itself, a rule break when you are using your own account. They do monitor IP activity, and their rules don't say whether a provider change triggers a warning or whether you must tell support first. Never use a VPS or VPN to hide your location or get around country restrictions." },
-          { type: "ol", items: ["On the new VPS or RDP, install MT5 and log in to your account.", "Open whatismyip.com on that machine and copy the IP.", "Dashboard → JX Bot: delete the old IP and add the new one.", "Attach the bot to EURUSD M15 again, load the Jenvu EURUSD 15M preset and type the new IP into MyIP.", "Turn off the bot on the old VPS so only one copy trades the account."] },
-          { type: "h2", content: "Can I log in on my phone while the bot runs on the VPS?" },
-          { type: "p", content: "Yes. The5ers support said you can be logged in to the same MT5 account on your phone while it runs on your VPS, for example to check trades and balance. Using more than one device or network is not, by itself, an IP rule break. Keep your password private." },
-          { type: "ul", items: ["Tip: log in on the phone with the investor (read-only) password, so a stray tap can't open or close a trade.", "Don't place manual trades on the same account; they can affect the bot's daily target and drawdown guard."] },
-          { type: "h2", content: "Does the bot avoid news by itself?" },
-          { type: "p", content: "Partly. The bot does not read a news calendar, but it has built-in filters that keep it away from most busy moments:" },
-          { type: "ul", items: ["No new trades during the London open (06:15–09:00 UTC) or the New York session (after 12:00 UTC), when a lot of major EUR and USD news comes out.", "No new trade if the spread is above 2 pips, and it skips spike candles.", `Fixed ${DAILY_DRAWDOWN_PCT}% daily drawdown guard: the bot stops for the day before most firms' 5% daily loss limit.`] },
-          { type: "note", tone: "warn", content: "For very big events outside those hours (for example a central bank decision), you can turn Algo Trading off in MT5 about 15 minutes before and back on after. Prop firm rules and losses are your responsibility; no setup guarantees you pass or keep a funded account." },
+          { type: "p", content: "Scam Protection checks what you paste for common warning signs: cloned or new websites, crypto-only payment requests, unlicensed brokers and 'guaranteed profit' sellers. It is free on every plan for signed-in accounts." },
+          { type: "h2", content: "Run a check" },
+          { type: "ol", items: ["Open jenvu.com/scam-protection.", "Pick Website link, Payment method, Broker / firm or Signal seller.", "Paste what you were sent and choose Check now.", "Read the risk score, the reasons and the steps to verify before you pay."] },
+          { type: "h2", content: "Daily report" },
+          { type: "ul", items: ["Page views and checks are counted every day.", "The report shows how many checks were flagged and how that share changed against the week before.", "Move the slider to see any of the last 30 days."] },
+          { type: "note", tone: "info", content: "The checker reads the text you paste; it never visits links or moves money. Always confirm a broker on the regulator's own register before paying." },
         ],
       },
     ],
@@ -432,7 +407,7 @@ export const collections: Collection[] = [
             "Multi-timeframe bias engine.",
           ]},
 
-          { type: "h2", content: "Pro — $69 / month with JX Bot" },
+          { type: "h2", content: "Pro — $69 / month" },
           { type: "ul", items: [
             "4,000,000 tokens per day.",
             "$40 API credit per month.",
@@ -443,7 +418,7 @@ export const collections: Collection[] = [
             "Multi-timeframe bias engine.",
           ]},
 
-          { type: "h2", content: "Elite — $139 / month with JX Bot" },
+          { type: "h2", content: "Elite — $139 / month" },
           { type: "ul", items: [
             "5,000,000 tokens per day.",
             "$70 API credit per month.",
@@ -453,7 +428,7 @@ export const collections: Collection[] = [
             "Dedicated onboarding & SLA.",
           ]},
 
-          { type: "h2", content: "Ultra — $239 / month with JX Bot" },
+          { type: "h2", content: "Ultra — $239 / month" },
           { type: "ul", items: [
             "10,000,000 tokens per day.",
             "$90 API credit per month.",
@@ -461,7 +436,7 @@ export const collections: Collection[] = [
             "Priority desk support.",
           ]},
 
-          { type: "note", tone: "info", content: "These prices are the same for everyone and include the Terminal, API credit and JX Bot. See the Pricing page for the full feature matrix. Credit top-ups are no longer sold: plans only. All credit expires 30 days after it is added; the oldest credit is spent first." },
+          { type: "note", tone: "info", content: "These prices are the same for everyone and include the Terminal, News, Scam Protection and API credit. See the Pricing page for the full feature matrix. Credit top-ups are no longer sold: plans only. All credit expires 30 days after it is added; the oldest credit is spent first." },
         ],
       },
 

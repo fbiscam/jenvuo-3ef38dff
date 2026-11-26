@@ -29,7 +29,6 @@ import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { EcosystemGridSection } from "@/components/home/EcosystemGridSection";
-import { BotStatsBar } from "@/components/home/BotStatsBar";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
 import { HomeProductCards, HomeExperiences, HomeUseCases } from "@/components/home/HomeShowcaseSections";
@@ -124,16 +123,16 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
+      { title: "Jenvu: AI Trading Platform | API, News & Scam Protection" },
       {
         name: "description",
         content:
-          "One platform. Endless market intelligence. Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
+          "One platform. Endless market intelligence. Ask the AI, read live charts in the Terminal, follow high-impact News, check scams before you pay and connect the developer API, all in one workspace.",
       },
-      { property: "og:title", content: "Jenvu: AI Trading Platform | API, JX Bot & Live Terminal" },
+      { property: "og:title", content: "Jenvu: AI Trading Platform | API, News & Scam Protection" },
       {
         property: "og:description",
-        content: "Ask the AI, read live charts in the Terminal, run JX Bot and connect the developer API, all in one workspace.",
+        content: "Ask the AI, read live charts in the Terminal, follow high-impact News, check scams before you pay and connect the developer API, all in one workspace.",
       },
       { property: "og:url", content: "https://jenvu.com/" },
       { property: "og:type", content: "website" },
@@ -150,7 +149,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI trading platform with a live Terminal, JX Bot and a developer API.",
+            "AI trading platform with a live Terminal, News, Scam Protection and a developer API.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },
@@ -408,7 +407,6 @@ function HomePage() {
           <EntHero />
           <EntShowcase />
           <DevApiSection />
-          <BotStatsBar />
           <EcosystemGridSection />
           <EntLatestNews articles={homeArticles} />
           <GetStartedSection />
