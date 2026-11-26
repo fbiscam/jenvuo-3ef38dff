@@ -74,8 +74,8 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
           </> : <p className="mt-2 leading-relaxed text-muted-foreground">A liquidity sweep moves beyond a prior high or low, then reverses back into the range.</p>}
         </div>
       </div>
-      <div className="mt-2 px-1 text-[12px] text-muted-foreground">
-        {hasKeys ? "Use one of your active keys as JENVU_API_KEY." : <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">Generate API key →</Link>}
+      <div className="mt-2 whitespace-nowrap px-1 text-[13px] text-muted-foreground">
+        {hasKeys ? <span title="Use one of your active keys as JENVU_API_KEY.">Use JENVU_API_KEY.</span> : <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">Generate API key →</Link>}
         {" · "}<Link to="/dashboard/code" className="underline-offset-4 hover:underline">More examples</Link>
       </div>
     </div>
@@ -119,19 +119,19 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <span className="text-muted-foreground">{hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}</span>
             <Link to="/dashboard/api" className="font-medium text-foreground underline-offset-4 hover:underline">{hasKeys ? "Manage API keys →" : "Create API key →"}</Link>
           </div>
+          <div className="mt-5 grid grid-cols-5 items-center gap-1 border-t border-border pt-4" aria-label="Compatible developer tools">
+            {WORKS_WITH.map((w) => (
+              <span key={w.name} className="flex min-w-0 flex-col items-center gap-1.5 whitespace-nowrap text-[9px] font-medium text-foreground sm:text-[11px]">
+                <img src={w.logo} alt="" aria-hidden="true" className="h-5 w-5 object-contain sm:h-6 sm:w-6" loading="lazy" />
+                {w.name}
+              </span>
+            ))}
+          </div>
         </div>
 
         <QuickstartCard hasKeys={hasKeys} />
       </div>
 
-      <div className="mx-auto mt-12 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-6 sm:gap-x-12">
-        {WORKS_WITH.map((w) => (
-          <span key={w.name} className="inline-flex items-center gap-2.5 text-lg font-semibold tracking-tight text-foreground sm:text-2xl">
-            <img src={w.logo} alt="" aria-hidden="true" className="h-7 w-7 object-contain sm:h-8 sm:w-8" loading="lazy" />
-            {w.name}
-          </span>
-        ))}
-      </div>
       <div className="mt-12 grid gap-4 md:grid-cols-3">
         {[
           { t: "Developer quickstart", d: "Generate an active key and run your first request without any delays.", l: "Explore docs", to: "/docs" },
