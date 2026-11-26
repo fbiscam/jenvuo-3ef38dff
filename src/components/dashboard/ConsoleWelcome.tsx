@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, Copy, Check, File } from "lucide-react";
-import { SiCurl, SiLangchain } from "react-icons/si";
-import { ProviderLogo } from "@/components/models/ModelsExplorer";
+import { Plus, Copy, Check, Globe, File, GitPullRequest } from "lucide-react";
+import { GitHubBrand, SlackBrand } from "@/components/dashboard/CodeBrandIcons";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { highlight } from "@/components/dashboard/CodeHighlight";
@@ -21,40 +20,26 @@ const TOP_MODELS = [
   { id: "deepseek-v4-pro-max", name: "DeepSeek V4 Pro Max", a: "Strongest DeepSeek for maths", b: "Code and high-volume workloads", img: starsPlain },
 ] as const;
 
-const PyLogo = () => (<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#3776AB" d="M11.9 1C6.3 1 6.6 3.4 6.6 3.4v2.5h5.4v.8H4.5S1 6.3 1 12s3.1 5.5 3.1 5.5h1.8v-2.6s-.1-3.1 3-3.1h5.3s2.9 0 2.9-2.8V4.3S17.6 1 11.9 1zM8.9 2.7a1 1 0 110 1.9 1 1 0 010-1.9z"/><path fill="#FFD43B" d="M12.1 23c5.6 0 5.3-2.4 5.3-2.4v-2.5H12v-.8h7.5s3.5.4 3.5-5.3-3.1-5.5-3.1-5.5h-1.8v2.6s.1 3.1-3 3.1H9.8s-2.9 0-2.9 2.8v4.7S6.4 23 12.1 23zm3-1.7a1 1 0 110-1.9 1 1 0 010 1.9z"/></svg>);
-const NodeLogo = () => (<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#5FA04E" d="M12 1.5l9.1 5.25v10.5L12 22.5l-9.1-5.25V6.75z"/></svg>);
-const OpenAILogo = () => <ProviderLogo provider="openai" bare />;
-const CurlLogo = () => <SiCurl color="#073551" />;
-const LangLogo = () => <SiLangchain color="#1C3C3C" />;
-
 const MINI = {
-  "OpenAI SDK": { icon: OpenAILogo, file: "client.py", code: `from openai import OpenAI
+  "Code review": { icon: GitHubBrand, file: "review.py", code: `from openai import OpenAI
 api = OpenAI(base_url="${BASE}")
 r = api.chat.completions.create(model="gpt-5.5",
-  messages=[{"role": "user", "content": "Hello!"}])
+  messages=[{"role": "user", "content": "Review: " + diff}])
 print(r.choices[0].message.content)` },
-  Python: { icon: PyLogo, file: "request.py", code: `import os, requests
-r = requests.post("${BASE}/chat/completions",
-  headers={"Authorization": f"Bearer {os.environ['JENVU_API_KEY']}"},
-  json={"model": "gpt-5.5", "messages": [{"role": "user", "content": "Hello!"}]})
-print(r.json()["choices"][0]["message"]["content"])` },
-  "Node.js": { icon: NodeLogo, file: "index.mjs", code: `import OpenAI from "openai";
-const api = new OpenAI({ baseURL: "${BASE}", apiKey: process.env.JENVU_API_KEY });
-const r = await api.chat.completions.create({ model: "gpt-5.5",
-  messages: [{ role: "user", content: "Hello!" }] });
-console.log(r.choices[0].message.content);` },
-  cURL: { icon: CurlLogo, file: "request.sh", code: `curl ${BASE}/chat/completions \\
+  "Slack bot": { icon: SlackBrand, file: "slack-bot.py", code: `@app.event("app_mention")
+def reply(event, say):
+  r = api.chat.completions.create(model="gpt-5.5",
+    messages=[{"role": "user", "content": event["text"]}])
+  say(r.choices[0].message.content)` },
+  "REST API": { icon: Globe, file: "request.sh", code: `curl ${BASE}/chat/completions \\
   -H "Authorization: Bearer $JENVU_API_KEY" \\
   -d '{"model": "gpt-5.5", "messages":
-    [{"role": "user", "content": "Hello!"}]}'` },
-  LangChain: { icon: LangLogo, file: "chain.py", code: `from langchain_openai import ChatOpenAI
-llm = ChatOpenAI(model="gpt-5.5", base_url="${BASE}")
-print(llm.invoke("Hello!").content)` },
+    [{"role": "user", "content": "Explain a sweep."}]}'` },
 } as const;
 type MiniTab = keyof typeof MINI;
 
 function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
-  const [tab, setTab] = useState<MiniTab>("OpenAI SDK");
+  const [tab, setTab] = useState<MiniTab>("Code review");
   const [copied, setCopied] = useState(false);
   const ex = MINI[tab];
   const copy = () => {
@@ -79,7 +64,10 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
         </div>
         <div className="min-w-0 p-2.5 text-[12px]">
           <p className="text-[11px] text-muted-foreground">Result · Example</p>
-          <p className="mt-2 leading-relaxed text-muted-foreground">Hello! How can I help you today?</p>
+          {tab === "Code review" ? <>
+            <p className="mt-2 flex items-center gap-1.5"><GitPullRequest className="h-3.5 w-3.5" />requested changes</p>
+            <div className="code-api-diff mt-2 p-2 font-code text-[11px]"><span className="code-api-diff-remove block">- end = start + size - 1</span><span className="code-api-diff-add block">+ end = start + size</span></div>
+          </> : <p className="mt-2 leading-relaxed text-muted-foreground">A liquidity sweep moves beyond a prior high or low, then reverses back into the range.</p>}
         </div>
       </div>
       <div className="mt-2 px-1 text-[12px] text-muted-foreground">
