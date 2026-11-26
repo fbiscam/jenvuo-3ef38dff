@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Compact API key dialog, idle/focused input borders and reference-style advanced layout; show unsupported restrictions disabled without changing key permissions. Add official GitHub/Slack marks and seven-line, wrapping Code examples; verify utility regression and signed-in desktop/mobile flow.
+
 - [x] Match Create API key popup and Code API page to supplied references. Existing 60-character server limit and supported GPT-5.5 retained rather than copying another provider's model/CLI. Temporary signed-in test user verified real key creation/readback, advanced disclosure, cancel, four tabs, copy, Playground/Docs links and desktop/393px layout without overflow/runtime errors. Utility regression passes; latest build OK. No publishing or account-rule changes.
 
 - [x] Restore only the selected Overview API-credit and JX Bot-profit sections to white, square console frames with subtle borders; preserve live numbers, links, animations and other page sections. Signed-in owner verified at 1234px and 393px with no overflow/runtime errors; build OK.
