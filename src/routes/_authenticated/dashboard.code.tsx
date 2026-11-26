@@ -93,17 +93,7 @@ function CodePage() {
   return (
     <section className="code-api-page mx-auto w-full max-w-[1100px] pb-10 text-foreground">
       <h1 className="text-[28px] font-normal">Code API</h1>
-      <div className="code-api-banner mt-10 flex flex-col justify-between gap-6 p-7 sm:flex-row sm:items-start">
-        <div className="min-w-0">
-          <div className="flex items-center gap-3"><h2 className="text-xl font-medium">GPT-5.5</h2><span className="rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground">Coding</span></div>
-          <p className="mt-5 max-w-[600px] text-sm leading-relaxed">Code review, trading scripts and real-world knowledge work with the Jenvu API.</p>
-        </div>
-        <div className="flex shrink-0 flex-wrap gap-2">
-          <Button asChild variant="outline" className="rounded-full text-xs font-normal"><Link to="/dashboard/chat">Try Playground</Link></Button>
-          <Button asChild className="rounded-full text-xs"><Link to="/dashboard/api">Get API Key</Link></Button>
-        </div>
-      </div>
-      <h2 className="mt-14 text-base font-medium">API Usage Examples</h2>
+      <h2 className="mt-8 text-base font-medium">API Usage Examples</h2>
       <div className="mt-4 flex flex-wrap gap-1" role="tablist" aria-label="API usage examples">
         {TABS.map((t) => {
           const Icon = EXAMPLES[t].icon;
