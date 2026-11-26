@@ -1,4 +1,4 @@
-# Scam Protection
+# Scam check helpers
 
-- `/jx-bot` redirects to `/scam-protection`; dashboard JX Bot/Bot Usage pages redirect to Overview: JX Bot is discontinued.
-- Public report numbers come only from `scam_daily_stats` (server-only table, `bump_scam_stat` RPC via `recordScamEvent`); every checker handler records its scan, page views are counted once per IP per 30 min; rules in `scam-stats.ts` (tested): the report must never show invented numbers.
+- `/jx-bot` and `/scam-protection` redirect to the homepage; dashboard JX Bot/Bot Usage pages redirect to Overview: both products are discontinued.
+- No scam usage stats are stored (the `scam_daily_stats` table was dropped at the owner's request).

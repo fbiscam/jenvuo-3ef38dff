@@ -79,7 +79,6 @@ export default function SiteHeader() {
             <Link to="/about" activeProps={ACTIVE}>Why Jenvu</Link>
             <Link to="/docs" activeProps={ACTIVE}>Docs</Link>
             <Link to="/status" activeProps={ACTIVE}>Status</Link>
-            <Link to="/scam-protection" activeProps={ACTIVE}>Scam Protection</Link>
             <div className="relative" onMouseLeave={() => setResOpen(false)}>
               <button
                 type="button"
@@ -187,7 +186,6 @@ export default function SiteHeader() {
                     {[
                       { to: isAuthed ? "/dashboard" : "/auth", label: "Dashboard" },
                       { to: "/dashboard/terminal", label: "Jenvu Terminal" },
-                      { to: "/scam-protection", label: "Scam Protection" },
                       { to: "/models", label: "AI models" },
                       { to: "/platform", label: "API Platform" },
                       { to: "/download", label: "Download app" },
@@ -245,7 +243,6 @@ export default function SiteHeader() {
                 { to: "/about", label: "Why Jenvu" },
                 { to: "/docs", label: "Docs" },
                 { to: "/status", label: "Status" },
-                { to: "/scam-protection", label: "Scam Protection" },
                 { to: "/platform", label: "Platform" },
                 { to: "/pricing", label: "Pricing" },
                 ...RESOURCES,

@@ -134,8 +134,6 @@ export const scamToolCheck = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ScamToolResult> => {
     const result = await analyse(data);
-    const { recordScamEvent } = await import("./scam-stats.server");
-    await recordScamEvent("scan", result.verdict);
     return result;
   });
 

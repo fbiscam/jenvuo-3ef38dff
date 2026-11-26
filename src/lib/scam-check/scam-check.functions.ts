@@ -47,8 +47,6 @@ export const scamCheck = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<ScamCheckResult> => {
     const result = await analyseInput(data);
-    const { recordScamEvent } = await import("./scam-stats.server");
-    await recordScamEvent("scan", result.verdict);
     return result;
   });
 
