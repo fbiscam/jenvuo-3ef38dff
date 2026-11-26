@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Slightly enlarge the Overview Quickstart footer on one line and move the five tool logos into API Credit; verify mobile/desktop and the reported utility diagnostic.
+- [x] Slightly enlarge the Overview Quickstart footer to 13px on one line and move the five tool logos into API Credit. Signed-in desktop/393px/320px checks confirm loaded logos in one row and no overflow or browser errors; utility test passes and reported line eight is absent. Active-key instruction shortened to fit; full instruction remains in its tooltip. Not published.
 
 - [x] Add aligned provider logos to API-key model choices; expand Code examples to full width with wrapping and no internal scrolling. Signed-in desktop/393px checks passed for loaded logos, model selection, all four examples and copy; utility regression passed and latest build OK. Not published.
 

@@ -137,8 +137,12 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { title: "Dashboard — Jenvu" },
       {
         name: "description",
-        content: "Your saved A+ setups, trade journal, and billing.",
+        content: "Manage your Jenvu API credit, keys, developer examples, and trading workspace.",
       },
+      { property: "og:title", content: "Dashboard — Jenvu" },
+      { property: "og:description", content: "Manage your Jenvu API credit, keys, developer examples, and trading workspace." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
