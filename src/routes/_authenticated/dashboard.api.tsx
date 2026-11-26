@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Copy, Check, Plus, Search, FileText, X, Terminal } from "lucide-react";
 import { KeyActionsMenu } from "@/components/dashboard/KeyActionsMenu";
+import { CreateApiKeyDialog } from "@/components/dashboard/CreateApiKeyDialog";
 import { EndpointPanel, QuickstartPanel } from "@/components/dashboard/ApiDocsPanels";
 import {
   listExtensionKeys,
@@ -432,45 +433,7 @@ function ExtensionPage() {
       {showGuide && <QuickstartPanel origin={origin} onClose={() => setShowGuide(false)} />}
 
       {/* Create dialog */}
-      {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/30 p-4">
-          <div className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-xl">
-            <div className="flex items-start justify-between gap-3">
-              <div className="text-[15px] font-medium text-zinc-900">Create API key</div>
-              <button
-                onClick={() => setShowCreate(false)}
-                className="rounded-full p-1 text-zinc-500 hover:bg-zinc-100"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="mt-1 text-[13px] text-zinc-500">
-              Give the key a name so you can recognise the device using it.
-            </p>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Key name (e.g. My laptop)"
-              className="mt-4 w-full rounded-lg border border-zinc-300 px-3 py-2 text-[13px] outline-none focus:border-zinc-500"
-            />
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setShowCreate(false)}
-                className="rounded-full px-4 py-2 text-[13px] text-zinc-700 hover:bg-zinc-100"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={onCreate}
-                disabled={creating}
-                className="rounded-full bg-zinc-900 px-4 py-2 text-[13px] font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-              >
-                {creating ? "Creating…" : "Create key"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CreateApiKeyDialog open={showCreate} onOpenChange={setShowCreate} name={name} onNameChange={setName} creating={creating} onCreate={onCreate} planName={access?.planName ?? "Free"} keyLimit={access?.keyLimit ?? 1} />
 
       <ConfirmDialog
         open={!!deleteTarget}

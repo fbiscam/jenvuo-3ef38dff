@@ -3063,6 +3063,16 @@ html.dark body .console-pill.console-pill-white {
 }
 .value-flash-up { animation: value-flash-up 1.2s ease-out; }
 .value-flash-down { animation: value-flash-down 1.2s ease-out; }
+.api-create-overlay { background: color-mix(in oklab, var(--foreground) 48%, transparent); }
+.api-create-dialog { background: var(--background); color: var(--foreground); box-shadow: 0 8px 18px color-mix(in oklab, var(--foreground) 16%, transparent); }
+.code-api-page { --code-api-surface: var(--gc-surface); --code-api-add: var(--pl-up); --code-api-remove: var(--pl-down); }
+.dash-dark .code-api-page { --code-api-surface: var(--console-card); }
+.code-api-banner, .code-api-workspace { background: var(--code-api-surface); border-radius: 16px; }
+.code-api-setup { background: var(--background); border-radius: 10px; }
+.code-api-page .code-box { border: 0; background: transparent !important; }
+.code-api-diff { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.code-api-diff-remove { color: var(--code-api-remove); background: color-mix(in oklab, var(--code-api-remove) 8%, transparent); }
+.code-api-diff-add { color: var(--code-api-add); background: color-mix(in oklab, var(--code-api-add) 12%, transparent); }
 @media (prefers-reduced-motion: reduce) {
   .value-flash-up, .value-flash-down { animation: none; }
 }

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Match Create API key popup and Code API page to supplied references. Existing 60-character server limit and supported GPT-5.5 retained rather than copying another provider's model/CLI. Temporary signed-in test user verified real key creation/readback, advanced disclosure, cancel, four tabs, copy, Playground/Docs links and desktop/393px layout without overflow/runtime errors. Utility regression passes; latest build OK. No publishing or account-rule changes.
+
 - [x] Restore only the selected Overview API-credit and JX Bot-profit sections to white, square console frames with subtle borders; preserve live numbers, links, animations and other page sections. Signed-in owner verified at 1234px and 393px with no overflow/runtime errors; build OK.
 
 - [x] Restore the standalone next-release countdown and separate beat/miss outlook panels; calendar only shows future High-impact events and Latest results is hidden. Eighteen focused tests pass; temporary signed-in test account verified live empty state, pair filter and phone fit without runtime errors. Browser-only samples verified both outlook panels and exclusion of Medium/past events; live feed returned no upcoming events. Current helper and 81 caller/helper files use text, no separate script/extension/electron/SQL helper found; reported utility line eight absent, build OK. Stored history, sent records, permissions/settings and other news screens unchanged; publishing not performed.
