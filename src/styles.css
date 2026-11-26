@@ -2125,18 +2125,10 @@ html.dark body .ask-jenvu-launcher, html.dark body .ask-jenvu-launcher *,
 .jenvu-zoom-dashboard.dash-dark { --console-card: #141414; }
 /* Overview account summaries retain the original white, square console frames. */
 html body .jenvu-zoom-dashboard main .overview-summary > .console-card {
-  background-color: #f9f8f6 !important;
+  background-color: var(--background) !important;
   border: 1px solid var(--console-line) !important;
-  border-radius: 18px !important;
+  border-radius: 0 !important;
 }
-html body .jenvu-zoom-dashboard.dash-dark main .overview-summary > .console-card { background-color: #141414 !important; }
-html body .jenvu-zoom-dashboard main .overview-summary .code-panel { border-radius: 14px !important; background-color: var(--background) !important; }
-.code-panel .tok-str { color: #16a34a; }
-.code-panel .tok-env { color: #dc2626; }
-.code-panel .tok-kw { color: var(--foreground); font-weight: 500; }
-.code-panel .tok-fn { color: #7c3aed; }
-.code-panel .tok-flag { color: var(--muted-foreground); }
-.code-panel .tok-com { color: var(--muted-foreground); font-style: italic; }
 html body .jenvu-zoom-dashboard main :is(.shadow, .shadow-sm, .shadow-md, .shadow-lg) { box-shadow: none !important; }
 html body .jenvu-zoom-dashboard main :is(.bg-gc-panel, .bg-gc-canvas, .bg-zinc-50, .bg-\[\#F4F4F4\]):not(.dash-dark *) { background-color: #f9f8f6 !important; }
 /* Important section icons/logos in orange */
