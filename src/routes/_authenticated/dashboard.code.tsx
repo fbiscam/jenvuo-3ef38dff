@@ -93,7 +93,6 @@ function CodePage() {
   return (
     <section className="code-api-page w-full min-w-0 pb-10 text-foreground">
       <h1 className="text-[28px] font-normal">Code API</h1>
-      <h2 className="mt-8 text-base font-medium">API Usage Examples</h2>
       <div className="mt-4 flex flex-wrap gap-1" role="tablist" aria-label="API usage examples">
         {TABS.map((t) => {
           const Icon = EXAMPLES[t].icon;
