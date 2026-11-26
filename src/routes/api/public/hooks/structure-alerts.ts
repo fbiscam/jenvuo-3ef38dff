@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 // Fresh high/low email alerts. Called every 5 min by pg_cron (x-cron-secret). Recipients: active Pro/Elite/Ultra only.
-// Scans XAU/USD, EUR/USD, BTC/USD on 1H/2H/3H/4H closed candles; each swing is
+// Scans XAU/USD, EUR/USD, BTC/USD on 1H only closed candles; each swing is
 // emailed once (structure_alert_sends primary key dedupes).
 
 const PAIR_NAME: Record<string, string> = { XAUUSD: 'XAU/USD', EURUSD: 'EUR/USD', BTCUSD: 'BTC/USD' }
