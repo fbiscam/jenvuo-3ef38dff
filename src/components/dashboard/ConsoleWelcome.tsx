@@ -64,7 +64,7 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
             <span className="flex min-w-0 items-center gap-1.5"><File className="h-3 w-3 shrink-0" /><span className="truncate font-code">{ex.file}</span></span>
             <button type="button" onClick={copy} aria-label="Copy code" className="rounded-full p-1 hover:text-foreground">{copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}</button>
           </div>
-          <pre className="mt-1.5 whitespace-pre-wrap break-words font-code text-[11px] leading-[1.6] [overflow-wrap:anywhere]"><code>{highlight(ex.code)}</code></pre>
+          <pre className="code-box mt-1.5 rounded-md p-2 whitespace-pre-wrap break-words font-code text-[11px] leading-[1.6] [overflow-wrap:anywhere]"><code>{highlight(ex.code)}</code></pre>
         </div>
         <div className="min-w-0 p-2.5 text-[12px]">
           <p className="text-[11px] text-muted-foreground">Result · Example</p>
@@ -130,6 +130,19 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
             <img src={w.logo} alt="" aria-hidden="true" className="h-7 w-7 object-contain sm:h-8 sm:w-8" loading="lazy" />
             {w.name}
           </span>
+        ))}
+      </div>
+      <div className="mt-12 grid gap-4 md:grid-cols-3">
+        {[
+          { t: "Developer quickstart", d: "Generate an active key and run your first request without any delays.", l: "Explore docs", to: "/docs" },
+          { t: "Workflow scripts", d: "Need rapid market signals? Run custom trading scripts directly through our fast API endpoints daily.", l: "Open code studio", to: "/dashboard/code" },
+          { t: "Market model intelligence", d: "Choose the optimal intelligence engine for accurate analysis, speed and low latency.", l: "Browse model catalog", to: "/models" },
+        ].map((c) => (
+          <div key={c.t} className="console-card flex min-w-0 flex-col p-6">
+            <p className="text-[16px] font-medium text-foreground">{c.t}</p>
+            <p className="mt-2 flex-1 text-[14px] leading-relaxed text-muted-foreground">{c.d}</p>
+            <Link to={c.to} className="mt-5 text-[14px] font-medium text-foreground underline-offset-4 hover:underline">{c.l} ↗</Link>
+          </div>
         ))}
       </div>
     </section>
