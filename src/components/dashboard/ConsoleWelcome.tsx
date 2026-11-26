@@ -30,14 +30,16 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
     <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-[28px] font-medium tracking-tight text-foreground sm:text-[32px]">Welcome, {name}</h1>
-        {hasKeys && (
+        {keysCount !== null && hasKeys && (
           <Link to="/dashboard/api" className="console-pill console-pill-solid">
             <Plus className="h-4 w-4" aria-hidden="true" /> Create API key
           </Link>
         )}
       </div>
 
-      {hasKeys ? (
+      {keysCount === null ? (
+        <div className="mt-8 h-40 animate-pulse bg-muted/40" aria-hidden="true" />
+      ) : hasKeys ? (
         <div className="overview-summary mt-8 flex flex-col gap-4">
           <div className="console-card flex flex-wrap items-center justify-between gap-4 p-5">
             <div className="flex items-center gap-3">
