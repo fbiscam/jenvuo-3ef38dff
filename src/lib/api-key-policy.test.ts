@@ -1,6 +1,6 @@
 import { describe, it as test } from "node:test";
 import assert from "node:assert/strict";
-import { apiKeyAllowsModel, apiKeyExpired, validateApiKeyOptions } from "./api-key-policy";
+import { apiKeyAllowsModel, apiKeyExpired, apiKeyTokensExhausted, validateApiKeyOptions } from "./api-key-policy";
 
 describe("API key model selection and expiry", () => {
   test("only ticked models are allowed", () => {
@@ -10,7 +10,7 @@ describe("API key model selection and expiry", () => {
     assert.equal(apiKeyAllowsModel(options.allowedModels, "deepseek-v3.2"), false);
   });
   test("all models and no expiry remain the default", () => {
-    assert.deepEqual(validateApiKeyOptions({}), { allowedModels: null, expiresAt: null });
+    assert.deepEqual(validateApiKeyOptions({}), { allowedModels: null, expiresAt: null, rpmLimit: null, tokenLimit: null });
     assert.equal(apiKeyAllowsModel(null, "deepseek-v3.2"), true);
     assert.equal(apiKeyExpired(null), false);
   });
@@ -26,4 +26,15 @@ describe("API key model selection and expiry", () => {
   test("past expiry cannot create a usable key", () => {
     assert.throws(() => validateApiKeyOptions({ expiresAt: "2026-11-26T14:17:00Z" }, Date.parse("2026-11-26T14:17:00Z")));
   });
+});
+test("token limit reached once usage meets the limit", () => {
+  assert.equal(apiKeyTokensExhausted(1000, 999), false);
+  assert.equal(apiKeyTokensExhausted(1000, 1000), true);
+  assert.equal(apiKeyTokensExhausted(null, 5_000_000), false);
+});
+
+test("rpm and token limits validated", () => {
+  assert.equal(validateApiKeyOptions({ rpmLimit: 30, tokenLimit: 500000 }).rpmLimit, 30);
+  assert.throws(() => validateApiKeyOptions({ rpmLimit: 0 }));
+  assert.throws(() => validateApiKeyOptions({ tokenLimit: 1.5 }));
 });

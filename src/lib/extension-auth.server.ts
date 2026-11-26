@@ -4,7 +4,7 @@
  */
 
 export const EXT_KEY_PREFIX = 'jenvu_ext_'
-import { apiKeyExpired } from './api-key-policy'
+import { apiKeyExpired, apiKeyTokensExhausted } from './api-key-policy'
 
 export async function hashExtensionKey(raw: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw.trim()))
@@ -45,7 +45,7 @@ export async function decryptExtensionKey(payload: string): Promise<string> {
 }
 
 export type ExtensionAuthResult =
-  | { ok: true; userId: string; keyId: string; name: string; allowedModels: string[] | null }
+  | { ok: true; userId: string; keyId: string; name: string; allowedModels: string[] | null; rpmLimit: number | null }
   | { ok: false; status: number; error: string }
 
 /** Validates an API key coming from the extension and marks it as used. */
@@ -63,7 +63,7 @@ export async function authenticateExtensionRequest(request: Request): Promise<Ex
 
   const { data, error } = await admin
     .from('extension_api_keys')
-    .select('id,user_id,name,revoked_at,created_at,allowed_models,expires_at')
+    .select('id,user_id,name,revoked_at,created_at,allowed_models,expires_at,rpm_limit,token_limit,tokens_used')
     .eq('key_hash', keyHash)
     .maybeSingle()
 
@@ -71,6 +71,12 @@ export async function authenticateExtensionRequest(request: Request): Promise<Ex
   if (!data) return { ok: false, status: 401, error: 'Invalid API key.' }
   if (data.revoked_at) return { ok: false, status: 401, error: 'This API key was revoked.' }
   if (apiKeyExpired(data.expires_at)) return { ok: false, status: 401, error: 'This API key has expired.' }
+  if (apiKeyTokensExhausted(data.token_limit, data.tokens_used)) return { ok: false, status: 429, error: 'This API key reached its total token limit.' }
+  if (data.rpm_limit) {
+    const since = new Date(Date.now() - 60_000).toISOString()
+    const { count } = await admin.from('credit_ledger').select('id', { count: 'exact', head: true }).eq('user_id', data.user_id).filter('metadata->>api_key_id', 'eq', data.id).gte('created_at', since)
+    if ((count ?? 0) >= data.rpm_limit) return { ok: false, status: 429, error: 'This API key reached its requests-per-minute limit.' }
+  }
 
   const { data: sub } = await admin.from('user_subscriptions').select('plan_id,status,is_trial,trial_ends_at,current_period_end').eq('user_id', data.user_id).maybeSingle()
   const expiry = sub?.trial_ends_at || sub?.current_period_end
@@ -89,7 +95,7 @@ export async function authenticateExtensionRequest(request: Request): Promise<Ex
     /* usage bookkeeping must never block the request */
   }
 
-  return { ok: true, userId: data.user_id as string, keyId: data.id as string, name: (data.name as string) || 'Extension key', allowedModels: data.allowed_models ?? null }
+  return { ok: true, userId: data.user_id as string, keyId: data.id as string, name: (data.name as string) || 'Extension key', allowedModels: data.allowed_models ?? null, rpmLimit: data.rpm_limit ?? null }
 }
 
 export const EXT_CORS_HEADERS: Record<string, string> = {

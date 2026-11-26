@@ -20,7 +20,7 @@ import {
 } from "@/lib/extension-keys.functions";
 import { getPlanCapabilities } from "@/lib/plan-entitlements";
 import { readPageCache, writePageCache } from "@/lib/page-cache";
-import { apiKeyExpired, type ApiKeyOptions } from "@/lib/api-key-policy";
+import { apiKeyExpired, apiKeyTokensExhausted, type ApiKeyOptions } from "@/lib/api-key-policy";
 import { useCredits } from "@/hooks/useCredits";
 
 const MONO = "font-sans";
@@ -394,12 +394,14 @@ function ExtensionPage() {
                     <td className="py-3.5 pr-4 text-foreground">
                       {new Date(k.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                       <div className="mt-1 text-xs text-muted-foreground">{k.expires_at ? `Expires ${new Date(k.expires_at).toLocaleString()}` : "No expiry"}</div>
+                      {k.token_limit != null || k.rpm_limit != null ? <div className="mt-1 text-xs text-muted-foreground">{k.token_limit != null ? `${Number(k.tokens_used ?? 0).toLocaleString()} / ${k.token_limit.toLocaleString()} tokens` : ""}{k.token_limit != null && k.rpm_limit != null ? " · " : ""}{k.rpm_limit != null ? `${k.rpm_limit} req/min` : ""}</div> : null}
                     </td>
                     <td className="py-3.5 pr-4 text-muted-foreground">
                       {k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : "Never"}
                     </td>
                     <td className="py-3.5 pr-4">
                       <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[12px] font-medium ${k.revoked_at ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${k.revoked_at ? "bg-red-500" : "bg-emerald-500"}`} />{k.revoked_at ? "Disabled" : apiKeyExpired(k.expires_at) ? "Expired" : "Active"}</span>
+                      {!k.revoked_at && apiKeyTokensExhausted(k.token_limit, k.tokens_used) ? <span className="ml-1.5 inline-flex items-center rounded-full bg-red-500/10 px-2.5 py-0.5 text-[12px] font-medium text-red-600 dark:text-red-400">Token limit reached</span> : null}
                     </td>
                     <td className="py-3.5 text-right">
                       <KeyActionsMenu

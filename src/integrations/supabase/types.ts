@@ -1304,6 +1304,9 @@ export type Database = {
           last_used_at: string | null
           name: string
           revoked_at: string | null
+          rpm_limit: number | null
+          token_limit: number | null
+          tokens_used: number
           user_id: string
         }
         Insert: {
@@ -1317,6 +1320,9 @@ export type Database = {
           last_used_at?: string | null
           name?: string
           revoked_at?: string | null
+          rpm_limit?: number | null
+          token_limit?: number | null
+          tokens_used?: number
           user_id: string
         }
         Update: {
@@ -1330,6 +1336,9 @@ export type Database = {
           last_used_at?: string | null
           name?: string
           revoked_at?: string | null
+          rpm_limit?: number | null
+          token_limit?: number | null
+          tokens_used?: number
           user_id?: string
         }
         Relationships: []
@@ -4186,6 +4195,10 @@ export type Database = {
       }
       activate_founding_trial: {
         Args: { _plan_id: string; _user_id: string }
+        Returns: undefined
+      }
+      add_api_key_tokens: {
+        Args: { p_key: string; p_tokens: number }
         Returns: undefined
       }
       admin_auto_scan_cron_history: {

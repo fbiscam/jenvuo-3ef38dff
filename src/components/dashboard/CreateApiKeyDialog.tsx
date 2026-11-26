@@ -18,8 +18,10 @@ export function CreateApiKeyDialog({ open, onOpenChange, name, onNameChange, cre
   const [expiry, setExpiry] = useState("");
   const [draftExpiry, setDraftExpiry] = useState("");
   const [expiryError, setExpiryError] = useState("");
+  const [rpm, setRpm] = useState("");
+  const [tokens, setTokens] = useState("");
   useEffect(() => {
-    if (open) { setSelected(null); setModelsOpen(false); setQuery(""); setExpiry(""); setDraftExpiry(""); setExpiryOpen(false); setExpiryError(""); }
+    if (open) { setSelected(null); setModelsOpen(false); setQuery(""); setExpiry(""); setDraftExpiry(""); setExpiryOpen(false); setExpiryError(""); setRpm(""); setTokens(""); }
   }, [open]);
   const localDate = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
   const toggleModel = (id: string) => {
@@ -38,7 +40,7 @@ export function CreateApiKeyDialog({ open, onOpenChange, name, onNameChange, cre
       <DialogContent onOpenAutoFocus={(event) => event.preventDefault()} className="api-create-dialog w-[calc(100%-32px)] max-w-[480px] max-h-[90dvh] overflow-y-auto gap-0 rounded-3xl p-4 sm:rounded-3xl" overlayClassName="api-create-overlay">
         <DialogTitle className="text-left text-base font-medium tracking-normal">Create API Key</DialogTitle>
         <DialogDescription className="sr-only">Name your key and choose its models and expiry.</DialogDescription>
-        <form onSubmit={(event) => { event.preventDefault(); void onCreate({ allowedModels: selected, expiresAt: expiry ? new Date(expiry).toISOString() : null }); }}>
+        <form onSubmit={(event) => { event.preventDefault(); void onCreate({ allowedModels: selected, expiresAt: expiry ? new Date(expiry).toISOString() : null, rpmLimit: rpm ? Number(rpm) : null, tokenLimit: tokens ? Number(tokens) : null }); }}>
           <label htmlFor="create-api-key-name" className="mb-2 mt-5 block text-[13px] text-foreground">Name</label>
           <div className="api-create-input flex h-9 items-center gap-3 rounded-md border border-border px-3 focus-within:border-foreground">
             <input id="create-api-key-name" value={name} maxLength={60} onChange={(event) => onNameChange(event.target.value)} placeholder="Production key" className="min-w-0 flex-1 bg-transparent text-[13px] text-foreground outline-none placeholder:text-muted-foreground" />
@@ -59,8 +61,8 @@ export function CreateApiKeyDialog({ open, onOpenChange, name, onNameChange, cre
                   </div>
                 </div>}
               </div>
-              <label className="space-y-2 text-xs text-muted-foreground">Tokens per minute<input disabled placeholder="Plan limit" className="api-create-option w-full rounded-md border border-border bg-transparent px-3 text-xs" /></label>
-              <label className="space-y-2 text-xs text-muted-foreground">Requests per minute<input disabled placeholder="Plan limit" className="api-create-option w-full rounded-md border border-border bg-transparent px-3 text-xs" /></label>
+              <label className="space-y-2 text-xs text-muted-foreground">Requests per minute<input type="number" min={1} max={10000} step={1} inputMode="numeric" value={rpm} onChange={(e) => setRpm(e.target.value.replace(/\D/g, ""))} placeholder="Plan limit" className="api-create-option w-full rounded-md border border-border bg-transparent px-3 text-xs text-foreground outline-none focus:border-foreground" /></label>
+              <label className="space-y-2 text-xs text-muted-foreground">Total token limit<input type="number" min={1} step={1} inputMode="numeric" value={tokens} onChange={(e) => setTokens(e.target.value.replace(/\D/g, ""))} placeholder="No limit" className="api-create-option w-full rounded-md border border-border bg-transparent px-3 text-xs text-foreground outline-none focus:border-foreground" /></label>
               <div className="col-span-2 space-y-2">
                 <span className="text-xs text-muted-foreground">Expiry</span>
                 <Button type="button" variant="outline" aria-expanded={expiryOpen} className="api-create-option w-full justify-start rounded-md font-normal" onClick={() => { setDraftExpiry(expiry); setExpiryError(""); setExpiryOpen((v) => !v); }}><CalendarDays />{expiry ? new Date(expiry).toLocaleString() : "No expiry"}</Button>
@@ -72,7 +74,7 @@ export function CreateApiKeyDialog({ open, onOpenChange, name, onNameChange, cre
                 </div>}
               </div>
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Your {planName} plan rate limits apply · {keyLimit} active key{keyLimit === 1 ? "" : "s"}.</p>
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Plan limits still apply ({planName}) · {keyLimit} active key{keyLimit === 1 ? "" : "s"}.</p>
           </details>
           <div className="mt-8 flex items-center justify-between gap-3">
             <Button type="button" variant="outline" size="sm" className="rounded-full font-normal" disabled={creating} onClick={() => onOpenChange(false)}>Cancel</Button>

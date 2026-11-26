@@ -153,6 +153,8 @@ export const Route = createFileRoute("/api/public/v1/chat/completions")({
             action: "chat.completions",
             calls: [{ model: result.model, usage: result.usage, stage: "public-api-chat" }],
           }).catch(() => null);
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          await (supabaseAdmin as any).rpc("add_api_key_tokens", { p_key: auth.keyId, p_tokens: result.usage.totalTokens }).then(() => null, () => null);
 
           if (body?.stream === true) {
             return sseStream({
