@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowUp, ArrowUpRight, ArrowRight, Copy, KeyRound, Paperclip, SlidersHorizontal, ChevronDown, Shuffle, LineChart, Newspaper, Code2, Bot, MessagesSquare, CandlestickChart, Check } from "lucide-react";
+import { ArrowUp, ArrowUpRight, ArrowRight, Copy, KeyRound, Paperclip, SlidersHorizontal, ChevronDown, Shuffle, LineChart, Newspaper, Code2, Bot, MessagesSquare, CandlestickChart, Check, ChevronsUpDown, Coins, Sparkle, Box, Asterisk } from "lucide-react";
 import { toast } from "sonner";
 import { useCredits } from "@/hooks/useCredits";
 
@@ -40,7 +40,21 @@ export default function ConsoleWelcome({ keysCount }: { name?: string; keysCount
   };
 
   return (
-    <section className="console-home mx-auto mb-10 w-full max-w-[960px] pt-6">
+    <section className="console-home mx-auto mb-10 w-full max-w-[960px]">
+      <div className="-mx-2 mb-10 flex items-center justify-between border-b border-border px-2 py-3">
+        <p className="flex items-center gap-3 text-[14px] font-medium text-foreground">
+          <span className="text-muted-foreground">/</span> Default Project <ChevronsUpDown className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+        </p>
+        <div className="flex items-center overflow-hidden rounded-lg border border-border text-[13px]">
+          <Link to="/dashboard/billing" className="flex items-center gap-2 px-3 py-1.5 text-muted-foreground hover:bg-muted">
+            <Coins className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="font-semibold text-foreground">{credits.isLoading ? "—" : `$${balance.toFixed(2)}`}</span> credits
+          </Link>
+          <Link to="/dashboard/api" className="flex items-center gap-1.5 border-l border-border px-3 py-1.5 text-foreground hover:bg-muted">
+            <KeyRound className="h-3.5 w-3.5" aria-hidden="true" /> API key
+          </Link>
+        </div>
+      </div>
       <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">Dashboard <span className="mx-1 opacity-50">/</span> API</p>
       <h1 className="mt-2 flex items-center gap-2.5 text-[28px] font-medium tracking-tight text-foreground">
         <CandlestickChart className="h-7 w-7" aria-hidden="true" /> Jenvu
@@ -86,8 +100,11 @@ export default function ConsoleWelcome({ keysCount }: { name?: string; keysCount
           { title: "Terminal", text: "Live gold charts", to: "/dashboard/terminal", aurora: 2, icon: CandlestickChart },
         ].map((p) => (
           <Link key={p.title} to={p.to} className="group flex items-stretch overflow-hidden rounded-xl border border-border bg-card">
-            <div className="flex w-[72px] shrink-0 items-center justify-center" style={{ backgroundImage: `var(--platform-aurora-${p.aurora})` }}>
-              <p.icon className="h-5 w-5 text-foreground/70" aria-hidden="true" />
+            <div className="flex w-[72px] shrink-0 items-center justify-center" style={{ backgroundColor: "var(--card)", backgroundImage: p.aurora === 1
+              ? "linear-gradient(90deg, transparent, var(--card)), repeating-conic-gradient(rgb(234 120 50 / .55) 0 25%, rgb(234 120 50 / .15) 0 50%)"
+              : "linear-gradient(90deg, transparent, var(--card)), repeating-conic-gradient(rgb(130 90 220 / .55) 0 25%, rgb(130 90 220 / .15) 0 50%)",
+              backgroundSize: "100% 100%, 6px 6px" }}>
+              <p.icon className="h-5 w-5 text-foreground/40" aria-hidden="true" />
             </div>
             <div className="flex flex-1 items-center justify-between px-4 py-4">
               <div>
@@ -102,7 +119,12 @@ export default function ConsoleWelcome({ keysCount }: { name?: string; keysCount
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <div className="relative flex min-h-[260px] flex-col overflow-hidden rounded-xl border border-border bg-card p-4">
-          <p className="text-[15px] font-medium text-foreground">For your coding agent</p>
+          <div className="flex items-center justify-between">
+            <p className="text-[15px] font-medium text-foreground">For your coding agent</p>
+            <span className="flex items-center gap-1.5 text-muted-foreground" aria-hidden="true">
+              <Asterisk className="h-4 w-4" /><Box className="h-4 w-4" /><Bot className="h-4 w-4" /><Sparkle className="h-4 w-4" />
+            </span>
+          </div>
           <pre className="mt-3 flex-1 overflow-hidden whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-muted-foreground/70">{SETUP_PROMPT}</pre>
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-card to-transparent" />
           <button type="button" onClick={copyPrompt}
@@ -118,7 +140,7 @@ export default function ConsoleWelcome({ keysCount }: { name?: string; keysCount
               <Link to="/dashboard/api" className="text-[13px] text-muted-foreground hover:text-foreground">View all</Link>
             </div>
             <Link to="/dashboard/api" className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-muted px-3 py-2 text-[13px] font-medium text-foreground">
-              <KeyRound className="h-3.5 w-3.5" /> {hasKeys ? `Manage ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create API key"}
+              <KeyRound className="h-3.5 w-3.5" /> {hasKeys ? "Copy API key" : "Create API key"}
             </Link>
           </div>
           <div className="flex flex-1 flex-col border-t border-border p-4">
@@ -127,12 +149,12 @@ export default function ConsoleWelcome({ keysCount }: { name?: string; keysCount
                 <p className="text-[15px] font-medium text-foreground">Usage</p>
                 <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
                   Balance <span className="text-foreground">{credits.isLoading ? "—" : `$${balance.toFixed(2)}`}</span>
-                  <span className="mx-2 opacity-50">·</span>Keys <span className="text-foreground">{keysCount ?? "—"}</span>
+                  <span className="mx-2 opacity-50">·</span>Capacity <span className="text-foreground">{keysCount ?? 0}/10</span>
                 </p>
               </div>
               <Link to="/dashboard/usage" className="flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">View all <ArrowRight className="h-3.5 w-3.5" /></Link>
             </div>
-            <p className="m-auto py-6 text-[13px] text-muted-foreground">{hasKeys ? "See your requests on the Usage page." : "No requests yet."}</p>
+            <p className="m-auto py-6 text-[13px] text-muted-foreground">No runs yet.</p>
           </div>
         </div>
       </div>
