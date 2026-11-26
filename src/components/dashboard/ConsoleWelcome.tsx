@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowUpRight, Plus, Copy, Check, Package, BookOpen, Activity, BrainCircuit, type LucideIcon } from "lucide-react";
+import { Plus, Copy, Check } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { highlight } from "@/components/dashboard/CodeHighlight";
-import { ProviderLogo } from "@/components/models/ModelsExplorer";
+import { PRICE_PER_MILLION } from "@/lib/model-catalog";
+import starsNebula from "@/assets/platform/stars-nebula.webp";
+import starsPlain from "@/assets/platform/stars-plain.webp";
 import { PlatformLogo } from "@/components/brand/ProductLogos";
 
 function PythonLogo({ className = "h-5 w-5" }: { className?: string }) {
@@ -57,13 +59,13 @@ console.log(r.choices[0].message.content);`,
 } as const;
 type Lang = keyof typeof SNIPPETS;
 
-type Resource = { title: string; text: string; to: string; icon: LucideIcon; mono?: string; live?: boolean };
-const RESOURCES: Resource[] = [
-  { title: "Python SDK", text: "Works with the OpenAI SDK, just change the base URL.", to: "/docs", icon: Package, mono: "pip install openai" },
-  { title: "API Documentation", text: "Endpoints, streaming and request examples.", to: "/docs", icon: BookOpen },
-  { title: "Platform Status", text: "All systems operational.", to: "/status", icon: Activity, live: true },
-  { title: "Models & Limits", text: "Available models, pricing and your plan limits.", to: "/dashboard/models", icon: BrainCircuit },
-];
+/** Top (heaviest) model from each lab, shown as starfield cards like the Platform page. */
+const TOP_MODELS = [
+  { id: "claude-opus-5.5", name: "Claude Opus 5.5", a: "Deep reasoning and long documents", b: "Code review and refactoring", img: starsNebula },
+  { id: "gpt-5.5-pro", name: "GPT-5.5 Pro", a: "Extra thinking for hard problems", b: "Trading scripts and coding help", img: starsPlain },
+  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro", a: "Text and image understanding", b: "Charts and screenshots", img: starsPlain },
+  { id: "deepseek-v4-pro-max", name: "DeepSeek V4 Pro Max", a: "Strongest DeepSeek for maths", b: "Code and high-volume workloads", img: starsPlain },
+] as const;
 
 function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
   const [lang, setLang] = useState<Lang>("cURL");
@@ -142,37 +144,29 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         <QuickstartCard hasKeys={hasKeys} />
       </div>
 
-      <h2 className="mt-12 text-[18px] font-medium text-foreground">Developer resources</h2>
+      <h2 className="mt-12 text-[18px] font-medium text-foreground">Top models</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {RESOURCES.map((r) => (
-          <Link key={r.title} to={r.to} className="console-card group flex flex-col p-5">
-            <p className="flex items-center justify-between text-[16px] font-medium text-foreground">
-              <span className="flex items-center gap-2">
-                {r.title === "Python SDK" ? <PythonLogo /> : r.title === "Platform Status" ? <PlatformLogo framed className="h-6 w-6" /> : r.live ? (
-                  <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  </span>
-                ) : (
-                  <r.icon className="h-4 w-4" aria-hidden="true" />
-                )}
-                {r.title}
-                {r.live ? <span className="relative ml-1 flex h-2.5 w-2.5" aria-hidden="true"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" /></span> : null}
-              </span>
-              <ArrowUpRight className="h-4 w-4 opacity-60 transition group-hover:opacity-100" aria-hidden="true" />
-            </p>
-            {r.mono ? (
-              <code className="mt-3 block rounded-md border border-border bg-muted px-2.5 py-1.5 font-mono text-[13px] text-foreground">{r.mono}</code>
-            ) : null}
-            {r.title === "Models & Limits" ? (
-              <span className="mt-3 flex items-center gap-1.5">
-                {(["openai", "anthropic", "deepseek", "google"] as const).map((p) => <ProviderLogo key={p} provider={p} bare />)}
-              </span>
-            ) : null}
-            <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">{r.text}</p>
+        {TOP_MODELS.map((m, i) => (
+          <Link key={m.id} to="/dashboard/models"
+            className="group relative flex aspect-[5/4] flex-col justify-end overflow-hidden rounded-md bg-gc-night px-6 pb-8 text-left text-gc-on-night sm:aspect-[5/7]">
+            <img src={m.img} alt="" width={768} height={1056} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+              style={{ transform: ["none", "none", "rotate(180deg)", "scaleX(-1)"][i] }} />
+            <span className="relative block">
+              <span className="block text-[1.5rem] font-medium leading-tight tracking-tight">{m.name}</span>
+              <span className="mt-3 block text-[13px] font-medium">Input: ${PRICE_PER_MILLION.toFixed(2)} per 1M tokens</span>
+              <span className="mt-1 block text-[13px] font-medium">Output: ${PRICE_PER_MILLION.toFixed(2)} per 1M tokens</span>
+              <span className="mt-4 block text-[13px] font-medium">{m.a}</span>
+              <span className="mt-1 block text-[13px] font-medium">{m.b}</span>
+              <span className="mt-4 block break-all text-[13px] font-medium">Model ID: {m.id}</span>
+            </span>
           </Link>
         ))}
       </div>
+      <p className="mt-6 text-center text-[13px] italic text-muted-foreground">
+        One flat rate for every model, paid from your API credit. See the{" "}
+        <Link to="/docs" className="underline underline-offset-2">API docs</Link> and{" "}
+        <Link to="/dashboard/models" className="underline underline-offset-2">all models</Link>.
+      </p>
     </section>
   );
 }
