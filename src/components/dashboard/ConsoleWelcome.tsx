@@ -2,8 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { ArrowUpRight, Plus, MessagesSquare, BrainCircuit, Newspaper, CandlestickChart, type LucideIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
-import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
-import { PlatformLogo } from "@/components/brand/ProductLogos";
 
 
 
@@ -24,7 +22,6 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
   const name = String(profileName?.trim() || meta.full_name || meta.name || user?.email?.split("@")[0] || "trader").split(" ")[0];
   const balance = credits.balance || 0;
   const hasKeys = (keysCount ?? 0) > 0;
-  const shown = useAnimatedNumber(balance, !credits.isLoading, "overview-api-credit");
 
   return (
     <section className="console-home mx-auto mb-10 w-full max-w-[1100px]">
@@ -35,53 +32,36 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
         </Link>
       </div>
 
-      <div className="overview-summary mt-8 grid items-stretch gap-4 md:grid-cols-2">
-        <div className="console-card flex flex-col p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <PlatformLogo framed className="h-8 w-8" />
-              <p className="text-[16px] font-medium text-foreground">API credit</p>
-            </div>
-            <span className="shrink-0 text-[14px] text-muted-foreground">{balance > 0 ? "Balance" : "Pick a plan for more"}</span>
-          </div>
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div className="console-card flex min-h-[184px] flex-col justify-between p-6">
+          <p className="text-[16px] font-medium text-foreground">
+            {balance > 0 ? "Your API credit balance." : "Pick a plan to get more API credit."}
+          </p>
           <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
-            <p
-              className={`text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground ${shown.flash ? `value-flash-${shown.flash}` : ""}`}
-              aria-label={credits.isLoading ? undefined : `$${balance.toFixed(2)}`}
-            >
-              {credits.isLoading ? "—" : `$${shown.value.toFixed(2)}`}
+            <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">
+              {credits.isLoading ? "—" : `$${balance.toFixed(2)}`}
             </p>
-            <Link to="/dashboard/api" className="console-pill console-pill-white">
-              {hasKeys ? "Manage API keys" : "Create API key"}
-            </Link>
-          </div>
-
-          <div className="mt-6 flex flex-col gap-4 border-t border-border pt-6 ">
-            <div className="min-w-0">
-              <p className="text-[16px] font-medium text-foreground">
-                {hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}
-              </p>
-              <p className="mt-2 text-[14px] text-muted-foreground">
-                Use a key to send requests to Jenvu models from your code.
-              </p>
-            </div>
+            <Link to="/dashboard/pay" className="console-pill console-pill-solid">Upgrade plan</Link>
           </div>
         </div>
 
-        <div className="console-card flex flex-col p-6">
-          <div className="flex items-center gap-2.5">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-foreground text-background">
-              <Newspaper className="h-4 w-4" aria-hidden="true" />
-            </span>
-            <p className="text-[16px] font-medium text-foreground">News</p>
+        <div className="console-card flex min-h-[184px] flex-col justify-between p-6">
+          <div>
+            <p className="text-[16px] font-medium text-foreground">
+              {hasKeys ? `You have ${keysCount} API key${keysCount === 1 ? "" : "s"}` : "Create your first API Key"}
+            </p>
+            <p className="mt-2 text-[14px] text-muted-foreground">
+              Use a key to send requests to Jenvu models from your code.
+            </p>
           </div>
-          <p className="mt-6 text-[16px] font-medium text-foreground">Next high-impact release</p>
-          <p className="mt-2 text-[14px] text-muted-foreground">
-            See the upcoming high-impact economic releases with a countdown and beat/miss outlook.
-          </p>
-          <Link to="/dashboard/news" className="console-pill console-pill-white mt-6 self-start">
-            Open News
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <Link to="/dashboard/api" className="console-pill">
+              {hasKeys ? "Manage API keys" : "Create API key"}
+            </Link>
+            <Link to="/docs" className="console-pill">
+              Read the docs <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -111,6 +91,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
                 {p.title}
                 <ArrowUpRight className="h-4 w-4 opacity-60 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100" aria-hidden="true" />
               </p>
+              <p className="mt-1.5 truncate text-[14px] leading-relaxed text-muted-foreground" title={p.text}>{p.text}</p>
             </div>
           </Link>
         ))}
