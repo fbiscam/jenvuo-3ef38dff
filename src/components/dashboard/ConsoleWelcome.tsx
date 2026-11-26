@@ -75,7 +75,7 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
     });
   };
   return (
-    <div className="console-card flex min-h-[184px] flex-col bg-white p-6 text-neutral-900">
+    <div className="console-card quickstart-card flex min-h-[184px] flex-col bg-white p-6 text-neutral-900">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-[16px] font-medium text-foreground">Quickstart</p>
         <div className="flex items-center gap-1">
