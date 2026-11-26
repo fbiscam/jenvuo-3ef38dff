@@ -21,6 +21,7 @@ import {
 import { readPageCache, writePageCache } from "@/lib/page-cache";
 import { pollWhileVisible } from "@/lib/poll";
 import { EconomicCalendar } from "@/components/news/EconomicCalendar";
+import { NewsSection } from "@/components/news/NewsSection";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_authenticated/dashboard/news")({
@@ -100,7 +101,9 @@ function NewsImpactPage() {
         <div className="console-card mt-4 px-4 py-3 text-[14px] text-muted-foreground">The news feed did not answer this time; showing the last saved results.</div>
       )}
 
-      <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
+      <NewsSection icon={Newspaper} title="Next release" sub="Next US news and Gold outlook." id="next-release-heading">
+        <Hero next={nextTracked ?? null} releases={releases} now={now} loading={!data} />
+      </NewsSection>
 
       <EconomicCalendar />
       <RecentResults releases={releases} now={now} loading={!data} />
@@ -115,8 +118,7 @@ function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook;
   const word = dir === "up" ? "UP" : dir === "down" ? "DOWN" : dir === "mixed" ? "MIXED" : "NO DATA";
   return (
     <div
-      className="rounded-2xl border p-5"
-      style={color ? { borderColor: tint(color, 40), background: tint(color, 7) } : undefined}
+      className="min-w-0 p-5"
     >
       <div className="text-[14px] text-muted-foreground">{title}</div>
       <div className={`mt-3 flex items-center gap-3 ${toneOf(dir)}`}>
@@ -141,12 +143,12 @@ function OutlookCard({ title, outlook, big }: { title: string; outlook: Outlook;
 }
 
 function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; releases: UpcomingRelease[]; now: number; loading: boolean }) {
-  if (loading) return <section className="console-card mt-6 min-h-[260px] p-5 text-[14px] text-muted-foreground">Loading the next release…</section>;
+  if (loading) return <div className="min-h-[260px] p-5 text-[14px] text-muted-foreground">Loading the next release…</div>;
   if (!next) {
     return (
-      <section className="console-card mt-6 flex items-center gap-3 p-5 text-[14px] text-muted-foreground">
+      <div className="flex items-center gap-3 p-5 text-[14px] text-muted-foreground">
         <CalendarClock className="h-5 w-5" /> No tracked US high-impact release in the next 8 days.
-      </section>
+      </div>
     );
   }
   const def = eventDef(next.event_key);
@@ -164,10 +166,10 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
   const allStats = moveStats(all, "t15");
   const overall = outlookFrom(allStats);
   return (
-    <section className="console-card mt-6 p-5 sm:p-6">
+    <div className="p-5">
       {preWindow && (
         <div
-          className="pl-down mb-5 flex items-center gap-2 rounded-xl border px-4 py-3 text-[14px] font-medium"
+          className="pl-down mb-5 flex items-center gap-2 border-b border-border pb-3 text-[14px] font-medium"
           style={{ borderColor: tint(DOWN, 40), background: tint(DOWN, 7) }}
           role="status"
         >
@@ -192,7 +194,7 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
       </div>
 
       {live ? (
-        <div className="mt-5">
+        <div className="-mx-5 mt-5 border-y border-border">
           <OutlookCard
             big
             title={`Released: ${fmtVal(next.actual, next.unit, next.scale)} vs forecast ${fmtVal(next.forecast, next.unit, next.scale)} (${read === 0 ? "in line" : (read ?? 0) > 0 ? "beat, USD stronger" : "miss, USD weaker"})`}
@@ -200,13 +202,13 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
           />
         </div>
       ) : (
-        <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="-mx-5 mt-5 grid grid-cols-1 divide-y divide-border border-y border-border sm:grid-cols-2 sm:divide-x sm:divide-y-0">
           <OutlookCard title="If the number beats forecast (USD stronger)" outlook={beat} />
           <OutlookCard title="If the number misses forecast (USD weaker)" outlook={miss} />
         </div>
       )}
 
-      <div className="mt-4 rounded-xl border border-border/60 px-4 py-3 text-[14px] leading-relaxed">
+      <div className="mt-4 text-[14px] leading-relaxed">
         {live ? (
           <>
             <div>Verdict: after a {read === 0 ? "in-line" : (read ?? 0) > 0 ? "beat" : "miss"} like this, Gold went <b className={toneOf(live.dir)}>{sideWord(live)}</b>{live.dir === "up" || live.dir === "down" ? ` ${live.confidence}% of the time` : ""}.</div>
@@ -224,19 +226,6 @@ function Hero({ next, releases, now, loading }: { next: UpcomingRelease | null; 
           </>
         )}
       </div>
-    </section>
-  );
-}
-
-function SectionHead({ icon: Icon, title, sub }: { icon: typeof Newspaper; title: string; sub: string }) {
-  return (
-    <div className="mb-4 flex items-end justify-between gap-3">
-      <div>
-        <h2 className="flex items-center gap-2 text-[18px] font-medium tracking-tight sm:text-[20px]">
-          <Icon className="h-[18px] w-[18px]" aria-hidden="true" /> {title}
-        </h2>
-        <p className="mt-0.5 text-[14px] text-muted-foreground">{sub}</p>
-      </div>
     </div>
   );
 }
@@ -248,14 +237,13 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
     .sort((a, b) => Date.parse(b.released_at) - Date.parse(a.released_at))
     .slice(0, 8);
   return (
-    <section className="mt-10">
-      <SectionHead icon={History} title="Latest results" sub="Recent releases and Gold moves." />
+    <NewsSection icon={History} title="Latest results" sub="Recent releases and Gold moves." id="latest-results-heading">
       {loading ? (
-        <div className="console-card h-[220px] animate-pulse" />
+        <div className="h-[220px] animate-pulse" />
       ) : recent.length === 0 ? (
-        <div className="console-card p-5 text-[14px] text-muted-foreground">No measured releases yet.</div>
+        <div className="p-5 text-[14px] text-muted-foreground">No measured releases yet.</div>
       ) : (
-        <div className="console-card overflow-hidden">
+        <div>
           <div className="hidden grid-cols-[1.4fr_1fr_0.8fr_repeat(3,0.7fr)] gap-3 border-b border-border px-5 py-3 text-[12px] font-semibold uppercase tracking-wider text-muted-foreground sm:grid">
             <span>Release</span><span>Actual / forecast</span><span>Result</span><span className="text-right">5 min</span><span className="text-right">15 min</span><span className="text-right">1 hour</span>
           </div>
@@ -286,6 +274,6 @@ function RecentResults({ releases, now, loading }: { releases: UpcomingRelease[]
           </ul>
         </div>
       )}
-    </section>
+    </NewsSection>
   );
 }

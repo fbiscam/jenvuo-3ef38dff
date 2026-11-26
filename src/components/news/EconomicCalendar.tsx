@@ -6,6 +6,7 @@ import { getPairNewsWeek } from "@/lib/news.functions";
 import { NEWS_PAIRS, type NewsImpactLevel, type NewsPair } from "@/lib/pair-news";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { NewsSection } from "./NewsSection";
 
 const PAIR_LABEL: Record<NewsPair, string> = { XAUUSD: "XAU/USD", EURUSD: "EUR/USD", BTCUSD: "BTC/USD" };
 const IMPACTS: Array<"All" | NewsImpactLevel> = ["All", "High", "Medium", "Low"];
@@ -32,35 +33,29 @@ export function EconomicCalendar() {
     days.set(k, [...(days.get(k) ?? []), e]);
   }
   return (
-    <section className="mt-10 space-y-4" aria-labelledby="economic-calendar-heading">
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <h2 id="economic-calendar-heading" className="flex items-center gap-2 text-[18px] font-medium sm:text-[20px]"><CalendarDays className="h-[18px] w-[18px]" aria-hidden="true" /> Economic Calendar</h2>
-          <p className="mt-0.5 text-[14px] text-muted-foreground">This week · Gold, EUR/USD and Bitcoin · Local time.</p>
-        </div>
-        <Button variant="ghost" size="icon-sm" className="console-pill shrink-0" aria-label="Refresh calendar" title="Refresh calendar" onClick={() => void q.refetch()}><RefreshCw className={cn("h-4 w-4", q.isFetching && "animate-spin")} /></Button>
-      </div>
-      <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+    <NewsSection icon={CalendarDays} title="Economic Calendar" sub="This week · Gold, EUR/USD and Bitcoin · Local time." id="economic-calendar-heading"
+      action={<Button variant="ghost" size="icon-sm" className="console-pill shrink-0" aria-label="Refresh calendar" title="Refresh calendar" onClick={() => void q.refetch()}><RefreshCw className={cn("h-4 w-4", q.isFetching && "animate-spin")} /></Button>}>
+      <div className="flex gap-2 overflow-x-auto border-b border-border px-5 py-3 [scrollbar-width:none]">
         {IMPACTS.map((i) => <Chip key={i} on={impact === i} onClick={() => setImpact(i)}>{i}</Chip>)}
         <span className="mx-1 w-px shrink-0 bg-border" aria-hidden="true" />
         <Chip on={pair === "All"} onClick={() => setPair("All")}>All pairs</Chip>
         {NEWS_PAIRS.map((p) => <Chip key={p} on={pair === p} onClick={() => setPair(p)}>{PAIR_LABEL[p]}</Chip>)}
       </div>
       {q.isPending ? (
-        <p className="console-card flex min-h-[180px] items-center justify-center gap-2 p-5 text-[14px] text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading calendar…</p>
+        <p className="flex min-h-[180px] items-center justify-center gap-2 p-5 text-[14px] text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Loading calendar…</p>
       ) : q.isError ? (
-        <p className="console-card p-5 text-[14px] text-muted-foreground">Calendar unavailable right now. Please try again shortly.</p>
+        <p className="p-5 text-[14px] text-muted-foreground">Calendar unavailable right now. Please try again shortly.</p>
       ) : rows.length === 0 ? (
-        <p className="console-card p-5 text-[14px] text-muted-foreground">No matching news this week.</p>
+        <p className="p-5 text-[14px] text-muted-foreground">No matching news this week.</p>
       ) : (
         [...days.entries()].map(([day, list]) => (
-          <div key={day} className="console-card overflow-hidden">
-            <h3 className="border-b border-border px-4 py-3 text-[14px] font-medium text-muted-foreground sm:px-5">{day}</h3>
+          <div key={day} className="border-b border-border last:border-b-0">
+            <h3 className="border-b border-border px-5 py-3 text-[12px] font-semibold uppercase text-muted-foreground">{day}</h3>
             <ul className="divide-y divide-border">
               {list.map((e) => {
                 const done = new Date(e.date).getTime() <= now;
                 return (
-                  <li key={e.date + e.country + e.title} className={cn("flex items-start gap-3 px-4 py-3.5 sm:px-5", done && "opacity-70")}>
+                  <li key={e.date + e.country + e.title} className={cn("flex items-start gap-3 px-5 py-3.5", done && "opacity-70")}>
                     <span className="w-14 shrink-0 pt-0.5 text-xs tabular-nums text-muted-foreground">{new Date(e.date).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</span>
                     <span aria-hidden="true" className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", dot[e.impact])} />
                     <span className="min-w-0 flex-1">
@@ -79,6 +74,6 @@ export function EconomicCalendar() {
           </div>
         ))
       )}
-    </section>
+    </NewsSection>
   );
 }

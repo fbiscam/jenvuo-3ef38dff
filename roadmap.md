@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Match all News sections to Latest results without changing news data or filters; verify the reported utility error.
+
 - [x] Extend swing audit to Gold and Bitcoin on 15M/1H using the same chart feeds and existing 15-minute schedule. Authorized local HTTP run completed all six asset/timeframe checks without errors; database readback confirms 63 Gold and 69 Bitcoin rows. Seven targeted tests pass and latest build OK. Read all 80 helper/caller files: shared cn returns string, reported line 8 absent. Published callback still requires publishing; initial historical observations do not establish live repaint rates. No permissions or settings changed.
 
 - [x] Apply selected seven-bar fixed confirmation with last-touch equal highs/lows. Read chart rendering/overlay, current and multi-timeframe server evidence, AI context, alert detector/scheduler and independent execution evidence; shared paths use one radius, execution settings unchanged, no separate detector found in local database scheduling sources. All 79 helper/caller files read; sole helper returns text and has seven lines. 60 targeted tests pass, including pair-scale/timeframe equal-wick cases. Temporary signed-in test user rendered real Terminal candles without runtime errors; browser confirmed HH absent after six bars/present after seven and one fixed last-touch HL. Build OK; no sent emails, settled records, permissions or unrelated settings changed. Live email delivery not exercised.
