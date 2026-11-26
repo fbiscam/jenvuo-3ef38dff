@@ -1,11 +1,29 @@
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
-import { auditSwing } from "./swing-audit";
+import { auditSwing, AUDIT_ASSETS, AUDIT_TIMEFRAMES, pipSize } from "./swing-audit";
 
 const b = (h: number, l: number, c: number, t: number) => ({ time: t, open: c, high: h, low: l, close: c, volume: 0 });
 const pip = 0.0001;
 
 describe("swing audit", () => {
+  test("tracks EUR/USD, Gold and Bitcoin on 15M and 1H", () => {
+    assert.deepEqual(AUDIT_ASSETS, ["EURUSD", "XAUUSD", "BTCUSD"]);
+    assert.deepEqual(AUDIT_TIMEFRAMES, ["15m", "1h"]);
+  });
+  test("Gold repaint and excursion use a 0.1 price unit", () => {
+    const bars = [b(2700, 2698, 2699, 0), b(2699, 2697, 2698, 1), b(2701, 2697, 2700, 2)];
+    const a = auditSwing(bars, 0, "high", 2700, null, pipSize("XAUUSD"));
+    assert.equal(a.repainted, true);
+    assert.equal(a.outcome, "sl");
+    assert.equal(a.maePips, 30);
+  });
+  test("Bitcoin target uses a 1 dollar price unit", () => {
+    const bars = [b(96000, 95800, 95900, 0), b(95900, 95700, 95800, 1), b(95900, 95500, 95600, 2)];
+    const a = auditSwing(bars, 0, "high", 96000, null, pipSize("BTCUSD"));
+    assert.equal(a.target, 95400);
+    assert.equal(a.outcome, "open");
+    assert.equal(a.mfePips, 300);
+  });
   test("a high broken before 7 candles counts as repainted", () => {
     const bars = [b(1.1010, 1.1000, 1.1005, 0), b(1.1006, 1.0998, 1.1000, 1), b(1.1012, 1.0999, 1.1008, 2)];
     const a = auditSwing(bars, 0, "high", 1.1010, null, pip);

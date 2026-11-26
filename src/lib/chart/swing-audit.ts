@@ -1,5 +1,5 @@
 /**
- * EUR/USD swing audit: grades every fresh HH/HL/LH/LL from closed candles only.
+ * Multi-asset swing audit: grades every fresh HH/HL/LH/LL from closed candles only.
  * Pure — the scheduled job feeds candles and stores the result.
  * - repainted: a later candle wicked beyond the swing before it locked (label moved).
  * - locked: FRACTAL_RADIUS closed candles held inside the swing.
@@ -10,6 +10,8 @@ import { FRACTAL_RADIUS } from "@/lib/chart/smc-overlay";
 import type { OhlcvBar } from "@/lib/chart/indicators";
 
 export const AUDIT_RR = 2;
+export const AUDIT_ASSETS = ["EURUSD", "XAUUSD", "BTCUSD"] as const;
+export const AUDIT_TIMEFRAMES = ["15m", "1h"] as const;
 export type AuditOutcome = "tp" | "sl" | "open";
 
 export type SwingAudit = {
