@@ -102,14 +102,14 @@ const PROMPTS: Record<Tab, string> = {
 function snippet(tab: Tab, lang: Lang): string {
   const prompt = PROMPTS[tab];
   if (lang === "python")
-    return `from openai import OpenAI\n\nclient = OpenAI(api_key="YOUR_JENVU_API_KEY", base_url="https://jenvu.com/api/public/v1")\n\nres = client.chat.completions.create(\n    model="deepseek-v3.2",\n    messages=[{"role": "user", "content": "${prompt}"}],\n)\nprint(res.choices[0].message.content)`;
+    return `from openai import OpenAI\n\nclient = OpenAI(api_key="YOUR_JENVU_API_KEY", base_url="https://jenvu.com/api/public/v1")\n\nres = client.chat.completions.create(\n    model="deepseek-v3.2",\n    messages=[\n        {"role": "system", "content": "You are Jenvu, a helpful AI assistant."},\n        {"role": "user", "content": "${prompt}"},\n    ],\n)\nprint(res.choices[0].message.content)`;
   if (lang === "node.js")
-    return `import OpenAI from "openai";\n\nconst client = new OpenAI({ apiKey: process.env.JENVU_API_KEY, baseURL: "https://jenvu.com/api/public/v1" });\n\nconst res = await client.chat.completions.create({\n  model: "deepseek-v3.2",\n  messages: [{ role: "user", content: "${prompt}" }],\n});\nconsole.log(res.choices[0].message.content);`;
-  return `curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer $JENVU_API_KEY" \\\n  -d '{\n    "model": "deepseek-v3.2",\n    "messages": [{"role": "user", "content": "${prompt}"}]\n  }'`;
+    return `import OpenAI from "openai";\n\nconst client = new OpenAI({ apiKey: process.env.JENVU_API_KEY, baseURL: "https://jenvu.com/api/public/v1" });\n\nconst res = await client.chat.completions.create({\n  model: "deepseek-v3.2",\n  messages: [\n    { role: "system", content: "You are Jenvu, a helpful AI assistant." },\n    { role: "user", content: "${prompt}" },\n  ],\n});\nconsole.log(res.choices[0].message.content);`;
+  return `curl https://jenvu.com/api/public/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -H "Authorization: Bearer $JENVU_API_KEY" \\\n  -d '{\n    "model": "deepseek-v3.2",\n    "messages": [\n      {\n        "role": "system",\n        "content": "You are Jenvu, a helpful AI assistant."\n      },\n      {\n        "role": "user",\n        "content": "${prompt}"\n      }\n    ]\n  }'`;
 }
 
 function CodeConsole() {
-  const [tab, setTab] = useState<Tab>("Code");
+  const [tab, setTab] = useState<Tab>("Chat");
   const [lang, setLang] = useState<Lang>("bash");
   const [copied, setCopied] = useState(false);
   const code = snippet(tab, lang);
@@ -127,14 +127,14 @@ function CodeConsole() {
               key={t}
               type="button"
               onClick={() => setTab(t)}
-              className={`-mb-px border-b-2 px-3 py-2 text-[14px] ${tab === t ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+              className={`mb-2 rounded-full px-3.5 py-1.5 text-[14px] ${tab === t ? "bg-background text-foreground ring-1 ring-border" : "text-muted-foreground hover:text-foreground"}`}
             >
               {t}
             </button>
           ))}
         </div>
-        <Link to="/docs" className="inline-flex items-center gap-1 pb-2 text-[14px] text-muted-foreground hover:text-foreground">
-          View docs <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+        <Link to="/dashboard/chat" className="inline-flex items-center gap-1 pb-2 text-[14px] text-muted-foreground hover:text-foreground">
+          Try Playground <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
       <div className="code-panel mt-3 overflow-hidden border border-border">
@@ -159,7 +159,7 @@ function CodeConsole() {
   );
 }
 
-const TOKEN_RE = /("(?:[^"\\]|\\.)*"|'[^']*')|\b(from|import|const|await|print|curl|new)\b|(\s-[a-zA-Z]+\b)|\b([A-Za-z_][\w.]*)(?=\()/g;
+const TOKEN_RE = /(\$[A-Z_]+|process\.env\.[A-Z_]+)|("(?:[^"\\]|\\.)*")|\b(from|import|const|await|print|curl|new)\b|(\s-[a-zA-Z]+\b)|\b([A-Za-z_][\w.]*)(?=\()/g;
 function highlight(code: string) {
   const out: ReactNode[] = [];
   let last = 0;
@@ -167,8 +167,12 @@ function highlight(code: string) {
   for (const m of code.matchAll(TOKEN_RE)) {
     const at = m.index ?? 0;
     if (at > last) out.push(code.slice(last, at));
-    const cls = m[1] ? "tok-str" : m[2] ? "tok-kw" : m[3] ? "tok-flag" : "tok-fn";
-    out.push(<span key={i++} className={cls}>{m[0]}</span>);
+    const cls = m[1] ? "tok-env" : m[2] ? "tok-str" : m[3] ? "tok-kw" : m[4] ? "tok-flag" : "tok-fn";
+    if (cls === "tok-str" && /\$[A-Z_]+/.test(m[0])) {
+      for (const part of m[0].split(/(\$[A-Z_]+)/)) {
+        if (part) out.push(<span key={i++} className={part.startsWith("$") ? "tok-env" : "tok-str"}>{part}</span>);
+      }
+    } else out.push(<span key={i++} className={cls}>{m[0]}</span>);
     last = at + m[0].length;
   }
   out.push(code.slice(last));
