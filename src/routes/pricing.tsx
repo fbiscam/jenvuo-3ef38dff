@@ -6,7 +6,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import * as React from "react";
 import { Check, Minus, Plus, ShieldCheck } from "lucide-react";
 
-const SCAM_ITEMS = ["Website link checks", "Payment method checks", "Broker and signal seller checks", "Public daily scam report"];
 function ShieldLogo({ className = "" }: { className?: string }) {
   return <ShieldCheck className={className} strokeWidth={1.75} aria-hidden="true" />;
 }
@@ -33,10 +32,9 @@ const SANS = "font-['Google_Sans_Flex','Google_Sans','Product_Sans','Poppins',sy
 
 export const FAQ = [
   ["Is this financial advice?", "No. Jenvu is an analysis tool. Every setup is for educational purposes and you remain responsible for your own trades."],
-  ["Is there a free plan?", `Yes. Anyone can sign up and use Jenvu on the Free plan. Multiple accounts are allowed; each email can belong to only one account. Free includes $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Free also includes News and Scam Protection checks. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
-  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day; Pro $${PLAN_API_CREDIT.pro} credit and ${TERMINAL_DAILY_HOURS.pro} hours; Elite $${PLAN_API_CREDIT.elite} credit and ${TERMINAL_DAILY_HOURS.elite} hours; Ultra $${PLAN_API_CREDIT.ultra} credit, all day. Every plan also includes News and Scam Protection: Pro $${TERMINAL_API_PRICE.pro}, Elite $${TERMINAL_API_PRICE.elite}, Ultra $${TERMINAL_API_PRICE.ultra} a month. Plans only: credit top-ups are not sold.`],
+  ["Is there a free plan?", `Yes. Anyone can sign up and use Jenvu on the Free plan. Multiple accounts are allowed; each email can belong to only one account. Free includes $${FREE_PLAN_CREDIT_USD} API credit every month, ${FREE_PLAN_API_KEYS} API key, ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Free also includes News. When the day's Terminal time is used up the indicators lock until 00:00 UTC.`],
+  ["What do the plans include?", `Every plan includes the Terminal's paid indicators for a set time each day, the Top AI Models and monthly API credit: Free $0 with $${FREE_PLAN_CREDIT_USD} credit and ${TERMINAL_DAILY_HOURS.free} hours a day; Pro $${PLAN_API_CREDIT.pro} credit and ${TERMINAL_DAILY_HOURS.pro} hours; Elite $${PLAN_API_CREDIT.elite} credit and ${TERMINAL_DAILY_HOURS.elite} hours; Ultra $${PLAN_API_CREDIT.ultra} credit, all day. Every plan also includes News: Pro $${TERMINAL_API_PRICE.pro}, Elite $${TERMINAL_API_PRICE.elite}, Ultra $${TERMINAL_API_PRICE.ultra} a month. Plans only: credit top-ups are not sold.`],
   ["Who can use the Terminal?", `Every signed-in user can open the Terminal. Its paid indicators run for a set time each UTC day by plan: Free ${TERMINAL_DAILY_HOURS.free} hours, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite} and Ultra all day. Time counts only while one of them is switched on and the Terminal is open; when it is used up they lock and disappear until 00:00 UTC.`],
-  ["What is Scam Protection?", "A free checker on every plan: paste a website link, payment method, broker name or signal seller and see the warning signs before you send money. It reads what you paste; it never visits links or moves money."],
   ["Is News Trading free?", `Yes. The News Trading page is free on every plan, including Free. It counts down to the next US high-impact release (NFP, CPI, FOMC, PCE, PPI, GDP) and shows how Gold moved after the same kind of result in the last ${RELEASES_PER_EVENT} real releases. It is a read of past reactions, not a promise of the next move.`],
   ["Can I cancel anytime?", "Yes. Plans are month-to-month with no lock-in. You keep access until the end of the period you already paid for."],
   ["What markets are covered?", "The Terminal covers Gold (XAU/USD), Bitcoin (BTC/USD) and Euro (EUR/USD). "],
@@ -46,9 +44,9 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Jenvu Pricing — Free, Pro, Elite and Ultra Plans" },
-      { name: "description", content: "Jenvu pricing: Free includes $35 monthly API credit, News and Scam Protection. Pro $69, Elite $139 and Ultra $239 add more Terminal time and API credit." },
+      { name: "description", content: "Jenvu pricing: Free includes $35 monthly API credit and News. Pro $69, Elite $139 and Ultra $239 add more Terminal time and API credit." },
       { property: "og:title", content: "Jenvu pricing" },
-      { property: "og:description", content: "Compare Jenvu Free, Pro, Elite and Ultra. Every plan includes the Terminal, News, Scam Protection and API credit." },
+      { property: "og:description", content: "Compare Jenvu Free, Pro, Elite and Ultra. Every plan includes the Terminal, News and API credit." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { property: "og:url", content: "https://jenvu.com/pricing" },
@@ -130,16 +128,6 @@ function buildGroups(): ReadonlyArray<Group> {
       { f: "Zone + FVG with non-overlapping BSL / SSL", v: ALL },
       { f: "Time left shown on the chart", v: ALL },
       { f: "Ask Jenvu on the chart", v: ALL },
-    ],
-  },
-  {
-    title: "Scam Protection",
-    icon: "bot",
-    rows: [
-      { f: "Website link checks", v: ALL },
-      { f: "Payment method checks (crypto, bank, PayPal)", v: ALL },
-      { f: "Broker and signal seller checks", v: ALL },
-      { f: "Public daily scam report", v: ALL },
     ],
   },
   {
@@ -308,7 +296,7 @@ function PricingPage() {
   const [open, setOpen] = React.useState<number | null>(null);
 
   const plans: Array<{ key: CardKey; name: string; description: string; big: string; bigLabel: string; features: string[]; ips: number }> = [
-    { key: "free", name: "Free", description: "Try the Terminal, News, API & Scam Protection", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: FREE_BOT.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
+    { key: "free", name: "Free", description: "Try the Terminal, News and API", big: `$${FREE_PLAN_CREDIT_USD}`, bigLabel: "API credit every month", ips: FREE_BOT.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.free}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("free")} daily tokens`, `${FREE_PLAN_API_KEYS} API key`] },
     { key: "pro", name: "Pro", description: "Terminal & AI for everyday trading", big: `$${PLAN_API_CREDIT.pro}`, bigLabel: "API credit every month", ips: MT5_PLANS.pro.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.pro}h a day`, "ChatGPT 5.5 Pro and Grok 4.6", `${TOKENS("pro")} daily tokens`, `${PLAN_API_KEYS.pro} API keys`] },
     { key: "elite", name: "Elite", description: "More AI usage with senior review.", big: `$${PLAN_API_CREDIT.elite}`, bigLabel: "API credit & senior review", ips: MT5_PLANS.elite.licenses, features: [`Terminal indicators ${TERMINAL_DAILY_HOURS.elite}h a day`, "Claude Fable 5.1 senior review", `${TOKENS("elite")} daily tokens`, `${PLAN_API_KEYS.elite} API keys, webhooks & logs`] },
     { key: "ultra", name: "Ultra", description: "Maximum limits & priority support", big: `$${PLAN_API_CREDIT.ultra}`, bigLabel: "API credit & priority desk", ips: MT5_PLANS.ultra.licenses, features: ["Terminal indicators all day", `${TOKENS("ultra")} daily tokens`, `${PLAN_API_KEYS.ultra} API keys`, "Priority desk support"] },
@@ -408,8 +396,8 @@ function PricingPage() {
 
       {/* HEADER */}
       <section className="mx-auto max-w-[900px] px-5 pb-10 pt-16 text-center sm:px-8 sm:pt-24">
-        <div className="mx-auto flex items-center justify-center gap-3.5" aria-label="Terminal, News Trading, Scam Protection and Platform">
-          {([["Terminal", TerminalLogo], ["News Trading", NewsLogo], ["Scam Protection", ShieldLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
+        <div className="mx-auto flex items-center justify-center gap-3.5" aria-label="Terminal, News Trading and Platform">
+          {([["Terminal", TerminalLogo], ["News Trading", NewsLogo], ["Platform", PlatformLogo]] as const).map(([label, Logo]) => (
             <Logo key={label} className="h-[22px] w-[22px] text-foreground" />
           ))}
         </div>
@@ -460,7 +448,7 @@ function PricingPage() {
               <p className="mt-1.5 min-h-[18px] text-[12px] leading-[18px] text-gc-ink-muted">
                 {plan.key === "free"
                   ? "Free forever, start with your email"
-                  : "Terminal, News, API & Scam Protection"}
+                  : "Terminal, News and API"}
               </p>
               <div className="mt-4">{plan.key === "free" ? freeCta() : planCta(plan.key)}</div>
               <p className="mt-6 min-h-[20px] text-[13px] text-gc-ink-muted">
@@ -468,10 +456,6 @@ function PricingPage() {
               </p>
               <Summary big={plan.big} label={plan.bigLabel} />
               <FeatureList title="Platform & AI" items={plan.features} />
-              <FeatureList
-                title="Scam Protection"
-                items={SCAM_ITEMS}
-              />
               <FeatureList title="News Trading" items={NEWS_ITEMS} />
             </article>
           ))}

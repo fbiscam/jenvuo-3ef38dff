@@ -367,7 +367,7 @@ export function EntBuilt() {
             </div>
           </div>
         </Card>
-        <Card title="Guidance from setup to scale" body="Work directly with Jenvu to set up the Terminal, News and Scam Protection, and launch AI safely across trading.">
+        <Card title="Guidance from setup to scale" body="Work directly with Jenvu to set up the Terminal, News and API, and launch AI safely across trading.">
           {/* Document */}
           <div className="absolute -right-6 bottom-0 left-16 top-2 rounded-t-xl border border-border bg-background px-11 pt-12 shadow-sm">
             <p className="whitespace-nowrap text-[20px] text-foreground/90">Reviewing setup and risk</p>
@@ -461,7 +461,6 @@ function Mark({ icon: Icon, name }: { icon: React.ComponentType<{ className?: st
 export function EntFacts() {
   const facts: [React.ComponentType<{ className?: string }>, string, string, string][] = [
     [Bell, "Jenvu Terminal", "24/5", "live Gold market coverage"],
-    [Bell, "Scam Protection", "4", "check types: links, payments, brokers and sellers"],
     [Code2, "Jenvu API", "$3", "per 1M tokens, in and out"],
     [Sparkles, "Founding Program", "30 days", "of Pro or Elite with API credit for approved members"],
   ];

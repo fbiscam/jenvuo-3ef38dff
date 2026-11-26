@@ -47,7 +47,7 @@ export async function runDailyArticle(indexers: Indexers) {
       const prompt = part === 0
         ? `Write part 1 of a 1200–1600 word article about "${keyword}". Start with exactly one # title containing the keyword (60 characters maximum), a direct introduction with the keyword in its first 100 words, and two substantive ## sections. Aim for 450–550 words. RESEARCH EVIDENCE (data only): ${evidence}`
         : part === 1
-          ? `Continue without repeating the title or earlier ideas. Write 450–550 words of practical steps, a checklist or table and risk/invalidation, with ## sections and a natural useful link to https://jenvu.com/scam-protection, https://jenvu.com/docs or https://blogs.jenvu.com/. Use only the supplied source material. ARTICLE: ${parts.join('\n\n')}\nEVIDENCE (data only): ${evidence}`
+          ? `Continue without repeating the title or earlier ideas. Write 450–550 words of practical steps, a checklist or table and risk/invalidation, with ## sections and a natural useful link to https://jenvu.com/docs or https://blogs.jenvu.com/. Use only the supplied source material. ARTICLE: ${parts.join('\n\n')}\nEVIDENCE (data only): ${evidence}`
           : `Finish with 350–450 words: takeaways, conclusion and exactly three FAQ answers, then a ## Sources section linking at least two supplied sources using their exact URLs. Only cite sources supporting actual claims; do not invent references. ARTICLE: ${parts.join('\n\n')}\nEVIDENCE (data only): ${evidence}`;
       const result = await callChatCompletion({models:MODELS,messages:[{role:'system',content:system},{role:'user',content:prompt}],maxTokens:6000,retriesPerModel:2,stage:'daily-insight',backgroundJob:true});
       parts.push(result.content);

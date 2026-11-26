@@ -17,7 +17,7 @@ export function WhyWorkspaceScene() {
       <CodeSnippet compact />
     </div>
     <div className="why-floating why-float-chat"><div className="why-window-label">Jenvu AI<Sparkles size={13} /></div><div className="why-chat-bubble">Explain the Gold market structure.</div><div className="why-thinking"><span><i /><i /><i /></span> Thinking</div></div>
-    <div className="why-floating why-float-bot"><div className="why-window-label">Scam Protection</div><div className="why-bot-chip"><span className="why-status-icon why-status-success"><ShieldCheck size={12} /></span> Website link</div><div className="why-bot-chip"><span className="why-status-icon why-status-neutral"><Bot size={12} /></span> Payment method</div><div className="why-bot-chip"><span className="why-status-icon why-status-warm"><Check size={12} /></span> Broker check</div></div>
+    <div className="why-floating why-float-bot"><div className="why-window-label">News Trading</div><div className="why-bot-chip"><span className="why-status-icon why-status-success"><ShieldCheck size={12} /></span> Next release</div><div className="why-bot-chip"><span className="why-status-icon why-status-neutral"><Bot size={12} /></span> Forecast</div><div className="why-bot-chip"><span className="why-status-icon why-status-warm"><Check size={12} /></span> Beat / miss</div></div>
     <div className="why-app-tile why-app-main"><PlatformLogo className="size-10" /></div><div className="why-app-tile why-app-small"><ShieldCheck className="size-10" strokeWidth={1.5} /></div>
   </div>
 }

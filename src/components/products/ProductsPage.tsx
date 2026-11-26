@@ -17,7 +17,6 @@ const productMarks = { terminal: TerminalLogo, bot: ShieldMark, news: NewsLogo, 
 
 const products = [
   { id: "terminal", title: "Terminal", icon: ChartCandlestick, intro: "See the market clearly. Live candles, rule-based analysis and conversational AI on one trading desk.", points: ["Gold, Bitcoin and EUR/USD, with multiple timeframes", "Structure, liquidity sweeps, zones and fair value gaps", "Ask about the chart; get answers grounded in its analysis"], href: "https://dash.jenvu.com/terminal", cta: "Open Terminal" },
-  { id: "bot", title: "Scam Protection", icon: ShieldCheck, intro: "Check before you pay. Paste a website, payment method, broker or signal seller and see the warning signs in seconds.", points: ["Website link, payment method, broker and seller checks", "Clear risk score with the reasons behind it", "Free on every plan, with a public daily scam report"], href: "https://jenvu.com/scam-protection", cta: "Open Scam Protection" },
   { id: "news", title: "News Trading", icon: CalendarDays, intro: "Know what is coming before the headline. US economic releases and historical Gold reaction context in one place.", points: ["Countdown to the next US high-impact release", "Actual, forecast and previous numbers, with beat-or-miss context", "Free on every plan; past reactions never guarantee the next move"], href: "https://dash.jenvu.com/news", cta: "Open News Trading" },
   { id: "api", title: "Platform & API", icon: Braces, intro: "Build with the models you need. One API key, a familiar request format and usage you can follow.", points: [`${PUBLIC_API_MODEL_IDS.length} models, including Claude, Gemini, OpenAI and DeepSeek`, "OpenAI-compatible requests and streaming responses", "Manage keys, tokens and monthly credit in your dashboard"], href: "https://jenvu.com/platform", cta: "Explore the API" },
 ] satisfies { id: ProductId; title: string; icon: typeof Bot; intro: string; points: string[]; href: string; cta: string }[];
@@ -60,7 +59,7 @@ export default function ProductsPage() {
       <section className="products-hero">
         <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground"><JenvuMark className="h-5 w-5"/><span>Jenvu Products</span><span aria-hidden>│</span><span>Web, desktop and browser</span></div>
         <h1>Jenvu products.<br/>One trading workspace.</h1>
-        <p>Analyze, automate, follow the news, and build.<br className="hidden sm:block"/> Terminal, News Trading, Scam Protection and top AI models — together.</p>
+        <p>Analyze, automate, follow the news, and build.<br className="hidden sm:block"/> Terminal, News Trading and top AI models — together.</p>
         <div className="products-actions"><Button asChild className="rounded-full" size="lg"><a href="https://dash.jenvu.com/terminal">Try Jenvu Terminal<ArrowRight/></a></Button><Button asChild variant="secondary" size="lg" className="rounded-full"><Link to="/pricing">View pricing</Link></Button></div>
       </section>
 

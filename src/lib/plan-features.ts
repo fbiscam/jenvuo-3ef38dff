@@ -7,7 +7,7 @@ export type PaidPlanId = "pro" | "elite" | "ultra";
 export function planFeatures(plan: PaidPlanId, _withBot = true): string[] {
   return [
     "Terminal paid strategies",
-    "News and Scam Protection",
+    "News",
     `$${PLAN_API_CREDIT[plan]} API credit`,
     `${PLAN_API_KEYS[plan]} API keys`,
   ];

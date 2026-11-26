@@ -80,7 +80,7 @@ export const collections: Collection[] = [
         summary: "Sign up in a minute and start on the Free plan with $35 API credit a month.",
         updatedAt: "2026-11-16",
         body: [
-          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan. News and Scam Protection are free on every plan. Profit is not guaranteed." },
+          { type: "p", content: "Anyone can create a Jenvu account. Multiple accounts are allowed, including on the same device or network; each email can belong to only one account. Every new account starts on the Free plan: $35 API credit every month, 1 API key and 2 hours a day of the Terminal's paid indicators (Fresh sweep, price action, Zone + FVG). Pro gives 8 hours a day and 3 API keys, Elite 16 hours and 5 keys, Ultra all day and 7 keys. The Terminal itself is open on every plan. News is free on every plan. Profit is not guaranteed." },
 
           { type: "h2", content: "Sign up" },
           { type: "ol", items: [
@@ -345,20 +345,6 @@ export const collections: Collection[] = [
           { type: "note", tone: "info", content: "Signals are filtered strictly to cut fakeouts, so you will see fewer marks than on other charts. That is expected. No tool guarantees a win — start small and use a stop on every trade." },
         ],
       },
-      {
-        slug: "scam-protection",
-        title: "Check a scam with Scam Protection",
-        summary: "How to check a website, payment method, broker or signal seller before you send money.",
-        updatedAt: "2026-11-26",
-        body: [
-          { type: "p", content: "Scam Protection checks what you paste for common warning signs: cloned or new websites, crypto-only payment requests, unlicensed brokers and 'guaranteed profit' sellers. It is free on every plan for signed-in accounts." },
-          { type: "h2", content: "Run a check" },
-          { type: "ol", items: ["Open jenvu.com/scam-protection.", "Pick Website link, Payment method, Broker / firm or Signal seller.", "Paste what you were sent and choose Check now.", "Read the risk score, the reasons and the steps to verify before you pay."] },
-          { type: "h2", content: "Daily report" },
-          { type: "ul", items: ["Page views and checks are counted every day.", "The report shows how many checks were flagged and how that share changed against the week before.", "Move the slider to see any of the last 30 days."] },
-          { type: "note", tone: "info", content: "The checker reads the text you paste; it never visits links or moves money. Always confirm a broker on the regulator's own register before paying." },
-        ],
-      },
     ],
   },
   {
@@ -436,7 +422,7 @@ export const collections: Collection[] = [
             "Priority desk support.",
           ]},
 
-          { type: "note", tone: "info", content: "These prices are the same for everyone and include the Terminal, News, Scam Protection and API credit. See the Pricing page for the full feature matrix. Credit top-ups are no longer sold: plans only. All credit expires 30 days after it is added; the oldest credit is spent first." },
+          { type: "note", tone: "info", content: "These prices are the same for everyone and include the Terminal, News and API credit. See the Pricing page for the full feature matrix. Credit top-ups are no longer sold: plans only. All credit expires 30 days after it is added; the oldest credit is spent first." },
         ],
       },
 

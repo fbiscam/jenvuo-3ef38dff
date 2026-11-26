@@ -188,7 +188,7 @@ ${stream ? "for part in res:\n    print(part.choices[0].delta.content or \"\", e
 
 const EXPLORE: { title: string; links: [string, string][] }[] = [
   { title: "Get started", links: [["Create an API key", "/dashboard/api"], ["Quickstart guide", "#quickstart"], ["Models", "/models"], ["Pricing", "#api-pricing"]] },
-  { title: "Platform", links: [["Terminal", "#terminal-access"], ["Scam Protection", "#scam-protection"], ["AI chat", "#ai-chat"], ["Alerts", "#alerts"]] },
+  { title: "Platform", links: [["Terminal", "#terminal-access"], ["AI chat", "#ai-chat"], ["Alerts", "#alerts"]] },
   { title: "Resources", links: [["API keys", "#api"], ["Connect AI assistants", "#ai-assistants"], ["Glossary A to Z", "#glossary"], ["Contact support", "/contact"]] },
 ];
 
@@ -216,7 +216,7 @@ export function DocsOverview() {
               Get started <span className="text-gc-ink-muted">with</span> Jenvu <span className="text-gc-ink-muted">{"\u00a0System"}</span>
             </h1>
             <p className="mt-5 max-w-[460px] text-[16px] leading-[1.65] text-gc-ink sm:text-[18px]">
-              Build with the Jenvu API: fast, cost-effective models for code, text and images — plus guides for the Terminal and Scam Protection.
+              Build with the Jenvu API: fast, cost-effective models for code, text and images — plus guides for the Terminal and News.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Pill to="/dashboard/api" solid>Create API key <ChevronRight className="h-4 w-4" /></Pill>
@@ -337,7 +337,7 @@ export function DocsOverview() {
           This guide walks you through the basics of the Jenvu API, from getting an account to making your first request.
         </p>
         <Step n={1} title="Get a Jenvu account">
-          <Link to="/auth" search={{ mode: "signup" } as never} className="underline underline-offset-4">Sign up</Link> to start on the Free plan ($35 API credit every month), with News and Scam Protection included. Paid plans and the <Link to="/founding" className="underline underline-offset-4">Founding Program</Link> add more limits.
+          <Link to="/auth" search={{ mode: "signup" } as never} className="underline underline-offset-4">Sign up</Link> to start on the Free plan ($35 API credit every month), with News included. Paid plans and the <Link to="/founding" className="underline underline-offset-4">Founding Program</Link> add more limits.
         </Step>
         <Step n={2} title="Generate an API key">
           Create a key on the <Link to="/dashboard/api" className="underline underline-offset-4">API keys page</Link>, then export it as an environment variable.

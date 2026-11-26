@@ -123,13 +123,13 @@ import xaiLogo from "@/assets/xai-logo.png";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Jenvu: AI Trading Platform | API, News & Scam Protection" },
+      { title: "Jenvu: AI Trading Platform | Terminal, API & News" },
       {
         name: "description",
         content:
           "One platform. Endless market intelligence. Ask the AI, read live charts in the Terminal, follow high-impact News, check scams before you pay and connect the developer API, all in one workspace.",
       },
-      { property: "og:title", content: "Jenvu: AI Trading Platform | API, News & Scam Protection" },
+      { property: "og:title", content: "Jenvu: AI Trading Platform | Terminal, API & News" },
       {
         property: "og:description",
         content: "Ask the AI, read live charts in the Terminal, follow high-impact News, check scams before you pay and connect the developer API, all in one workspace.",
@@ -149,7 +149,7 @@ export const Route = createFileRoute("/")({
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web",
           description:
-            "AI trading platform with a live Terminal, News, Scam Protection and a developer API.",
+            "AI trading platform with a live Terminal, News and a developer API.",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
         }),
       },

@@ -22,7 +22,6 @@ export const sendWelcomeSystemMail = createServerFn({ method: "POST" })
       `• Open the Terminal for live Gold, Bitcoin and EUR/USD charts`,
       `• Ask anything in Chat with 60+ AI models`,
       `• Free plan: $${FREE_PLAN_CREDIT_USD} API credit every month, 1 API key and ${TERMINAL_DAILY_HOURS.free} hours a day of the Terminal's paid indicators`,
-      `• Check a website, payment or broker for scams at jenvu.com/scam-protection`,
       `• Reply to this message any time — support@jenvu.email is monitored by our team`,
       ``,
       `— The Jenvu Team`,

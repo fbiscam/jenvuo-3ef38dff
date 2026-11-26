@@ -168,7 +168,7 @@ export const template = {
     planName: 'Elite',
     months: 5,
     code: 'JNV-ELITE-5M-7K3Q-X9PD',
-    perks: ['$70 API credit every month', 'News and Scam Protection', '16 hours of Terminal strategies a day', '5 API keys, 40 requests per minute'],
+    perks: ['$70 API credit every month', 'Free News', '16 hours of Terminal strategies a day', '5 API keys, 40 requests per minute'],
     redeemBy: '23 Dec 2026',
     redeemUrl: 'https://dash.jenvu.com/billing',
   },

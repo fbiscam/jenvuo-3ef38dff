@@ -8,10 +8,10 @@ describe("billing plan features", () => {
       expect(planFeatures(p).some((f) => f.includes("JX Bot"))).toBe(false);
     }
   });
-  it("lists Terminal, News/Scam Protection, API credit and keys", () => {
+  it("lists Terminal, News, API credit and keys", () => {
     const f = planFeatures("ultra");
     expect(f).toContain("Terminal paid strategies");
-    expect(f).toContain("News and Scam Protection");
+    expect(f).toContain("News");
     expect(f).toContain("$90 API credit");
     expect(f).toContain("7 API keys");
   });

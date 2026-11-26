@@ -152,7 +152,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "google-adsense-account", content: "ca-pub-9179643691974639" },
       { name: "google-adsense-account", content: "ca-pub-8708842688547386" },
       { name: "google-adsense-account", content: "ca-pub-6031688799547633" },
-      { title: "Jenvu: AI Trading Platform | API, News & Scam Protection" },
+      { title: "Jenvu: AI Trading Platform | Terminal, API & News" },
       {
         name: "description",
         content:
@@ -161,7 +161,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Jenvu AI" },
       { name: "theme-color", content: "#000000" },
       { property: "og:site_name", content: "Jenvu AI" },
-      { property: "og:title", content: "Jenvu: AI Trading Platform | API, News & Scam Protection" },
+      { property: "og:title", content: "Jenvu: AI Trading Platform | Terminal, API & News" },
       {
         property: "og:description",
         content:
@@ -175,7 +175,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/afb81f86-c6e3-4892-b81f-eb551ed99e17/id-preview-cf5425ce--06cd4260-299b-4286-8096-c43f2f596dee.lovable.app-1782731006346.png",
       },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Jenvu: AI Trading Platform | API, News & Scam Protection" },
+      { name: "twitter:title", content: "Jenvu: AI Trading Platform | Terminal, API & News" },
       {
         name: "twitter:description",
         content:

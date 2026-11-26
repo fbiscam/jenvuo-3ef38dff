@@ -4,8 +4,8 @@ export const Route = createFileRoute("/ai-engine")({
   beforeLoad: () => { throw redirect({ to: '/products', statusCode: 301 }); },
   head: () => ({
     meta: [
-      { title: "Jenvu Products — Terminal, News, Scam Protection & API" },
-      { name: "description", content: "Explore Jenvu Terminal, free News Trading, Scam Protection and the developer API in one workspace." },
+      { title: "Jenvu Products — Terminal, News & API" },
+      { name: "description", content: "Explore Jenvu Terminal, free News Trading and the developer API in one workspace." },
       { property: "og:title", content: "Products — Jenvu" },
       { property: "og:description", content: "The Jenvu Terminal, AI engine, analysis engines and API for Gold, BTC/USD and EUR/USD traders." },
       { property: "og:url", content: "https://jenvu.com/products" },

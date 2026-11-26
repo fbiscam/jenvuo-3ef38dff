@@ -52,7 +52,7 @@ export const DOC_GROUPS: DocGroup[] = [
               <li>Enter the 6-digit code we email you.</li>
               <li>You land on API keys: create your first key and start building.</li>
             </ol>
-            <p>Free also includes News and Scam Protection checks.</p>
+            <p>Free also includes News.</p>
           </>
         ),
       },
@@ -278,30 +278,6 @@ export const DOC_GROUPS: DocGroup[] = [
     ],
   },
   {
-    title: "Scam Protection",
-    sections: [
-      {
-        id: "scam-protection",
-        title: "Scam Protection",
-        keywords: "scam fraud check broker website link payment crypto wallet iban signal seller report",
-        body: (
-          <>
-            <p>
-              Scam Protection checks a <strong>website link</strong>, <strong>payment method</strong>, <strong>broker</strong> or{" "}
-              <strong>signal seller</strong> for common warning signs before you send money. It is free on every plan for signed-in accounts.
-            </p>
-            <ul>
-              <li>Open <a href="https://jenvu.com/scam-protection">jenvu.com/scam-protection</a>, pick what you want to check and paste it.</li>
-              <li>You get a risk score, the reasons behind it and the steps to verify before you pay.</li>
-              <li>The page shows a public daily report: page views, checks run and how many were flagged.</li>
-            </ul>
-            <Note>The checker reads what you paste; it never visits links or moves money. Always verify with the regulator before paying.</Note>
-          </>
-        ),
-      },
-    ],
-  },
-  {
     title: "AI and engines",
     sections: [
       {
@@ -359,7 +335,7 @@ export const DOC_GROUPS: DocGroup[] = [
         body: (
           <>
             <ul>
-              <li><strong>Free</strong> — $0 per month, with News and Scam Protection.</li>
+              <li><strong>Free</strong> — $0 per month, with News.</li>
               <li><strong>Pro</strong> — $69 per month.</li>
               <li><strong>Elite</strong> — $139 per month.</li>
               <li><strong>Ultra</strong> — $239 per month.</li>

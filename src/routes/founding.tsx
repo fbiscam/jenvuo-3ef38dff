@@ -129,7 +129,7 @@ function FoundingPage() {
           <div className="rounded-xl bg-gc-surface px-5 py-4">
             <p className="text-[12px] text-gc-ink-muted">What you get</p>
             <p className="mt-1.5 text-[15px] leading-relaxed text-foreground">
-              Approved traders get 1 month of Pro or Elite, with the Terminal, News, Scam Protection and API credit ($40 Pro, $70 Elite).
+              Approved traders get 1 month of Pro or Elite, with the Terminal, News and API credit ($40 Pro, $70 Elite).
             </p>
           </div>
           <div className="rounded-xl bg-gc-surface px-5 py-4">

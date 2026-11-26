@@ -26,9 +26,9 @@ export const Route = createFileRoute('/about')({
   head: () => ({
     meta: [
       { title: 'Why Jenvu — Your AI Trading Workspace' },
-      { name: 'description', content: 'Explore Jenvu: Gold chart analysis, conversational AI, Scam Protection, model APIs and free News Trading in one workspace.' },
+      { name: 'description', content: 'Explore Jenvu: Gold chart analysis, conversational AI, model APIs and free News Trading in one workspace.' },
       { property: 'og:title', content: 'Why Jenvu — Your AI Trading Workspace' },
-      { property: 'og:description', content: 'A chart-first Terminal, conversational AI, Scam Protection and API access. Start Free and choose the plan that fits your desk.' },
+      { property: 'og:description', content: 'A chart-first Terminal, conversational AI and API access. Start Free and choose the plan that fits your desk.' },
       { property: 'og:type', content: 'website' },
       { name: 'twitter:card', content: 'summary_large_image' },
     ],
@@ -39,20 +39,19 @@ export const Route = createFileRoute('/about')({
 
 const products = [
   { title: 'Read Gold with the Terminal', text: 'Structure, liquidity and chart-first ICT/SMC analysis, together in one workspace.', href: 'https://dash.jenvu.com/terminal', link: 'Open the Terminal', icon: CandlestickChart, type: 'terminal' },
-  { title: 'Check before you pay', text: 'Scam Protection checks websites, payment methods, brokers and signal sellers for warning signs.', href: 'https://jenvu.com/scam-protection', link: 'Open Scam Protection', icon: ShieldCheck, type: 'bot' },
   { title: 'Stay ahead with News Trading', text: 'Follow US high-impact releases and explore historical Gold reactions. Free on every plan.', href: 'https://dash.jenvu.com/news', link: 'Explore News Trading', icon: Newspaper, type: 'chat' },
   { title: 'Build on the Jenvu API', text: 'Bring reasoning, coding and conversational models into your own tools and products.', href: 'https://jenvu.com/platform', link: 'Explore the API', icon: Code2, type: 'api' },
 ]
-const workspaceMarks = [['Terminal', TerminalLogo], ['Scam Protection', ShieldMark], ['News Trading', NewsLogo], ['Platform', PlatformLogo]] as const
+const workspaceMarks = [['Terminal', TerminalLogo], ['News Trading', NewsLogo], ['Platform', PlatformLogo]] as const
 const benefits = [
-  { icon: Layers, title: 'One connected workspace', text: 'Terminal, News, API and Scam Protection, with your account and plan in one place with top models you need.' },
+  { icon: Layers, title: 'One connected workspace', text: 'Terminal, News and API, with your account and plan in one place with top models you need.' },
   { icon: ShieldCheck, title: 'Limits you can see', text: 'Clear plan allowances for API keys, daily tokens and Terminal indicator hours with daily limits.' },
   { icon: Users, title: 'A team in your corner', text: 'Account help, product guides and a Founding Program for one time 30 day Pro or Elite plan.' },
   { icon: Newspaper, title: 'News Trading, always free', text: 'Follow the next US high-impact release, with countdowns and beat-or-miss context every plan.' },
 ]
 const faqs = [
-  ['What’s in the workspace?', 'Terminal, News Trading, Scam Protection and Platform share your Jenvu account. Use chart analysis, follow US economic releases, check scams before you pay and build with model APIs without separate product accounts. Each product keeps its own plan allowances.'],
-  ['Can I start on the Free plan?', 'Yes. New accounts start on Free with one API key and free News Trading. Scam Protection is free on every plan. There is no new free trial.'],
+  ['What’s in the workspace?', 'Terminal, News Trading and Platform share your Jenvu account. Use chart analysis, follow US economic releases, build with model APIs without separate product accounts. Each product keeps its own plan allowances.'],
+  ['Can I start on the Free plan?', 'Yes. New accounts start on Free with one API key and free News Trading. There is no new free trial.'],
   ['How many Terminal hours?', `Free includes ${TERMINAL_DAILY_HOURS.free} hours per UTC day, Pro ${TERMINAL_DAILY_HOURS.pro}, Elite ${TERMINAL_DAILY_HOURS.elite}, and Ultra ${TERMINAL_DAILY_HOURS.ultra}. When the allowance runs out, paid indicators lock until the next UTC day. The Terminal remains accessible.`],
   ['How many API keys?', `API keys: Free ${PLAN_API_KEYS.free}, Pro ${PLAN_API_KEYS.pro}, Elite ${PLAN_API_KEYS.elite}, Ultra ${PLAN_API_KEYS.ultra}.`],
   ['How does Founding work?', 'Apply for Pro or Elite. If approved, complete ID verification to start a one-time 30-day plan grant with that plan’s API credit. After the month ends, continue on Free or purchase a plan.'],
@@ -85,7 +84,7 @@ function AboutPage() {
       <section className="why-hero why-wrap">
         <div className="why-hero-copy">
           <h1>Everything you<br />need for your<br />trading workspace</h1>
-          <p className="mb-9 mt-7 max-w-[550px] text-[17px] leading-7 text-gc-ink-muted">Analysis and support across Terminal, News Trading, Scam Protection and the Jenvu API, all in one place with different strategies.</p>
+          <p className="mb-9 mt-7 max-w-[550px] text-[17px] leading-7 text-gc-ink-muted">Analysis and support across Terminal, News Trading and the Jenvu API, all in one place with different strategies.</p>
           <Actions />
         </div>
         <WhyWorkspaceScene />
