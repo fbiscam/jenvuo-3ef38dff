@@ -138,10 +138,10 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
           { t: "Workflow scripts", d: "Need rapid market signals? Run custom trading scripts directly through our fast API .", l: "Open code studio", to: "/dashboard/code" },
           { t: "Market model intelligence", d: "Choose the optimal intelligence engine for accurate analysis, speed and low latency.", l: "Browse model catalog", to: "/models" },
         ].map((c) => (
-          <div key={c.t} className="console-card flex min-w-0 flex-col p-6">
+          <div key={c.t} className="flex min-h-[200px] min-w-0 flex-col rounded-[8px] border border-border bg-background p-6">
             <p className="text-[16px] font-medium text-foreground">{c.t}</p>
             <p className="mt-2 flex-1 text-[14px] leading-relaxed text-muted-foreground">{c.d}</p>
-            <Link to={c.to} className="mt-5 text-[14px] font-medium text-foreground underline-offset-4 hover:underline">{c.l} ↗</Link>
+            <Link to={c.to} className="mt-5 w-fit text-[14px] font-medium text-foreground underline underline-offset-8">{c.l} ↗</Link>
           </div>
         ))}
       </div>
