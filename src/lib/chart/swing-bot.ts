@@ -1,16 +1,11 @@
-/**
- * JX Bot H1 swing-to-swing rules (mirrors resources/mt5/JXBot H1.mq5).
- * - Swing high at bar j: high[j] is the highest of the SWING_LEFT bars before it and of bar j+1,
- *   and Candle 1 (bar j+1) closes bearish below the swing candle's close. Swing low mirrors it. Known only at Candle 1 close.
- * - Swing high -> SELL at Candle 1 close, SL = swing high wick. Swing low -> BUY, SL = swing low wick.
- * - Exit: SL hit, or the next opposite swing confirms (close at that Candle 1 close). Same-side swings do nothing.
- * - Max 2 open trades, one per symbol, signals that find no free slot are dropped (no queue).
- * - News: no entries from 60 min before to 60 min after a high-impact event; at 60 min before,
- *   winners close and losers close once +BREAKEVEN_PIPS. Same for XAU/EUR on Friday >= 20:00 UTC.
- * - Daily circuit breaker: day loss (closed + floating) <= -4.5% of day start balance closes all, day locked.
- */
+/** Jenvu EA closed-candle rules. Entry evidence is evaluated when available,
+ * never backdated to the pivot or Candle 1. Hourly simulation is not an MT5 backtest. */
+import { computeSmcOverlay, computeLivePivots } from "./smc-overlay";
+import { classifySwingPriceAction } from "./swing-price-action";
+import { classifySwingSweep } from "./swing-sweep";
+import { isHighProbabilityPriceAction, isHighProbabilitySweep } from "./high-probability";
 export const SWING_LEFT = 7; // same left length as the chart labels (FRACTAL_RADIUS)
-export const MAX_OPEN = 2;
+export const MAX_OPEN = Infinity; // one per symbol; no portfolio cap
 export const BREAKER_PCT = 4.5;
 export const BREAKEVEN_PIPS = 2;
 export const NEWS_WINDOW_MIN = 60;
@@ -23,17 +18,45 @@ export type Trade = Signal & { exitAt: number; exitPrice: number; reason: "swing
 
 const HOUR = 3600;
 
-/** Swings confirmed at each Candle 1 close. Uses closed bars only. */
+const candles = (bars: Bar[]) => bars.map(b => ({ t: b.time, o: b.open, h: b.high, l: b.low, c: b.close }));
+
+/** First appearance of each Candle-1 swing, without future candles. Used for exits. */
 export function confirmedSwings(bars: Bar[], symbol: string): Signal[] {
-  const out: Signal[] = [];
-  for (let j = SWING_LEFT; j + 1 < bars.length; j++) {
-    const b = bars[j]!, c1 = bars[j + 1]!;
-    const left = bars.slice(j - SWING_LEFT, j);
-    const at = c1.time + HOUR;
-    if (left.every((x) => x.high < b.high) && c1.high <= b.high && c1.close < b.close && c1.close < c1.open)
-      out.push({ symbol, dir: -1, at, price: c1.close, sl: b.high, swingTime: b.time });
-    if (left.every((x) => x.low > b.low) && c1.low >= b.low && c1.close > b.close && c1.close > c1.open)
-      out.push({ symbol, dir: 1, at, price: c1.close, sl: b.low, swingTime: b.time });
+  const seen = new Set<string>(), out: Signal[] = [];
+  for (let n = SWING_LEFT + 2; n <= bars.length; n++) {
+    const closed = bars.slice(0, n), last = closed.at(-1);
+    if (!last) continue;
+    for (const p of computeLivePivots(candles(closed), null, [])) {
+      const key = `${p.kind}:${p.t}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ symbol, dir: p.kind === "high" ? -1 : 1, at: last.time + HOUR, price: last.close, sl: p.price, swingTime: p.t });
+    }
+  }
+  return out;
+}
+
+export function entryAllowed(priceAction: boolean, sweep: boolean) { return priceAction || sweep; }
+
+/** Same strict gates as drawn Terminal tags. PA needs 3 closed reaction candles;
+ * strong sweep needs its full 5-candle hold. No look-ahead or old-signal queue. */
+export function confirmedEntries(bars: Bar[], symbol: string): Signal[] {
+  const out: Signal[] = [], seen = new Set<string>();
+  for (let n = 10; n <= bars.length; n++) {
+    const closed = bars.slice(Math.max(0, n - 400), n), last = closed.at(-1);
+    if (!last) continue;
+    const cs = candles(closed);
+    const overlay = computeSmcOverlay(closed.map(b => ({ ...b, volume: 0 })), last.close, null, { useVolume: false });
+    for (const p of computeLivePivots(cs, null, [])) {
+      const key = `${p.kind}:${p.t}`;
+      if (seen.has(key)) continue;
+      const i = cs.findIndex(b => b.t === p.t);
+      const pa = classifySwingPriceAction(cs, i, p.kind, overlay.pressure?.[p.t * 1000]);
+      const sw = classifySwingSweep(cs, i, p.kind);
+      if (!entryAllowed(isHighProbabilityPriceAction(pa), isHighProbabilitySweep(sw))) continue;
+      seen.add(key);
+      out.push({ symbol, dir: p.kind === "high" ? -1 : 1, at: last.time + HOUR, price: last.close, sl: p.price, swingTime: p.t });
+    }
   }
   return out;
 }
@@ -58,16 +81,17 @@ export function simulate(data: { spec: SymbolSpec; bars: Bar[] }[], news: number
   const specs = new Map(data.map((d) => [d.spec.symbol, d.spec]));
   const barMap = new Map(data.map((d) => [d.spec.symbol, new Map(d.bars.map((b) => [b.time, b]))]));
   const signals = data.flatMap((d) => confirmedSwings(d.bars, d.spec.symbol));
+  const entries = data.flatMap((d) => confirmedEntries(d.bars, d.spec.symbol));
   const times = [...new Set(data.flatMap((d) => d.bars.map((b) => b.time)))].sort((a, b) => a - b);
   const open: Open[] = [];
   const trades: Trade[] = [];
   const dropped: Signal[] = [];
   let balance = startBalance, day = "", dayStart = balance, dayLocked = false, maxDayDd = 0;
-  const pnlOf = (o: Open, px: number) => (px - o.price) * o.dir * specs.get(o.symbol)!.usdPerUnit;
+  const pnlOf = (o: Open, px: number) => (px - o.price) * o.dir * (specs.get(o.symbol)?.usdPerUnit ?? 0);
   const close = (o: Open, at: number, px: number, reason: Trade["reason"]) => {
     const pnl = pnlOf(o, px);
     balance += pnl;
-    trades.push({ ...o, exitAt: at, exitPrice: px, reason, pips: ((px - o.price) * o.dir) / specs.get(o.symbol)!.pip, pnl });
+    trades.push({ ...o, exitAt: at, exitPrice: px, reason, pips: ((px - o.price) * o.dir) / (specs.get(o.symbol)?.pip ?? 1), pnl });
     open.splice(open.indexOf(o), 1);
   };
   const guardOpen = new Set<Open>(); // waiting for +BREAKEVEN_PIPS
@@ -77,27 +101,27 @@ export function simulate(data: { spec: SymbolSpec; bars: Bar[] }[], news: number
     if (dk !== day) { day = dk; dayStart = balance; dayLocked = false; }
     // 1) intrabar: SL, breakeven guard, floating breaker (worst case of the bar)
     for (const o of [...open]) {
-      const b = barMap.get(o.symbol)!.get(t); if (!b) continue;
-      const spec = specs.get(o.symbol)!;
+      const b = barMap.get(o.symbol)?.get(t); if (!b) continue;
+      const spec = specs.get(o.symbol); if (!spec) continue;
       if (o.dir === 1 ? b.low <= o.sl : b.high >= o.sl) { close(o, end, o.sl, "sl"); guardOpen.delete(o); continue; }
       if (guardOpen.has(o)) {
         const be = o.price + o.dir * BREAKEVEN_PIPS * spec.pip;
         if (o.dir === 1 ? b.high >= be : b.low <= be) { close(o, end, be, isFridayCutoff(t) ? "friday" : "news"); guardOpen.delete(o); }
       }
     }
-    const worst = open.reduce((s, o) => { const b = barMap.get(o.symbol)!.get(t); return b ? s + pnlOf(o, o.dir === 1 ? b.low : b.high) : s; }, 0);
+    const worst = open.reduce((s, o) => { const b = barMap.get(o.symbol)?.get(t); return b ? s + pnlOf(o, o.dir === 1 ? b.low : b.high) : s; }, 0);
     const dayDd = balance + worst - dayStart;
     maxDayDd = Math.min(maxDayDd, dayDd);
     if (!dayLocked && dayDd <= -dayStart * BREAKER_PCT / 100) {
-      for (const o of [...open]) { const b = barMap.get(o.symbol)!.get(t)!; close(o, end, o.dir === 1 ? b.low : b.high, "breaker"); guardOpen.delete(o); }
+      for (const o of [...open]) { const b = barMap.get(o.symbol)?.get(t); if (!b) continue; close(o, end, o.dir === 1 ? b.low : b.high, "breaker"); guardOpen.delete(o); }
       dayLocked = true;
     }
     // 2) at bar close: news / Friday guard on open trades
     for (const o of [...open]) {
-      const spec = specs.get(o.symbol)!;
+      const spec = specs.get(o.symbol); if (!spec) continue;
       const blocked = news.some((n) => end >= n - NEWS_WINDOW_MIN * 60 && end <= n) || (spec.weekendGuard && isFridayCutoff(end));
       if (!blocked) continue;
-      const b = barMap.get(o.symbol)!.get(t); if (!b) continue;
+      const b = barMap.get(o.symbol)?.get(t); if (!b) continue;
       if (pnlOf(o, b.close) > 0) { close(o, end, b.close, isFridayCutoff(end) ? "friday" : "news"); guardOpen.delete(o); }
       else guardOpen.add(o);
     }
@@ -107,18 +131,18 @@ export function simulate(data: { spec: SymbolSpec; bars: Bar[] }[], news: number
       const o = open.find((x) => x.symbol === s.symbol && x.dir !== s.dir);
       if (o) { close(o, end, s.price, "swing"); guardOpen.delete(o); }
     }
-    for (const s of now) {
-      const spec = specs.get(s.symbol)!;
-      const block = dayLocked || inNewsWindow(end, news) || (spec.weekendGuard && isFridayCutoff(end));
+    for (const s of entries.filter(s => s.at === end)) {
+      const spec = specs.get(s.symbol); if (!spec) continue;
+      const block = dayLocked || inNewsWindow(end, news) || (spec.weekendGuard && (isFridayCutoff(end) || isFxWeekend(end)));
       if (block || open.length >= MAX_OPEN || open.some((x) => x.symbol === s.symbol)) { dropped.push(s); continue; }
       if (Math.abs(s.price - s.sl) <= 0) { dropped.push(s); continue; }
       open.push({ ...s, lots: 1 });
     }
   }
   for (const o of [...open]) {
-    const bars = data.find((d) => d.spec.symbol === o.symbol)!.bars; const last = bars.at(-1)!;
+    const bars = data.find((d) => d.spec.symbol === o.symbol)?.bars; const last = bars?.at(-1); if (!last) continue;
     const pnl = pnlOf(o, last.close);
-    trades.push({ ...o, exitAt: last.time + HOUR, exitPrice: last.close, reason: "open", pips: ((last.close - o.price) * o.dir) / specs.get(o.symbol)!.pip, pnl });
+    trades.push({ ...o, exitAt: last.time + HOUR, exitPrice: last.close, reason: "open", pips: ((last.close - o.price) * o.dir) / (specs.get(o.symbol)?.pip ?? 1), pnl });
   }
   return { trades: trades.sort((a, b) => a.at - b.at), dropped, closedBalance: balance, maxDayDrawdown: maxDayDd };
 }
