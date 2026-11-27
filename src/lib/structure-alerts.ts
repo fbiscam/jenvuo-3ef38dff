@@ -4,7 +4,22 @@
  * filter. Pure: the scheduled job feeds closed candles, this decides what fires.
  */
 import { computeSmcOverlay, FRACTAL_RADIUS, FRACTAL_WINDOW } from "@/lib/chart/smc-overlay";
-import { isHighProbabilityPriceAction, isHighProbabilitySweep } from "@/lib/chart/high-probability";
+import { PA_MIN_REVERSAL_SHARE } from "@/lib/chart/high-probability";
+import type { SwingPriceAction } from "@/lib/chart/swing-price-action";
+import type { SwingSweep } from "@/lib/chart/swing-sweep";
+
+/**
+ * Email-speed price action: a reversal pattern printed with clear reversal-side
+ * control and no close back beyond the extreme. Unlike the chart tag it does not
+ * wait for every reaction candle, so the email goes out on the candle that proves it.
+ */
+export function alertPriceActionOk(pa: SwingPriceAction | undefined | null): boolean {
+  return !!pa && pa.reacted && pa.pattern !== "indecision" && pa.pattern !== "pending" && pa.control !== "balanced" && (pa.reversalShare ?? 0) >= PA_MIN_REVERSAL_SHARE && (pa.held === true || pa.pattern === "pin");
+}
+/** Email-speed sweep: liquidity taken, closed back inside and a displacement close (confirmed or late), not failed. */
+export function alertSweepOk(sw: SwingSweep | undefined | null): boolean {
+  return !!sw && (sw.status === "confirmed" || sw.status === "late");
+}
 import type { OhlcvBar } from "@/lib/chart/indicators";
 
 export const ALERT_ASSETS = ["XAUUSD", "EURUSD", "BTCUSD"] as const;
@@ -25,6 +40,8 @@ export type StructureAlert = {
   confirmedTime: number;
   priceAction: string | null;
   sweep: string | null;
+  /** Previous same-side swing the label is measured against (HH/LH vs previous high, HL/LL vs previous low). */
+  prevPrice: number | null;
 };
 
 export function detectStructureAlerts(asset: string, timeframe: string, closed: OhlcvBar[]): StructureAlert[] {
@@ -37,8 +54,8 @@ export function detectStructureAlerts(asset: string, timeframe: string, closed: 
     if (p.confirmedIndex < fractal.length - FRESH_CONFIRM_BARS) continue;
     const pa = smc.priceAction?.[p.t];
     const sw = smc.swingSweeps?.[p.t];
-    const paOk = isHighProbabilityPriceAction(pa);
-    const swOk = isHighProbabilitySweep(sw);
+    const paOk = alertPriceActionOk(pa);
+    const swOk = alertSweepOk(sw);
     if (!paOk && !swOk) continue;
     const conf = fractal[Math.min(p.confirmedIndex, fractal.length - 1)]!;
     pushAlert(p.kind, p.label, p.price, p.t, conf.time * 1000, pa, sw, paOk, swOk);
@@ -51,8 +68,8 @@ export function detectStructureAlerts(asset: string, timeframe: string, closed: 
     if (out.some((a) => a.swingTime === p.t && a.kind === p.kind)) continue;
     const pa = smc.priceAction?.[p.t];
     const sw = smc.swingSweeps?.[p.t];
-    const paOk = isHighProbabilityPriceAction(pa);
-    const swOk = isHighProbabilitySweep(sw);
+    const paOk = alertPriceActionOk(pa);
+    const swOk = alertSweepOk(sw);
     if (!paOk && !swOk) continue;
     const idx = fractal.findIndex((b) => b.time * 1000 === p.t);
     const conf = fractal[Math.min(idx + 1, fractal.length - 1)]!;
@@ -60,14 +77,24 @@ export function detectStructureAlerts(asset: string, timeframe: string, closed: 
   }
   return out;
 
+  function prevOf(kind: "high" | "low", t: number): number | null {
+    const prev = smc.pivots.filter((q) => q.kind === kind && q.t < t).pop();
+    return prev ? prev.price : null;
+  }
+  function labelFor(kind: "high" | "low", price: number, t: number, fallback: string): string {
+    const prev = prevOf(kind, t);
+    if (prev == null) return fallback;
+    return kind === "high" ? (price > prev ? "HH" : "LH") : (price < prev ? "LL" : "HL");
+  }
   function pushAlert(kind: "high" | "low", label: string, price: number, t: number, confirmedTime: number, pa: NonNullable<typeof smc.priceAction>[number] | undefined, sw: NonNullable<typeof smc.swingSweeps>[number] | undefined, paOk: boolean, swOk: boolean) {
     out.push({
       key: `${asset}:${timeframe}:${kind}:${t}`,
       asset,
       timeframe,
-      label,
+      label: labelFor(kind, price, t, label),
       kind,
       price,
+      prevPrice: prevOf(kind, t),
       swingTime: t,
       confirmedTime,
       priceAction: paOk && pa ? `${pa.text}${pa.reversalShare != null ? ` (${pa.control} ${Math.round(pa.reversalShare)}%)` : ""}` : null,
