@@ -6,36 +6,38 @@ import { Check } from "lucide-react";
  * out in colored code on a pure white canvas while the build steps tick off.
  * Illustration of the bot's published rules only — not the full source.
  */
-const CODE = `// Jenvu EA — H1 swing-to-swing (EURUSD, XAUUSD, BTCUSD)
+const CODE = `// JX Bot — EUR/USD M15 swing EA
 #property strict
-input string MyIP = "";           // your registered IP
+input double LotPer1000 = 0.02;   // lot per $1,000
+input bool   UseStopLoss = true;  // stop loss on every trade
 
 void OnTick()
 {
-   if(!NewClosedCandle(PERIOD_H1)) return;
-   Swing s = FreshSwing(_Symbol, PERIOD_H1);   // HH/HL/LH/LL
+   if(!NewClosedCandle(PERIOD_M15)) return;
+   Swing s = ReadSwing(_Symbol, PERIOD_M15);
 
-   if(!(s.Sweep || s.PriceAction) || HasOpenTrade()) return;
-   if(s.IsLow)  OpenTrade(ORDER_TYPE_BUY,  s.WickLow);
-   if(s.IsHigh) OpenTrade(ORDER_TYPE_SELL, s.WickHigh);
+   if(s.HigherHigh && s.HigherLow && !HasOpenTrade())
+      OpenTrade(ORDER_TYPE_BUY, s.Low);
+   else if(s.LowerHigh && s.LowerLow && !HasOpenTrade())
+      OpenTrade(ORDER_TYPE_SELL, s.High);
 }
 
-void OpenTrade(int type, double wick)
+void OpenTrade(int type, double swing)
 {
-   double lot = FixedLot(_Symbol);   // 0.35 / 0.02 / 0.05
-   double sl  = wick;                // stop at the swing wick
-   Trade.PositionOpen(_Symbol, type, lot, Price(), sl, 0);
-   // exit: next opposite confirmed swing
+   double lot = LotPer1000 * AccountBalance() / 1000.0;
+   double sl  = StopFrom(swing);   // never without SL
+   double tp  = TakeProfitFrom(sl);
+   Trade.PositionOpen(_Symbol, type, lot, Ask(), sl, tp);
 }`;
 
 const LINES = CODE.split("\n");
 
 const STEPS = [
-  { at: 4, label: "IP license check" },
-  { at: 9, label: "Read closed H1 candles" },
-  { at: 14, label: "Fresh swing + Sweep or Price Action" },
-  { at: 21, label: "Stop at wick, exit at next swing" },
-  { at: LINES.length, label: "Compile Jenvu EA.ex5" },
+  { at: 4, label: "Risk settings" },
+  { at: 9, label: "Read closed M15 candles" },
+  { at: 14, label: "Swing rules: HH/HL buy, LH/LL sell" },
+  { at: 21, label: "Stop loss + take profit on every order" },
+  { at: LINES.length, label: "Compile JXBot.ex5" },
 ];
 
 const KEYWORDS = /^(input|double|int|bool|void|if|else|return|true|false)\b/;
@@ -44,7 +46,7 @@ const RULES: [RegExp, string][] = [
   [/^#\w+/, "jxc-macro"],
   [/^"(?:\\.|[^"\\])*"/, "jxc-string"],
   [KEYWORDS, "jxc-keyword"],
-  [/^\b(PERIOD_H1|ORDER_TYPE_BUY|ORDER_TYPE_SELL|_Symbol)\b/, "jxc-const"],
+  [/^\b(PERIOD_M15|ORDER_TYPE_BUY|ORDER_TYPE_SELL|_Symbol)\b/, "jxc-const"],
   [/^\d+(\.\d+)?/, "jxc-number"],
   [/^[A-Za-z_]\w*(?=\s*\()/, "jxc-func"],
   [/^\b[A-Z]\w*/, "jxc-type"],
@@ -146,7 +148,7 @@ export default function BotCodingPreview() {
           })}
           <div className="mt-auto rounded-xl bg-[#f9fafb] p-3 font-mono text-[11px] leading-relaxed text-[#6b7280]">
             <div>Symbol <span className="text-[#111827]">EURUSD</span></div>
-            <div>Timeframe <span className="text-[#111827]">H1</span></div>
+            <div>Timeframe <span className="text-[#111827]">M15</span></div>
             <div>Lot <span className="text-[#111827]">0.02 / $1,000</span></div>
             <div>Stop loss <span className="text-[#16a34a]">always on</span></div>
           </div>

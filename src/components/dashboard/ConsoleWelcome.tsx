@@ -6,9 +6,6 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCredits } from "@/hooks/useCredits";
 import { highlight } from "@/components/dashboard/CodeHighlight";
 import { PlatformLogo } from "@/components/brand/ProductLogos";
-import { JxFace } from "@/components/jxbot/JxBotFeatures";
-import { useMt5Access } from "@/components/dashboard/Mt5Licenses";
-import { DAILY_DRAWDOWN_PCT, countIpLicenses, dailyTargetLabel, isBotPlan } from "@/lib/mt5-licenses";
 
 const BASE = "https://jenvu.com/api/public/v1";
 
@@ -85,39 +82,6 @@ function QuickstartCard({ hasKeys }: { hasKeys: boolean }) {
   );
 }
 
-/** Overview right card: JX Bot (H1 swing EA) status and quick links. */
-function JxBotCard() {
-  const { access } = useMt5Access();
-  const plan = access && isBotPlan(access.plan) ? access.plan : "free";
-  const used = access ? countIpLicenses(access.licenses) : 0;
-  const planName = plan === "free" ? "Free" : plan[0].toUpperCase() + plan.slice(1);
-  return (
-    <div className="console-card flex min-h-[184px] min-w-0 flex-col p-6">
-      <div className="flex items-center gap-3">
-        <JxFace className="h-9 w-9" />
-        <div>
-          <p className="text-[16px] font-medium text-foreground">JX Bot</p>
-          <p className="text-[13px] text-muted-foreground">H1 swing bot for MT5 · EURUSD, XAUUSD, BTCUSD</p>
-        </div>
-      </div>
-      <div className="mt-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-[40px] font-medium leading-none tracking-tight tabular-nums text-foreground">{access ? dailyTargetLabel(plan) : "—"}</p>
-          <p className="mt-2 text-[13px] text-muted-foreground">{planName} daily target · {DAILY_DRAWDOWN_PCT}% drawdown guard</p>
-        </div>
-        <Link to="/dashboard/jx-bot" className="console-pill console-pill-white">Open JX Bot</Link>
-      </div>
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[14px]">
-        <span className="text-muted-foreground">{access ? `IPs registered: ${used} of ${access.limit}` : "Loading…"}</span>
-        <Link to="/dashboard/bot-usage" className="font-medium text-foreground underline-offset-4 hover:underline">Bot Usage →</Link>
-      </div>
-      <p className="mt-4 border-t border-border pt-4 text-[12px] leading-relaxed text-muted-foreground">
-        Fresh H1 high/low + Sweep or Price Action → entry on Candle 1 close, stop loss at the swing wick, exit at the next opposite swing. Profit is not guaranteed.
-      </p>
-    </div>
-  );
-}
-
 /** xAI console-style dashboard home: welcome line, two start cards, product grid. */
 export default function ConsoleWelcome({ name: profileName, keysCount }: { name?: string; keysCount: number | null }) {
   const { user } = useAuthUser();
@@ -165,7 +129,7 @@ export default function ConsoleWelcome({ name: profileName, keysCount }: { name?
           </div>
         </div>
 
-        <JxBotCard />
+        <QuickstartCard hasKeys={hasKeys} />
       </div>
 
       <div className="mt-12 grid gap-4 md:grid-cols-3">

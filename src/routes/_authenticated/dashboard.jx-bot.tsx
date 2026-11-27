@@ -28,9 +28,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/jx-bot")({
 
 const STEPS: { title: string; text: string; code?: string }[] = [
   { title: "Add your IP", text: "On the PC or RDP that runs MT5, open whatismyip.com, then click Add IP here and enter that IP address.", code: "203.0.113.25" },
-  { title: "Install the bot", text: "In MT5: File → Open Data Folder. Put Jenvu EA.ex5 in MQL5 → Experts and the three Jenvu-EA-*-H1.set files in MQL5 → Presets, then refresh the Navigator.", code: "MQL5/Experts/Jenvu EA.ex5" },
+  { title: "Install the bot", text: "In MT5: File → Open Data Folder. Put JXBot H1.ex5 in MQL5 → Experts and the .set files in MQL5 → Presets, then refresh the Navigator.", code: "MQL5/Experts/JXBot H1.ex5" },
   { title: "Allow the IP check", text: "Tools → Options → Expert Advisors → tick “Allow WebRequest for listed URL” and add this address.", code: "https://jenvu.com" },
-  { title: "Run the bot", text: "Turn on Algo Trading, open XAUUSD, EURUSD, BTCUSD H1, drag Jenvu EA onto each chart separately, load that pair's preset and type the same IP into MyIP. A popup and a green chart label confirm the IP.", code: "License: ACTIVE (IP verified)" },
+  { title: "Run the bot", text: "Turn on Algo Trading, open XAUUSD, EURUSD, BTCUSD H1, drag JXBot H1 onto each chart, load “JXBot H1.set” (load it again after every update) and type the same IP into MyIP.", code: "Jenvu license: VALID" },
 ];
 
 const ERRORS = [
@@ -44,9 +44,10 @@ const ERRORS = [
 const HOW = [
   ["IP check", "On start the bot checks your IP with jenvu.com and trades only while the IP matches and the plan is valid."],
   ["Three pairs, H1", "Runs XAUUSD, EURUSD, BTCUSD H1 charts; one IP works with one MT5 account."],
-  ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, counting open (floating) profit too, then closes its trades; or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
+  ["Daily auto-stop", `Fixed by Jenvu: pauses for the day at ${DAILY_TARGET_PCT.pro}% (Pro), ${DAILY_TARGET_PCT.elite}% (Elite) or ${DAILY_TARGET_PCT.ultra}% (Ultra) of the day's starting balance, or at the ${DAILY_DRAWDOWN_PCT}% daily drawdown guard.`],
   ["News and Friday", "No new trades one hour before and after high-impact news or Friday after 20:00 UTC; winners close first."],
-  ["Entry rules", "Same as the Terminal: a fresh H1 high/low with a Liquidity Sweep or Price Action, entry on Candle 1 close, stop loss at the swing wick, exit at the next opposite swing. One trade per pair, no late entries."],
+  ["Entry checks", "Enters only after Candle 1 confirms a fresh swing; max 2 trades open, one per pair, no late entries."],
+  ["Monthly limit", "Stops at your plan's monthly target until the next period."],
 ];
 
 const fmtDate = (d: string) => new Date(d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });

@@ -12,13 +12,13 @@ import { DAILY_DRAWDOWN_PCT } from "@/lib/mt5-licenses";
 export const Route = createFileRoute("/jx-bot")({
   head: () => ({
     meta: [
-      { title: "JX Bot — Jenvu's H1 swing trading bot for MetaTrader 5" },
+      { title: "JX Bot — Jenvu's EUR/USD trading bot for MetaTrader 5" },
       {
         name: "description",
         content:
           "How JX Bot works: a multi-pair H1 swing bot for MetaTrader 5 with a stop loss on every trade, a news blackout, daily auto-stop and IP licensing.",
       },
-      { property: "og:title", content: "JX Bot — Jenvu's H1 swing trading bot for MetaTrader 5" },
+      { property: "og:title", content: "JX Bot — Jenvu's EUR/USD trading bot for MetaTrader 5" },
       {
         property: "og:description",
         content: "A multi-pair H1 swing bot for MT5: stop loss on every trade, news pause, daily auto-stop and IP licensing.",
@@ -122,8 +122,8 @@ function Banner() {
         <div className="relative z-10 max-w-[460px] p-8 md:p-12">
           <h2 className="text-[28px] font-medium tracking-tight text-foreground md:whitespace-nowrap md:text-[32px]">Trades with rules, not feelings</h2>
           <p className="mt-4 text-[16px] leading-relaxed text-muted-foreground">
-            JX Bot waits for a fresh H1 high or low with a Liquidity Sweep or Price Action, enters on the next closed
-            candle, puts the stop loss at the swing wick and exits at the next opposite swing. One trade per pair.
+            JX Bot buys after a higher high and higher low, sells after a lower high and lower low, and only acts on
+            closed candles. One trade per swing, a stop loss and take profit on every order
           </p>
         </div>
         <div className="pointer-events-none absolute -bottom-4 right-6 hidden md:block">
@@ -155,11 +155,11 @@ function Guides() {
 const FAQS = [
   {
     q: "How is JX Bot different?",
-    a: "It places trades itself inside your MetaTrader 5, using fixed swing rules on closed H1 candles, the same swing, Liquidity Sweep and Price Action checks you see in the Jenvu Terminal, with a stop loss and swing exit on every order.",
+    a: "It places trades itself inside your MetaTrader 5, using fixed swing rules on closed H1 candles, with a stop loss and swing exit on every order.",
   },
   {
     q: "Who can use JX Bot?",
-    a: "JX Bot comes with every paid plan (Pro $69, Elite $139, Ultra $239 a month), with no limit on how many people can join. Free accounts get it too with a $10 daily target and 1 IP. Pro (2%, 1 IP), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
+    a: "JX Bot comes with every paid plan (Pro $69, Elite $139, Ultra $239 a month), with no limit on how many people can join. Free accounts don't include it; Founding members get it during their 30-day Founding month. Pro (2%, 1 IP), Elite (4%, 3 IPs) and Ultra (6%, 4 IPs) stop at a percentage of the day's starting balance. Daily profit targets are maximum safety caps — profit is not guaranteed.",
   },
   {
     q: "How many accounts can I use?",
@@ -187,7 +187,7 @@ const FAQS = [
   },
   {
     q: "Can I backtest it first?",
-    a: "Yes. The bot runs in the MT5 Strategy Tester (no IP check there), so you can test it on past H1 data. Test on a demo account before going live.",
+    a: "Yes. The bot supports the MT5 Strategy Tester, so you can test it on past H1 data before running it live.",
   },
 ];
 
@@ -202,7 +202,7 @@ function Closing() {
   return (
     <section className="overflow-hidden px-5 pt-16 text-center">
       <h2 className="text-[34px] font-medium tracking-tight text-foreground md:text-[40px]">Meet your first Bot</h2>
-      <p className="mt-2 text-[16px] text-foreground/80">An H1 swing bot for Gold, EUR/USD and BTC that follows its rules every candle</p>
+      <p className="mt-2 text-[16px] text-foreground/80">An EUR/USD trading bot that follows its rules every candle</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <GetBot label="Open JX Bot" />
         <Link to="/contact" className={pillGrey}>

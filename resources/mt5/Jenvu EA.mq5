@@ -17,7 +17,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Jenvu"
 #property link      "https://jenvu.com"
-#property version   "5.12"
+#property version   "5.10"
 #property description "JX Bot H1 - swing-to-swing, wick stop loss, one trade per symbol, news/Friday guard, 4.5% daily breaker."
 #include <Trade\Trade.mqh>
 
@@ -40,12 +40,9 @@ bool     g_licensed = false;
 datetime g_lastBar = 0, g_lastNewsLoad = 0, g_lastLicense = 0;
 datetime g_news[];
 bool     g_guard = false;        // waiting for +BreakevenPips on a losing trade
-double   g_targetPct = 0;        // paid plan daily target from validated license
-double   g_targetUsd = 0;        // Free plan fixed daily target
-const double TesterTargetPct = 2.0; // offline tester explicitly models Pro
+double   g_targetPct = 0;        // plan daily target from jenvu.com (0 = none)
 ulong g_pendingClose=0;
 bool g_newsReady=false;
-string g_licenseWhy="";
 
 //--- helpers -------------------------------------------------------
 bool IsBtc()  { return StringFind(_Symbol, "BTC") >= 0; }
@@ -98,8 +95,7 @@ bool MyPosition(ulong &ticket, int &dir, double &openPx, double &profit)
 void CloseAllMine()
   {
    for(int i = PositionsTotal() - 1; i >= 0; i--)
-     { ulong t = PositionGetTicket(i); if(t > 0 && PositionGetInteger(POSITION_MAGIC) == Magic) { trade.SetTypeFillingBySymbol(PositionGetString(POSITION_SYMBOL)); trade.PositionClose(t); } }
-   trade.SetTypeFillingBySymbol(_Symbol);
+     { ulong t = PositionGetTicket(i); if(t > 0 && PositionGetInteger(POSITION_MAGIC) == Magic) trade.PositionClose(t); }
   }
 
 // Pure closed-candle predicates; also compiled by native parity tests.
@@ -225,39 +221,7 @@ double DefaultLots(bool gold, bool btc) { return gold ? 0.02 : btc ? 0.05 : 0.35
 bool NewsBlockedAt(long now, long release) { return now>=release-3600 && now<=release+3600; }
 bool FridayBlocked(int day, int hour, bool btc) { return !btc && ((day==5 && hour>=20) || day==6); }
 bool MustBreak(double start, double equity) { return start>0 && equity-start<=-start*4.5/100; }
-double DailyTargetAmount(double start, double pct, double usd) { return start>0 ? (usd>0 ? usd : start*pct/100.0) : 0; }
-bool MustTakeProfit(double start, double equity, double pct, double usd)
-{
- double target=DailyTargetAmount(start,pct,usd);
- return target>0 && equity-start>=target;
-}
 // END PURE PREDICATES
-
-bool ConfigureDailyTarget(string txt)
-{
- g_targetPct=0; g_targetUsd=0;
- if(StringFind(txt,"\"plan\":\"pro\"")>=0)g_targetPct=2.0;
- else if(StringFind(txt,"\"plan\":\"elite\"")>=0)g_targetPct=4.0;
- else if(StringFind(txt,"\"plan\":\"ultra\"")>=0)g_targetPct=6.0;
- else if(StringFind(txt,"\"plan\":\"free\"")>=0)g_targetUsd=10.0;
- else return false;
- return true;
-}
-
-// Persistent account/day lock is set BEFORE attempting closes. Failed closes
-// retry on every tick across all charts; the target cannot reopen entries.
-bool EnforceDailyLimits(double start, double equity)
-{
- if(DayLocked()) { CloseAllMine(); return true; }
- bool loss=MustBreak(start,equity);
- bool target=MustTakeProfit(start,equity,g_targetPct,g_targetUsd);
- if(!loss && !target)return false;
- GlobalVariableSet(GvLock(),1);
- CloseAllMine();
- Print(loss ? "Jenvu EA: daily circuit breaker reached." : "Jenvu EA: closed + floating daily target reached.");
- return true;
-}
-// END DAILY LIMIT ENFORCEMENT
 
 // Candidate detection uses closed bars only, never the forming bar.
 datetime g_seenHigh=0,g_seenLow=0,g_entryHigh=0,g_entryLow=0;
@@ -315,7 +279,7 @@ bool FridayCut()
 //--- license (server checks the caller IP; info stays hidden) ----------
 bool CheckLicense()
   {
-   if(MQLInfoInteger(MQL_TESTER) || MQLInfoInteger(MQL_OPTIMIZATION)) { g_targetPct=TesterTargetPct; g_targetUsd=0; Print("Jenvu EA: offline Strategy Tester uses Pro 2% daily target; license check skipped."); return true; }
+   if(MQLInfoInteger(MQL_TESTER) || MQLInfoInteger(MQL_OPTIMIZATION)) { Print("JX Bot: Strategy Tester - license check skipped"); return true; }
    if(StringLen(MyIP)<7 || StringFind(MyIP,"\"")>=0 || StringFind(MyIP,"\\")>=0) return false;
    g_lastLicense=TimeCurrent();
    string acc = IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
@@ -324,17 +288,22 @@ bool CheckLicense()
    StringToCharArray(body, post, 0, StringLen(body), CP_UTF8);
    ResetLastError();
    int code = WebRequest("POST", LicenseUrl, "Content-Type: application/json\r\n", 8000, post, res, hdr);
-   if(code == -1) { g_licenseWhy="WebRequest blocked: add https://jenvu.com in Tools > Options > Expert Advisors."; Print("JX Bot: license server not reachable. Add https://jenvu.com in Tools > Options > Expert Advisors > Allow WebRequest."); return false; }
+   if(code == -1) { Print("JX Bot: license server not reachable. Add https://jenvu.com in Tools > Options > Expert Advisors > Allow WebRequest."); return false; }
    string txt = CharArrayToString(res, 0, WHOLE_ARRAY, CP_UTF8);
-   g_licenseWhy="IP not registered on jenvu.com or plan inactive.";
    bool ok = code==200 && StringFind(txt, "\"valid\":true") >= 0;
-   if(ok)ok=ConfigureDailyTarget(txt);
+   if(ok)
+     {
+      if(StringFind(txt, "\"plan\":\"pro\"") >= 0) g_targetPct = 2.0;
+      else if(StringFind(txt, "\"plan\":\"elite\"") >= 0) g_targetPct = 4.0;
+      else if(StringFind(txt, "\"plan\":\"ultra\"") >= 0) g_targetPct = 6.0;
+      else g_targetPct = 0;
+     }
    Print("JX Bot license: ", ok ? "VALID" : "INVALID", " (MT5 account ", acc, ")");
    if(!ok)
      {
-      if(StringFind(txt, "account_mismatch") >= 0) { g_licenseWhy="IP already used by another MT5 account."; Print("JX Bot: this IP is already used by another MT5 account. One IP = one account."); }
-      else if(StringFind(txt, "ip_mismatch") >= 0) { g_licenseWhy="MyIP does not match this PC/VPS real IP."; Print("JX Bot: MyIP does not match this PC/RDP real IP. Update it on jenvu.com."); }
-      else if(StringFind(txt, "expired") >= 0) { g_licenseWhy="plan expired."; Print("JX Bot: your license has expired. Renew it at jenvu.com."); }
+      if(StringFind(txt, "account_mismatch") >= 0) Print("JX Bot: this IP is already used by another MT5 account. One IP = one account.");
+      else if(StringFind(txt, "ip_mismatch") >= 0) Print("JX Bot: MyIP does not match this PC/RDP real IP. Update it on jenvu.com.");
+      else if(StringFind(txt, "expired") >= 0) Print("JX Bot: your license has expired. Renew it at jenvu.com.");
       else if(StringFind(txt, "not_found") >= 0 || StringFind(txt, "malformed") >= 0) Print("JX Bot: IP not registered. Add this IP on jenvu.com > JX Bot and type it in MyIP.");
       else Print("JX Bot: license check failed (HTTP ", code, ").");
      }
@@ -354,20 +323,8 @@ void ReportStatus(string event = "", string reason = "")
    StringToCharArray(body, post, 0, StringLen(body), CP_UTF8);
    if(WebRequest("POST", ReportUrl, "Content-Type: application/json\r\n", 8000, post, res, hdr) == -1) return;
    string txt = CharArrayToString(res, 0, WHOLE_ARRAY, CP_UTF8);
-   if(StringFind(txt, "\"valid\":false") >= 0) { g_licensed = false; ShowLicense(false); }
+   if(StringFind(txt, "\"valid\":false") >= 0) g_licensed = false;
    if(StringFind(txt, "\"stop\":true") >= 0 && !DayLocked()) { GlobalVariableSet(GvLock(), 1); CloseAllMine(); }
-  }
-
-void ShowLicense(bool ok)
-  {
-   string n="JXH1_LIC";
-   if(ObjectFind(0,n)<0) ObjectCreate(0,n,OBJ_LABEL,0,0,0);
-   ObjectSetInteger(0,n,OBJPROP_CORNER,CORNER_LEFT_UPPER);
-   ObjectSetInteger(0,n,OBJPROP_XDISTANCE,12); ObjectSetInteger(0,n,OBJPROP_YDISTANCE,24);
-   ObjectSetInteger(0,n,OBJPROP_FONTSIZE,10);
-   ObjectSetInteger(0,n,OBJPROP_COLOR,ok?clrLime:clrRed);
-   ObjectSetString(0,n,OBJPROP_TEXT,"JENVU EA | "+_Symbol+" | License: "+(ok?"ACTIVE (IP verified)":"INVALID - trading off"));
-   ChartRedraw();
   }
 
 //--- events ----------------------------------------------------------
@@ -377,12 +334,8 @@ int OnInit()
    if(!IsGold() && !IsBtc() && StringFind(_Symbol,"EURUSD")<0) return INIT_PARAMETERS_INCORRECT;
    trade.SetExpertMagicNumber(Magic);
    trade.SetTypeFillingBySymbol(_Symbol);
-   bool tester=(bool)MQLInfoInteger(MQL_TESTER);
-   if(!tester && StringLen(MyIP)<7) { Alert("JX Bot: enter your registered PC/VPS IP in MyIP (jenvu.com > JX Bot)."); ShowLicense(false); return INIT_PARAMETERS_INCORRECT; }
    g_licensed = CheckLicense();
-   ShowLicense(g_licensed);
-   if(!CanEnter(tester,g_licensed,StringLen(MyIP)>=7)) { Alert("JX Bot: IP NOT VERIFIED - "+g_licenseWhy+" Bot removed."); return INIT_FAILED; }
-   if(!tester) Alert("JX Bot: IP VERIFIED ("+MyIP+") - license ACTIVE on "+_Symbol+" H1.");
+   if(!CanEnter((bool)MQLInfoInteger(MQL_TESTER),g_licensed,StringLen(MyIP)>=7)) return INIT_FAILED;
    LoadNews();
    double dummy=0;int ex=0;ReadSignals(dummy,ex); // consume pre-attach signals
    g_entryHigh=g_seenHigh;g_entryLow=g_seenLow; // also discard pre-attach unsettled swings
@@ -392,7 +345,7 @@ int OnInit()
    ReportStatus("start");
    return INIT_SUCCEEDED;
   }
-void OnDeinit(const int reason) { EventKillTimer(); ObjectDelete(0,"JXH1_LIC"); ReportStatus("stop", IntegerToString(reason)); }
+void OnDeinit(const int reason) { EventKillTimer(); ReportStatus("stop", IntegerToString(reason)); }
 void OnTimer()
   {
    ReportStatus();
@@ -408,12 +361,18 @@ void OnTick()
    bool freshBar=bar!=g_lastBar;
    double sl=0;int exitDir=0,sig=0;
    if(freshBar) {g_lastBar=bar;sig=ReadSignals(sl,exitDir);}
-   // Account equity includes closed + floating P/L. Check on EVERY tick,
-   // before any per-position close retry or hourly-entry early return.
-   double start = DayStart();
-   if(EnforceDailyLimits(start,AccountInfoDouble(ACCOUNT_EQUITY)))return;
    if(g_pendingClose>0) { if(!PositionSelectByTicket(g_pendingClose))g_pendingClose=0;else {trade.PositionClose(g_pendingClose);return;} }
+   if(DayLocked()) {CloseAllMine();return;}
    if(MQLInfoInteger(MQL_TESTER) && TimeCurrent() - g_lastNewsLoad > 3600) g_lastNewsLoad = TimeCurrent();
+   double start = DayStart();
+
+   // 1) daily circuit breaker (closed + floating, all JX Bot trades)
+   double dayPnl = AccountInfoDouble(ACCOUNT_EQUITY) - start;
+   if(!DayLocked() && MustBreak(start,AccountInfoDouble(ACCOUNT_EQUITY)))
+     { GlobalVariableSet(GvLock(), 1); CloseAllMine(); Print("JX Bot: daily circuit breaker hit, trading stopped for today."); return; }
+   // plan daily target (set by jenvu.com)
+   if(!DayLocked() && g_targetPct > 0 && AccountInfoDouble(ACCOUNT_BALANCE) - start >= start * g_targetPct / 100.0)
+     { GlobalVariableSet(GvLock(), 1); CloseAllMine(); Print("JX Bot: plan daily target reached."); return; }
 
    // 2) news / Friday guard on this symbol's open trade
    ulong tk = 0; int dir = 0; double px = 0, profit = 0;
@@ -450,6 +409,6 @@ void OnTick()
 double OnTester()
 {
  double count=TesterStatistics(STAT_TRADES),profit=TesterStatistics(STAT_PROFIT),dd=TesterStatistics(STAT_EQUITY_DD);
- PrintFormat("Jenvu EA TEST: trades %.0f | wins %.1f%% | net %.2f | equity drawdown %.2f | Pro 2%% equity daily target | historical news NOT replayed",count,count>0?100*TesterStatistics(STAT_PROFIT_TRADES)/count:0,profit,dd);
+ PrintFormat("Jenvu EA TEST: trades %.0f | wins %.1f%% | net %.2f | equity drawdown %.2f | historical news NOT replayed",count,count>0?100*TesterStatistics(STAT_PROFIT_TRADES)/count:0,profit,dd);
  return dd>0?profit/dd:profit;
 }
