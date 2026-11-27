@@ -4,3 +4,4 @@
 - Execute native tests against the actual MQL predicates and pivot lookup; these checks do not substitute for MetaEditor compilation or MT5 backtests.
 - Trap Shield and local invalidation only filter entries / add an earlier closed-candle exit; they never create entries or change signal, lot, session or drawdown logic. The separately approved basket TP and FVG-only profit guard may change exits, not signals.
 - Persist the FVG profit guard per account/symbol/magic/position identifier and retry triggered closes; a restart or failed close must not discard an armed exit.
+- `JXBot H1.mq5` is the current bot; its rules mirror `src/lib/chart/swing-bot.ts` (tested), so the website 7-day test and the EA trade the same way. Change both together.
