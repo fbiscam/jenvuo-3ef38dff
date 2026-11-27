@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import { getUsageStats } from "@/lib/usage.functions";
 import { Button } from "@/components/ui/button";
+import { UsageTabs } from "@/components/dashboard/UsageTabs";
 import chatGptLogoAsset from "@/assets/chatgpt-logo.png.asset.json";
 import solLogoAsset from "@/assets/sol-logo.png.asset.json";
 
@@ -483,6 +484,7 @@ function UsagePage() {
     <div className="mx-auto min-w-0 w-full max-w-[1100px] pb-10 text-foreground">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-[30px] font-normal tracking-tight text-foreground sm:text-[34px]">Usage</h1>
+        <UsageTabs active="usage" />
       </div>
 
       {/* Filter bar */}

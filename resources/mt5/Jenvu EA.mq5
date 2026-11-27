@@ -17,7 +17,7 @@
 //+------------------------------------------------------------------+
 #property copyright "Jenvu"
 #property link      "https://jenvu.com"
-#property version   "5.11"
+#property version   "5.12"
 #property description "JX Bot H1 - swing-to-swing, wick stop loss, one trade per symbol, news/Friday guard, 4.5% daily breaker."
 #include <Trade\Trade.mqh>
 
@@ -45,6 +45,7 @@ double   g_targetUsd = 0;        // Free plan fixed daily target
 const double TesterTargetPct = 2.0; // offline tester explicitly models Pro
 ulong g_pendingClose=0;
 bool g_newsReady=false;
+string g_licenseWhy="";
 
 //--- helpers -------------------------------------------------------
 bool IsBtc()  { return StringFind(_Symbol, "BTC") >= 0; }
@@ -323,16 +324,17 @@ bool CheckLicense()
    StringToCharArray(body, post, 0, StringLen(body), CP_UTF8);
    ResetLastError();
    int code = WebRequest("POST", LicenseUrl, "Content-Type: application/json\r\n", 8000, post, res, hdr);
-   if(code == -1) { Print("JX Bot: license server not reachable. Add https://jenvu.com in Tools > Options > Expert Advisors > Allow WebRequest."); return false; }
+   if(code == -1) { g_licenseWhy="WebRequest blocked: add https://jenvu.com in Tools > Options > Expert Advisors."; Print("JX Bot: license server not reachable. Add https://jenvu.com in Tools > Options > Expert Advisors > Allow WebRequest."); return false; }
    string txt = CharArrayToString(res, 0, WHOLE_ARRAY, CP_UTF8);
+   g_licenseWhy="IP not registered on jenvu.com or plan inactive.";
    bool ok = code==200 && StringFind(txt, "\"valid\":true") >= 0;
    if(ok)ok=ConfigureDailyTarget(txt);
    Print("JX Bot license: ", ok ? "VALID" : "INVALID", " (MT5 account ", acc, ")");
    if(!ok)
      {
-      if(StringFind(txt, "account_mismatch") >= 0) Print("JX Bot: this IP is already used by another MT5 account. One IP = one account.");
-      else if(StringFind(txt, "ip_mismatch") >= 0) Print("JX Bot: MyIP does not match this PC/RDP real IP. Update it on jenvu.com.");
-      else if(StringFind(txt, "expired") >= 0) Print("JX Bot: your license has expired. Renew it at jenvu.com.");
+      if(StringFind(txt, "account_mismatch") >= 0) { g_licenseWhy="IP already used by another MT5 account."; Print("JX Bot: this IP is already used by another MT5 account. One IP = one account."); }
+      else if(StringFind(txt, "ip_mismatch") >= 0) { g_licenseWhy="MyIP does not match this PC/VPS real IP."; Print("JX Bot: MyIP does not match this PC/RDP real IP. Update it on jenvu.com."); }
+      else if(StringFind(txt, "expired") >= 0) { g_licenseWhy="plan expired."; Print("JX Bot: your license has expired. Renew it at jenvu.com."); }
       else if(StringFind(txt, "not_found") >= 0 || StringFind(txt, "malformed") >= 0) Print("JX Bot: IP not registered. Add this IP on jenvu.com > JX Bot and type it in MyIP.");
       else Print("JX Bot: license check failed (HTTP ", code, ").");
      }
@@ -352,8 +354,20 @@ void ReportStatus(string event = "", string reason = "")
    StringToCharArray(body, post, 0, StringLen(body), CP_UTF8);
    if(WebRequest("POST", ReportUrl, "Content-Type: application/json\r\n", 8000, post, res, hdr) == -1) return;
    string txt = CharArrayToString(res, 0, WHOLE_ARRAY, CP_UTF8);
-   if(StringFind(txt, "\"valid\":false") >= 0) g_licensed = false;
+   if(StringFind(txt, "\"valid\":false") >= 0) { g_licensed = false; ShowLicense(false); }
    if(StringFind(txt, "\"stop\":true") >= 0 && !DayLocked()) { GlobalVariableSet(GvLock(), 1); CloseAllMine(); }
+  }
+
+void ShowLicense(bool ok)
+  {
+   string n="JXH1_LIC";
+   if(ObjectFind(0,n)<0) ObjectCreate(0,n,OBJ_LABEL,0,0,0);
+   ObjectSetInteger(0,n,OBJPROP_CORNER,CORNER_LEFT_UPPER);
+   ObjectSetInteger(0,n,OBJPROP_XDISTANCE,12); ObjectSetInteger(0,n,OBJPROP_YDISTANCE,24);
+   ObjectSetInteger(0,n,OBJPROP_FONTSIZE,10);
+   ObjectSetInteger(0,n,OBJPROP_COLOR,ok?clrLime:clrRed);
+   ObjectSetString(0,n,OBJPROP_TEXT,"JENVU EA | "+_Symbol+" | License: "+(ok?"ACTIVE (IP verified)":"INVALID - trading off"));
+   ChartRedraw();
   }
 
 //--- events ----------------------------------------------------------
@@ -363,8 +377,12 @@ int OnInit()
    if(!IsGold() && !IsBtc() && StringFind(_Symbol,"EURUSD")<0) return INIT_PARAMETERS_INCORRECT;
    trade.SetExpertMagicNumber(Magic);
    trade.SetTypeFillingBySymbol(_Symbol);
+   bool tester=(bool)MQLInfoInteger(MQL_TESTER);
+   if(!tester && StringLen(MyIP)<7) { Alert("JX Bot: enter your registered PC/VPS IP in MyIP (jenvu.com > JX Bot)."); ShowLicense(false); return INIT_PARAMETERS_INCORRECT; }
    g_licensed = CheckLicense();
-   if(!CanEnter((bool)MQLInfoInteger(MQL_TESTER),g_licensed,StringLen(MyIP)>=7)) return INIT_FAILED;
+   ShowLicense(g_licensed);
+   if(!CanEnter(tester,g_licensed,StringLen(MyIP)>=7)) { Alert("JX Bot: IP NOT VERIFIED - "+g_licenseWhy+" Bot removed."); return INIT_FAILED; }
+   if(!tester) Alert("JX Bot: IP VERIFIED ("+MyIP+") - license ACTIVE on "+_Symbol+" H1.");
    LoadNews();
    double dummy=0;int ex=0;ReadSignals(dummy,ex); // consume pre-attach signals
    g_entryHigh=g_seenHigh;g_entryLow=g_seenLow; // also discard pre-attach unsettled swings
@@ -374,7 +392,7 @@ int OnInit()
    ReportStatus("start");
    return INIT_SUCCEEDED;
   }
-void OnDeinit(const int reason) { EventKillTimer(); ReportStatus("stop", IntegerToString(reason)); }
+void OnDeinit(const int reason) { EventKillTimer(); ObjectDelete(0,"JXH1_LIC"); ReportStatus("stop", IntegerToString(reason)); }
 void OnTimer()
   {
    ReportStatus();
