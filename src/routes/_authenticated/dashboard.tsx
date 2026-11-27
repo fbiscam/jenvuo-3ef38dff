@@ -45,7 +45,6 @@ import { signOutAndRedirect } from "@/lib/cross-domain-session";
 
 import { getUsageStats, type UsageStats } from "@/lib/usage.functions";
 import { listExtensionKeys } from "@/lib/extension-keys.functions";
-import { getJxBotNavAccess } from "@/lib/mt5-licenses.functions";
 import { Button } from "@/components/ui/button";
 import astraGalaxyBanner from "@/assets/astra-galaxy-banner.jpg";
 import grokModelLogo from "@/assets/grok-logo-transparent.png";
@@ -193,7 +192,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
   {
     label: "",
     items: [
-      { to: "/dashboard/jx-bot", label: "JX Bot", icon: Cpu },
       { to: "/dashboard/usage", label: "Usage", icon: ChartNoAxesCombined },
     ],
   },
@@ -753,20 +751,8 @@ function DashboardLayout() {
   const credits = useCredits();
   const { user: authUser, loading: authLoading } = useAuthUser();
   const terminalAccess = useTerminalAccess(authUser?.id);
-  // The JX Bot page opens for every signed-in user; it locks downloads without a paid plan.
-  const jxBotNavFn = useServerFn(getJxBotNavAccess);
-  const [jxBotOpen, setJxBotOpen] = useState<boolean | null>(null);
-  useEffect(() => {
-    if (!authUser?.id) return;
-    let alive = true;
-    jxBotNavFn()
-      .then((r) => alive && setJxBotOpen(!!r.open))
-      .catch(() => alive && setJxBotOpen(false));
-    return () => {
-      alive = false;
-    };
-  }, [authUser?.id, jxBotNavFn]);
-  const jxBotLocked = jxBotOpen === false;
+  // JX Bot is discontinued: no nav lookup needed.
+  const jxBotLocked = false;
   const localHour = useLocalHour();
   const greetingText = pickGreeting(localHour);
   const currentPlan = useCurrentPlan();
@@ -1463,7 +1449,7 @@ function DashboardLayout() {
               ? "h-full min-h-0 w-full flex-1 overflow-hidden bg-background"
               : embedMode
                 ? `dash-page${isSettingsPath(pathname) ? " settings-page" : ""} w-full flex-1 bg-background px-5 pt-7 pb-7 sm:px-8`
-                : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""}${["/dashboard/models", "/dashboard/usage", "/dashboard/api", "/dashboard/code", "/dashboard/bot-usage", "/dashboard/jx-bot"].includes(pathname) ? " page-plus5" : ""} w-full max-w-7xl flex-1 bg-white px-5 ${pathname === "/dashboard/chat" ? "pt-14" : "pt-14 lg:pt-20"} pb-7 sm:px-8 lg:pb-2`
+                : `dash-page${isSettingsPath(pathname) ? " settings-page" : ""}${pathname === "/dashboard/chat" ? " chat-page" : ""}${["/dashboard/models", "/dashboard/usage", "/dashboard/api", "/dashboard/code", ].includes(pathname) ? " page-plus5" : ""} w-full max-w-7xl flex-1 bg-white px-5 ${pathname === "/dashboard/chat" ? "pt-14" : "pt-14 lg:pt-20"} pb-7 sm:px-8 lg:pb-2`
           }
           style={pathname === "/dashboard/terminal" ? undefined : { zoom: 0.9 }}
         >
