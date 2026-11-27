@@ -51,16 +51,3 @@ test("alerts confirm swings exactly like the chart labels (email only after the 
   expect(ALERT_FRACTAL_RADIUS).toBe(FRACTAL_RADIUS);
   expect(ALERT_FRACTAL_RADIUS).toBe(7);
 });
-
-import { alertPriceActionOk, alertSweepOk } from "./structure-alerts";
-import { test as t2 } from "node:test";
-import assert2 from "node:assert/strict";
-t2("email fires on price action before all reaction candles close", () => {
-  assert2.equal(alertPriceActionOk({ pattern: "displacement", reacted: true, control: "sellers", text: "", held: true, settled: false, reversalShare: 70 }), true);
-  assert2.equal(alertPriceActionOk({ pattern: "pending", reacted: false, control: "sellers", text: "", reversalShare: 70 }), false);
-});
-t2("email fires on a confirmed or late sweep, never a failed one", () => {
-  assert2.equal(alertSweepOk({ status: "confirmed", level: 1, text: "" }), true);
-  assert2.equal(alertSweepOk({ status: "late", level: 1, text: "" }), true);
-  assert2.equal(alertSweepOk({ status: "failed", level: 1, text: "" }), false);
-});

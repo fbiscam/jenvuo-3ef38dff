@@ -12,7 +12,6 @@ interface Props {
   confirmedTime?: string
   priceAction?: string | null
   sweep?: string | null
-  prevPrice?: string | null
   chartUrl?: string
 }
 
@@ -28,7 +27,7 @@ const DetailRow = ({ icon, label, value }: { icon: string; label: string; value:
 
 const Email = ({
   pair = 'EUR/USD', timeframe = '1H', label = 'LH', price = '1.09720',
-  swingTime = '', confirmedTime = '', priceAction = null, sweep = null, prevPrice = null,
+  swingTime = '', confirmedTime = '', priceAction = null, sweep = null,
   chartUrl = 'https://dash.jenvu.com/terminal',
 }: Props) => {
   const bull = BULL.has(label)
@@ -59,8 +58,7 @@ const Email = ({
               <tbody>
                 <DetailRow icon="💱" label="Pair" value={pair} />
                 <DetailRow icon="⏱" label="Timeframe" value={timeframe} />
-                <DetailRow icon={bull ? '📈' : '📉'} label="Structure" value={`${label} — ${({ HH: 'Higher High', LH: 'Lower High', HL: 'Higher Low', LL: 'Lower Low' } as Record<string, string>)[label] ?? label}`} />
-                {prevPrice ? <DetailRow icon="↔" label={label.endsWith('H') ? 'Previous high' : 'Previous low'} value={prevPrice} /> : null}
+                <DetailRow icon={bull ? '📈' : '📉'} label="Structure" value={label} />
                 {swingTime ? <DetailRow icon="🕯" label="Swing candle" value={swingTime} /> : null}
                 {confirmedTime ? <DetailRow icon="✅" label="Confirmed" value={confirmedTime} /> : null}
                 <DetailRow icon="⚡" label="Signal" value={signal} />

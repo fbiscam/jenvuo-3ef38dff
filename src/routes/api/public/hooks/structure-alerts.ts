@@ -61,7 +61,6 @@ export const Route = createFileRoute('/api/public/hooks/structure-alerts')({
                         price: fmtPrice(asset, alert.price), swingTime: fmtUtc(alert.swingTime),
                         confirmedTime: fmtUtc(alert.confirmedTime + payload.stepSeconds * 1000),
                         priceAction: alert.priceAction, sweep: alert.sweep,
-                        prevPrice: alert.prevPrice != null ? fmtPrice(asset, alert.prevPrice) : null,
                         chartUrl: 'https://dash.jenvu.com/terminal',
                       },
                     })

@@ -4,3 +4,8 @@
 - Execute native tests against the actual MQL predicates and pivot lookup; these checks do not substitute for MetaEditor compilation or MT5 backtests.
 - Trap Shield and local invalidation only filter entries / add an earlier closed-candle exit; they never create entries or change signal, lot, session or drawdown logic. The separately approved basket TP and FVG-only profit guard may change exits, not signals.
 - Persist the FVG profit guard per account/symbol/magic/position identifier and retry triggered closes; a restart or failed close must not discard an armed exit.
+- `Jenvu EA.mq5` is the single current H1 source; `JXBot H1.mq5` is only a compatibility include. Keep strict Terminal signal gates aligned with `swing-bot.ts` and run native predicate parity tests; no confirmation may be backdated.
+- Expose only MyIP; fixed settings are internal, not secret in source. Distribute compiled EX5 only after owner MT5 verification; live/demo licensing fails closed, offline tester bypass is explicit.
+- Hourly simulations cannot certify tick execution, broker contracts, historical news or drawdown limits; label them as simulations, never verified MT5 results.
+- Evaluate daily profit caps against account equity minus day-start balance on every tick before position-close retries; persist the day lock before closing all EA positions and retry failed closes. Offline tests must name their fixed plan assumption because they cannot fetch live entitlements.
+- EA license state must be visible to the trader: MT5 Alert on attach (verified / reason refused) and an on-chart License label; missing MyIP or failed check refuses to attach. Silent Journal-only logs made users think IP was never checked.

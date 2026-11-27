@@ -29,6 +29,7 @@ import { DevApiSection } from "@/components/home/DevApiSection";
 import { homeArticlesQueryOptions, type HomeArticle } from "@/lib/home-articles";
 import { GetStartedSection } from "@/components/platform/GetStartedSection";
 import { EcosystemGridSection } from "@/components/home/EcosystemGridSection";
+import { BotStatsBar } from "@/components/home/BotStatsBar";
 import { CloudFrontierModels } from "@/components/home/CloudFrontierModels";
 import { HomeStats, HomeReadAskAutomate, HomeTrust, HomeGetStarted } from "@/components/home/HomePlatformSections";
 import { HomeProductCards, HomeExperiences, HomeUseCases } from "@/components/home/HomeShowcaseSections";
@@ -407,6 +408,7 @@ function HomePage() {
           <EntHero />
           <EntShowcase />
           <DevApiSection />
+          <BotStatsBar />
           <EcosystemGridSection />
           <EntLatestNews articles={homeArticles} />
           <GetStartedSection />

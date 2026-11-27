@@ -292,3 +292,8 @@
 - [x] Increase Code page readability and prevent API/Code navigation reloads. All tabs use 15px wrapping code; both directions produce no main-document requests and share the same content scale.
 - [x] Reopen Ask Jenvu to visitors with abuse limits. A signed-out visitor received a real answer; limiter tests pass.
 - [x] Match Terminal drawer sizing to the dashboard menu; verify all changes. Both measured 243px at 1280px; mobile Code has no horizontal overflow, no runtime errors, nine focused tests pass, latest build OK. Not published.
+
+- [x] Approved Jenvu EA source update: Terminal settled sweep OR price-action entry (no backdated Candle-1 fills), no portfolio two-trade cap, fixed internal settings, MyIP-only inputs and fail-closed live validation. 32 focused checks pass, including native MQL predicate/Terminal parity. Single-file v5.10 source delivered; existing compiled customer download unchanged. Native checks are not an MT5 performance backtest.
+- [ ] Compile and real-tick MT5/demo verification of the updated EA — requires MetaEditor/MT5; no verified win rate claimed.
+- [x] Add closed + floating equity plan daily targets, persistent stop and close retries; 19 checks pass on the actual EA code.
+- [ ] Repeat seven-day full-rule performance backtest with the target — blocked by unavailable MT5 real ticks, broker specifications and historical news replay; earlier reported profits are not verified baselines.
