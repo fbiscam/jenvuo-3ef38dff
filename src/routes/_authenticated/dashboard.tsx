@@ -83,7 +83,6 @@ import {
   X,
   Sparkles,
   LayoutGrid,
-  LifeBuoy,
   Settings as SettingsIcon,
   Lightbulb,
   ChevronLeft,
@@ -211,7 +210,6 @@ const NAV_GROUPS: Array<{ label: string; items: TabItem[] }> = [
     items: [
       // Billing, Payments, Documents and profile pages live inside Settings (see SettingsNav).
       { to: "/dashboard/settings", label: "Settings", icon: Settings2 },
-      { to: "/help", label: "Help Centre", icon: LifeBuoy },
     ],
   },
 ];
