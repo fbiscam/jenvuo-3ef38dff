@@ -46,7 +46,7 @@ function WorksCard() {
       <div className="jx-preview-window">
         <WindowBar title="MetaTrader 5" />
         <div className="jx-preview-heading"><span>Account connection</span><span className="jx-status-pill"><ShieldCheck size={12} /> Verified</span></div>
-        <div className="jx-check-list"><CheckRow>Registered IP</CheckRow><CheckRow>MT5 account linked</CheckRow><CheckRow>Plan matched</CheckRow><CheckRow>EUR/USD · M15</CheckRow></div>
+        <div className="jx-check-list"><CheckRow>Registered IP</CheckRow><CheckRow>MT5 account linked</CheckRow><CheckRow>Plan matched</CheckRow><CheckRow>EURUSD · XAUUSD · BTCUSD · H1</CheckRow></div>
       </div>
     </Card>
   );
@@ -54,16 +54,16 @@ function WorksCard() {
 
 function CandlesCard() {
   return (
-    <Card title="Checks every candle" text="It follows the H1 trend and skips wide spreads, weak candles and sudden spikes, so some days have fewer trades.">
+    <Card title="Checks every candle" text="Every closed H1 candle it looks for a fresh high or low with a Liquidity Sweep or Price Action, so some days have no trades.">
       <div className="jx-scanner-stage"><div className="jx-preview-window">
         <WindowBar title="Candle scanner" />
-        <div className="jx-preview-heading"><span>EUR/USD <small>M15</small></span><span className="jx-status-pill"><TrendingUp size={12} /> H1 trend</span></div>
+        <div className="jx-preview-heading"><span>EUR/USD <small>H1</small></span><span className="jx-status-pill"><TrendingUp size={12} /> Fresh swing</span></div>
         <svg className="jx-candle-chart" viewBox="0 0 420 125" role="img" aria-label="Illustrative EUR/USD candle scan">
           {[25,55,85,115].map(y => <path key={y} d={`M0 ${y} H420`} className="jx-chart-grid" />)}
           {[82,94,72,78,55,64,40,49,28,35,18].map((y,i) => <g key={i} className={i % 3 === 1 ? 'jx-candle-down' : 'jx-candle-up'}><path d={`M${20+i*37} ${y-15} v48`} /><rect x={13+i*37} y={y} width="14" height={i%3===1 ? 19 : 25} rx="2" /></g>)}
           <path className="jx-chart-scan" d="M385 0 V125" />
         </svg>
-        <div className="jx-scanner-footer"><span><Check size={13} /> Closed candle</span><span><Check size={13} /> Spread filter</span></div>
+        <div className="jx-scanner-footer"><span><Check size={13} /> Closed candle</span><span><Check size={13} /> Sweep / PA</span></div>
       </div></div>
     </Card>
   );
@@ -71,7 +71,7 @@ function CandlesCard() {
 
 function StopCard() {
   return (
-    <Card title="Stops at your target" text={`Pro stops at ${DAILY_TARGET_PCT.pro}%, Elite at ${DAILY_TARGET_PCT.elite}% and Ultra at ${DAILY_TARGET_PCT.ultra}% of each account's day-start balance. The ${DAILY_DRAWDOWN_PCT}% drawdown protects the profit.`}>
+    <Card title="Stops at your target" text={`Pro stops at ${DAILY_TARGET_PCT.pro}%, Elite at ${DAILY_TARGET_PCT.elite}% and Ultra at ${DAILY_TARGET_PCT.ultra}% of each account's day-start balance, open profit included. The ${DAILY_DRAWDOWN_PCT}% drawdown protects the profit.`}>
       <div className="jx-target-stage">
         <div className="jx-target-bubble">Daily target reached <Check size={14} /></div>
         <div className="jx-guard-caption"><ShieldCheck size={15} /> Your limits stay in control</div>
